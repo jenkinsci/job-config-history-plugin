@@ -2,10 +2,11 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
 import hudson.XmlFile;
-import hudson.model.Item;
+import hudson.model.AbstractProject;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
@@ -16,14 +17,19 @@ import java.util.logging.Logger;
 @Extension
 public final class JobConfigHistorySaveableListener extends SaveableListener {
 
+    private static final Logger LOG = Logger.getLogger(JobConfigHistorySaveableListener.class.getName());
+
     /** {@inheritDoc} */
     @Override
     public void onChange(final Saveable o, final XmlFile file) {
-        try {
-            ConfigHistoryListenerHelper.CHANGED.createNewHistoryEntry((Item) o);
-        } catch (Exception e) {
-            Logger.getLogger("Config History Exception: " + e.getMessage());
+        LOG.finest("In onChange for " + o);
+        if (o instanceof AbstractProject<?, ?>) {
+            try {
+                ConfigHistoryListenerHelper.CHANGED.createNewHistoryEntry((AbstractProject<?, ?>) o);
+            } catch (IOException e) {
+                throw new RuntimeException("Saving " + o + " did not succeed", e);
+            }
         }
-        super.onChange(o, file);
+        LOG.finest("onChange for " + o + " done.");
     }
 }

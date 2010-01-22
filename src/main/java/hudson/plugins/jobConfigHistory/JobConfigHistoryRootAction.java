@@ -1,5 +1,11 @@
 package hudson.plugins.jobConfigHistory;
 
+import hudson.Extension;
+import hudson.XmlFile;
+import hudson.model.Hudson;
+import hudson.model.RootAction;
+import hudson.util.RunList;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,13 +13,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
-
-import hudson.Extension;
-import hudson.XmlFile;
-
-import hudson.model.Hudson;
-import hudson.model.RootAction;
-import hudson.util.RunList;
 
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;

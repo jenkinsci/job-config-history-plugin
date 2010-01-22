@@ -1,9 +1,11 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
+import hudson.model.AbstractProject;
 import hudson.model.Item;
 import hudson.model.listeners.ItemListener;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
@@ -14,27 +16,34 @@ import java.util.logging.Logger;
 @Extension
 public final class JobConfigHistoryJobListener extends ItemListener {
 
-    public JobConfigHistoryJobListener() {
-        super();
-    }
+    private static final Logger LOG = Logger.getLogger(JobConfigHistoryJobListener.class.getName());
 
+    /** {@inheritDoc} */
     @Override
     public void onCreated(Item item) {
-        try {
-            ConfigHistoryListenerHelper.CREATED.createNewHistoryEntry(item);
-        } catch (Exception e) {
-            Logger.getLogger("Config History Exception: " + e.getMessage());
+        LOG.finest("In onCreated for " + item);
+        if (item instanceof AbstractProject<?, ?>) {
+            try {
+                ConfigHistoryListenerHelper.CREATED.createNewHistoryEntry((AbstractProject<?, ?>) item);
+            } catch (IOException e) {
+                throw new RuntimeException("Saving creation of " + item + " did not succeed", e);
+            }
         }
-
+        LOG.finest("onCreated for " + item + " done.");
     }
 
     /** {@inheritDoc} */
     @Override
     public void onRenamed(Item item, String oldName, String newName) {
-        try {
-            ConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry(item);
-        } catch (Exception e) {
-            Logger.getLogger("Config History Exception: " + e.getMessage());
+        LOG.finest("In onRenamed for " + item + " oldName=" + oldName + ", newName=" + newName);
+        if (item instanceof AbstractProject<?, ?>) {
+            try {
+                ConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry((AbstractProject<?, ?>) item);
+            } catch (IOException e) {
+                throw new RuntimeException("Rrenaming of " + item + " from " + oldName + " to " + newName
+                        + " did not succeed", e);
+            }
         }
+        LOG.finest("onRename for " + item + " done.");
     }
 }
