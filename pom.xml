@@ -73,7 +73,7 @@
                 <configuration>
                     <instrumentation>
                         <excludes>
-                            <exclude>hudson/plugins/jswidgets/JsConsts.class</exclude>
+                            <exclude>hudson/plugins/jobConfigHistory/JobConfigHistoryConsts.class</exclude>
                         </excludes>
                     </instrumentation>
                 </configuration>
