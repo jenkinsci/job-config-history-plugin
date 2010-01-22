@@ -1,0 +1,51 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+ <l:layout title="Job Configuration History">
+
+    <st:include it="${it.project}" page="sidepanel.jelly" />
+    <l:main-panel>
+        <h1>Job Configuration History</h1>
+        <div>
+        <j:choose>
+            <j:when test="${it.configs.size() == 0}">
+                No job configuration history available
+            </j:when>
+
+        </j:choose>
+        </div>
+        <br/>
+
+         <f:form method="post" action="diffFiles" enctype="multipart/form-data">
+         <div>
+            <table class="pane sortable" style="width:100%">
+                <tr><td class="pane-header" initialSortDir="down" align="left">Date</td><td class="pane-header" align="left">Operation</td><td class="pane-header" align="left">User</td><td class="pane-header" align="left">Show File</td><td class="pane-header" align="left">Diff</td></tr>
+                <j:forEach var="config" items="${it.configs}">
+                    <tr>
+                        <td>${config.date}</td>
+                        <td>${config.operation}</td>
+                        <td><a href="${rootURL}/user/${config.userId}">${config.userId}</a></td>
+                        <td><a href="configOutput?type=xml&amp;file=${config.file}">
+                                <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
+                            </a>
+                            <st:nbsp />
+                            <a href="configOutput?type=raw&amp;file=${config.file}">
+                                (${%RAW})
+                            </a>
+                        </td>
+                        <td>
+                        <f:radio name="DiffFile1" value="${config.file}" />
+                        <f:radio name="DiffFile2" value="${config.file}" /> </td>
+                    </tr>
+                </j:forEach>
+            </table>
+        </div>
+
+        <div align="right">
+
+
+              <f:submit value="Show Diffs" />
+                </div>
+          </f:form>
+
+    </l:main-panel>
+    </l:layout>
+</j:jelly>

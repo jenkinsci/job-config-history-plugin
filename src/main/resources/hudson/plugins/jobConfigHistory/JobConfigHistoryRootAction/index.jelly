@@ -1,0 +1,38 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+ <l:layout title="Job Configuration History">
+    <st:include page="sidepanel.jelly"/>
+    <l:main-panel>
+        <h1>All Jobs Configuration History</h1>
+        <div>
+        <j:choose>
+            <j:when test="${it.configs.size() == 0}">
+                No job configuration history available
+            </j:when>
+
+        </j:choose>
+        </div>
+        <br/>
+        <div>
+            <table class="pane sortable" style="width:100%">
+                <tr><td class="pane-header" initialSortDir="down" align="left">Date</td><td class="pane-header" align="left">Job</td><td class="pane-header" align="left">Operation</td><td class="pane-header" align="left">User</td><td class="pane-header" align="left">File(raw)</td></tr>
+                <j:forEach var="config" items="${it.configs}">
+                    <tr>
+                        <td>${config.date}</td>
+                        <td><a href="${rootURL}/job/${config.job}">${config.job}</a></td>
+                        <td>${config.operation}</td>
+                        <td><a href="${rootURL}/user/${config.userId}">${config.userId}</a></td>
+                        <td><a href="configOutput?type=xml&amp;file=${config.file}">
+                                <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
+                            </a>
+                            <st:nbsp />
+                            <a href="configOutput?type=raw&amp;file=${config.file}">
+                                (${%RAW})
+                            </a>
+                        </td>
+                    </tr>
+                </j:forEach>
+            </table>
+        </div>
+    </l:main-panel>
+    </l:layout>
+</j:jelly>
