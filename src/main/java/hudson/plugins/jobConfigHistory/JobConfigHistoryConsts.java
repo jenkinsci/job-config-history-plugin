@@ -7,20 +7,20 @@ package hudson.plugins.jobConfigHistory;
  */
 public final class JobConfigHistoryConsts {
 
-	/**
-	 * Holder for constants.
-	 */
-	private JobConfigHistoryConsts() {
-		// Holder for constants
-	}
+    /**
+     * Holder for constants.
+     */
+    private JobConfigHistoryConsts() {
+        // Holder for constants
+    }
 
-	/** Display name. */
-	public static final String DISPLAYNAME = "Job Config History";
+    /** Display name. */
+    public static final String DISPLAYNAME = "Job Config History";
 
-	/** Path to the jobConfigHistory base. */
-	public static final String URLNAME = "jobConfigHistory";
+    /** Path to the jobConfigHistory base. */
+    public static final String URLNAME = "jobConfigHistory";
 
-	/** Path to the icon. */
-	public static final String ICONFILENAME = "/plugin/jobConfigHistory/img/confighistory.png";
+    /** Path to the icon. */
+    public static final String ICONFILENAME = "/plugin/jobConfigHistory/img/confighistory.png";
 
 }

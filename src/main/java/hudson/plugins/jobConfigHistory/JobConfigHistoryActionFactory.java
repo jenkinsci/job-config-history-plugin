@@ -16,28 +16,28 @@ import java.util.logging.Logger;
  */
 @Extension
 public class JobConfigHistoryActionFactory extends
-		TransientProjectActionFactory {
+        TransientProjectActionFactory {
 
-	/** Our logger. */
-	private static final Logger LOG = Logger
-			.getLogger(JobConfigHistoryActionFactory.class.getName());
+    /** Our logger. */
+    private static final Logger LOG = Logger
+            .getLogger(JobConfigHistoryActionFactory.class.getName());
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Collection<? extends Action> createFor(
-			@SuppressWarnings("unchecked") AbstractProject target) {
-		LOG.fine(this + " adds JsJobAction for " + target);
-		final ArrayList<Action> actions = new ArrayList<Action>();
-		final JobConfigHistoryProjectAction historyJobAction = target
-				.getAction(JobConfigHistoryProjectAction.class);
-		if (historyJobAction == null) {
-			actions.add(new JobConfigHistoryProjectAction(target));
-		} else {
-			LOG.fine(target + " already has " + historyJobAction);
-		}
-		return actions;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<? extends Action> createFor(
+            @SuppressWarnings("unchecked") AbstractProject target) {
+        LOG.fine(this + " adds JsJobAction for " + target);
+        final ArrayList<Action> actions = new ArrayList<Action>();
+        final JobConfigHistoryProjectAction historyJobAction = target
+                .getAction(JobConfigHistoryProjectAction.class);
+        if (historyJobAction == null) {
+            actions.add(new JobConfigHistoryProjectAction(target));
+        } else {
+            LOG.fine(target + " already has " + historyJobAction);
+        }
+        return actions;
+    }
 
 }

@@ -6,7 +6,7 @@ import org.kohsuke.stapler.export.ExportedBean;
 /**
  * @author Stefan Brausch
  */
- 
+
 @ExportedBean(defaultVisibility=999)
 public class ConfigInfo {
 
