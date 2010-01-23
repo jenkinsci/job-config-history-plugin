@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -36,28 +35,23 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     @Exported
     public List<ConfigInfo> getConfigs() {
 
-        ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        if (!configs.isEmpty()) {
-            configs.clear();
-        }
-        File dirList = new File(project.getRootDir(), "config-history");
-        File[] configDirs = dirList.listFiles();
-        for (int i = 0; i < configDirs.length; i++) {
-            File configDir = configDirs[i];
-
-            XmlFile myConfig = new XmlFile(new File(configDir, "history.xml"));
-            HistoryDescr histDescr = null;
+        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+        final File dirList = new File(project.getRootDir(), "config-history");
+        final File[] configDirs = dirList.listFiles();
+        for (final File configDir : configDirs) {
+            final XmlFile myConfig = new XmlFile(new File(configDir, "history.xml"));
+            final HistoryDescr histDescr;
             try {
                 histDescr = (HistoryDescr) myConfig.read();
-                ConfigInfo config = new ConfigInfo();
-                config.setDate(histDescr.getTimestamp());
-                config.setUser(histDescr.getUser());
-                config.setOperation(histDescr.getOperation());
-                config.setFile(configDir.getAbsolutePath());
-                configs.add(config);
             } catch (IOException e) {
-                Logger.getLogger("Exception: " + e.getMessage());
+                throw new RuntimeException("Error reading " + myConfig, e);
             }
+            ConfigInfo config = new ConfigInfo();
+            config.setDate(histDescr.getTimestamp());
+            config.setUser(histDescr.getUser());
+            config.setOperation(histDescr.getOperation());
+            config.setFile(configDir.getAbsolutePath());
+            configs.add(config);
 
         }
         Collections.sort(configs, new Comparator<ConfigInfo>() {
@@ -105,71 +99,73 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     @Exported
     public String getDiffFile() {
 
-        String diffFile1 = Stapler.getCurrentRequest()
+        final String diffFile1 = Stapler.getCurrentRequest()
                 .getParameter("diffFile1");
-        String diffFile2 = Stapler.getCurrentRequest()
+        final String diffFile2 = Stapler.getCurrentRequest()
                 .getParameter("diffFile2");
-        String diff = "\nDiffs:\n\n";
-        XmlFile myConfig1 = new XmlFile(new File(diffFile1, "config.xml"));
-        XmlFile myConfig2 = new XmlFile(new File(diffFile2, "config.xml"));
+        final StringBuilder diff = new StringBuilder("\nDiffs:\n\n");
+        final XmlFile myConfig1 = new XmlFile(new File(diffFile1, "config.xml"));
+        final XmlFile myConfig2 = new XmlFile(new File(diffFile2, "config.xml"));
+        assert myConfig1.exists();
+        assert myConfig2.exists();
 
+        // http://www.cs.princeton.edu/introcs/96optimization/Diff.java.html
+
+        final String[] x;
+        final String[] y;
         try {
-            // http://www.cs.princeton.edu/introcs/96optimization/Diff.java.html
-
-            String[] x;
             x = myConfig1.asString().split("\\n");
-
-            String[] y;
-
             y = myConfig2.asString().split("\\n");
-
-            if (x != null && y != null) {
-                // number of lines of each file
-                int M = x.length;
-                int N = y.length;
-
-                // opt[i][j] = length of LCS of x[i..M] and y[j..N]
-                int[][] opt = new int[M + 1][N + 1];
-
-                // compute length of LCS and all subproblems via dynamic
-                // programming
-                for (int i = M - 1; i >= 0; i--) {
-                    for (int j = N - 1; j >= 0; j--) {
-                        if (x[i].equals(y[j]))
-                            opt[i][j] = opt[i + 1][j + 1] + 1;
-                        else
-                            opt[i][j] = Math.max(opt[i + 1][j], opt[i][j + 1]);
-                    }
-                }
-
-                // recover LCS itself and print out non-matching lines to
-                // standard
-                // output
-                int i = 0, j = 0;
-                while (i < M && j < N) {
-                    if (x[i].equals(y[j])) {
-                        i++;
-                        j++;
-                    } else if (opt[i + 1][j] >= opt[i][j + 1])
-                        diff += ("< " + x[i++]) + "\n";
-                    else
-                        diff += ("> " + y[j++]) + "\n";
-                }
-
-                // dump out one remainder of one string if the other is
-                // exhausted
-                while (i < M || j < N) {
-                    if (i == M)
-                        diff += ("> " + y[j++]) + "\n";
-                    else if (j == N)
-                        diff += ("< " + x[i++]) + "\n";
-                }
-
-            }
         } catch (IOException e) {
-            Logger.getLogger("Exception: " + e.getMessage());
+            throw new RuntimeException("Error reading " + diffFile1 + " or " + diffFile2, e);
         }
-        return diff;
+
+        if (x != null && y != null) {
+            // number of lines of each file
+            final int xLength = x.length;
+            final int yLength = y.length;
+
+            // opt[i][j] = length of LCS of x[i..M] and y[j..N]
+            final int[][] opt = new int[xLength + 1][yLength + 1];
+
+            // compute length of LCS and all subproblems via dynamic
+            // programming
+            for (int i = xLength - 1; i >= 0; i--) {
+                for (int j = yLength - 1; j >= 0; j--) {
+                    if (x[i].equals(y[j]))
+                        opt[i][j] = opt[i + 1][j + 1] + 1;
+                    else
+                        opt[i][j] = Math.max(opt[i + 1][j], opt[i][j + 1]);
+                }
+            }
+
+            // recover LCS itself and print out non-matching lines to
+            // standard
+            // output
+            int i = 0, j = 0;
+            while (i < xLength && j < yLength) {
+                if (x[i].equals(y[j])) {
+                    i++;
+                    j++;
+                } else if (opt[i + 1][j] >= opt[i][j + 1]) {
+                    diff.append("< " + x[i++] + "\n");
+                } else {
+                    diff.append("> " + y[j++] + "\n");
+                }
+            }
+
+            // dump out one remainder of one string if the other is
+            // exhausted
+            while (i < xLength || j < yLength) {
+                if (i == xLength) {
+                    diff.append("> " + y[j++] + "\n");
+                } else if (j == yLength) {
+                    diff.append("< " + x[i++] + "\n");
+                }
+            }
+
+        }
+        return diff.toString();
     }
 
 }
