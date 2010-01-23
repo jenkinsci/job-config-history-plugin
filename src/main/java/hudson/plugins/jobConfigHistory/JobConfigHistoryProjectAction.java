@@ -78,36 +78,19 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         return project;
     }
 
+    /**
+     * See {@link JobConfigHistoryBaseAction#getConfigFileContent()}.
+     *
+     * @return content of the file.
+     */
     @Exported
     public String getFile() {
-
-        String filePath = Stapler.getCurrentRequest().getParameter("file");
-        String rawFile = "not found for: " + filePath;
-        XmlFile myConfig = new XmlFile(new File(filePath, "config.xml"));
-        try {
-            rawFile = myConfig.asString();
-        } catch (IOException e) {
-            Logger.getLogger("Exception: " + e.getMessage());
-        }
-        return rawFile;
+        return getConfigFileContent();
     }
 
     @Exported
     public String getType() {
         return Stapler.getCurrentRequest().getParameter("type");
-
-    }
-
-    public boolean isRawOutput() {
-        return Stapler.getCurrentRequest().getParameter("type")
-                .equalsIgnoreCase("raw");
-
-    }
-
-    public boolean isXmlOutput() {
-        return Stapler.getCurrentRequest().getParameter("type")
-                .equalsIgnoreCase("xml");
-
     }
 
     public void doDiffFiles(StaplerRequest req, StaplerResponse rsp)

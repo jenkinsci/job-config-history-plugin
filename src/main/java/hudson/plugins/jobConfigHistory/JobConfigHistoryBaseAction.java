@@ -1,10 +1,14 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.Functions;
+import hudson.XmlFile;
 import hudson.model.Action;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -92,5 +96,44 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     // @Override
     public String getUrlName() {
         return JobConfigHistoryConsts.URLNAME;
+    }
+
+    /**
+     * Do we want 'raw' output?
+     * @return true if request parameter type is 'raw'
+     */
+    public boolean wantsRawOutput() {
+        return Stapler.getCurrentRequest().getParameter("type")
+                .equalsIgnoreCase("raw");
+
+    }
+
+    /**
+     * Do we want 'xml' output?
+     * @return true if request parameter type is 'xml'
+     */
+    public boolean wantsXmlOutput() {
+        return Stapler.getCurrentRequest().getParameter("type")
+                .equalsIgnoreCase("xml");
+
+    }
+
+    /**
+     * Gets the content of the file in request parameter 'file'.
+     * The public method getFile in derived classes delegates
+     * to this method as I do not know wether the Exported annotation
+     * is valid for child classes.
+     *
+     * @return content of the file or an error message.
+     */
+    protected String getConfigFileContent() {
+        final String filePath = Stapler.getCurrentRequest().getParameter("file");
+        final XmlFile myConfig = new XmlFile(new File(filePath, "config.xml"));
+        try {
+            return myConfig.asString();
+        } catch (IOException e) {
+            Logger.getLogger("Exception: " + e.getMessage());
+            return "not found for: " + filePath;
+        }
     }
 }
