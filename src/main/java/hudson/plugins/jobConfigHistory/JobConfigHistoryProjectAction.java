@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -23,6 +24,10 @@ import org.kohsuke.stapler.export.Exported;
 
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
+    /** Our logger. */
+    private static final Logger LOG = Logger
+            .getLogger(JobConfigHistoryProjectAction.class.getName());
+
     public JobConfigHistoryProjectAction(AbstractProject<?, ?> project) {
         super();
         this.project = project;
@@ -33,9 +38,12 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
     @Exported
     public List<ConfigInfo> getConfigs() {
-
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File dirList = new File(project.getRootDir(), "config-history");
+        if (!dirList.isDirectory()) {
+            LOG.info(dirList + " is not a directory, assuming that no history exists.");
+            return Collections.emptyList();
+        }
         final File[] configDirs = dirList.listFiles();
         for (final File configDir : configDirs) {
             final XmlFile myConfig = new XmlFile(new File(configDir, "history.xml"));
