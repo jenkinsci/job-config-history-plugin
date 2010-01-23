@@ -1,14 +1,11 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
-import hudson.XmlFile;
 import hudson.model.Hudson;
 import hudson.model.Project;
 import hudson.model.RootAction;
 import hudson.util.RunList;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
