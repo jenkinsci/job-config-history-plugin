@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -54,12 +53,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             configs.add(config);
 
         }
-        Collections.sort(configs, new Comparator<ConfigInfo>() {
-            public int compare(ConfigInfo o1, ConfigInfo o2) {
-                return o2.getDate().compareTo(o1.getDate());
-            }
-        });
-
+        Collections.sort(configs, ConfigInfoComparator.INSTANCE);
         return configs;
     }
 

@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -68,46 +67,32 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
     @Exported
     public List<ConfigInfo> getConfigs() {
-        ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        File jobList = new File(Hudson.getInstance().getRootDir(), "jobs");
-        File[] jobDirs = jobList.listFiles();
-        for (int j = 0; j < jobDirs.length; j++) {
-            try {
-                File dirList = new File(jobDirs[j], "config-history");
-                File[] configDirs = dirList.listFiles();
-                for (int i = 0; i < configDirs.length; i++) {
-                    File configDir = configDirs[i];
-
-                    XmlFile myConfig = new XmlFile(new File(configDir,
-                            "history.xml"));
-                    HistoryDescr histDescr = new HistoryDescr("", "", "", "");
-                    try {
-                        histDescr = (HistoryDescr) myConfig.read();
-                    } catch (IOException e) {
-
-                        Logger.getLogger("IO-Exception: " + e.getMessage());
-                    }
-
-                    ConfigInfo config = new ConfigInfo();
-                    config.setDate(histDescr.getTimestamp());
-                    config.setUser(histDescr.getUser());
-                    config.setUserId(histDescr.getUserID());
-                    config.setOperation(histDescr.getOperation());
-                    config.setJob(jobDirs[j].getName());
-                    config.setFile(configDir.getAbsolutePath());
-                    configs.add(config);
-
+        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+        final File jobList = new File(Hudson.getInstance().getRootDir(), "jobs");
+        final File[] jobDirs = jobList.listFiles();
+        for (final File jobDir : jobDirs) {
+            final File dirList = new File(jobDir, "config-history");
+            final File[] configDirs = dirList.listFiles();
+            for (final File configDir : configDirs) {
+                final XmlFile myConfig = new XmlFile(new File(configDir, "history.xml"));
+                HistoryDescr histDescr = new HistoryDescr("", "", "", "");
+                try {
+                    histDescr = (HistoryDescr) myConfig.read();
+                } catch (IOException e) {
+                    Logger.getLogger("IO-Exception: " + e.getMessage());
                 }
-            } catch (Exception e) {
+                ConfigInfo config = new ConfigInfo();
+                config.setDate(histDescr.getTimestamp());
+                config.setUser(histDescr.getUser());
+                config.setUserId(histDescr.getUserID());
+                config.setOperation(histDescr.getOperation());
+                config.setJob(jobDir.getName());
+                config.setFile(configDir.getAbsolutePath());
+                configs.add(config);
 
-                Logger.getLogger("Exception: " + e.getMessage());
             }
         }
-        Collections.sort(configs, new Comparator<ConfigInfo>() {
-            public int compare(ConfigInfo o1, ConfigInfo o2) {
-                return o2.getDate().compareTo(o1.getDate());
-            }
-        });
+        Collections.sort(configs, ConfigInfoComparator.INSTANCE);
         return configs;
     }
 
