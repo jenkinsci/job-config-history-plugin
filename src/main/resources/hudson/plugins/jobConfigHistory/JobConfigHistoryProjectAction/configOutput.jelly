@@ -3,10 +3,10 @@
 -->
 <st:compress xmlns:j="jelly:core" xmlns:st="jelly:stapler">
 
-<j:if test="${it.isXmlOutput()}">
+<j:if test="${it.wantXmlOutput()}">
    <st:contentType value="text/xml;charset=UTF-8" />${it.file}
 </j:if>
-<j:if test="${it.isRawOutput()}">
+<j:if test="${it.wantRawOutput()}">
    <st:contentType value="text/plain;charset=UTF-8" />${it.file}
 </j:if>
 </st:compress>

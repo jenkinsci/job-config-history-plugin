@@ -102,7 +102,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * Do we want 'raw' output?
      * @return true if request parameter type is 'raw'
      */
-    public boolean wantsRawOutput() {
+    public boolean wantRawOutput() {
         return Stapler.getCurrentRequest().getParameter("type")
                 .equalsIgnoreCase("raw");
 
@@ -112,7 +112,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * Do we want 'xml' output?
      * @return true if request parameter type is 'xml'
      */
-    public boolean wantsXmlOutput() {
+    public boolean wantXmlOutput() {
         return Stapler.getCurrentRequest().getParameter("type")
                 .equalsIgnoreCase("xml");
 
