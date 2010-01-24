@@ -3,7 +3,6 @@ package hudson.plugins.jobConfigHistory;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
-import hudson.model.Project;
 import hudson.model.RootAction;
 import hudson.util.RunList;
 
@@ -94,6 +93,11 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         return getConfigFileContent();
     }
 
+    /**
+     * Returns the type parameter of the current request.
+     *
+     * @return type.
+     */
     @Exported
     public String getType() {
         return Stapler.getCurrentRequest().getParameter("type");

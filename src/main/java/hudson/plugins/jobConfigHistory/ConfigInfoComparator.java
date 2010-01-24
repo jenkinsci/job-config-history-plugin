@@ -1,5 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -7,12 +8,13 @@ import java.util.Comparator;
  *
  * @author mfriedenhagen
  */
-final class ConfigInfoComparator implements Comparator<ConfigInfo> {
+@SuppressWarnings("serial")
+final class ConfigInfoComparator implements Comparator<ConfigInfo>, Serializable {
 
     /**
      * No need to create more than one instance.
      */
-    public final static ConfigInfoComparator INSTANCE = new ConfigInfoComparator();
+    public static final ConfigInfoComparator INSTANCE = new ConfigInfoComparator();
 
     /** {@inheritDoc} */
     public int compare(final ConfigInfo o1, final ConfigInfo o2) {
