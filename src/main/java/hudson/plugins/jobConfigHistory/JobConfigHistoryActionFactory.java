@@ -28,7 +28,7 @@ public class JobConfigHistoryActionFactory extends
     @Override
     public Collection<? extends Action> createFor(
             @SuppressWarnings("unchecked") AbstractProject target) {
-        LOG.fine(this + " adds JsJobAction for " + target);
+        LOG.fine(this + " adds JobConfigHistoryProjectAction for " + target);
         final ArrayList<Action> actions = new ArrayList<Action>();
         final JobConfigHistoryProjectAction historyJobAction = target
                 .getAction(JobConfigHistoryProjectAction.class);

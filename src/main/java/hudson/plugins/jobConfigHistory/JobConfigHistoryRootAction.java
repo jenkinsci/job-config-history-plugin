@@ -63,6 +63,11 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         }
     }
 
+    /**
+     * Returns the configuration history entries for all {@link AbstractProject}s.
+     *
+     * @return list for all {@link AbstractProject}s.
+     */
     @Exported
     public List<ConfigInfo> getConfigs() {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();

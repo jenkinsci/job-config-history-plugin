@@ -25,9 +25,12 @@ import org.kohsuke.stapler.export.Exported;
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
     /** Our logger. */
-    private static final Logger LOG = Logger
-            .getLogger(JobConfigHistoryProjectAction.class.getName());
+    private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
 
+    /**
+     * @param project
+     *            for which configurations should be returned.
+     */
     public JobConfigHistoryProjectAction(AbstractProject<?, ?> project) {
         super();
         this.project = project;
@@ -36,6 +39,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     /** The project. */
     private final transient AbstractProject<?, ?> project;
 
+    /**
+     * Returns the configuration history entries for one {@link AbstractProject}.
+     *
+     * @return list for one {@link AbstractProject}.
+     */
     @Exported
     public List<ConfigInfo> getConfigs() {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
@@ -90,22 +98,20 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         return Stapler.getCurrentRequest().getParameter("type");
     }
 
-    public void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
-            throws ServletException, IOException {
+    public void doDiffFiles(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
 
         MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        rsp.sendRedirect("showDiffFiles?diffFile1=" + parser.get("DiffFile1")
-                + "&diffFile2=" + parser.get("DiffFile2"));
+        rsp
+                .sendRedirect("showDiffFiles?diffFile1=" + parser.get("DiffFile1") + "&diffFile2="
+                        + parser.get("DiffFile2"));
 
     }
 
     @Exported
     public String getDiffFile() {
 
-        final String diffFile1 = Stapler.getCurrentRequest()
-                .getParameter("diffFile1");
-        final String diffFile2 = Stapler.getCurrentRequest()
-                .getParameter("diffFile2");
+        final String diffFile1 = Stapler.getCurrentRequest().getParameter("diffFile1");
+        final String diffFile2 = Stapler.getCurrentRequest().getParameter("diffFile2");
         final StringBuilder diff = new StringBuilder("\nDiffs:\n\n");
         final XmlFile myConfig1 = new XmlFile(new File(diffFile1, "config.xml"));
         final XmlFile myConfig2 = new XmlFile(new File(diffFile2, "config.xml"));

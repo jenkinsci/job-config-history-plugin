@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 @Extension
 public final class JobConfigHistoryJobListener extends ItemListener {
 
+    /** Our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistoryJobListener.class.getName());
 
     /** {@inheritDoc} */
