@@ -14,7 +14,7 @@
     <version>1.1-SNAPSHOT</version>
     <name>Hudson Job Configuration History Plugin</name>
     <description>Saves a copy of all job configurations</description>
-    <url>http://wiki.hudson-ci.org/display/HUDSON/JobConfigHistory+plugin</url>
+    <url>http://wiki.hudson-ci.org/display/HUDSON/JobConfigHistory+Plugin</url>
 
     <developers>
         <developer>

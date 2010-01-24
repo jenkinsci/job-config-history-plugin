@@ -54,6 +54,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
                 throw new RuntimeException("Error reading " + myConfig, e);
             }
             ConfigInfo config = new ConfigInfo();
+            config.setJob(project.getName());
             config.setDate(histDescr.getTimestamp());
             config.setUser(histDescr.getUser());
             config.setOperation(histDescr.getOperation());

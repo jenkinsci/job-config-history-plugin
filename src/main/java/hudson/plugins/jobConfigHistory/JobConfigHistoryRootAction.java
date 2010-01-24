@@ -1,6 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
+import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.model.Project;
 import hudson.model.RootAction;
@@ -21,18 +22,15 @@ import org.kohsuke.stapler.export.Exported;
  */
 
 @Extension
-public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
-        implements RootAction {
+public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction implements RootAction {
 
     /** Our logger. */
-    private static final Logger LOG = Logger
-            .getLogger(JobConfigHistoryRootAction.class.getName());
+    private static final Logger LOG = Logger.getLogger(JobConfigHistoryRootAction.class.getName());
 
     /**
      * {@inheritDoc}
      *
-     * This actions always starts from the context directly, so prefix
-     * {@link JsConsts} with a slash.
+     * This actions always starts from the context directly, so prefix {@link JsConsts} with a slash.
      */
     @Override
     public String getUrlName() {
@@ -40,16 +38,14 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     }
 
     /**
-     * Returns some or all known runs of this hudson instance, depending on
-     * parameter count.
+     * Returns some or all known runs of this hudson instance, depending on parameter count.
      *
      * @param request
      *            evalutes parameter <tt>count</tt>
      * @return runlist
      */
     public RunList getRunList(StaplerRequest request) {
-        final RunList allRuns = new RunList(Hudson.getInstance()
-                .getPrimaryView());
+        final RunList allRuns = new RunList(Hudson.getInstance().getPrimaryView());
         final String countParameter = request.getParameter("count");
         if (countParameter == null) {
             return allRuns;
@@ -67,13 +63,12 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         }
     }
 
-
     @Exported
     public List<ConfigInfo> getConfigs() {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         @SuppressWarnings("unchecked")
-        final List<Project> projects = Hudson.getInstance().getProjects();
-        for (@SuppressWarnings("unchecked") final Project project : projects) {
+        final List<AbstractProject> projects = Hudson.getInstance().getItems(AbstractProject.class);
+        for (final AbstractProject<?, ?> project : projects) {
             LOG.finest("getConfigs: Getting configs for " + project.getName());
             final JobConfigHistoryProjectAction action = new JobConfigHistoryProjectAction(project);
             final List<ConfigInfo> jobConfigs = action.getConfigs();
