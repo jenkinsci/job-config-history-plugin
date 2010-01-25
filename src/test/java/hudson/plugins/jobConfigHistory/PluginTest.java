@@ -10,6 +10,8 @@ import org.jvnet.hudson.test.HudsonTestCase;
 import org.jvnet.hudson.test.recipes.LocalData;
 import org.xml.sax.SAXException;
 
+import com.gargoylesoftware.htmlunit.html.HtmlButton;
+import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
@@ -18,6 +20,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 public class PluginTest extends HudsonTestCase {
 
     private WebClient webClient;
+    private static final String JOB_CONFIG_HISTORY_LINK = "/job/bar/jobConfigHistory";
 
     @Override
     protected void setUp() throws Exception {
@@ -34,18 +37,32 @@ public class PluginTest extends HudsonTestCase {
 
     @LocalData
     public void testJobPage() throws IOException, SAXException {
-        final String jobConfigHistoryLink = "/job/bar/jobConfigHistory";
         final HtmlPage jobPage = webClient.goTo("/job/bar/");
-        assertXPath(jobPage, "//a[@href=\"" + jobConfigHistoryLink + "\"]");
-        final HtmlPage jobConfigHistoryPage = (HtmlPage) jobPage.getAnchorByHref(jobConfigHistoryLink).click();
+        assertXPath(jobPage, "//a[@href=\"" + JOB_CONFIG_HISTORY_LINK + "\"]");
+        goToJobConfigurationHistoryPage(jobPage);
+    }
+
+    /**
+     * @param jobPage
+     * @throws IOException
+     */
+    private HtmlPage goToJobConfigurationHistoryPage(final HtmlPage jobPage) throws IOException {
+        final HtmlPage jobConfigHistoryPage = (HtmlPage) jobPage.getAnchorByHref(JOB_CONFIG_HISTORY_LINK).click();
         assertEquals("Job Configuration History [Hudson]", jobConfigHistoryPage.getTitleText());
+        return jobConfigHistoryPage;
     }
 
     @LocalData
     public void testSaveConfiguration() throws IOException, SAXException {
         final HtmlPage configuration = webClient.goTo("/job/bar/configure");
-        final String asXml = configuration.asXml();
-//        assertXPath(configuration, "//a[@href=\"/job/bar/jobConfigHistory\"]");
+        assertXPath(configuration, "//a[@href=\"" + JOB_CONFIG_HISTORY_LINK + "\"]");
+        final HtmlForm configForm = configuration.getFormByName("config");
+//        System.err.println(configForm.asXml());
+        final HtmlButton submitButton = (HtmlButton) configuration.getFirstByXPath("//button[@title=\"Click to submit form.\"]");
+        final HtmlPage jobPage = (HtmlPage) submitButton.click();
+        final HtmlPage jobConfigHistoryPage = goToJobConfigurationHistoryPage(jobPage);
+//        System.err.println(jobConfigHistoryPage.asXml());
+
 //        System.err.println(asXml);
     }
 
