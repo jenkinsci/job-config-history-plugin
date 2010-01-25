@@ -57,6 +57,7 @@ public class PluginTest extends HudsonTestCase {
         final HtmlPage configuration = webClient.goTo("/job/bar/configure");
         assertXPath(configuration, "//a[@href=\"" + JOB_CONFIG_HISTORY_LINK + "\"]");
         final HtmlForm configForm = configuration.getFormByName("config");
+        configForm.getTextAreaByName("description").setText("just a test");
 //        System.err.println(configForm.asXml());
         final HtmlButton submitButton = (HtmlButton) configuration.getFirstByXPath("//button[@title=\"Click to submit form.\"]");
         final HtmlPage jobPage = (HtmlPage) submitButton.click();
