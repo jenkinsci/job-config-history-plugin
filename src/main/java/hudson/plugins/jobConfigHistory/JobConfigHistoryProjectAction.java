@@ -6,6 +6,8 @@ import hudson.util.MultipartFormDataParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -66,7 +68,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             config.setDate(histDescr.getTimestamp());
             config.setUser(histDescr.getUser());
             config.setOperation(histDescr.getOperation());
-            config.setFile(configDir.getAbsolutePath());
+            try {
+                config.setFile(URLEncoder.encode(configDir.getAbsolutePath(), "utf-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
             configs.add(config);
 
         }
