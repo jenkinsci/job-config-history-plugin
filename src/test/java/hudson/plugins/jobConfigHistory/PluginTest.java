@@ -70,8 +70,8 @@ public class PluginTest extends HudsonTestCase {
         final HtmlPage jobPage = submit(configForm1);
         final HtmlPage historyPage = goToJobConfigurationHistoryPage(jobPage);
         System.out.println(historyPage.asXml());
-        final FreeStyleProject project = createFreeStyleProject("foo");
-        final HtmlPage fooPage = webClient.getPage(project);
+//        final FreeStyleProject project = createFreeStyleProject("foo");
+//        final HtmlPage fooPage = webClient.getPage(project);
     }
 
 }
