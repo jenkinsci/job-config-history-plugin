@@ -49,14 +49,13 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     @Exported
     public List<ConfigInfo> getConfigs() {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final File historyDir = new File(project.getRootDir(), "config-history");
-        if (!historyDir.isDirectory()) {
-            LOG.info(historyDir + " is not a directory, assuming that no history exists.");
+        final File historyRootDir = new File(project.getRootDir(), "config-history");
+        if (!historyRootDir.isDirectory()) {
+            LOG.info(historyRootDir + " is not a directory, assuming that no history exists.");
             return Collections.emptyList();
         }
-        final File[] configDirs = historyDir.listFiles();
-        for (final File configDir : configDirs) {
-            final XmlFile myConfig = new XmlFile(new File(configDir, "history.xml"));
+        for (final File historyDir : historyRootDir.listFiles()) {
+            final XmlFile myConfig = new XmlFile(new File(historyDir, "history.xml"));
             final HistoryDescr histDescr;
             try {
                 histDescr = (HistoryDescr) myConfig.read();
@@ -69,9 +68,9 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             config.setUser(histDescr.getUser());
             config.setOperation(histDescr.getOperation());
             try {
-                config.setFile(URLEncoder.encode(configDir.getAbsolutePath(), "utf-8"));
+                config.setFile(URLEncoder.encode(historyDir.getAbsolutePath(), "utf-8"));
             } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Error encoding " + configDir, e);
+                throw new RuntimeException("Error encoding " + historyDir, e);
             }
             configs.add(config);
 
