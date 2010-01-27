@@ -41,14 +41,14 @@ public class PluginTest extends HudsonTestCase {
     }
 
     @LocalData
-    public void itestAllProjectsConfigurationHistoryPage() throws IOException, SAXException {
+    public void testAllProjectsConfigurationHistoryPage() throws IOException, SAXException {
         final HtmlPage allProjectsHistory = webClient.goTo("jobConfigHistory/");
         assertEquals("Job Configuration History [Hudson]", allProjectsHistory.getTitleText());
         assertXPath(allProjectsHistory, "//h1[text()=\"All Jobs Configuration History\"]");
     }
 
     @LocalData
-    public void itestJobPage() throws IOException, SAXException {
+    public void testJobPage() throws IOException, SAXException {
         final HtmlPage jobPage = webClient.goTo("job/bar/");
         assertXPath(jobPage, "//a[@href=\"/" + JOB_CONFIG_HISTORY_LINK + "\"]");
         goToJobConfigurationHistoryPage(jobPage);
