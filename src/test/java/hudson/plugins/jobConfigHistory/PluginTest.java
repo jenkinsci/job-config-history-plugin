@@ -14,10 +14,14 @@ import org.jvnet.hudson.test.HudsonTestCase;
 import org.jvnet.hudson.test.recipes.LocalData;
 import org.xml.sax.SAXException;
 
+import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 import com.gargoylesoftware.htmlunit.xml.XmlPage;
 
@@ -37,14 +41,14 @@ public class PluginTest extends HudsonTestCase {
     }
 
     @LocalData
-    public void testAllProjectsConfigurationHistoryPage() throws IOException, SAXException {
+    public void itestAllProjectsConfigurationHistoryPage() throws IOException, SAXException {
         final HtmlPage allProjectsHistory = webClient.goTo("jobConfigHistory/");
         assertEquals("Job Configuration History [Hudson]", allProjectsHistory.getTitleText());
         assertXPath(allProjectsHistory, "//h1[text()=\"All Jobs Configuration History\"]");
     }
 
     @LocalData
-    public void testJobPage() throws IOException, SAXException {
+    public void itestJobPage() throws IOException, SAXException {
         final HtmlPage jobPage = webClient.goTo("job/bar/");
         assertXPath(jobPage, "//a[@href=\"/" + JOB_CONFIG_HISTORY_LINK + "\"]");
         goToJobConfigurationHistoryPage(jobPage);
@@ -81,7 +85,17 @@ public class PluginTest extends HudsonTestCase {
         assertEquals(2, allXmlHRefs.size());
         final TextPage firstRawOfAll = (TextPage) allXmlHRefs.get(0).click();
         assertThat(firstRawOfAll.getContent(), containsString(secondDescription));
-
+        final HtmlPage jobConfigHistoryPage = webClient.goTo(JOB_CONFIG_HISTORY_LINK);
+        final HtmlForm diffFilesForm = jobConfigHistoryPage.getFormByName("diffFiles");
+        final HtmlRadioButtonInput diffFile1 = (HtmlRadioButtonInput) diffFilesForm.getInputsByName("DiffFile1").get(0);
+        final HtmlRadioButtonInput diffFile2 = (HtmlRadioButtonInput) diffFilesForm.getInputsByName("DiffFile2").get(1);
+        diffFile1.setChecked(true);
+        diffFile2.setChecked(true);
+        final TextPage diffPage = (TextPage) diffFilesForm.submit((HtmlButton)last(diffFilesForm.getHtmlElementsByTagName("button")));
+        final String diffPageContent = diffPage.getContent();
+        assertThat(diffPageContent, containsString("Diffs:"));
+        assertThat(diffPageContent, containsString("<   <description>just a second test</description>"));
+        assertThat(diffPageContent, containsString(">   <description>just a test</description>"));
     }
 
     /**
@@ -111,6 +125,7 @@ public class PluginTest extends HudsonTestCase {
      * @return
      */
     private List<? extends HtmlAnchor> getConfigOutputLinks(final String type, final HtmlPage historyPage) {
+        @SuppressWarnings("unchecked")
         final List<? extends HtmlAnchor> hrefs = (List<? extends HtmlAnchor>) historyPage
                 .getByXPath("//a[contains(@href, \"configOutput?type=" + type + "\")]");
         return hrefs;

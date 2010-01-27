@@ -14,7 +14,7 @@
         </div>
         <br/>
 
-         <f:form method="post" action="diffFiles" enctype="multipart/form-data">
+         <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
          <div>
             <table class="pane sortable" style="width:100%">
                 <tr><td class="pane-header" initialSortDir="down" align="left">Date</td><td class="pane-header" align="left">Operation</td><td class="pane-header" align="left">User</td><td class="pane-header" align="left">Show File</td><td class="pane-header" align="left">Diff</td></tr>
