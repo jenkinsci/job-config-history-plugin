@@ -23,7 +23,6 @@ import org.kohsuke.stapler.export.Exported;
 /**
  * @author Stefan Brausch
  */
-
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
     /** Our logger. */
@@ -62,7 +61,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             } catch (IOException e) {
                 throw new RuntimeException("Error reading " + myConfig, e);
             }
-            ConfigInfo config = new ConfigInfo();
+            final ConfigInfo config = new ConfigInfo();
             config.setJob(project.getName());
             config.setDate(histDescr.getTimestamp());
             config.setUser(histDescr.getUser());
@@ -98,16 +97,31 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         return getConfigFileContent();
     }
 
+    /**
+     * Returns the type parameter of the current request.
+     *
+     * @return type.
+     */
     @Exported
     public String getType() {
         return Stapler.getCurrentRequest().getParameter("type");
     }
 
+    /**
+     * Parses the incoming {@code POST} request and redirects as {@code GET showDiffFiles}.
+     *
+     * @param req
+     *            incoming request
+     * @param rsp
+     *            outgoing response
+     * @throws ServletException
+     *             when parsing the request as {@link MultipartFormDataParser} does not succeed.
+     * @throws IOException
+     *             when the redirection does not succeed.
+     */
     public void doDiffFiles(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
-
         MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        rsp
-                .sendRedirect("showDiffFiles?diffFile1=" + parser.get("DiffFile1") + "&diffFile2="
+        rsp.sendRedirect("showDiffFiles?diffFile1=" + parser.get("DiffFile1") + "&diffFile2="
                         + parser.get("DiffFile2"));
 
     }
@@ -178,10 +192,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             // programming
             for (int i = xLength - 1; i >= 0; i--) {
                 for (int j = yLength - 1; j >= 0; j--) {
-                    if (x[i].equals(y[j]))
+                    if (x[i].equals(y[j])) {
                         opt[i][j] = opt[i + 1][j + 1] + 1;
-                    else
+                    } else {
                         opt[i][j] = Math.max(opt[i + 1][j], opt[i][j + 1]);
+                    }
                 }
             }
 
