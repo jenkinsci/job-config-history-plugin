@@ -25,7 +25,7 @@ import java.util.GregorianCalendar;
 public class ConfigHistoryListenerHelper {
 
     /**
-     *
+     * Format for timestamped dirs.
      */
     private static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
 
