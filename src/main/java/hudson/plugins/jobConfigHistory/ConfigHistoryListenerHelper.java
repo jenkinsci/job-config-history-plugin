@@ -25,6 +25,11 @@ import java.util.GregorianCalendar;
 public class ConfigHistoryListenerHelper {
 
     /**
+     *
+     */
+    private static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
+
+    /**
      * Helper for job creation.
      */
     static final ConfigHistoryListenerHelper CREATED = new ConfigHistoryListenerHelper("Created");
@@ -38,11 +43,6 @@ public class ConfigHistoryListenerHelper {
      * Helper for job change.
      */
     static final ConfigHistoryListenerHelper CHANGED = new ConfigHistoryListenerHelper("Changed");
-
-    /**
-     * Simple formatter used for creating timestamped directories.
-     */
-    private final SimpleDateFormat idFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 
     /**
      * Name of the operation.
@@ -79,7 +79,7 @@ public class ConfigHistoryListenerHelper {
      * @return timestamped directory where to store one history entry.
      */
     private File getRootDir(Item item, Calendar timestamp) {
-        final File f = new File(getConfigsDir(item), idFormatter.format(timestamp.getTime()));
+        final File f = new File(getConfigsDir(item), getIdFormatter().format(timestamp.getTime()));
         // mkdirs sometimes fails although the directory exists afterwards,
         // so check for existence as well and just be happy if it does.
         if (!(f.mkdirs() || f.exists())) {
@@ -121,10 +121,21 @@ public class ConfigHistoryListenerHelper {
             userId = "";
         }
 
-        final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, idFormatter.format(timestamp.getTime()));
+        final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, getIdFormatter().format(
+                timestamp.getTime()));
 
         myDescription.write(myDescr);
 
+    }
+
+    /**
+     * Returns a simple formatter used for creating timestamped directories. We create this every time as
+     * {@link SimpleDateFormat} is <b>not</b> threadsafe.
+     *
+     * @return the idFormatter
+     */
+    SimpleDateFormat getIdFormatter() {
+        return new SimpleDateFormat(ID_FORMATTER);
     }
 
 }
