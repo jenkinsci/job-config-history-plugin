@@ -74,7 +74,10 @@ public class ConfigHistoryListenerHelper {
      */
     private File getRootDir(Item item, Calendar timestamp) {
         final File f = new File(getConfigsDir(item), idFormatter.format(timestamp.getTime()));
-        if (!f.mkdirs()) {
+        if (f.mkdirs() || f.exists()) {
+            // mkdirs sometimes fails although the directory exists afterwards,
+            // so check for existence as well and just be happy if it does.
+        } else {
             throw new RuntimeException("Could not create rootDir " + f);
         }
         return f;
