@@ -120,7 +120,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      *             when the redirection does not succeed.
      */
     public void doDiffFiles(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
-        MultipartFormDataParser parser = new MultipartFormDataParser(req);
+        final MultipartFormDataParser parser = new MultipartFormDataParser(req);
         rsp.sendRedirect("showDiffFiles?diffFile1=" + parser.get("DiffFile1") + "&diffFile2="
                         + parser.get("DiffFile2"));
 
