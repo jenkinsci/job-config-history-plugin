@@ -42,4 +42,10 @@ public class JobConfigHistoryJobListenerTest extends HudsonTestCase {
         final List<File> historyFilesNew = Arrays.asList(new File(jobsDir, "renamedjob/config-history").listFiles());
         assertEquals(historyFilesNew.toString(), 1, historyFilesNew.size());
     }
+
+    public void testNonAbstractProjects() {
+        final JobConfigHistoryJobListener listener = new JobConfigHistoryJobListener();
+        listener.onCreated(null);
+        listener.onRenamed(null, "oldName", "newName");
+    }
 }
