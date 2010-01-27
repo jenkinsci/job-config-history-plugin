@@ -24,21 +24,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             .getLogger(JobConfigHistoryBaseAction.class.getName());
 
     /**
-     * Returns whether we want HTML instead of javascript by checking the
-     * request for {@literal html=true}.
-     *
-     * @param request
-     *            stapler request
-     * @return true if html is true
-     */
-    public boolean wantHtml(final StaplerRequest request) {
-        final boolean wantHtml = Boolean.parseBoolean(request
-                .getParameter("html"));
-        LOG.finest("wantHtml=" + wantHtml);
-        return wantHtml;
-    }
-
-    /**
      * Calculates Hudson's URL including protocol, host and port from the
      * request.
      *

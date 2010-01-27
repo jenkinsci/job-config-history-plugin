@@ -49,12 +49,12 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     @Exported
     public List<ConfigInfo> getConfigs() {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final File dirList = new File(project.getRootDir(), "config-history");
-        if (!dirList.isDirectory()) {
-            LOG.info(dirList + " is not a directory, assuming that no history exists.");
+        final File historyDir = new File(project.getRootDir(), "config-history");
+        if (!historyDir.isDirectory()) {
+            LOG.info(historyDir + " is not a directory, assuming that no history exists.");
             return Collections.emptyList();
         }
-        final File[] configDirs = dirList.listFiles();
+        final File[] configDirs = historyDir.listFiles();
         for (final File configDir : configDirs) {
             final XmlFile myConfig = new XmlFile(new File(configDir, "history.xml"));
             final HistoryDescr histDescr;
@@ -71,7 +71,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             try {
                 config.setFile(URLEncoder.encode(configDir.getAbsolutePath(), "utf-8"));
             } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Error encoding " + configDir, e);
             }
             configs.add(config);
 
@@ -113,14 +113,32 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
     }
 
+    /**
+     * Returns a textual diff between two {@code config.xml} files located in {@code diffFile1} and {@code diffFile2}
+     * directories given as parameters of {@link Stapler#getCurrentRequest()}.
+     *
+     * @return diff
+     */
     @Exported
     public String getDiffFile() {
-
         final String diffFile1 = Stapler.getCurrentRequest().getParameter("diffFile1");
         final String diffFile2 = Stapler.getCurrentRequest().getParameter("diffFile2");
-        final StringBuilder diff = new StringBuilder("\nDiffs:\n\n");
-        final XmlFile myConfig1 = new XmlFile(new File(diffFile1, "config.xml"));
-        final XmlFile myConfig2 = new XmlFile(new File(diffFile2, "config.xml"));
+        return getDiffFile(diffFile1, diffFile2);
+    }
+
+    /**
+     * Returns a textual diff between two {@code config.xml} files located in {@code histDir1} and {@code histDir2}.
+     *
+     * @param histDir1
+     *            first history directory
+     * @param histDir2
+     *            second history directory
+     * @return diff
+     */
+    String getDiffFile(final String histDir1, final String histDir2) {
+
+        final XmlFile myConfig1 = new XmlFile(new File(histDir1, "config.xml"));
+        final XmlFile myConfig2 = new XmlFile(new File(histDir2, "config.xml"));
         assert myConfig1.exists();
         assert myConfig2.exists();
 
@@ -132,9 +150,23 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             x = myConfig1.asString().split("\\n");
             y = myConfig2.asString().split("\\n");
         } catch (IOException e) {
-            throw new RuntimeException("Error reading " + diffFile1 + " or " + diffFile2, e);
+            throw new RuntimeException("Error reading " + histDir1 + " or " + histDir2, e);
         }
 
+        return getDiff(x, y);
+    }
+
+    /**
+     * Returns a textual diff between two string arrays.
+     *
+     * @param x
+     *            first array
+     * @param y
+     *            second array
+     * @return diff
+     */
+    String getDiff(final String[] x, final String[] y) {
+        final StringBuilder diff = new StringBuilder("\nDiffs:\n\n");
         if (x != null && y != null) {
             // number of lines of each file
             final int xLength = x.length;
