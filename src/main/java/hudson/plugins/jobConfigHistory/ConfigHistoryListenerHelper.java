@@ -39,8 +39,14 @@ public class ConfigHistoryListenerHelper {
      */
     static final ConfigHistoryListenerHelper CHANGED = new ConfigHistoryListenerHelper("Changed");
 
+    /**
+     * Simple formatter used for creating timestamped directories.
+     */
     private final SimpleDateFormat idFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 
+    /**
+     * Name of the operation.
+     */
     private final String operation;
 
     /**
@@ -74,10 +80,9 @@ public class ConfigHistoryListenerHelper {
      */
     private File getRootDir(Item item, Calendar timestamp) {
         final File f = new File(getConfigsDir(item), idFormatter.format(timestamp.getTime()));
-        if (f.mkdirs() || f.exists()) {
-            // mkdirs sometimes fails although the directory exists afterwards,
-            // so check for existence as well and just be happy if it does.
-        } else {
+        // mkdirs sometimes fails although the directory exists afterwards,
+        // so check for existence as well and just be happy if it does.
+        if (!(f.mkdirs() || f.exists())) {
             throw new RuntimeException("Could not create rootDir " + f);
         }
         return f;
