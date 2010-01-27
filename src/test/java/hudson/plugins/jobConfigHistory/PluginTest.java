@@ -74,6 +74,14 @@ public class PluginTest extends HudsonTestCase {
         final HtmlAnchor rawAnchor = hrefs2.get(0);
         final TextPage firstRaw = (TextPage) rawAnchor.click();
         assertThat(firstRaw.getContent(), containsString(secondDescription));
+        final HtmlPage allProjectsHistory = webClient.goTo("jobConfigHistory/");
+        assertEquals("Job Configuration History [Hudson]", allProjectsHistory.getTitleText());
+        assertXPath(allProjectsHistory, "//h1[text()=\"All Jobs Configuration History\"]");
+        List<? extends HtmlAnchor> allXmlHRefs = getConfigOutputLinks("raw", allProjectsHistory);
+        assertEquals(2, allXmlHRefs.size());
+        final TextPage firstRawOfAll = (TextPage) allXmlHRefs.get(0).click();
+        assertThat(firstRawOfAll.getContent(), containsString(secondDescription));
+
     }
 
     /**
@@ -93,6 +101,16 @@ public class PluginTest extends HudsonTestCase {
         descriptionTextArea.setText(text);
         final HtmlPage jobPage = submit(configForm);
         final HtmlPage historyPage = goToJobConfigurationHistoryPage(jobPage);
+        final List<? extends HtmlAnchor> hrefs = getConfigOutputLinks(type, historyPage);
+        return hrefs;
+    }
+
+    /**
+     * @param type
+     * @param historyPage
+     * @return
+     */
+    private List<? extends HtmlAnchor> getConfigOutputLinks(final String type, final HtmlPage historyPage) {
         final List<? extends HtmlAnchor> hrefs = (List<? extends HtmlAnchor>) historyPage
                 .getByXPath("//a[contains(@href, \"configOutput?type=" + type + "\")]");
         return hrefs;
