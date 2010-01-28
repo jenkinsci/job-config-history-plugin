@@ -32,8 +32,8 @@
                             </a>
                         </td>
                         <td>
-                        <f:radio name="DiffFile1" value="${config.file}" />
-                        <f:radio name="DiffFile2" value="${config.file}" /> </td>
+                        <f:radio name="histDir1" value="${config.file}" />
+                        <f:radio name="histDir2" value="${config.file}" /> </td>
                     </tr>
                 </j:forEach>
             </table>

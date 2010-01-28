@@ -57,15 +57,13 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         return configs;
     }
 
-    /**
-     * See {@link JobConfigHistoryBaseAction#getConfigFileContent()}.
-     *
-     * @return content of the file.
-     * @throws IOException if the config file could not be read.
+    /** {@inheritDoc}
+     * Delegate to parent as I do not know whether exported is inherited.
      */
     @Exported
+    @Override
     public String getFile() throws IOException {
-        return getConfigFileContent();
+        return super.getFile();
     }
 
     /**
@@ -75,7 +73,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      */
     @Exported
     public String getType() {
-        return Stapler.getCurrentRequest().getParameter("type");
+        return getRequestParameter("type");
     }
 
 }

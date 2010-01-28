@@ -74,16 +74,13 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         return project;
     }
 
-    /**
-     * See {@link JobConfigHistoryBaseAction#getConfigFileContent()}.
-     *
-     * @return content of the file.
-     * @throws IOException
-     *             if the config file could not be read.
+    /** {@inheritDoc}
+     * Delegate to parent as I do not know whether exported is inherited.
      */
     @Exported
+    @Override
     public String getFile() throws IOException {
-        return getConfigFileContent();
+        return super.getFile();
     }
 
     /**
@@ -93,7 +90,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      */
     @Exported
     public String getType() {
-        return Stapler.getCurrentRequest().getParameter("type");
+        return getRequestParameter("type");
     }
 
     /**
@@ -110,14 +107,13 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      */
     public void doDiffFiles(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
         final MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        rsp
-                .sendRedirect("showDiffFiles?diffFile1=" + parser.get("DiffFile1") + "&diffFile2="
-                        + parser.get("DiffFile2"));
+        rsp.sendRedirect("showDiffFiles?histDir1=" + parser.get("histDir1") + "&histDir2="
+                        + parser.get("histDir2"));
 
     }
 
     /**
-     * Returns a textual diff between two {@code config.xml} files located in {@code diffFile1} and {@code diffFile2}
+     * Returns a textual diff between two {@code config.xml} files located in {@code histDir1} and {@code histDir2}
      * directories given as parameters of {@link Stapler#getCurrentRequest()}.
      *
      * @return diff
@@ -126,31 +122,9 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      */
     @Exported
     public String getDiffFile() throws IOException {
-        final String[] x = getConfigXml(getRequestParameter("diffFile1")).asString().split("\\n");
-        final String[] y = getConfigXml(getRequestParameter("diffFile2")).asString().split("\\n");
+        final String[] x = getConfigXml(getRequestParameter("histDir1")).asString().split("\\n");
+        final String[] y = getConfigXml(getRequestParameter("histDir2")).asString().split("\\n");
         return getDiff(x, y);
-    }
-
-    /**
-     * Returns the {@code config.xml} located in {@code diffDir}.
-     *
-     * @param diffDir
-     *            timestamped history directory.
-     * @return xmlfile.
-     */
-    XmlFile getConfigXml(final String diffDir) {
-        return new XmlFile(new File(diffDir, "config.xml"));
-    }
-
-    /**
-     * Returns the parameter named {@code parameterName} from current request.
-     *
-     * @param parameterName
-     *            name of the parameter.
-     * @return value of the request parameter or null if it does not exist.
-     */
-    String getRequestParameter(final String parameterName) {
-        return Stapler.getCurrentRequest().getParameter(parameterName);
     }
 
     /**

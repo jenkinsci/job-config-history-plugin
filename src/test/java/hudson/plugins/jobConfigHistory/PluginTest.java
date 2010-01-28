@@ -111,19 +111,19 @@ public class PluginTest extends HudsonTestCase {
             return (TextPage) diffFilesForm.submit((HtmlButton) last(diffFilesForm.getHtmlElementsByTagName("button")));
         }
 
-        public void setCheckedDiffFile1RadioButton(int index, boolean isChecked) {
-            getDiffFileRadioButton("DiffFile1", index).setChecked(isChecked);
+        public void setCheckedHistDir1RadioButton(int index, boolean isChecked) {
+            getHistDirRadioButton("histDir1", index).setChecked(isChecked);
         }
 
-        public void setCheckedDiffFile2RadioButton(int index, boolean isChecked) {
-            getDiffFileRadioButton("DiffFile2", index).setChecked(isChecked);
+        public void setCheckedHistDir2RadioButton(int index, boolean isChecked) {
+            getHistDirRadioButton("histDir2", index).setChecked(isChecked);
         }
 
         public void assertNoHistoryEntriesAvailable() {
             assertThat(historyPage.asXml(), containsString("No job configuration history available"));
         }
 
-        private HtmlRadioButtonInput getDiffFileRadioButton(final String name, int index) {
+        private HtmlRadioButtonInput getHistDirRadioButton(final String name, int index) {
             final HtmlForm diffFilesForm = historyPage.getFormByName("diffFiles");
             return (HtmlRadioButtonInput) diffFilesForm.getInputsByName(name).get(index);
         }
@@ -182,8 +182,8 @@ public class PluginTest extends HudsonTestCase {
         final TextPage firstRawOfAll = (TextPage) allRawHRefs.get(0).click();
         assertThat(firstRawOfAll.getContent(), containsString(secondDescription));
         final HistoryPage historyPage = new HistoryPage();
-        historyPage.setCheckedDiffFile1RadioButton(0, true);
-        historyPage.setCheckedDiffFile2RadioButton(1, true);
+        historyPage.setCheckedHistDir1RadioButton(0, true);
+        historyPage.setCheckedHistDir2RadioButton(1, true);
         final String diffPageContent = historyPage.getDiffPage().getContent();
         assertThat(diffPageContent, containsString("Diffs:"));
         assertThat(diffPageContent, containsString("<   <description>" + secondDescription + "</description>"));
