@@ -21,7 +21,7 @@ public class ConfigInfo {
     private final String user;
 
     /** The id of the user. */
-    private final String userId;
+    private final String userID;
 
     /** The date of the change. */
     private final String date;
@@ -44,7 +44,7 @@ public class ConfigInfo {
         this.date = histDescr.getTimestamp();
         this.user = histDescr.getUser();
         this.operation = histDescr.getOperation();
-        this.userId = histDescr.getUserID();
+        this.userID = histDescr.getUserID();
     }
 
     /** Returns the display name of the user. */
@@ -55,8 +55,8 @@ public class ConfigInfo {
 
     /** Returns the id of the user. */
     @Exported
-    public String getUserId() {
-        return userId;
+    public String getUserID() {
+        return userID;
     }
 
     /** Returns the date of the change. */
