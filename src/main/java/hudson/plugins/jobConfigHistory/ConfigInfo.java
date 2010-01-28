@@ -1,5 +1,11 @@
 package hudson.plugins.jobConfigHistory;
 
+import hudson.model.AbstractProject;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
@@ -12,27 +18,33 @@ import org.kohsuke.stapler.export.ExportedBean;
 public class ConfigInfo {
 
     /** The display name of the user. */
-    private String user;
+    private final String user;
 
     /** The id of the user. */
-    private String userId;
+    private final String userId;
 
     /** The date of the change. */
-    private String date;
+    private final String date;
 
-    private String file;
+    /** The urlencoded path to the config file of the job. */
+    private final String file;
 
     /** The name of the job. */
-    private String job;
+    private final String job;
 
     /** One of created, changed or renamed. */
-    private String operation;
+    private final String operation;
 
     /**
-     * Empty constructor for the bean.
+     * @throws UnsupportedEncodingException
      */
-    public ConfigInfo() {
-
+    public ConfigInfo(final AbstractProject<?,?> job, final File file, final HistoryDescr histDescr) throws UnsupportedEncodingException {
+        this.job = job.getName();
+        this.file = URLEncoder.encode(file.getAbsolutePath(), "utf-8");
+        this.date = histDescr.getTimestamp();
+        this.user = histDescr.getUser();
+        this.operation = histDescr.getOperation();
+        this.userId = histDescr.getUserID();
     }
 
     /** Returns the display name of the user. */
@@ -41,20 +53,10 @@ public class ConfigInfo {
         return user;
     }
 
-    /** Sets the display name of the user. */
-    public void setUser(String userId) {
-        this.userId = userId;
-    }
-
     /** Returns the id of the user. */
     @Exported
     public String getUserId() {
         return userId;
-    }
-
-    /** Sets the id of the user. */
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     /** Returns the date of the change. */
@@ -63,20 +65,10 @@ public class ConfigInfo {
         return date;
     }
 
-    /** Sets the date of the change. */
-    public void setDate(String date) {
-        this.date = date;
-    }
-
     /** Returns the name of the file. */
     @Exported
     public String getFile() {
         return file;
-    }
-
-    /** Sets the name of the file. */
-    public void setFile(String file) {
-        this.file = file;
     }
 
     /** Returns the name of the job. */
@@ -85,20 +77,9 @@ public class ConfigInfo {
         return job;
     }
 
-    /** Sets the name of the job. */
-    public void setJob(String job) {
-        this.job = job;
-    }
-
     /** Returns the type of the operation. */
     @Exported
     public String getOperation() {
         return operation;
     }
-
-    /** Sets the type of the operation. */
-    public void setOperation(String operation) {
-        this.operation = operation;
-    }
-
 }

@@ -39,9 +39,10 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      * Returns the configuration history entries for all {@link AbstractProject}s.
      *
      * @return list for all {@link AbstractProject}s.
+     * @throws IOException if one of the history entries might not be read.
      */
     @Exported
-    public List<ConfigInfo> getConfigs() {
+    public List<ConfigInfo> getConfigs() throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         @SuppressWarnings("unchecked")
         final List<AbstractProject> projects = Hudson.getInstance().getItems(AbstractProject.class);

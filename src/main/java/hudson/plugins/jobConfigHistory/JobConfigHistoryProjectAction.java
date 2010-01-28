@@ -6,7 +6,6 @@ import hudson.util.MultipartFormDataParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,9 +43,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * Returns the configuration history entries for one {@link AbstractProject}.
      *
      * @return history list for one {@link AbstractProject}.
+     * @throws IOException
+     *             if {@code history.xml} might not be read or the path might not be urlencoded.
      */
     @Exported
-    public List<ConfigInfo> getConfigs() {
+    public List<ConfigInfo> getConfigs() throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = new File(project.getRootDir(), "config-history");
         if (!historyRootDir.isDirectory()) {
@@ -54,25 +55,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             return Collections.emptyList();
         }
         for (final File historyDir : historyRootDir.listFiles()) {
-            final XmlFile myConfig = new XmlFile(new File(historyDir, "history.xml"));
+            final XmlFile historyXml = new XmlFile(new File(historyDir, "history.xml"));
             final HistoryDescr histDescr;
-            try {
-                histDescr = (HistoryDescr) myConfig.read();
-            } catch (IOException e) {
-                throw new RuntimeException("Error reading " + myConfig, e);
-            }
-            final ConfigInfo config = new ConfigInfo();
-            config.setJob(project.getName());
-            config.setDate(histDescr.getTimestamp());
-            config.setUser(histDescr.getUser());
-            config.setOperation(histDescr.getOperation());
-            try {
-                config.setFile(URLEncoder.encode(historyDir.getAbsolutePath(), "utf-8"));
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Error encoding " + historyDir, e);
-            }
+            histDescr = (HistoryDescr) historyXml.read();
+            final ConfigInfo config = new ConfigInfo(project, historyDir, histDescr);
             configs.add(config);
-
         }
         Collections.sort(configs, ConfigInfoComparator.INSTANCE);
         return configs;
@@ -91,7 +78,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * See {@link JobConfigHistoryBaseAction#getConfigFileContent()}.
      *
      * @return content of the file.
-     * @throws IOException if the config file could not be read.
+     * @throws IOException
+     *             if the config file could not be read.
      */
     @Exported
     public String getFile() throws IOException {
@@ -122,7 +110,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      */
     public void doDiffFiles(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
         final MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        rsp.sendRedirect("showDiffFiles?diffFile1=" + parser.get("DiffFile1") + "&diffFile2="
+        rsp
+                .sendRedirect("showDiffFiles?diffFile1=" + parser.get("DiffFile1") + "&diffFile2="
                         + parser.get("DiffFile2"));
 
     }
@@ -132,46 +121,42 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * directories given as parameters of {@link Stapler#getCurrentRequest()}.
      *
      * @return diff
+     * @throws IOException
+     *             if reading one of the config files does not succeed.
      */
     @Exported
-    public String getDiffFile() {
-        final String diffFile1 = Stapler.getCurrentRequest().getParameter("diffFile1");
-        final String diffFile2 = Stapler.getCurrentRequest().getParameter("diffFile2");
-        return getDiffFile(diffFile1, diffFile2);
-    }
-
-    /**
-     * Returns a textual diff between two {@code config.xml} files located in {@code histDir1} and {@code histDir2}.
-     *
-     * @param histDir1
-     *            first history directory
-     * @param histDir2
-     *            second history directory
-     * @return diff
-     */
-    String getDiffFile(final String histDir1, final String histDir2) {
-
-        final XmlFile myConfig1 = new XmlFile(new File(histDir1, "config.xml"));
-        final XmlFile myConfig2 = new XmlFile(new File(histDir2, "config.xml"));
-        assert myConfig1.exists();
-        assert myConfig2.exists();
-
-        // http://www.cs.princeton.edu/introcs/96optimization/Diff.java.html
-
-        final String[] x;
-        final String[] y;
-        try {
-            x = myConfig1.asString().split("\\n");
-            y = myConfig2.asString().split("\\n");
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading " + histDir1 + " or " + histDir2, e);
-        }
-
+    public String getDiffFile() throws IOException {
+        final String[] x = getConfigXml(getRequestParameter("diffFile1")).asString().split("\\n");
+        final String[] y = getConfigXml(getRequestParameter("diffFile2")).asString().split("\\n");
         return getDiff(x, y);
     }
 
     /**
+     * Returns the {@code config.xml} located in {@code diffDir}.
+     *
+     * @param diffDir
+     *            timestamped history directory.
+     * @return xmlfile.
+     */
+    XmlFile getConfigXml(final String diffDir) {
+        return new XmlFile(new File(diffDir, "config.xml"));
+    }
+
+    /**
+     * Returns the parameter named {@code parameterName} from current request.
+     *
+     * @param parameterName
+     *            name of the parameter.
+     * @return value of the request parameter or null if it does not exist.
+     */
+    String getRequestParameter(final String parameterName) {
+        return Stapler.getCurrentRequest().getParameter(parameterName);
+    }
+
+    /**
      * Returns a textual diff between two string arrays.
+     *
+     * @see <a href="http://www.cs.princeton.edu/introcs/96optimization/Diff.java.html">Diff</a>
      *
      * @param x
      *            first array

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * Comparator for {@link ConfigInfo}.
+ * Comparator for {@link ConfigInfo}, sort order depends on {@link ConfigInfo#getDate()}.
  *
  * @author mfriedenhagen
  */
