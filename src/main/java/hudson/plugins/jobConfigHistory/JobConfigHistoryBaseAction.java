@@ -106,19 +106,15 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     /**
      * Gets the content of the file in request parameter 'file'.
      * The public method getFile in derived classes delegates
-     * to this method as I do not know wether the Exported annotation
+     * to this method as I do not know whether the Exported annotation
      * is valid for child classes.
      *
      * @return content of the file or an error message.
+     * @throws IOException if the config file could not be read.
      */
-    protected String getConfigFileContent() {
+    protected String getConfigFileContent() throws IOException {
         final String filePath = Stapler.getCurrentRequest().getParameter("file");
         final XmlFile myConfig = new XmlFile(new File(filePath, "config.xml"));
-        try {
-            return myConfig.asString();
-        } catch (IOException e) {
-            Logger.getLogger("Exception: " + e.getMessage());
-            return "not found for: " + filePath;
-        }
+        return myConfig.asString();
     }
 }

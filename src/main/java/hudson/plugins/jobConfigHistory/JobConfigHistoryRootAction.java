@@ -5,6 +5,7 @@ import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.model.RootAction;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -59,9 +60,10 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      * See {@link JobConfigHistoryBaseAction#getConfigFileContent()}.
      *
      * @return content of the file.
+     * @throws IOException if the config file could not be read.
      */
     @Exported
-    public String getFile() {
+    public String getFile() throws IOException {
         return getConfigFileContent();
     }
 
