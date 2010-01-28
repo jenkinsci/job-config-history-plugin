@@ -43,7 +43,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     /**
      * Returns the configuration history entries for one {@link AbstractProject}.
      *
-     * @return list for one {@link AbstractProject}.
+     * @return history list for one {@link AbstractProject}.
      */
     @Exported
     public List<ConfigInfo> getConfigs() {

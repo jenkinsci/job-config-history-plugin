@@ -40,7 +40,6 @@ public class PluginTest extends HudsonTestCase {
         webClient = createWebClient();
     }
 
-    @LocalData
     public void testAllProjectsConfigurationHistoryPage() throws IOException, SAXException {
         final HtmlPage allProjectsHistory = webClient.goTo("jobConfigHistory/");
         assertEquals("Job Configuration History [Hudson]", allProjectsHistory.getTitleText());
@@ -54,6 +53,12 @@ public class PluginTest extends HudsonTestCase {
         goToJobConfigurationHistoryPage(jobPage);
     }
 
+    @LocalData
+    public void testHistoryPageWithOutEntries() throws IOException, SAXException {
+        final HtmlPage historyPage = webClient.goTo(JOB_CONFIG_HISTORY_LINK);
+        final String html = historyPage.asXml();
+        assertThat(html, containsString("No job configuration history available"));
+    }
     /**
      * @param jobPage
      * @throws IOException
