@@ -93,39 +93,40 @@ public class ConfigHistoryListenerHelper {
      *
      * @param project
      *            for which we want to save the configuration.
-     * @throws IOException
-     *             when reading the old configuration or storing the new configuration does not succeed.
      */
-    public final void createNewHistoryEntry(final AbstractProject<?, ?> project) throws IOException {
-        final Calendar timestamp = new GregorianCalendar();
-        final File timestampedDir = getRootDir(project, timestamp);
-        final TextFile myConfig = new TextFile(new File(timestampedDir, "config.xml"));
+    public final void createNewHistoryEntry(final AbstractProject<?, ?> project) {
+        try {
+            final Calendar timestamp = new GregorianCalendar();
+            final File timestampedDir = getRootDir(project, timestamp);
+            final TextFile myConfig = new TextFile(new File(timestampedDir, "config.xml"));
 
-        final String configContent;
-        if (project.getConfigFile().exists()) {
-            configContent = project.getConfigFile().asString();
-        } else {
-            configContent = "";
+            final String configContent;
+            if (project.getConfigFile().exists()) {
+                configContent = project.getConfigFile().asString();
+            } else {
+                configContent = "";
+            }
+            myConfig.write(configContent);
+
+            final XmlFile myDescription = new XmlFile(new File(timestampedDir, "history.xml"));
+
+            final String user;
+            final String userId;
+            if (User.current() != null) {
+                user = User.current().getFullName();
+                userId = User.current().getId();
+            } else {
+                user = "Anonym";
+                userId = "";
+            }
+
+            final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, getIdFormatter().format(
+                    timestamp.getTime()));
+
+            myDescription.write(myDescr);
+        } catch (IOException e) {
+            throw new RuntimeException("Operation " + operation + " on " + project.getName() + " did not succeed", e);
         }
-        myConfig.write(configContent);
-
-        final XmlFile myDescription = new XmlFile(new File(timestampedDir, "history.xml"));
-
-        final String user;
-        final String userId;
-        if (User.current() != null) {
-            user = User.current().getFullName();
-            userId = User.current().getId();
-        } else {
-            user = "Anonym";
-            userId = "";
-        }
-
-        final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, getIdFormatter().format(
-                timestamp.getTime()));
-
-        myDescription.write(myDescr);
-
     }
 
     /**
