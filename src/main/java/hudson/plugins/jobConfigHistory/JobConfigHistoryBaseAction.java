@@ -22,37 +22,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
 
     /**
-     * Calculates Hudson's URL including protocol, host and port from the request.
-     *
-     * @param req
-     *            request from the jelly page.
-     * @return the baseurl
-     */
-    public String getBaseUrl(final StaplerRequest req) {
-        final String requestURL = String.valueOf(req.getRequestURL());
-        final String requestURI = req.getRequestURI();
-        final String baseUrl = requestURL.substring(0, requestURL.length() - requestURI.length())
-                + req.getContextPath();
-        LOG.finest("baseUrl=" + baseUrl + " from requestURL=" + requestURL);
-        return baseUrl;
-    }
-
-    /**
-     * Returns the static path for images.
-     *
-     * TODO: Check how we may get this from injected h-Object.
-     *
-     * @param req
-     *            request from the jelly page.
-     * @return static image path
-     */
-    public String getImagesUrl(final StaplerRequest req) {
-        final String imagesPath = getBaseUrl(req) + Functions.getResourcePath() + "/images/16x16";
-        LOG.finest("imagesPath=" + imagesPath);
-        return imagesPath;
-    }
-
-    /**
      * {@inheritDoc}
      *
      * Make method final, as we always want the same display name.
