@@ -1,15 +1,12 @@
 package hudson.plugins.jobConfigHistory;
 
-import hudson.Functions;
 import hudson.XmlFile;
 import hudson.model.Action;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Implements some basic methods for returning baseUrl and image paths. This is the base class for javascript actions.
@@ -17,9 +14,6 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author mfriedenhagen
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
-
-    /** Our logger. */
-    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
 
     /**
      * {@inheritDoc}
