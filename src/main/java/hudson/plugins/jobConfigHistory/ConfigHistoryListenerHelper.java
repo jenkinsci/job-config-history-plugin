@@ -22,27 +22,27 @@ import java.util.GregorianCalendar;
  *
  * @author mfriedenhagen
  */
-public class ConfigHistoryListenerHelper {
+public enum ConfigHistoryListenerHelper {
+
+    /**
+     * Helper for job creation.
+     */
+    CREATED("Created"),
+
+    /**
+     * Helper for job rename.
+     */
+    RENAMED("Renamed"),
+
+    /**
+     * Helper for job change.
+     */
+    CHANGED("Changed");
 
     /**
      * Format for timestamped dirs.
      */
     static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
-
-    /**
-     * Helper for job creation.
-     */
-    static final ConfigHistoryListenerHelper CREATED = new ConfigHistoryListenerHelper("Created");
-
-    /**
-     * Helper for job rename.
-     */
-    static final ConfigHistoryListenerHelper RENAMED = new ConfigHistoryListenerHelper("Renamed");
-
-    /**
-     * Helper for job change.
-     */
-    static final ConfigHistoryListenerHelper CHANGED = new ConfigHistoryListenerHelper("Changed");
 
     /**
      * Name of the operation.
