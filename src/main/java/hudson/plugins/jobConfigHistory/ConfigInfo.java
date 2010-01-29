@@ -36,9 +36,17 @@ public class ConfigInfo {
     private final String operation;
 
     /**
+     * @param job
+     *            a project
+     * @param file
+     *            pointing to {@code config.xml}
+     * @param histDescr
+     *            metadata of the change
      * @throws UnsupportedEncodingException
+     *             if UTF-8 is not available (probably a serious error).
      */
-    public ConfigInfo(final AbstractProject<?,?> job, final File file, final HistoryDescr histDescr) throws UnsupportedEncodingException {
+    public ConfigInfo(final AbstractProject<?, ?> job, final File file, final HistoryDescr histDescr)
+            throws UnsupportedEncodingException {
         this.job = job.getName();
         this.file = URLEncoder.encode(file.getAbsolutePath(), "utf-8");
         this.date = histDescr.getTimestamp();
@@ -47,37 +55,61 @@ public class ConfigInfo {
         this.userID = histDescr.getUserID();
     }
 
-    /** Returns the display name of the user. */
+    /**
+     * Returns the display name of the user.
+     *
+     * @return display name
+     */
     @Exported
     public String getUser() {
         return user;
     }
 
-    /** Returns the id of the user. */
+    /**
+     * Returns the id of the user.
+     *
+     * @return user id
+     */
     @Exported
     public String getUserID() {
         return userID;
     }
 
-    /** Returns the date of the change. */
+    /**
+     * Returns the date of the change.
+     *
+     * @return timestamp in the format of {@link ConfigHistoryListenerHelper#ID_FORMATTER}
+     */
     @Exported
     public String getDate() {
         return date;
     }
 
-    /** Returns the name of the file. */
+    /**
+     * Returns the URL encoded absolute name of the file.
+     *
+     * @return URL encoded filename
+     */
     @Exported
     public String getFile() {
         return file;
     }
 
-    /** Returns the name of the job. */
+    /**
+     * Returns the name of the job.
+     *
+     * @return name of the job
+     */
     @Exported
     public String getJob() {
         return job;
     }
 
-    /** Returns the type of the operation. */
+    /**
+     * Returns the type of the operation.
+     *
+     * @return name of the operation
+     */
     @Exported
     public String getOperation() {
         return operation;

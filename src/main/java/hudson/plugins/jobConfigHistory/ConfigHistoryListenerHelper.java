@@ -27,7 +27,7 @@ public class ConfigHistoryListenerHelper {
     /**
      * Format for timestamped dirs.
      */
-    private static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
+    static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
 
     /**
      * Helper for job creation.
