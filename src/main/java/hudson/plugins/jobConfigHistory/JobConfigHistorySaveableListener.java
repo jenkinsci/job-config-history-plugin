@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 @Extension
 public final class JobConfigHistorySaveableListener extends SaveableListener {
 
+    /** Our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistorySaveableListener.class.getName());
 
     /** {@inheritDoc} */
