@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.export.Exported;
 
 /**
  * Implements some basic methods for returning baseUrl and image paths. This is the base class for javascript actions.
