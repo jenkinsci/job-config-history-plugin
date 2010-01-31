@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
 import hudson.model.Action;
+import hudson.model.Hudson;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,17 @@ import org.kohsuke.stapler.Stapler;
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
 
+    /**
+     * The hudson instance.
+     */
+    private final Hudson hudson;
+
+    /**
+     * Set the {@link Hudson} instance.
+     */
+    public JobConfigHistoryBaseAction() {
+        hudson = Hudson.getInstance();
+    }
     /**
      * {@inheritDoc}
      *
@@ -80,6 +92,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return xmlfile.
      */
     protected XmlFile getConfigXml(final String diffDir) {
+        final File rootDir = hudson.getRootDir();
+        final String absoluteRootDirPath = rootDir.getAbsolutePath();
+        if (!diffDir.startsWith(absoluteRootDirPath) || !diffDir.contains("config-history")) {
+            throw new IllegalArgumentException(diffDir + " does not start with " + absoluteRootDirPath
+                    + " or does not contain 'config-history'");
+        }
         return new XmlFile(new File(diffDir, "config.xml"));
     }
 
