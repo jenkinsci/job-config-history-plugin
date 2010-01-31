@@ -100,12 +100,7 @@ public enum ConfigHistoryListenerHelper {
             final File timestampedDir = getRootDir(project, timestamp);
             final TextFile myConfig = new TextFile(new File(timestampedDir, "config.xml"));
 
-            final String configContent;
-            if (project.getConfigFile().exists()) {
-                configContent = project.getConfigFile().asString();
-            } else {
-                configContent = "";
-            }
+            final String configContent = project.getConfigFile().asString();
             myConfig.write(configContent);
 
             final XmlFile myDescription = new XmlFile(new File(timestampedDir, "history.xml"));
