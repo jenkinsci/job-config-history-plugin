@@ -97,8 +97,8 @@
                     <instrumentation>
                         <excludes>
                             <exclude>hudson/plugins/jobConfigHistory/JobConfigHistoryConsts.class</exclude>
-                            <exclude>bmsi/util/Diff.java</exclude>
-                            <exclude>bmsi/util/DiffPrint.java</exclude>
+                            <exclude>bmsi/util/Diff.class</exclude>
+                            <exclude>bmsi/util/DiffPrint.class</exclude>
                         </excludes>
                     </instrumentation>
                 </configuration>
