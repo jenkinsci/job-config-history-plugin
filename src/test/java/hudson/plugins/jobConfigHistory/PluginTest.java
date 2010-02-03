@@ -185,9 +185,9 @@ public class PluginTest extends HudsonTestCase {
         historyPage.setCheckedHistDir1RadioButton(0, true);
         historyPage.setCheckedHistDir2RadioButton(1, true);
         final String diffPageContent = historyPage.getDiffPage().getContent();
-        assertThat(diffPageContent, containsString("Diffs:"));
-        assertThat(diffPageContent, containsString("<   <description>" + secondDescription + "</description>"));
-        assertThat(diffPageContent, containsString(">   <description>" + firstDescription + "</description>"));
+        assertThat(diffPageContent, containsString("@@ -1,7 +1,7 @@"));
+        assertThat(diffPageContent, containsString("-  <description>" + secondDescription + "</description>"));
+        assertThat(diffPageContent, containsString("+  <description>" + firstDescription + "</description>"));
     }
 
 }
