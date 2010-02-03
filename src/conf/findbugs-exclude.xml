@@ -1,0 +1,6 @@
+<FindBugsFilter>
+    <Match>
+        <Class name="bmsi.util.Diff" />
+        <Class name="bmsi.util.DiffPrint" />
+    </Match>
+</FindBugsFilter>

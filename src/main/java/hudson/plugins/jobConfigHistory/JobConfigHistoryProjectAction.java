@@ -6,6 +6,7 @@ import hudson.util.MultipartFormDataParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +17,10 @@ import javax.servlet.ServletException;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+
+import bmsi.util.Diff;
+import bmsi.util.DiffPrint;
+import bmsi.util.Diff.change;
 
 /**
  * @author Stefan Brausch
@@ -85,8 +90,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      */
     public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
         final MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        rsp.sendRedirect("showDiffFiles?histDir1=" + parser.get("histDir1") + "&histDir2="
-                        + parser.get("histDir2"));
+        rsp.sendRedirect("showDiffFiles?histDir1=" + parser.get("histDir1") + "&histDir2=" + parser.get("histDir2"));
 
     }
 
@@ -99,15 +103,20 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      *             if reading one of the config files does not succeed.
      */
     public final String getDiffFile() throws IOException {
-        final String[] x = getConfigXml(getRequestParameter("histDir1")).asString().split("\\n");
-        final String[] y = getConfigXml(getRequestParameter("histDir2")).asString().split("\\n");
-        return getDiff(x, y);
+        final XmlFile configXml1 = getConfigXml(getRequestParameter("histDir1"));
+        final String[] x = configXml1.asString().split("\\n");
+        final XmlFile configXml2 = getConfigXml(getRequestParameter("histDir2"));
+        final String[] y = configXml2.asString().split("\\n");
+        return getDiff(configXml1.getFile(), configXml2.getFile(), x, y);
     }
 
     /**
      * Returns a textual diff between two string arrays.
      *
-     * @see <a href="http://www.cs.princeton.edu/introcs/96optimization/Diff.java.html">Diff</a>
+     * @param file1
+     *            first config file
+     * @param file2
+     *            second config file
      *
      * @param x
      *            first array
@@ -115,55 +124,14 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      *            second array
      * @return diff
      */
-    String getDiff(final String[] x, final String[] y) {
-        final StringBuilder diff = new StringBuilder("\nDiffs:\n\n");
-        if (x != null && y != null) {
-            // number of lines of each file
-            final int xLength = x.length;
-            final int yLength = y.length;
-
-            // opt[i][j] = length of LCS of x[i..M] and y[j..N]
-            final int[][] opt = new int[xLength + 1][yLength + 1];
-
-            // compute length of LCS and all subproblems via dynamic
-            // programming
-            for (int i = xLength - 1; i >= 0; i--) {
-                for (int j = yLength - 1; j >= 0; j--) {
-                    if (x[i].equals(y[j])) {
-                        opt[i][j] = opt[i + 1][j + 1] + 1;
-                    } else {
-                        opt[i][j] = Math.max(opt[i + 1][j], opt[i][j + 1]);
-                    }
-                }
-            }
-
-            // recover LCS itself and print out non-matching lines to
-            // standard
-            // output
-            int i = 0, j = 0;
-            while (i < xLength && j < yLength) {
-                if (x[i].equals(y[j])) {
-                    i++;
-                    j++;
-                } else if (opt[i + 1][j] >= opt[i][j + 1]) {
-                    diff.append("< " + x[i++] + "\n");
-                } else {
-                    diff.append("> " + y[j++] + "\n");
-                }
-            }
-
-            // dump out one remainder of one string if the other is
-            // exhausted
-            while (i < xLength || j < yLength) {
-                if (i == xLength) {
-                    diff.append("> " + y[j++] + "\n");
-                } else if (j == yLength) {
-                    diff.append("< " + x[i++] + "\n");
-                }
-            }
-
-        }
-        return diff.toString();
+    String getDiff(final File file1, final File file2, final String[] x, final String[] y) {
+        final change change = new Diff(x, y).diff_2(false);
+        final DiffPrint.UnifiedPrint unifiedPrint = new DiffPrint.UnifiedPrint(x, y);
+        final StringWriter output = new StringWriter();
+        unifiedPrint.setOutput(output);
+        unifiedPrint.print_header(file1.getPath(), file2.getPath());
+        unifiedPrint.print_script(change);
+        return output.toString();
     }
 
 }

@@ -14,7 +14,13 @@
     <name>Hudson Job Configuration History Plugin</name>
     <description>Saves copies of all job configurations.</description>
     <url>http://wiki.hudson-ci.org/display/HUDSON/JobConfigHistory+Plugin</url>
-
+    <licenses>
+        <license>
+            <!-- Dictated by the used class Diff.java -->
+            <name>GPL 2.0</name>
+            <url>http://www.gnu.org/licenses/gpl-2.0.txt</url>
+        </license>
+    </licenses>
     <developers>
         <developer>
             <id>stefanbrausch</id>
@@ -91,6 +97,8 @@
                     <instrumentation>
                         <excludes>
                             <exclude>hudson/plugins/jobConfigHistory/JobConfigHistoryConsts.class</exclude>
+                            <exclude>bmsi/util/Diff.java</exclude>
+                            <exclude>bmsi/util/DiffPrint.java</exclude>
                         </excludes>
                     </instrumentation>
                 </configuration>
@@ -165,6 +173,7 @@
                 <configuration>
                     <enableRulesSummary>false</enableRulesSummary>
                     <configLocation>${basedir}/src/conf/checkstyle-ruleset.xml</configLocation>
+                    <excludes>bmsi/util/Diff.java,bmsi/util/DiffPrint.java</excludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -176,6 +185,7 @@
                     <sourceEncoding>utf-8</sourceEncoding>
                     <minimumTokens>100</minimumTokens>
                     <targetJdk>1.5</targetJdk>
+                    <excludes>bmsi/util/Diff.java,bmsi/util/DiffPrint.java</excludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -188,6 +198,7 @@
                     <effort>Max</effort>
                     <debug>false</debug>
                     <relaxed>false</relaxed>
+                    <excludeFilterFile>src/conf/findbugs-exclude.xml</excludeFilterFile>
                 </configuration>
             </plugin>
             <plugin>
