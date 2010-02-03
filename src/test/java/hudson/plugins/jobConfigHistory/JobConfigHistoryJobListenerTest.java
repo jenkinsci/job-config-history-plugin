@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.jvnet.hudson.test.HudsonTestCase;
 import org.xml.sax.SAXException;
@@ -34,13 +35,15 @@ public class JobConfigHistoryJobListenerTest extends HudsonTestCase {
         assertEquals(historyFiles.toString(), 1, historyFiles.size());
     }
 
-    public void testRename() throws IOException, SAXException {
+    public void testRename() throws IOException, SAXException, InterruptedException {
         final FreeStyleProject project = createFreeStyleProject("newjob");
+        // Sleep two seconds to make sure we have two history entries.
+        Thread.sleep(TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
         project.renameTo("renamedjob");
         final File[] historyFiles = new File(jobsDir, "newjob/config-history").listFiles();
         assertNull("Got history files for old job", historyFiles);
         final List<File> historyFilesNew = Arrays.asList(new File(jobsDir, "renamedjob/config-history").listFiles());
-        assertEquals(historyFilesNew.toString(), 1, historyFilesNew.size());
+        assertEquals(historyFilesNew.toString(), 2, historyFilesNew.size());
     }
 
     public void testNonAbstractProjects() {
