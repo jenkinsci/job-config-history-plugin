@@ -549,7 +549,8 @@ public class DiffPrint {
      convert sequences of whitespace to a single space for comparison
      purposes.
    */
-  static String[] slurp(String file) throws IOException {
+  @SuppressWarnings("unchecked")
+static String[] slurp(String file) throws IOException {
     BufferedReader rdr = new BufferedReader(new FileReader(file));
     Vector s = new Vector();
     for (;;) {

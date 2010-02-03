@@ -70,7 +70,8 @@ public class Diff {
       be needed again later to print the results of the comparison as
       an edit script, if desired.
    */
-  public Diff(Object[] a,Object[] b) {
+  @SuppressWarnings("unchecked")
+public Diff(Object[] a,Object[] b) {
     Hashtable h = new Hashtable(a.length + b.length);
     filevec[0] = new file_data(a,h);
     filevec[1] = new file_data(b,h);
@@ -330,7 +331,8 @@ public class Diff {
 
 	int d = diag (xoff, xlim, yoff, ylim);
 	int c = cost;
-	int f = fdiag[fdiagoff + d];
+	@SuppressWarnings("unused")
+    int f = fdiag[fdiagoff + d];
 	int b = bdiag[bdiagoff + d];
 
 	if (c == 1)
@@ -769,6 +771,7 @@ public class Diff {
       nondiscarded_lines = j;
     }
 
+    @SuppressWarnings("unchecked")
     file_data(Object[] data,Hashtable h) {
       buffered_lines = data.length;
 
