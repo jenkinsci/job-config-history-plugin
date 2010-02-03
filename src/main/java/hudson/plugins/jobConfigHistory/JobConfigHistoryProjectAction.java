@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
+import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import org.kohsuke.stapler.export.Exported;
 
 /**
  * @author Stefan Brausch
@@ -44,12 +44,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @throws IOException
      *             if {@code history.xml} might not be read or the path might not be urlencoded.
      */
-    @Exported
-    public List<ConfigInfo> getConfigs() throws IOException {
+    public final List<ConfigInfo> getConfigs() throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = new File(project.getRootDir(), "config-history");
         if (!historyRootDir.isDirectory()) {
-            LOG.info(historyRootDir + " is not a directory, assuming that no history exists.");
+            LOG.info(historyRootDir + " is not a directory, assuming that no history exists yet.");
             return Collections.emptyList();
         }
         for (final File historyDir : historyRootDir.listFiles()) {
@@ -68,27 +67,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      *
      * @return job
      */
-    public AbstractProject<?, ?> getProject() {
+    public final AbstractProject<?, ?> getProject() {
         return project;
-    }
-
-    /** {@inheritDoc}
-     * Delegate to parent as I do not know whether exported is inherited.
-     */
-    @Exported
-    @Override
-    public String getFile() throws IOException {
-        return super.getFile();
-    }
-
-    /**
-     * Returns the type parameter of the current request.
-     *
-     * @return type.
-     */
-    @Exported
-    public String getType() {
-        return getRequestParameter("type");
     }
 
     /**
@@ -103,7 +83,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @throws IOException
      *             when the redirection does not succeed.
      */
-    public void doDiffFiles(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
+    public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
         final MultipartFormDataParser parser = new MultipartFormDataParser(req);
         rsp.sendRedirect("showDiffFiles?histDir1=" + parser.get("histDir1") + "&histDir2="
                         + parser.get("histDir2"));
@@ -118,8 +98,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @throws IOException
      *             if reading one of the config files does not succeed.
      */
-    @Exported
-    public String getDiffFile() throws IOException {
+    public final String getDiffFile() throws IOException {
         final String[] x = getConfigXml(getRequestParameter("histDir1")).asString().split("\\n");
         final String[] y = getConfigXml(getRequestParameter("histDir2")).asString().split("\\n");
         return getDiff(x, y);

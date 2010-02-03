@@ -27,6 +27,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     public JobConfigHistoryBaseAction() {
         hudson = Hudson.getInstance();
     }
+
     /**
      * {@inheritDoc}
      *
@@ -47,7 +48,11 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return JobConfigHistoryConsts.ICONFILENAME;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * Do not make this method final as {@link JobConfigHistoryRootAction} overrides this method.
+     */
     // @Override
     public String getUrlName() {
         return JobConfigHistoryConsts.URLNAME;
@@ -58,8 +63,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *
      * @return true if request parameter type is 'raw'
      */
-    public boolean wantRawOutput() {
-        return Stapler.getCurrentRequest().getParameter("type").equalsIgnoreCase("raw");
+    public final boolean wantRawOutput() {
+        return getType().equalsIgnoreCase("raw");
 
     }
 
@@ -68,8 +73,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *
      * @return true if request parameter type is 'xml'
      */
-    public boolean wantXmlOutput() {
-        return Stapler.getCurrentRequest().getParameter("type").equalsIgnoreCase("xml");
+    public final boolean wantXmlOutput() {
+        return getType().equalsIgnoreCase("xml");
 
     }
 
@@ -80,8 +85,17 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @throws IOException
      *             if the config file could not be read.
      */
-    public String getFile() throws IOException {
+    public final String getFile() throws IOException {
         return getConfigXml(getRequestParameter("file")).asString();
+    }
+
+    /**
+     * Returns the type parameter of the current request.
+     *
+     * @return type.
+     */
+    public final String getType() {
+        return getRequestParameter("type");
     }
 
     /**
@@ -111,4 +125,5 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     protected String getRequestParameter(final String parameterName) {
         return Stapler.getCurrentRequest().getParameter(parameterName);
     }
+
 }

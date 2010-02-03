@@ -11,8 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.kohsuke.stapler.export.Exported;
-
 /**
  *
  * @author Stefan Brausch, mfriedenhagen
@@ -27,21 +25,22 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     /**
      * {@inheritDoc}
      *
-     * This actions always starts from the context directly, so prefix {@link JobConfigHistoryConsts#URLNAME} with a slash.
+     * This actions always starts from the context directly, so prefix {@link JobConfigHistoryConsts#URLNAME} with a
+     * slash.
      */
     @Override
-    public String getUrlName() {
+    public final String getUrlName() {
         return "/" + JobConfigHistoryConsts.URLNAME;
     }
 
     /**
-     * Returns the configuration history entries for all {@link AbstractProject}s.
+     * Returns the configuration history entries for all {@link AbstractProject}s in this Hudson instance.
      *
      * @return list for all {@link AbstractProject}s.
-     * @throws IOException if one of the history entries might not be read.
+     * @throws IOException
+     *             if one of the history entries might not be read.
      */
-    @Exported
-    public List<ConfigInfo> getConfigs() throws IOException {
+    public final List<ConfigInfo> getConfigs() throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         @SuppressWarnings("unchecked")
         final List<AbstractProject> projects = Hudson.getInstance().getItems(AbstractProject.class);
@@ -54,25 +53,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         }
         Collections.sort(configs, ConfigInfoComparator.INSTANCE);
         return configs;
-    }
-
-    /** {@inheritDoc}
-     * Delegate to parent as I do not know whether exported is inherited.
-     */
-    @Exported
-    @Override
-    public String getFile() throws IOException {
-        return super.getFile();
-    }
-
-    /**
-     * Returns the type parameter of the current request.
-     *
-     * @return type.
-     */
-    @Exported
-    public String getType() {
-        return getRequestParameter("type");
     }
 
 }
