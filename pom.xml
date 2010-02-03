@@ -169,23 +169,24 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.5</version>
                 <configuration>
                     <enableRulesSummary>false</enableRulesSummary>
                     <configLocation>${basedir}/src/conf/checkstyle-ruleset.xml</configLocation>
-                    <excludes>bmsi/util/Diff.java,bmsi/util/DiffPrint.java</excludes>
+                    <excludes>bmsi/util/*.java</excludes>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
+                <version>2.4</version>
                 <configuration>
                     <linkXref>true</linkXref>
                     <includeTests>true</includeTests>
                     <sourceEncoding>utf-8</sourceEncoding>
                     <minimumTokens>100</minimumTokens>
                     <targetJdk>1.5</targetJdk>
-                    <excludes>bmsi/util/Diff.java,bmsi/util/DiffPrint.java</excludes>
+                    <excludes><exclude>bmsi/util/*.java</exclude></excludes>
                 </configuration>
             </plugin>
             <plugin>
