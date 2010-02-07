@@ -112,7 +112,7 @@ public enum ConfigHistoryListenerHelper {
                 userId = User.current().getId();
             } else {
                 user = "Anonym";
-                userId = "";
+                userId = "anonymous";
             }
 
             final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, getIdFormatter().format(
