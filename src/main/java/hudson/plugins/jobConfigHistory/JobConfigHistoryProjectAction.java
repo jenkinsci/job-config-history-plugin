@@ -50,6 +50,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      *             if {@code history.xml} might not be read or the path might not be urlencoded.
      */
     public final List<ConfigInfo> getConfigs() throws IOException {
+        checkReadPermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = new File(project.getRootDir(), "config-history");
         if (!historyRootDir.isDirectory()) {
@@ -103,6 +104,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      *             if reading one of the config files does not succeed.
      */
     public final String getDiffFile() throws IOException {
+        checkReadPermission();
         final XmlFile configXml1 = getConfigXml(getRequestParameter("histDir1"));
         final String[] x = configXml1.asString().split("\\n");
         final XmlFile configXml2 = getConfigXml(getRequestParameter("histDir2"));

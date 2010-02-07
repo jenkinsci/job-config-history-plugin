@@ -3,6 +3,8 @@ package hudson.plugins.jobConfigHistory;
 import hudson.XmlFile;
 import hudson.model.Action;
 import hudson.model.Hudson;
+import hudson.security.AccessControlled;
+import hudson.security.Permission;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,7 +88,17 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *             if the config file could not be read.
      */
     public final String getFile() throws IOException {
+        checkReadPermission();
         return getConfigXml(getRequestParameter("file")).asString();
+    }
+
+    /**
+     * See wether the current user may read configurations.
+     */
+    protected void checkReadPermission() {
+        final AccessControlled accessControled = hudson;
+        final Permission permission = Permission.READ;
+        accessControled.checkPermission(permission);
     }
 
     /**
