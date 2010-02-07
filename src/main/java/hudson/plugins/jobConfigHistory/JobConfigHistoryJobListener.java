@@ -26,6 +26,7 @@ public final class JobConfigHistoryJobListener extends ItemListener {
             ConfigHistoryListenerHelper.CREATED.createNewHistoryEntry((AbstractProject<?, ?>) item);
         }
         LOG.finest("onCreated for " + item + " done.");
+        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
 
     /** {@inheritDoc} */
@@ -36,5 +37,6 @@ public final class JobConfigHistoryJobListener extends ItemListener {
             ConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry((AbstractProject<?, ?>) item);
         }
         LOG.finest("onRename for " + item + " done.");
+        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
 }

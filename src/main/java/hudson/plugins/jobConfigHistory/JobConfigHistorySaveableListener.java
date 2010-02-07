@@ -27,5 +27,6 @@ public final class JobConfigHistorySaveableListener extends SaveableListener {
             ConfigHistoryListenerHelper.CHANGED.createNewHistoryEntry((AbstractProject<?, ?>) o);
         }
         LOG.finest("onChange for " + o + " done.");
+        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
 }
