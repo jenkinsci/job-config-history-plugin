@@ -2,8 +2,6 @@
   Displays the config output as plain/text
 -->
 <st:compress xmlns:j="jelly:core" xmlns:st="jelly:stapler">
-   <st:contentType value="text/plain;charset=UTF-8" />
-      ${it.diffFile}
-
-
+<st:contentType value="text/plain;charset=UTF-8" />
+${it.diffFile}
 </st:compress>
