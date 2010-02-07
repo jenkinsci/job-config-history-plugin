@@ -16,6 +16,13 @@
     <url>http://wiki.hudson-ci.org/display/HUDSON/JobConfigHistory+Plugin</url>
     <licenses>
         <license>
+            <name>MIT</name>
+            <comments>
+                All source code written in this plugin is licensed under a MIT license as well.
+                Only the bmsi.util package is licensed under GPL only.
+            </comments>
+        </license>
+        <license>
             <!-- Dictated by the used class Diff.java -->
             <name>GPL 2.0</name>
             <url>http://www.gnu.org/licenses/gpl-2.0.txt</url>
