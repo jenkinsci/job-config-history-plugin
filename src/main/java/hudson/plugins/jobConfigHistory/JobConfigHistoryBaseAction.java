@@ -93,7 +93,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * See wether the current user may read configurations.
+     * See whether the current user may read configurations.
      */
     protected void checkReadPermission() {
         final AccessControlled accessControled = hudson;
