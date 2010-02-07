@@ -97,7 +97,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected void checkReadPermission() {
         final AccessControlled accessControled = hudson;
-        final Permission permission = Permission.READ;
+        final Permission permission = Permission.CONFIGURE;
         accessControled.checkPermission(permission);
     }
 
