@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
 import hudson.model.Action;
+import hudson.model.CheckPoint;
 import hudson.model.Hudson;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
@@ -47,7 +48,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     // @Override
     public final String getIconFileName() {
-        return JobConfigHistoryConsts.ICONFILENAME;
+        return hasConfigurePermission() ? JobConfigHistoryConsts.ICONFILENAME : null;
     }
 
     /**
@@ -88,19 +89,28 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *             if the config file could not be read.
      */
     public final String getFile() throws IOException {
-        checkReadPermission();
+        checkConfigurePermission();
         return getConfigXml(getRequestParameter("file")).asString();
     }
 
     /**
      * See whether the current user may read configurations.
      */
-    protected void checkReadPermission() {
+    protected void checkConfigurePermission() {
         final AccessControlled accessControled = hudson;
         final Permission permission = Permission.CONFIGURE;
         accessControled.checkPermission(permission);
     }
 
+    /**
+     * See whether the current user may read configurations.
+     * @return
+     */
+    protected boolean hasConfigurePermission() {
+        final AccessControlled accessControled = hudson;
+        final Permission permission = Permission.CONFIGURE;
+        return accessControled.hasPermission(permission);
+    }
     /**
      * Returns the type parameter of the current request.
      *
