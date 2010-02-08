@@ -2,7 +2,6 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
 import hudson.model.Action;
-import hudson.model.CheckPoint;
 import hudson.model.Hudson;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
