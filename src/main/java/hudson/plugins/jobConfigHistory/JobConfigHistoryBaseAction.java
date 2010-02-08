@@ -44,7 +44,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     /**
      * {@inheritDoc}
      *
-     * Make method final, as we always want the same icon file.
+     * Make method final, as we always want the same icon file. Return {@code null} to hide the icon if
+     * the user is not allowed to configure jobs.
      */
     // @Override
     public final String getIconFileName() {
