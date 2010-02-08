@@ -21,7 +21,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     /**
      * The hudson instance.
      */
-    protected final Hudson hudson;
+    private final Hudson hudson;
 
     /**
      * Set the {@link Hudson} instance.
@@ -110,7 +110,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return xmlfile.
      */
     protected XmlFile getConfigXml(final String diffDir) {
-        final File rootDir = hudson.getRootDir();
+        final File rootDir = getHudson().getRootDir();
         final String absoluteRootDirPath = rootDir.getAbsolutePath();
         if (!diffDir.startsWith(absoluteRootDirPath) || !diffDir.contains("config-history")) {
             throw new IllegalArgumentException(diffDir + " does not start with " + absoluteRootDirPath
@@ -146,6 +146,15 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected final boolean hasConfigurePermission() {
         return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
+    }
+
+    /**
+     * Returns the hudson instance.
+     *
+     * @return the hudson
+     */
+    protected final Hudson getHudson() {
+        return hudson;
     }
 
     /**

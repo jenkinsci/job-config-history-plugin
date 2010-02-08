@@ -46,7 +46,7 @@ public class JobConfigHistoryBaseActionTest extends HudsonTestCase {
         final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
             @Override
             protected AccessControlled getAccessControlledObject() {
-                return hudson;
+                return getHudson();
             }
         };
         try {

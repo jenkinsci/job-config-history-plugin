@@ -63,7 +63,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      */
     @Override
     protected AccessControlled getAccessControlledObject() {
-        return hudson;
+        return getHudson();
     }
 
 }
