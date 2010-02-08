@@ -21,7 +21,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     /**
      * The hudson instance.
      */
-    private final Hudson hudson;
+    protected final Hudson hudson;
 
     /**
      * Set the {@link Hudson} instance.
@@ -43,8 +43,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     /**
      * {@inheritDoc}
      *
-     * Make method final, as we always want the same icon file. Return {@code null} to hide the icon if
-     * the user is not allowed to configure jobs.
+     * Make method final, as we always want the same icon file. Return {@code null} to hide the icon if the user is not
+     * allowed to configure jobs.
      */
     // @Override
     public final String getIconFileName() {
@@ -94,24 +94,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * See whether the current user may read configurations.
-     */
-    protected void checkConfigurePermission() {
-        final AccessControlled accessControled = hudson;
-        final Permission permission = Permission.CONFIGURE;
-        accessControled.checkPermission(permission);
-    }
-
-    /**
-     * See whether the current user may read configurations.
-     * @return true if the current user may read configurations.
-     */
-    protected boolean hasConfigurePermission() {
-        final AccessControlled accessControled = hudson;
-        final Permission permission = Permission.CONFIGURE;
-        return accessControled.hasPermission(permission);
-    }
-    /**
      * Returns the type parameter of the current request.
      *
      * @return type.
@@ -147,5 +129,30 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     protected String getRequestParameter(final String parameterName) {
         return Stapler.getCurrentRequest().getParameter(parameterName);
     }
+
+    /**
+     * See whether the current user may read configurations in the object returned by
+     * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
+     */
+    protected final void checkConfigurePermission() {
+        getAccessControlledObject().checkPermission(Permission.CONFIGURE);
+    }
+
+    /**
+     * Returns whether the current user may read configurations in the object returned by
+     * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
+     *
+     * @return true if the current user may read configurations.
+     */
+    protected final boolean hasConfigurePermission() {
+        return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
+    }
+
+    /**
+     * Returns the object for which we want to provide access control.
+     *
+     * @return the access controlled object.
+     */
+    protected abstract AccessControlled getAccessControlledObject();
 
 }

@@ -4,6 +4,7 @@ import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.model.RootAction;
+import hudson.security.AccessControlled;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,6 +54,16 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         }
         Collections.sort(configs, ConfigInfoComparator.INSTANCE);
         return configs;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Returns the hudson instance.
+     */
+    @Override
+    protected AccessControlled getAccessControlledObject() {
+        return hudson;
     }
 
 }

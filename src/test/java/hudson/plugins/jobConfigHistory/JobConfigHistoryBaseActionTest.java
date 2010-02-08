@@ -7,8 +7,10 @@ package hudson.plugins.jobConfigHistory;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
+import hudson.security.AccessControlled;
 import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.security.LegacyAuthorizationStrategy;
+import hudson.security.Permission;
 
 import java.io.IOException;
 
@@ -42,6 +44,10 @@ public class JobConfigHistoryBaseActionTest extends HudsonTestCase {
      */
     public void testGetConfigXml() throws IOException, SAXException {
         final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
+            @Override
+            protected AccessControlled getAccessControlledObject() {
+                return hudson;
+            }
         };
         try {
             action.getConfigXml(hudson.getRootDir().getAbsolutePath());
@@ -74,6 +80,25 @@ public class JobConfigHistoryBaseActionTest extends HudsonTestCase {
         } catch (ElementNotFoundException e) {
             // Expected
         }
+    }
+
+    /**
+     * See whether the current user may read configurations.
+     */
+    protected void checkConfigurePermission() {
+        final AccessControlled accessControled = hudson;
+        final Permission permission = Permission.CONFIGURE;
+        accessControled.checkPermission(permission);
+    }
+
+    /**
+     * See whether the current user may read configurations.
+     * @return true if the current user may read configurations.
+     */
+    protected boolean hasConfigurePermission() {
+        final AccessControlled accessControled = hudson;
+        final Permission permission = Permission.CONFIGURE;
+        return accessControled.hasPermission(permission);
     }
 
 }

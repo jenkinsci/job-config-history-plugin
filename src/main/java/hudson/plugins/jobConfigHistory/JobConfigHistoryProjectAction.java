@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
 import hudson.model.AbstractProject;
+import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
 
 import java.io.File;
@@ -134,6 +135,14 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         unifiedPrint.print_header(file1.getPath(), file2.getPath());
         unifiedPrint.print_script(change);
         return output.toString();
+    }
+
+    /**
+     * {@inheritDoc} Returns the project.
+     */
+    @Override
+    protected AccessControlled getAccessControlledObject() {
+        return project;
     }
 
 }
