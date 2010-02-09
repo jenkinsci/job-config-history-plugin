@@ -4,6 +4,7 @@
 
 package hudson.plugins.jobConfigHistory;
 
+import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
@@ -11,6 +12,9 @@ import hudson.model.User;
 import hudson.util.TextFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -98,29 +102,64 @@ public enum ConfigHistoryListenerHelper {
         try {
             final Calendar timestamp = new GregorianCalendar();
             final File timestampedDir = getRootDir(project, timestamp);
-            final TextFile myConfig = new TextFile(new File(timestampedDir, "config.xml"));
-
-            final String configContent = project.getConfigFile().asString();
-            myConfig.write(configContent);
-
-            final XmlFile myDescription = new XmlFile(new File(timestampedDir, "history.xml"));
-
-            final String user;
-            final String userId;
-            if (User.current() != null) {
-                user = User.current().getFullName();
-                userId = User.current().getId();
-            } else {
-                user = "Anonym";
-                userId = "anonymous";
-            }
-
-            final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, getIdFormatter().format(
-                    timestamp.getTime()));
-
-            myDescription.write(myDescr);
+            copyConfigFile(project, timestampedDir);
+            createHistoryXmlFile(timestamp, timestampedDir);
         } catch (IOException e) {
             throw new RuntimeException("Operation " + operation + " on " + project.getName() + " did not succeed", e);
+        }
+    }
+
+    /**
+     * Creates the historical description for this action.
+     *
+     * @param timestamp
+     *            when the action did happen.
+     * @param timestampedDir
+     *            the directory where to save the history.
+     * @throws IOException
+     *             if writing the history fails.
+     */
+    private void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir) throws IOException {
+        final String user;
+        final String userId;
+        if (User.current() != null) {
+            user = User.current().getFullName();
+            userId = User.current().getId();
+        } else {
+            user = "Anonym";
+            userId = "anonymous";
+        }
+
+        final XmlFile historyDescription = new XmlFile(new File(timestampedDir, "history.xml"));
+        final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, getIdFormatter().format(
+                timestamp.getTime()));
+        historyDescription.write(myDescr);
+    }
+
+    /**
+     * Saves a copy of this project's {@code config.xml} into {@code timestampedDir}.
+     *
+     * @param project
+     *            whose {@code config.xml} we want to copy.
+     * @param timestampedDir
+     *            the directory where to save the copy.
+     * @throws FileNotFoundException
+     *             if initiating the file holding the copy fails.
+     * @throws IOException
+     *             if writing the file holding the copy fails.
+     */
+    private void copyConfigFile(final AbstractProject<?, ?> project, final File timestampedDir)
+            throws FileNotFoundException, IOException {
+        final FileOutputStream configCopy = new FileOutputStream(new File(timestampedDir, "config.xml"));
+        try {
+            final FileInputStream configOriginal = new FileInputStream(project.getConfigFile().getFile());
+            try {
+                Util.copyStream(configOriginal, configCopy);
+            } finally {
+                configOriginal.close();
+            }
+        } finally {
+            configCopy.close();
         }
     }
 
