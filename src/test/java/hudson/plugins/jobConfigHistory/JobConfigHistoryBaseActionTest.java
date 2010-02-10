@@ -35,14 +35,22 @@ public class JobConfigHistoryBaseActionTest extends HudsonTestCase {
         webClient = createWebClient();
     }
 
-    /**
-     * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getConfigXml(java.lang.String)}
-     * .
-     *
-     * @throws SAXException
-     * @throws IOException
-     */
-    public void testGetConfigXml() throws IOException, SAXException {
+    public void testGetConfigXmlIllegalArgumentExceptionNoConfigHistory() throws IOException, SAXException {
+        // config-history not in diffDir
+        testGetConfigXmlIllegalArgumentException(hudson.getRootDir().getAbsolutePath());
+    }
+
+    public void testGetConfigXmlIllegalArgumentExceptionNoHudsonHome() throws IOException, SAXException {
+        // HUDSON_HOME not in diffDir
+        testGetConfigXmlIllegalArgumentException("/etc/config-history/");
+    }
+
+    public void testGetConfigXmlIllegalArgumentExceptionHasDoubleDots() throws IOException, SAXException {
+        // diffDir has double dots.
+        testGetConfigXmlIllegalArgumentException(hudson.getRootDir().getAbsolutePath() + "/../config-history/2010_02_09");
+    }
+
+    private void testGetConfigXmlIllegalArgumentException(final String diffDir) {
         final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
             @Override
             protected AccessControlled getAccessControlledObject() {
@@ -50,18 +58,13 @@ public class JobConfigHistoryBaseActionTest extends HudsonTestCase {
             }
         };
         try {
-            action.getConfigXml(hudson.getRootDir().getAbsolutePath());
-            fail("Expected " + IllegalArgumentException.class);
-        } catch (IllegalArgumentException e) {
-            System.err.println(e);
-        }
-        try {
-            action.getConfigXml("/etc");
+            action.getConfigXml(diffDir);
             fail("Expected " + IllegalArgumentException.class);
         } catch (IllegalArgumentException e) {
             System.err.println(e);
         }
     }
+
 
     @Bug(5534)
     public void testSecuredAccessToJobConfigHistoryPage() throws IOException, SAXException {
@@ -78,27 +81,8 @@ public class JobConfigHistoryBaseActionTest extends HudsonTestCase {
             withSecurityEnabled.getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
             fail("Expected a " + ElementNotFoundException.class + " to be thrown");
         } catch (ElementNotFoundException e) {
-            // Expected
+            System.err.println(e);
         }
-    }
-
-    /**
-     * See whether the current user may read configurations.
-     */
-    protected void checkConfigurePermission() {
-        final AccessControlled accessControled = hudson;
-        final Permission permission = Permission.CONFIGURE;
-        accessControled.checkPermission(permission);
-    }
-
-    /**
-     * See whether the current user may read configurations.
-     * @return true if the current user may read configurations.
-     */
-    protected boolean hasConfigurePermission() {
-        final AccessControlled accessControled = hudson;
-        final Permission permission = Permission.CONFIGURE;
-        return accessControled.hasPermission(permission);
     }
 
 }

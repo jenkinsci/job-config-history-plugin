@@ -12,7 +12,7 @@ import java.io.IOException;
 import org.kohsuke.stapler.Stapler;
 
 /**
- * Implements some basic methods for returning baseUrl and image paths. This is the base class for javascript actions.
+ * Implements some basic methods needed by the {@link JobConfigHistoryRootAction} and {@link JobConfigHistoryProjectAction}.
  *
  * @author mfriedenhagen
  */
@@ -43,7 +43,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     /**
      * {@inheritDoc}
      *
-     * Make method final, as we always want the same icon file. Return {@code null} to hide the icon if the user is not
+     * Make method final, as we always want the same icon file. Returns {@code null} to hide the icon if the user is not
      * allowed to configure jobs.
      */
     // @Override
@@ -64,21 +64,19 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     /**
      * Do we want 'raw' output?
      *
-     * @return true if request parameter type is 'raw'
+     * @return true if request parameter type is 'raw'.
      */
     public final boolean wantRawOutput() {
-        return getType().equalsIgnoreCase("raw");
-
+        return isTypeParameter("raw");
     }
 
     /**
      * Do we want 'xml' output?
      *
-     * @return true if request parameter type is 'xml'
+     * @return true if request parameter type is 'xml'.
      */
     public final boolean wantXmlOutput() {
-        return getType().equalsIgnoreCase("xml");
-
+        return isTypeParameter("xml");
     }
 
     /**
@@ -94,16 +92,21 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * Returns the type parameter of the current request.
+     * Checks whether the type parameter of the current request equals {@code toCompare}
      *
-     * @return type.
+     * @param toCompare
+     *            the string we want to compare.
+     * @return true if {@code toCompare} equals request parameter type.
      */
-    public final String getType() {
-        return getRequestParameter("type");
+    private boolean isTypeParameter(final String toCompare) {
+        return getRequestParameter("type").equalsIgnoreCase(toCompare);
     }
 
     /**
-     * Returns the {@code config.xml} located in {@code diffDir}.
+     * Returns the {@code config.xml} located in {@code diffDir}. {@code diffDir} must start with {@code HUDSON_HOME}
+     * and contain {@code config-history}, otherwise an {@link IllegalArgumentException} will be thrown. This is to
+     * ensure that this plugin will not be abused to get arbitrary {@code config.xml} files located anywhere on the
+     * system.
      *
      * @param diffDir
      *            timestamped history directory.
@@ -112,9 +115,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     protected XmlFile getConfigXml(final String diffDir) {
         final File rootDir = getHudson().getRootDir();
         final String absoluteRootDirPath = rootDir.getAbsolutePath();
-        if (!diffDir.startsWith(absoluteRootDirPath) || !diffDir.contains("config-history")) {
+        if (!diffDir.startsWith(absoluteRootDirPath) || !diffDir.contains("config-history") || diffDir.contains("..")) {
             throw new IllegalArgumentException(diffDir + " does not start with " + absoluteRootDirPath
-                    + " or does not contain 'config-history'");
+                    + ", does not contain 'config-history' or contains '..'");
         }
         return new XmlFile(new File(diffDir, "config.xml"));
     }
