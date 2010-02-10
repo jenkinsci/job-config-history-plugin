@@ -14,6 +14,10 @@
     <name>Hudson Job Configuration History Plugin</name>
     <description>Saves copies of all job configurations.</description>
     <url>http://wiki.hudson-ci.org/display/HUDSON/JobConfigHistory+Plugin</url>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://issues.hudson-ci.org/secure/IssueNavigator.jspa?reset=true&amp;jqlQuery=project+%3D+HUDSON+AND+status+in+%28Open%2C+%22In+Progress%22%2C+Reopened%29+AND+component+%3D+%27jobConfigHistory%27</url>
+    </issueManagement>
     <licenses>
         <license>
             <name>MIT</name>
