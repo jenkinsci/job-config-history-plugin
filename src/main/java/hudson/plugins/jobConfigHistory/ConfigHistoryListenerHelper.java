@@ -9,7 +9,6 @@ import hudson.XmlFile;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
 import hudson.model.User;
-import hudson.util.TextFile;
 
 import java.io.File;
 import java.io.FileInputStream;
