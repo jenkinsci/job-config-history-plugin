@@ -101,7 +101,7 @@ public enum ConfigHistoryListenerHelper {
         try {
             final Calendar timestamp = new GregorianCalendar();
             final File timestampedDir = getRootDir(project, timestamp);
-            copyConfigFile(project, timestampedDir);
+            copyConfigFile(project.getConfigFile(), timestampedDir);
             createHistoryXmlFile(timestamp, timestampedDir);
         } catch (IOException e) {
             throw new RuntimeException("Operation " + operation + " on " + project.getName() + " did not succeed", e);
@@ -118,12 +118,13 @@ public enum ConfigHistoryListenerHelper {
      * @throws IOException
      *             if writing the history fails.
      */
-    private void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir) throws IOException {
+    private final void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir) throws IOException {
+        final User currentUser = getCurrentUser();
         final String user;
         final String userId;
-        if (User.current() != null) {
-            user = User.current().getFullName();
-            userId = User.current().getId();
+        if (currentUser != null) {
+            user = currentUser.getFullName();
+            userId = currentUser.getId();
         } else {
             user = "Anonym";
             userId = "anonymous";
@@ -136,10 +137,19 @@ public enum ConfigHistoryListenerHelper {
     }
 
     /**
+     * Returns the user who invoked the action.
+     *
+     * @return current user.
+     */
+    User getCurrentUser() {
+        return User.current();
+    }
+
+    /**
      * Saves a copy of this project's {@code config.xml} into {@code timestampedDir}.
      *
-     * @param project
-     *            whose {@code config.xml} we want to copy.
+     * @param currentConfig
+     *            which we want to copy.
      * @param timestampedDir
      *            the directory where to save the copy.
      * @throws FileNotFoundException
@@ -147,11 +157,11 @@ public enum ConfigHistoryListenerHelper {
      * @throws IOException
      *             if writing the file holding the copy fails.
      */
-    private void copyConfigFile(final AbstractProject<?, ?> project, final File timestampedDir)
+    private final void copyConfigFile(final XmlFile currentConfig, final File timestampedDir)
             throws FileNotFoundException, IOException {
         final FileOutputStream configCopy = new FileOutputStream(new File(timestampedDir, "config.xml"));
         try {
-            final FileInputStream configOriginal = new FileInputStream(project.getConfigFile().getFile());
+            final FileInputStream configOriginal = new FileInputStream(currentConfig.getFile());
             try {
                 Util.copyStream(configOriginal, configCopy);
             } finally {
