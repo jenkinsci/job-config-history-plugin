@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
-import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -70,9 +69,9 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     }
 
     /**
-     * Returns the job for which the health report will be generated.
+     * Returns the project for which we want to see the config history, the config files or the diff.
      *
-     * @return job
+     * @return project
      */
     public final AbstractProject<?, ?> getProject() {
         return project;
@@ -107,29 +106,28 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     public final String getDiffFile() throws IOException {
         checkConfigurePermission();
         final XmlFile configXml1 = getConfigXml(getRequestParameter("histDir1"));
-        final String[] x = configXml1.asString().split("\\n");
+        final String[] configXml1Lines = configXml1.asString().split("\\n");
         final XmlFile configXml2 = getConfigXml(getRequestParameter("histDir2"));
-        final String[] y = configXml2.asString().split("\\n");
-        return getDiff(configXml1.getFile(), configXml2.getFile(), x, y);
+        final String[] configXml2Lines = configXml2.asString().split("\\n");
+        return getDiff(configXml1.getFile(), configXml2.getFile(), configXml1Lines, configXml2Lines);
     }
 
     /**
-     * Returns a textual diff between two string arrays.
+     * Returns a unified diff between two string arrays.
      *
      * @param file1
-     *            first config file
+     *            first config file.
      * @param file2
-     *            second config file
-     *
-     * @param x
-     *            first array
-     * @param y
-     *            second array
-     * @return diff
+     *            second config file.
+     * @param file1Lines
+     *            the lines of the first file.
+     * @param file2Lines
+     *            the lines of the second file.
+     * @return unified diff
      */
-    String getDiff(final File file1, final File file2, final String[] x, final String[] y) {
-        final change change = new Diff(x, y).diff_2(false);
-        final DiffPrint.UnifiedPrint unifiedPrint = new DiffPrint.UnifiedPrint(x, y);
+    String getDiff(final File file1, final File file2, final String[] file1Lines, final String[] file2Lines) {
+        final change change = new Diff(file1Lines, file2Lines).diff_2(false);
+        final DiffPrint.UnifiedPrint unifiedPrint = new DiffPrint.UnifiedPrint(file1Lines, file2Lines);
         final StringWriter output = new StringWriter();
         unifiedPrint.setOutput(output);
         unifiedPrint.print_header(file1.getPath(), file2.getPath());
