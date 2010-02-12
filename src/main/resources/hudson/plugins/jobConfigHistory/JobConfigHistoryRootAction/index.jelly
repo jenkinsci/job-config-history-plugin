@@ -20,7 +20,7 @@
                         <td>${config.date}</td>
                         <td><a href="${rootURL}/job/${config.job}">${config.job}</a></td>
                         <td>${config.operation}</td>
-                        <td><a href="${rootURL}/user/${config.userId}">${config.userID}</a></td>
+                        <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
                         <td><a href="configOutput?type=xml&amp;file=${config.file}">
                                 <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
                             </a>
