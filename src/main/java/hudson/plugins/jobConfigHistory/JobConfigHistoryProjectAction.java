@@ -61,7 +61,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             final XmlFile historyXml = new XmlFile(new File(historyDir, "history.xml"));
             final HistoryDescr histDescr;
             histDescr = (HistoryDescr) historyXml.read();
-            final ConfigInfo config = new ConfigInfo(project, historyDir, histDescr);
+            final ConfigInfo config = ConfigInfo.create(project, historyDir, histDescr);
             configs.add(config);
         }
         Collections.sort(configs, ConfigInfoComparator.INSTANCE);

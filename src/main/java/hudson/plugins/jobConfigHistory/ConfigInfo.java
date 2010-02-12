@@ -36,6 +36,8 @@ public class ConfigInfo {
     private final String operation;
 
     /**
+     * Returns a new ConfigInfo object.
+     *
      * @param job
      *            a project
      * @param file
@@ -45,14 +47,32 @@ public class ConfigInfo {
      * @throws UnsupportedEncodingException
      *             if UTF-8 is not available (probably a serious error).
      */
-    public ConfigInfo(final AbstractProject<?, ?> job, final File file, final HistoryDescr histDescr)
-            throws UnsupportedEncodingException {
-        this.job = job.getName();
-        this.file = URLEncoder.encode(file.getAbsolutePath(), "utf-8");
-        this.date = histDescr.getTimestamp();
-        this.user = histDescr.getUser();
-        this.operation = histDescr.getOperation();
-        this.userID = histDescr.getUserID();
+    public static ConfigInfo create(final AbstractProject<?, ?> job, final File file, final HistoryDescr histDescr) throws UnsupportedEncodingException {
+        return new ConfigInfo(
+                job.getName(),
+                URLEncoder.encode(file.getAbsolutePath(), "utf-8"),
+                histDescr.getTimestamp(),
+                histDescr.getUser(),
+                histDescr.getOperation(),
+                histDescr.getUserID());
+    }
+
+    /**
+     * @param job see {@link ConfigInfo#job}.
+     * @param file see {@link ConfigInfo#file}.
+     * @param date see {@link ConfigInfo#date}
+     * @param user see {@link ConfigInfo#user}
+     * @param operation see {@link ConfigInfo#operation}
+     * @param userID see {@link ConfigInfo#userID}
+     */
+    ConfigInfo(String job, String file, String date, String user, String operation, String userID) {
+        this.job = job;
+        this.file = file;
+        this.date = date;
+        this.user = user;
+        this.operation = operation;
+        this.userID = userID;
+
     }
 
     /**

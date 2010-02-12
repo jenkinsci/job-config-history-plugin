@@ -10,7 +10,6 @@ import static org.junit.matchers.JUnitMatchers.containsString;
 import hudson.security.AccessControlled;
 import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.security.LegacyAuthorizationStrategy;
-import hudson.security.Permission;
 
 import java.io.IOException;
 
