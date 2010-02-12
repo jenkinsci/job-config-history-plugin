@@ -132,6 +132,10 @@
                             <goal>analyze-only</goal>
                             <goal>analyze-dep-mgt</goal>
                         </goals>
+                        <configuration>
+                            <verbose>true</verbose>
+                            <ignoreDirect>false</ignoreDirect>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
