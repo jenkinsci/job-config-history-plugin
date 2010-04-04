@@ -92,7 +92,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * Checks whether the type parameter of the current request equals {@code toCompare}
+     * Checks whether the type parameter of the current request equals {@code toCompare}.
      *
      * @param toCompare
      *            the string we want to compare.

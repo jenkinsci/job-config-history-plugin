@@ -81,9 +81,8 @@ public class PluginTest extends HudsonTestCase {
             assertEquals("Job Configuration History [Hudson]", historyPage.getTitleText());
         }
 
-        public List<? extends HtmlAnchor> getConfigOutputLinks(final String type) {
-            @SuppressWarnings("unchecked")
-            final List<? extends HtmlAnchor> hrefs = (List<? extends HtmlAnchor>) historyPage
+        public List<HtmlAnchor> getConfigOutputLinks(final String type) {
+            final List<HtmlAnchor> hrefs = historyPage
                     .getByXPath("//a[contains(@href, \"configOutput?type=" + type + "\")]");
             return hrefs;
         }
@@ -160,7 +159,7 @@ public class PluginTest extends HudsonTestCase {
         final String secondDescription = "just a second test";
         {
             new ConfigPage().setNewDescription(firstDescription);
-            final List<? extends HtmlAnchor> hrefs = new HistoryPage().getConfigOutputLinks("xml");
+            final List<HtmlAnchor> hrefs = new HistoryPage().getConfigOutputLinks("xml");
             assertEquals(1, hrefs.size());
             final HtmlAnchor xmlAnchor = hrefs.get(0);
             final XmlPage xmlPage = (XmlPage) xmlAnchor.click();
@@ -168,14 +167,14 @@ public class PluginTest extends HudsonTestCase {
         }
         {
             new ConfigPage().setNewDescription(secondDescription);
-            final List<? extends HtmlAnchor> hrefs = new HistoryPage().getConfigOutputLinks("raw");
+            final List<HtmlAnchor> hrefs = new HistoryPage().getConfigOutputLinks("raw");
             assertEquals(2, hrefs.size());
             final HtmlAnchor rawAnchor = hrefs.get(0);
             final TextPage firstRaw = (TextPage) rawAnchor.click();
             assertThat(firstRaw.getContent(), containsString(secondDescription));
         }
         final AllJobConfigHistoryPage allJobConfigHistoryPage = new AllJobConfigHistoryPage(webClient.goTo("jobConfigHistory/"));
-        List<? extends HtmlAnchor> allRawHRefs = allJobConfigHistoryPage.getConfigOutputLinks("raw");
+        List<HtmlAnchor> allRawHRefs = allJobConfigHistoryPage.getConfigOutputLinks("raw");
         assertEquals(2, allRawHRefs.size());
         List<? extends HtmlAnchor> allXmlHRefs = allJobConfigHistoryPage.getConfigOutputLinks("xml");
         assertEquals(2, allXmlHRefs.size());

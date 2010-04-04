@@ -44,6 +44,8 @@ public class ConfigInfo {
      *            pointing to {@code config.xml}
      * @param histDescr
      *            metadata of the change
+     * @return a new ConfigInfo object.
+     *
      * @throws UnsupportedEncodingException
      *             if UTF-8 is not available (probably a serious error).
      */

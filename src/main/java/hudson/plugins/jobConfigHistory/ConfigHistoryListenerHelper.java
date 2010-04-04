@@ -157,8 +157,7 @@ public enum ConfigHistoryListenerHelper {
      * @throws IOException
      *             if writing the file holding the copy fails.
      */
-    private void copyConfigFile(final XmlFile currentConfig, final File timestampedDir)
-            throws FileNotFoundException, IOException {
+    private void copyConfigFile(final XmlFile currentConfig, final File timestampedDir) throws FileNotFoundException, IOException {
         final FileOutputStream configCopy = new FileOutputStream(new File(timestampedDir, "config.xml"));
         try {
             final FileInputStream configOriginal = new FileInputStream(currentConfig.getFile());
