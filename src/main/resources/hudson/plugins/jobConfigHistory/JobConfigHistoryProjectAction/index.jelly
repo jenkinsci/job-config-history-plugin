@@ -1,51 +1,56 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
- <l:layout title="Job Configuration History">
-
+  <l:layout title="Job Configuration History">
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
-        <h1>Job Configuration History</h1>
-        <div>
+      <h1>Job Configuration History</h1>
+      <div>
         <j:choose>
-            <j:when test="${it.configs.size() == 0}">
-                No job configuration history available
-            </j:when>
-
-        </j:choose>
-        </div>
-        <br/>
-
-         <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
-         <div>
-            <table class="pane sortable" style="width:100%">
-                <tr><td class="pane-header" initialSortDir="down" align="left">Date</td><td class="pane-header" align="left">Operation</td><td class="pane-header" align="left">User</td><td class="pane-header" align="left">Show File</td><td class="pane-header" align="left">Diff</td></tr>
-                <j:forEach var="config" items="${it.configs}">
+          <j:when test="${it.configs.size() == 0}">
+              No job configuration history available
+          </j:when>
+          <j:otherwise>
+            <br/>
+            <div>
+              <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
+                <table class="pane sortable" style="width:100%">
+                  <tr>
+                    <td class="pane-header" initialSortDir="down" align="left">Date</td>
+                    <td class="pane-header" align="left">Operation</td>
+                    <td class="pane-header" align="left">User</td>
+                    <td class="pane-header" align="left">Show File</td>
+                    <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">Diff</td>
+                  </tr>
+                  <tr>
+                    <td colspan="4"></td>
+                    <td align="center" style="border-left: solid 1px #bbb;">File A</td>
+                    <td align="center" style="border-left: solid 1px #bbb;">File B</td>
+                  </tr>
+                  <j:forEach var="config" items="${it.configs}">
                     <tr>
-                        <td>${config.date}</td>
-                        <td>${config.operation}</td>
-                        <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                        <td><a href="configOutput?type=xml&amp;file=${config.file}">
-                                <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
-                            </a>
-                            <st:nbsp />
-                            <a href="configOutput?type=raw&amp;file=${config.file}">
-                                (${%RAW})
-                            </a>
-                        </td>
-                        <td>
-                        <f:radio name="histDir1" value="${config.file}" />
-                        <f:radio name="histDir2" value="${config.file}" /> </td>
+                      <td>${config.date}</td>
+                      <td>${config.operation}</td>
+                      <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                      <td><a href="configOutput?type=xml&amp;file=${config.file}">
+                            <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
+                          </a>
+                          <st:nbsp />
+                          <a href="configOutput?type=raw&amp;file=${config.file}">
+                            (${%RAW})
+                          </a>
+                      </td>
+                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir1" value="${config.file}" /></td>
+                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir2" value="${config.file}" /></td>
                     </tr>
-                </j:forEach>
-            </table>
-        </div>
-
-        <div align="right">
-
-
-              <f:submit value="Show Diffs" />
+                  </j:forEach>
+                </table>
+                <div align="right">
+                  <f:submit value="Show Diffs" />
                 </div>
-          </f:form>
-
+              </f:form>
+            </div> 
+          </j:otherwise>
+        </j:choose>
+      </div>
     </l:main-panel>
-    </l:layout>
+  </l:layout>
 </j:jelly>

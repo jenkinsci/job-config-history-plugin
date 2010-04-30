@@ -1,7 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
 /**
- * Holder for information about an altering operation saved to {@code history.xml}.
+ * Holder for information about an altering operation saved to {@link JobConfigHistoryConsts#HISTORY_FILE}.
  *
  * @author Stefan Brausch
  */

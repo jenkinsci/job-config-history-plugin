@@ -1,38 +1,93 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
- <l:layout title="Job Configuration History">
+  <l:layout title="All Configuration History">
     <st:include page="sidepanel.jelly"/>
     <l:main-panel>
-        <h1>All Jobs Configuration History</h1>
-        <div>
+      <j:choose>
+        <j:when test="${it.isFiltered()}">
+          <h1>${it.filter} Configuration History</h1>
+        </j:when>
+        <j:otherwise>
+          <h1>All Configuration History</h1>
+        </j:otherwise>
+      </j:choose>
+      <div>
         <j:choose>
-            <j:when test="${it.configs.size() == 0}">
-                No job configuration history available
-            </j:when>
-
-        </j:choose>
-        </div>
-        <br/>
-        <div>
-            <table class="pane sortable" style="width:100%">
-                <tr><td class="pane-header" initialSortDir="down" align="left">Date</td><td class="pane-header" align="left">Job</td><td class="pane-header" align="left">Operation</td><td class="pane-header" align="left">User</td><td class="pane-header" align="left">File(raw)</td></tr>
+          <j:when test="${it.configs.size() == 0}">
+            No job configuration history available
+          </j:when>
+          <j:otherwise>
+            <br/>
+            <div>
+            <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
+              <table class="pane sortable" style="width:100%">
+                  <j:choose>
+                    <j:when test="${it.isFiltered()}">
+                      <tr>
+                        <td class="pane-header" initialSortDir="down" align="left">Date</td>
+                        <td class="pane-header" align="left">Job/System configuration</td>
+                        <td class="pane-header" align="left">Operation</td>
+                        <td class="pane-header" align="left">User</td>
+                        <td class="pane-header" align="left">File(raw)</td>
+                        <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">Diff</td>
+                      </tr>
+                      <tr>
+                        <td colspan="5"></td>
+                        <td align="center" style="border-left: solid 1px #bbb;">File A</td>
+                        <td align="center" style="border-left: solid 1px #bbb;">File B</td>
+                      </tr>
+                    </j:when>
+                    <j:otherwise>
+                      <tr>
+                      <td class="pane-header" initialSortDir="down" align="left">Date</td>
+                      <td class="pane-header" align="left">Job/System configuration</td>
+                      <td class="pane-header" align="left">Operation</td>
+                      <td class="pane-header" align="left">User</td>
+                      <td class="pane-header" align="left">File(raw)</td>
+                      </tr>
+                    </j:otherwise>
+                  </j:choose>
                 <j:forEach var="config" items="${it.configs}">
-                    <tr>
-                        <td>${config.date}</td>
+                  <tr>
+                    <td>${config.date}</td>
+                    <j:choose>
+                      <j:when test="${config.isJob}">
                         <td><a href="${rootURL}/job/${config.job}">${config.job}</a></td>
-                        <td>${config.operation}</td>
-                        <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                        <td><a href="configOutput?type=xml&amp;file=${config.file}">
-                                <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
-                            </a>
-                            <st:nbsp />
-                            <a href="configOutput?type=raw&amp;file=${config.file}">
-                                (${%RAW})
-                            </a>
-                        </td>
-                    </tr>
+                      </j:when>
+                      <j:otherwise>
+                        <td><a href="?filter=${config.job}">${config.job}</a> (system)</td>
+                      </j:otherwise>
+                    </j:choose>
+                    <td>${config.operation}</td>
+                    <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                    <td><a href="configOutput?type=xml&amp;file=${config.file}">
+                          <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
+                        </a>
+                        <st:nbsp />
+                        <a href="configOutput?type=raw&amp;file=${config.file}">
+                          (${%RAW})
+                        </a>
+                    </td>
+                    <j:choose>
+                      <j:when test="${it.isFiltered()}">
+                        <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir1" value="${config.file}" /></td>
+                        <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir2" value="${config.file}" /></td>
+                      </j:when>
+                    </j:choose>
+                  </tr>
                 </j:forEach>
-            </table>
-        </div>
+              </table>
+              <j:choose>
+                <j:when test="${it.isFiltered()}">
+                  <div align="right">
+                    <f:submit value="Show Diffs" />
+                  </div>
+                </j:when>
+              </j:choose>
+            </f:form>
+            </div>
+          </j:otherwise>
+        </j:choose>
+      </div>
     </l:main-panel>
-    </l:layout>
+  </l:layout>
 </j:jelly>

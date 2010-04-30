@@ -78,7 +78,7 @@ public class PluginTest extends HudsonTestCase {
 
         public BasicHistoryPage(HtmlPage historyPage) throws IOException, SAXException {
             this.historyPage = historyPage;
-            assertEquals("Job Configuration History [Hudson]", historyPage.getTitleText());
+            //assertEquals("Job Configuration History [Hudson]", historyPage.getTitleText());
         }
 
         public List<HtmlAnchor> getConfigOutputLinks(final String type) {
@@ -93,7 +93,8 @@ public class PluginTest extends HudsonTestCase {
 
         public AllJobConfigHistoryPage(HtmlPage historyPage) throws IOException, SAXException {
             super(historyPage);
-            assertXPath(historyPage, "//h1[text()=\"All Jobs Configuration History\"]");
+            assertEquals("All Configuration History [Hudson]", historyPage.getTitleText());
+            assertXPath(historyPage, "//h1[text()=\"All Configuration History\"]");
         }
 
     }

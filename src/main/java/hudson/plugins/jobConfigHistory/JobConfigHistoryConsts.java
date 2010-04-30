@@ -23,4 +23,15 @@ public final class JobConfigHistoryConsts {
     /** Path to the icon. */
     public static final String ICONFILENAME = "/plugin/jobConfigHistory/img/confighistory.png";
 
+    /** Default directory for storing history. */
+    public static final String DEFAULT_HISTORY_DIR = "config-history";
+
+    /** name of history xml file. */
+    public static final String HISTORY_FILE = "history.xml";
+
+    /** Default regexp pattern of configuration files not to save. */
+    public static final String DEFAULT_EXCLUDE = "queue|nodeMonitors|UpdateCenter";
+
+    /** Format for timestamped dirs. */
+    public static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
 }

@@ -2,7 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
 import hudson.XmlFile;
-import hudson.model.AbstractProject;
+import hudson.model.Hudson;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
 
@@ -22,11 +22,13 @@ public final class JobConfigHistorySaveableListener extends SaveableListener {
     /** {@inheritDoc} */
     @Override
     public void onChange(final Saveable o, final XmlFile file) {
+        final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
+
         LOG.finest("In onChange for " + o);
-        if (o instanceof AbstractProject<?, ?>) {
-            ConfigHistoryListenerHelper.CHANGED.createNewHistoryEntry((AbstractProject<?, ?>) o);
+        if (plugin.isSaveable(o, file)) {
+            ConfigHistoryListenerHelper.CHANGED.createNewHistoryEntry(file);
         }
         LOG.finest("onChange for " + o + " done.");
-//        new Exception("STACKTRACE for double invocation").printStackTrace();
+        //        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
 }

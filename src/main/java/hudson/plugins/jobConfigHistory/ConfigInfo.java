@@ -29,14 +29,19 @@ public class ConfigInfo {
     /** The urlencoded path to the config file of the job. */
     private final String file;
 
-    /** The name of the job. */
+    /** The name of the job or file. */
     private final String job;
 
     /** One of created, changed or renamed. */
     private final String operation;
 
+    /** true if this information is for a Hudson job, 
+     *  as opposed to information for a system configuration file.
+     */
+    private boolean isJob;
+
     /**
-     * Returns a new ConfigInfo object.
+     * Returns a new ConfigInfo object for a Hudson job.
      *
      * @param job
      *            a project
@@ -49,14 +54,39 @@ public class ConfigInfo {
      * @throws UnsupportedEncodingException
      *             if UTF-8 is not available (probably a serious error).
      */
-    public static ConfigInfo create(final AbstractProject<?, ?> job, final File file, final HistoryDescr histDescr) throws UnsupportedEncodingException {
+    public static ConfigInfo create(final AbstractProject<?, ?> job, final File file, final HistoryDescr histDescr)
+        throws UnsupportedEncodingException {
         return new ConfigInfo(
                 job.getName(),
                 URLEncoder.encode(file.getAbsolutePath(), "utf-8"),
                 histDescr.getTimestamp(),
                 histDescr.getUser(),
                 histDescr.getOperation(),
-                histDescr.getUserID());
+                histDescr.getUserID(),
+                true);
+    }
+    /**
+     * Returns a new ConfigInfo object for a system configuration file.
+     * @param name
+     *            Name of the configuration entity we are saving.
+     * @param file
+     *            The file with configuration data.
+     * @param histDescr
+     *            metadata of the change.
+     * @return a new ConfigInfo object.
+     * @throws UnsupportedEncodingException
+     *             if UTF-8 is not available
+     */
+    public static ConfigInfo create(final String name, final File file, final HistoryDescr histDescr)
+        throws UnsupportedEncodingException {
+        return new ConfigInfo(
+                name,
+                URLEncoder.encode(file.getAbsolutePath(), "utf-8"),
+                histDescr.getTimestamp(),
+                histDescr.getUser(),
+                histDescr.getOperation(),
+                histDescr.getUserID(),
+                false);
     }
 
     /**
@@ -66,14 +96,16 @@ public class ConfigInfo {
      * @param user see {@link ConfigInfo#user}
      * @param operation see {@link ConfigInfo#operation}
      * @param userID see {@link ConfigInfo#userID}
+     * @param isJob see {@link ConfigInfo#isJob}
      */
-    ConfigInfo(String job, String file, String date, String user, String operation, String userID) {
+    ConfigInfo(String job, String file, String date, String user, String operation, String userID, boolean isJob) {
         this.job = job;
         this.file = file;
         this.date = date;
         this.user = user;
         this.operation = operation;
         this.userID = userID;
+        this.isJob = isJob;
 
     }
 
@@ -135,5 +167,14 @@ public class ConfigInfo {
     @Exported
     public String getOperation() {
         return operation;
+    }
+
+    /**
+     * Returns true if this object represents a Hudson job
+     * as opposed to representing a system configuration.
+     * @return true if this object stores a Hudson job configuration
+     */
+    public boolean getIsJob() {
+        return isJob;
     }
 }

@@ -6,8 +6,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Util;
 import hudson.XmlFile;
-import hudson.model.AbstractProject;
-import hudson.model.Item;
+import hudson.model.Hudson;
 import hudson.model.User;
 
 import java.io.File;
@@ -40,12 +39,12 @@ public enum ConfigHistoryListenerHelper {
     /**
      * Helper for job change.
      */
-    CHANGED("Changed");
+    CHANGED("Changed"),
 
     /**
-     * Format for timestamped dirs.
+     * Helper for job deleted.
      */
-    static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
+    DELETED("Deleted");
 
     /**
      * Name of the operation.
@@ -68,21 +67,27 @@ public enum ConfigHistoryListenerHelper {
      *            for which we want to save the configuration.
      * @return base directory where to store the history.
      */
-    private File getConfigsDir(Item item) {
-        return new File(item.getRootDir(), "config-history");
-    }
+    //private File getConfigsDir(Item item) {
+    //    return new File(item.getRootDir(), "config-history");
+    //}
 
     /**
-     * Creates a timestamped directory to save the job configuration beneath.
+     * Creates a timestamped directory to save the configuration beneath.
+     * Purges old data if configured
      *
-     * @param item
-     *            for which we want to save the configuration.
+     * @param xmlFile
+     *            the current xmlFile configuration file to save
      * @param timestamp
      *            time of operation.
      * @return timestamped directory where to store one history entry.
      */
-    private File getRootDir(Item item, Calendar timestamp) {
-        final File f = new File(getConfigsDir(item), getIdFormatter().format(timestamp.getTime()));
+    private File getRootDir(final XmlFile xmlFile, final Calendar timestamp) {
+        final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
+        final File itemHistoryDir = plugin.getHistoryDir(xmlFile);
+        // perform check for purge here, when we are actually going to create
+        //  a new directory, rather than just when we scan it in above method.
+        plugin.checkForPurgeByQuantity(itemHistoryDir);
+        final File f = new File(itemHistoryDir, getIdFormatter().format(timestamp.getTime()));
         // mkdirs sometimes fails although the directory exists afterwards,
         // so check for existence as well and just be happy if it does.
         if (!(f.mkdirs() || f.exists())) {
@@ -94,17 +99,19 @@ public enum ConfigHistoryListenerHelper {
     /**
      * Creates a new backup of the job configuration.
      *
-     * @param project
-     *            for which we want to save the configuration.
+     * @param xmlFile
+     *            configuration file for the item we want to backup
      */
-    public final void createNewHistoryEntry(final AbstractProject<?, ?> project) {
+    public final void createNewHistoryEntry(final XmlFile xmlFile) {
         try {
             final Calendar timestamp = new GregorianCalendar();
-            final File timestampedDir = getRootDir(project, timestamp);
-            copyConfigFile(project.getConfigFile(), timestampedDir);
+            final File timestampedDir = getRootDir(xmlFile, timestamp);
+            if (this != DELETED) {
+                copyConfigFile(xmlFile.getFile(), timestampedDir);
+            }
             createHistoryXmlFile(timestamp, timestampedDir);
         } catch (IOException e) {
-            throw new RuntimeException("Operation " + operation + " on " + project.getName() + " did not succeed", e);
+            throw new RuntimeException("Operation " + operation + " on " + xmlFile + " did not succeed", e);
         }
     }
 
@@ -130,7 +137,7 @@ public enum ConfigHistoryListenerHelper {
             userId = "anonymous";
         }
 
-        final XmlFile historyDescription = new XmlFile(new File(timestampedDir, "history.xml"));
+        final XmlFile historyDescription = new XmlFile(new File(timestampedDir, JobConfigHistoryConsts.HISTORY_FILE));
         final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, getIdFormatter().format(
                 timestamp.getTime()));
         historyDescription.write(myDescr);
@@ -157,10 +164,11 @@ public enum ConfigHistoryListenerHelper {
      * @throws IOException
      *             if writing the file holding the copy fails.
      */
-    private void copyConfigFile(final XmlFile currentConfig, final File timestampedDir) throws FileNotFoundException, IOException {
-        final FileOutputStream configCopy = new FileOutputStream(new File(timestampedDir, "config.xml"));
+    private void copyConfigFile(final File currentConfig, final File timestampedDir) throws FileNotFoundException, IOException {
+
+        final FileOutputStream configCopy = new FileOutputStream(new File(timestampedDir, currentConfig.getName()));
         try {
-            final FileInputStream configOriginal = new FileInputStream(currentConfig.getFile());
+            final FileInputStream configOriginal = new FileInputStream(currentConfig);
             try {
                 Util.copyStream(configOriginal, configCopy);
             } finally {
@@ -178,7 +186,7 @@ public enum ConfigHistoryListenerHelper {
      * @return the idFormatter
      */
     SimpleDateFormat getIdFormatter() {
-        return new SimpleDateFormat(ID_FORMATTER);
+        return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);
     }
 
 }
