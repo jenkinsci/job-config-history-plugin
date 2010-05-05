@@ -3,13 +3,13 @@ package hudson.plugins.jobConfigHistory;
 import hudson.security.HudsonPrivateSecurityRealm;
 
 import java.io.IOException;
-import org.jvnet.hudson.test.HudsonTestCase;
+
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class JobConfigHistoryRootActionTest extends HudsonTestCase {
+public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private WebClient webClient;
 
@@ -17,7 +17,7 @@ public class JobConfigHistoryRootActionTest extends HudsonTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true));
-        webClient = createWebClient(); 
+        webClient = createWebClient();
     }
 
     // test filter page

@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 
 import org.jvnet.hudson.test.Bug;
-import org.jvnet.hudson.test.HudsonTestCase;
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
@@ -28,7 +27,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
  * @author mfriedenhagen
  *
  */
-public class JobConfigHistoryBaseActionTest extends HudsonTestCase {
+public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private WebClient webClient;
 
@@ -113,11 +112,11 @@ public class JobConfigHistoryBaseActionTest extends HudsonTestCase {
         // diffDir has double dots.
         testGetConfigXmlIllegalArgumentException(hudson.getRootDir().getAbsolutePath() + "/../config-history/2010_02_09");
     }
-    
+
     public void testGetConfigXmlIllegalArgumentExceptionNull() {
         testGetConfigXmlIllegalArgumentException(null);
     }
-    
+
     public void testGetConfigXmlIllegalArgumentExceptionNotUnderConfigRoot() throws IOException, SAXException {
         // request file not under historyRootDir when historyRootDir is configured
         try {
@@ -131,7 +130,7 @@ public class JobConfigHistoryBaseActionTest extends HudsonTestCase {
         // request outside of configured history root
         //testGetConfigXmlIllegalArgumentException(hudson.getRootDir().getParent());
         testGetConfigXmlIllegalArgumentException(hudson.getRootDir().getPath());
-        
+
         // request contains '..'
         testGetConfigXmlIllegalArgumentException(hudson.getRootDir() + "/jobConfigHistory/../jobs/");
 
@@ -145,7 +144,7 @@ public class JobConfigHistoryBaseActionTest extends HudsonTestCase {
         page = (TextPage) webClient.goTo("jobConfigHistory/configOutput?type=raw&file=" + URLEncoder.encode(invalidDir.getPath(),"UTF-8"),"text/plain");
         assertTrue("Verify empty return on non-existent directory request.", page.getContent().trim().isEmpty());
     }
-    
+
     private void testGetConfigXmlIllegalArgumentException(final String diffDir) {
         final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
             @Override

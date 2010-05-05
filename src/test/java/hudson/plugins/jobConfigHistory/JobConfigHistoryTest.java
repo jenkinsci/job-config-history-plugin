@@ -11,15 +11,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.jvnet.hudson.test.HudsonTestCase;
-
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 
 /**
  * @author jborghi@cisco.com
  *
  */
-public class JobConfigHistoryTest extends HudsonTestCase {
+public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private WebClient webClient;
     // we need to sleep between saves so we don't overwrite the history directories
@@ -177,7 +175,7 @@ public class JobConfigHistoryTest extends HudsonTestCase {
 
             final FreeStyleProject project = createFreeStyleProject("testproject");
             final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
-            
+
             assertEquals("Verify 1 history entry created.", 1, projectAction.getConfigs().size());
             for (int i = 0 ; i < 3 ; i++) {
                 Thread.sleep(SLEEP_TIME);
@@ -205,7 +203,7 @@ public class JobConfigHistoryTest extends HudsonTestCase {
 
             // check with default value
             jch.checkForPurgeByQuantity(historyDir);
-            assertEquals("Verify 1 history entry exists, default purge quantity.", 1, projectAction.getConfigs().size());       
+            assertEquals("Verify 1 history entry exists, default purge quantity.", 1, projectAction.getConfigs().size());
 
             // set to negative value, ensure no purge happens
             jch.setMaxHistoryEntries("-1");
@@ -222,7 +220,7 @@ public class JobConfigHistoryTest extends HudsonTestCase {
 
             // clear out all history - setting to 1 will clear out all with the expectation that we are creating a new entry
             jch.setMaxHistoryEntries("1");
-            jch.checkForPurgeByQuantity(historyDir);      
+            jch.checkForPurgeByQuantity(historyDir);
             assertEquals("Verify no history entries remain.", 0, projectAction.getConfigs().size());
 
             // recreate a history entry, set to read-only status, verify it is not deleted
@@ -286,7 +284,7 @@ public class JobConfigHistoryTest extends HudsonTestCase {
         try {
             final FreeStyleProject project = createFreeStyleProject("testproject");
             final File configuredHistoryRootFile = jch.getConfiguredHistoryRootDir();
-            
+
             // project configs should always be saveable
             assertTrue("Verify new project is a saveable item.", jch.isSaveable(project, project.getConfigFile()));
 

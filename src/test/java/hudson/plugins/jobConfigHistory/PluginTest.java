@@ -10,7 +10,6 @@ import static org.junit.matchers.JUnitMatchers.containsString;
 import java.io.IOException;
 import java.util.List;
 
-import org.jvnet.hudson.test.HudsonTestCase;
 import org.jvnet.hudson.test.recipes.LocalData;
 import org.xml.sax.SAXException;
 
@@ -26,7 +25,7 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
 /**
  * @author mfriedenhagen
  */
-public class PluginTest extends HudsonTestCase {
+public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private class JobPage {
 

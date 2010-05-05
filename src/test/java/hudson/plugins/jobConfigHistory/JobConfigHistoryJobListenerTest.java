@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.jvnet.hudson.test.HudsonTestCase;
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
@@ -23,7 +22,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
  * @author mirko
  *
  */
-public class JobConfigHistoryJobListenerTest extends HudsonTestCase {
+public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private File jobsDir;
     private WebClient webClient;
