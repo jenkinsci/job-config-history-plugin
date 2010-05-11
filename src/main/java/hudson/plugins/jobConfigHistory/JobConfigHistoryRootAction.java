@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
-
+import hudson.security.Permission;
 /**
  *
  * @author Stefan Brausch, mfriedenhagen
@@ -120,5 +120,16 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     protected AccessControlled getAccessControlledObject() {
         return getHudson();
     }
+    
+    @Override
+    protected void checkConfigurePermission() {
+        getAccessControlledObject().checkPermission(Permission.CONFIGURE);
+    }
+
+    @Override
+    protected boolean hasConfigurePermission() {
+         return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
+    }
+
 
 }

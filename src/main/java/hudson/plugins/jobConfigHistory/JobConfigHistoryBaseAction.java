@@ -27,6 +27,8 @@ import bmsi.util.Diff.change;
  * @author mfriedenhagen
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
+	  /** Our logger. */
+    private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
 
     /**
      * The hudson instance.
@@ -163,20 +165,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * See whether the current user may read configurations in the object returned by
      * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
      */
-    protected final void checkConfigurePermission() {
-        getAccessControlledObject().checkPermission(Permission.CONFIGURE);
-    }
-
+    protected abstract  void checkConfigurePermission() ;
     /**
      * Returns whether the current user may read configurations in the object returned by
      * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
      *
      * @return true if the current user may read configurations.
      */
-    protected final boolean hasConfigurePermission() {
-        return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
-    }
-
+    protected abstract boolean hasConfigurePermission();
     /**
      * Returns the hudson instance.
      *
