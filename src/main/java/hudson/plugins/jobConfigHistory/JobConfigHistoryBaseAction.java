@@ -27,9 +27,7 @@ import bmsi.util.Diff.change;
  * @author mfriedenhagen
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
-	  /** Our logger. */
-    private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
-
+	
     /**
      * The hudson instance.
      */
