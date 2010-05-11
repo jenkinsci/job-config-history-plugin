@@ -23,6 +23,8 @@ import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+import hudson.security.Permission;
+
 /**
  * @author mfriedenhagen
  *
@@ -58,6 +60,14 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
             protected AccessControlled getAccessControlledObject() {
                 return getHudson();
             }
+            @Override
+            protected void checkConfigurePermission() {
+                getAccessControlledObject().checkPermission(Permission.CONFIGURE);
+            }
+            @Override
+            protected boolean hasConfigurePermission() {
+                 return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
+            }
         };
 
         final String s1 = "123\n346";
@@ -75,6 +85,14 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
             protected AccessControlled getAccessControlledObject() {
                 return getHudson();
             }
+            @Override
+            protected void checkConfigurePermission() {
+                getAccessControlledObject().checkPermission(Permission.CONFIGURE);
+            }
+            @Override
+            protected boolean hasConfigurePermission() {
+                 return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
+            }
         };
         assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependant(action.getDiff(file1, file2, new String[0], new String[0])));
     }
@@ -88,6 +106,15 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
             protected AccessControlled getAccessControlledObject() {
                 return getHudson();
             }
+            @Override
+            protected void checkConfigurePermission() {
+                getAccessControlledObject().checkPermission(Permission.CONFIGURE);
+            }
+            @Override
+            protected boolean hasConfigurePermission() {
+                 return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
+            }
+
         };
         assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependant(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n".split("\n"))));
         assertEquals("--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,3 @@\n 123\n 346\n+123\n", makeResultPlatformIndependant(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n123".split("\n"))));
@@ -150,6 +177,14 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
             @Override
             protected AccessControlled getAccessControlledObject() {
                 return getHudson();
+            }
+            @Override
+            protected void checkConfigurePermission() {
+                getAccessControlledObject().checkPermission(Permission.CONFIGURE);
+            }
+            @Override
+            protected boolean hasConfigurePermission() {
+                 return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
             }
         };
         try {
