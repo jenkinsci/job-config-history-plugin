@@ -63,11 +63,13 @@ public final class JobConfigHistoryJobListener extends ItemListener {
                         fp.deleteRecursive();
                         LOG.finest("completed move of old history files for " + item.getName());
                     } catch (IOException e) {
-                        LOG.warning("unable to move old history on rename for " + item.getName());
-                        e.printStackTrace();
+                    	String ioExceptionStr ="unable to move old history on rename for " + item.getName();
+                        LOG.warning(ioExceptionStr);
+                        new RuntimeException(ioExceptionStr);
                     } catch (InterruptedException e) {
-                        LOG.warning("interrupted while moving old history on rename for " + item.getName());
-                        e.printStackTrace();
+                    	String irExceptionStr ="interrupted while moving old history on rename for " + item.getName();
+                        LOG.warning(irExceptionStr);
+                        new RuntimeException(irExceptionStr);
                     }
                 }
             }
