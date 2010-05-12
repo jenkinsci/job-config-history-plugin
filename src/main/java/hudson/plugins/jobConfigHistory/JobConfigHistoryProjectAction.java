@@ -70,16 +70,16 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      */
     @Override
     protected AccessControlled getAccessControlledObject() {
-         return project;
+        return project;
     }
 
-   @Override
-   protected void checkConfigurePermission() {
-       getAccessControlledObject().checkPermission(project.CONFIGURE);
-   }
+    @Override
+    protected void checkConfigurePermission() {
+        getAccessControlledObject().checkPermission(project.CONFIGURE);
+    }
 
-   @Override
-   protected boolean hasConfigurePermission() {
-       return getAccessControlledObject().hasPermission(project.CONFIGURE);
-   }
+    @Override
+    protected boolean hasConfigurePermission() {
+         return getAccessControlledObject().hasPermission(project.CONFIGURE);
+    }
 }

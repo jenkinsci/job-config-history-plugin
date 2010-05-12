@@ -128,7 +128,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
 
     @Override
     protected boolean hasConfigurePermission() {
-         return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
+        return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
     }
 
 

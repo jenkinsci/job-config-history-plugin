@@ -4,7 +4,6 @@ import hudson.XmlFile;
 import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.security.AccessControlled;
-import hudson.security.Permission;
 import hudson.util.MultipartFormDataParser;
 
 import java.io.File;
@@ -27,7 +26,7 @@ import bmsi.util.Diff.change;
  * @author mfriedenhagen
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
-	
+
     /**
      * The hudson instance.
      */
@@ -163,7 +162,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * See whether the current user may read configurations in the object returned by
      * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
      */
-    protected abstract  void checkConfigurePermission() ;
+    protected abstract  void checkConfigurePermission();
     /**
      * Returns whether the current user may read configurations in the object returned by
      * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
