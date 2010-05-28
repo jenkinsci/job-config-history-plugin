@@ -22,6 +22,7 @@ import javax.servlet.ServletException;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -181,7 +182,7 @@ public class JobConfigHistory extends Plugin {
      */
     protected File getConfiguredHistoryRootDir() {
         File rootFile = null;
-        if (historyRootDir != null && !historyRootDir.trim().isEmpty()) {
+        if (StringUtils.isNotBlank(historyRootDir)) {
             if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*")) {
                 rootFile = new File(historyRootDir);
             } else {
@@ -355,7 +356,7 @@ public class JobConfigHistory extends Plugin {
      */
     protected void checkForPurgeByQuantity(final File itemHistoryRoot) {
         int maxEntries = 0;
-        if (maxHistoryEntries != null && !maxHistoryEntries.isEmpty()) {
+        if (StringUtils.isNotEmpty(maxHistoryEntries)) {
             try {
                 maxEntries = new Integer(getMaxHistoryEntries());
                 maxEntries = Integer.parseInt(getMaxHistoryEntries());
@@ -423,7 +424,7 @@ public class JobConfigHistory extends Plugin {
      */
     public FormValidation doCheckMaxHistoryEntries(@QueryParameter final String value) {
         try {
-            if (!value.trim().isEmpty() && Integer.parseInt(value) < 0) {
+            if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
                 throw new NumberFormatException();
             }
             return FormValidation.ok();
