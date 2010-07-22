@@ -46,7 +46,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     // @Override
     public final String getDisplayName() {
-        return JobConfigHistoryConsts.DISPLAYNAME;
+        return Messages.displayName();
     }
 
     /**

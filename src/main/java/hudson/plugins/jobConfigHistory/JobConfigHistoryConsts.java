@@ -14,9 +14,6 @@ public final class JobConfigHistoryConsts {
         // Holder for constants
     }
 
-    /** Display name. */
-    public static final String DISPLAYNAME = "Job Config History";
-
     /** Path to the jobConfigHistory base. */
     public static final String URLNAME = "jobConfigHistory";
 

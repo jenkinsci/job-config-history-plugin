@@ -2,11 +2,11 @@
   <l:layout title="Job Configuration History">
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
-      <h1>Job Configuration History</h1>
+      <h1>${%Job Configuration History}</h1>
       <div>
         <j:choose>
           <j:when test="${it.configs.size() == 0}">
-              No job configuration history available
+              ${%No job configuration history available}
           </j:when>
           <j:otherwise>
             <br/>
@@ -14,16 +14,16 @@
               <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
                 <table class="pane sortable" style="width:100%">
                   <tr>
-                    <td class="pane-header" initialSortDir="down" align="left">Date</td>
-                    <td class="pane-header" align="left">Operation</td>
-                    <td class="pane-header" align="left">User</td>
-                    <td class="pane-header" align="left">Show File</td>
-                    <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">Diff</td>
+                    <td class="pane-header" initialSortDir="down" align="left">${%Date}</td>
+                    <td class="pane-header" align="left">${%Operation}</td>
+                    <td class="pane-header" align="left">${%User}</td>
+                    <td class="pane-header" align="left">${%Show File}</td>
+                    <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">${%Diff}</td>
                   </tr>
                   <tr>
                     <td colspan="4"></td>
-                    <td align="center" style="border-left: solid 1px #bbb;">File A</td>
-                    <td align="center" style="border-left: solid 1px #bbb;">File B</td>
+                    <td align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
+                    <td align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
                   </tr>
                   <j:forEach var="config" items="${it.configs}">
                     <tr>
@@ -44,7 +44,7 @@
                   </j:forEach>
                 </table>
                 <div align="right">
-                  <f:submit value="Show Diffs" />
+                  <f:submit value="${%Show Diffs}" />
                 </div>
               </f:form>
             </div> 

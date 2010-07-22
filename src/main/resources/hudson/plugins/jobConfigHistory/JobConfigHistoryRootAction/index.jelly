@@ -1,19 +1,19 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-  <l:layout title="All Configuration History">
+  <l:layout title="${%All Configuration History}">
     <st:include page="sidepanel.jelly"/>
     <l:main-panel>
       <j:choose>
         <j:when test="${it.isFiltered()}">
-          <h1>${it.filter} Configuration History</h1>
+          <h1>${it.filter} ${%Configuration History}</h1>
         </j:when>
         <j:otherwise>
-          <h1>All Configuration History</h1>
+          <h1>${%All Configuration History}</h1>
         </j:otherwise>
       </j:choose>
       <div>
         <j:choose>
           <j:when test="${it.configs.size() == 0}">
-            No job configuration history available
+            ${%No job configuration history available}
           </j:when>
           <j:otherwise>
             <br/>
@@ -23,12 +23,12 @@
                   <j:choose>
                     <j:when test="${it.isFiltered()}">
                       <tr>
-                        <td class="pane-header" initialSortDir="down" align="left">Date</td>
-                        <td class="pane-header" align="left">Job/System configuration</td>
-                        <td class="pane-header" align="left">Operation</td>
-                        <td class="pane-header" align="left">User</td>
-                        <td class="pane-header" align="left">File(raw)</td>
-                        <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">Diff</td>
+                        <td class="pane-header" initialSortDir="down" align="left">${%Date}</td>
+                        <td class="pane-header" align="left">${%Job/System configuration}</td>
+                        <td class="pane-header" align="left">${%Operation}</td>
+                        <td class="pane-header" align="left">${%User}</td>
+                        <td class="pane-header" align="left">${%File(raw)}</td>
+                        <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">${%Diff}</td>
                       </tr>
                       <tr>
                         <td colspan="5"></td>
@@ -38,11 +38,11 @@
                     </j:when>
                     <j:otherwise>
                       <tr>
-                      <td class="pane-header" initialSortDir="down" align="left">Date</td>
-                      <td class="pane-header" align="left">Job/System configuration</td>
-                      <td class="pane-header" align="left">Operation</td>
-                      <td class="pane-header" align="left">User</td>
-                      <td class="pane-header" align="left">File(raw)</td>
+                      <td class="pane-header" initialSortDir="down" align="left">${%Date}</td>
+                      <td class="pane-header" align="left">${%Job/System configuration}</td>
+                      <td class="pane-header" align="left">${%Operation}</td>
+                      <td class="pane-header" align="left">${%User}</td>
+                      <td class="pane-header" align="left">${%File(raw)}</td>
                       </tr>
                     </j:otherwise>
                   </j:choose>
@@ -79,7 +79,7 @@
               <j:choose>
                 <j:when test="${it.isFiltered()}">
                   <div align="right">
-                    <f:submit value="Show Diffs" />
+                    <f:submit value="${%Show Diffs}" />
                   </div>
                 </j:when>
               </j:choose>

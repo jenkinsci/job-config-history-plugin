@@ -4,18 +4,18 @@
       <f:textbox name="historyRootDir" value="${it.historyRootDir}"/>
     </f:entry>
     <f:advanced>
-      <f:entry title="Max number of history entries to keep" help="/plugin/jobConfigHistory/help/help-maxHistoryEntries.html">
+      <f:entry title="${%Max number of history entries to keep}" help="/plugin/jobConfigHistory/help/help-maxHistoryEntries.html">
         <f:textbox name="maxHistoryEntries" value="${it.maxHistoryEntries}"
            checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxHistoryEntries?value='+escape(this.value)"/>
       </f:entry>
-      <f:entry title="Save system configuration changes" help="/plugin/jobConfigHistory/help/help-saveSystemConfiguration.html">
+      <f:entry title="${%Save system configuration changes}" help="/plugin/jobConfigHistory/help/help-saveSystemConfiguration.html">
         <f:checkbox name="saveSystemConfiguration" checked="${it.saveSystemConfiguration}"/>
       </f:entry>
-      <f:entry title="System configuration exclude file pattern" help="/plugin/jobConfigHistory/help/help-excludePattern.html">
+      <f:entry title="${%System configuration exclude file pattern}" help="/plugin/jobConfigHistory/help/help-excludePattern.html">
         <f:textbox name="excludePattern" value="${it.excludePattern}" default="${it.defaultExcludePattern}"
            checkUrl="'${rootURL}/plugin/jobConfigHistory/checkExcludePattern?value='+escape(this.value)"/>
       </f:entry>
-      <f:entry title="Do not save duplicate history" help="/plugin/jobConfigHistory/help/help-skipDuplicateHistory.html">
+      <f:entry title="${%Do not save duplicate history}" help="/plugin/jobConfigHistory/help/help-skipDuplicateHistory.html">
         <f:checkbox name="skipDuplicateHistory" checked="${it.skipDuplicateHistory}"/>
       </f:entry>
     </f:advanced>
