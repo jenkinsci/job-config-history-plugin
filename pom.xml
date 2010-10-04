@@ -267,18 +267,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.jvnet.sorcerer</groupId>
-                <artifactId>maven-sorcerer-plugin</artifactId>
-                <configuration>
-                    <tabWidth>4</tabWidth>
-                    <javadocs>
-                        <javadoc>
-                            <href>http://java.sun.com/j2se/1.5.0/docs/api/</href>
-                        </javadoc>
-                    </javadocs>
-                </configuration>
-            </plugin>
         </plugins>
     </reporting>
 </project>
