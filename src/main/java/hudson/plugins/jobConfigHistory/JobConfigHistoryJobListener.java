@@ -2,15 +2,16 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.model.Item;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
-import hudson.model.Item;
 import hudson.model.listeners.ItemListener;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -45,7 +46,8 @@ public final class JobConfigHistoryJobListener extends ItemListener {
      */
     @Override
     public void onRenamed(Item item, String oldName, String newName) {
-        LOG.finest("In onRenamed for " + item + " oldName=" + oldName + ", newName=" + newName);
+        final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
+        LOG.finest("In onRenamed for " + item + onRenameDesc);
         if (item instanceof AbstractProject<?, ?>) {
             ConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry(((AbstractProject<?, ?>) item).getConfigFile());
             final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
@@ -58,23 +60,22 @@ public final class JobConfigHistoryJobListener extends ItemListener {
                 final File oldHistoryDir = new File(historyParentDir, oldName);
                 if (oldHistoryDir.exists()) {
                     final FilePath fp = new FilePath(oldHistoryDir);
+                    // catch all exceptions so Hudson can continue with other rename tasks.
                     try {
                         fp.copyRecursiveTo(new FilePath(currentHistoryDir));
                         fp.deleteRecursive();
-                        LOG.finest("completed move of old history files for " + item.getName());
+                        LOG.finest("completed move of old history files on rename." + onRenameDesc);
                     } catch (IOException e) {
-                        final String ioExceptionStr = "unable to move old history on rename for " + item.getName();
-                        LOG.warning(ioExceptionStr);
-                        throw new RuntimeException(ioExceptionStr);
+                        final String ioExceptionStr = "unable to move old history on rename." + onRenameDesc;
+                        LOG.log(Level.SEVERE, ioExceptionStr, e);
                     } catch (InterruptedException e) {
-                        final String irExceptionStr = "interrupted while moving old history on rename for " + item.getName();
-                        LOG.warning(irExceptionStr);
-                        throw new RuntimeException(irExceptionStr);
+                        final String irExceptionStr = "interrupted while moving old history on rename." + onRenameDesc;
+                        LOG.log(Level.WARNING, irExceptionStr, e);
                     }
                 }
             }
         }
-        LOG.finest("onRename for " + item + " done.");
+        LOG.finest("Completed onRename for" + item + " done.");
         //        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
 

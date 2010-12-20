@@ -86,12 +86,7 @@ public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDelet
                 historyDir = jch.getHistoryDir(project.getConfigFile());
                 historyDir.getParentFile().setWritable(false);
 
-                // catch the RuntimeException thrown by ConfigHistoryListenerHelper
-                try {
-                    project.renameTo("newproject2");
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                }
+                project.renameTo("newproject2");
                 assertTrue("Verify history dir not able to be renamed.", historyDir.exists());
                 historyDir.getParentFile().setWritable(true);
 
@@ -100,12 +95,7 @@ public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDelet
                 historyDir = jch.getHistoryDir(project.getConfigFile());
                 historyDir.getParentFile().setWritable(false);
 
-                // again catch RuntimeException from ConfigHistoryListenerHelper
-                try {
-                    project.delete();
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
-                }
+                project.delete();
                 assertTrue("Verify history dir not able to be renamed on delete.", historyDir.exists());
                 historyDir.getParentFile().setWritable(true);
             }

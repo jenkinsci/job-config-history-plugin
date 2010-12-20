@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Defines some helper functions needed by {@link JobConfigHistoryJobListener} and
@@ -45,6 +47,9 @@ public enum ConfigHistoryListenerHelper {
      * Helper for job deleted.
      */
     DELETED("Deleted");
+    
+    /** Our logger. */
+    private static final Logger LOG = Logger.getLogger(JobConfigHistorySaveableListener.class.getName());
 
     /**
      * Name of the operation.
@@ -110,8 +115,12 @@ public enum ConfigHistoryListenerHelper {
                 copyConfigFile(xmlFile.getFile(), timestampedDir);
             }
             createHistoryXmlFile(timestamp, timestampedDir);
-        } catch (IOException e) {
-            throw new RuntimeException("Operation " + operation + " on " + xmlFile + " did not succeed", e);
+        } catch (Exception e) {
+            // If not able to create the history entry, log, but continue without it.
+            // A known issue is where Hudson core fails to move the folders on rename,
+            // but continues as if it did.
+            // Reference HUDSON-8318
+            LOG.log(Level.SEVERE, "Unable to create history entry for configuration file: " + xmlFile, e);
         }
     }
 
