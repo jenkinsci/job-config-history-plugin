@@ -115,11 +115,11 @@ public enum ConfigHistoryListenerHelper {
                 copyConfigFile(xmlFile.getFile(), timestampedDir);
             }
             createHistoryXmlFile(timestamp, timestampedDir);
-        } catch (Exception e) {
+        } catch (IOException e) {
             // If not able to create the history entry, log, but continue without it.
             // A known issue is where Hudson core fails to move the folders on rename,
             // but continues as if it did.
-            // Reference HUDSON-8318
+            // Reference http://issues.hudson-ci.org/browse/HUDSON-8318
             LOG.log(Level.SEVERE, "Unable to create history entry for configuration file: " + xmlFile, e);
         }
     }
