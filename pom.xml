@@ -1,4 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -17,13 +20,13 @@
     <issueManagement>
         <system>JIRA</system>
         <url>http://issues.hudson-ci.org/secure/IssueNavigator.jspa?reset=true&amp;jqlQuery=project+%3D+HUDSON+AND+status+in+%28Open%2C+%22In+Progress%22%2C+Reopened%29+AND+component+%3D+%27jobConfigHistory%27</url>
-    </issueManagement>   
+    </issueManagement>
     <scm>
         <connection>scm:git:git://github.com/hudson/jobConfigHistory-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:hudson/jobConfigHistory-plugin.git</developerConnection>
         <url>https://github.com/hudson/jobConfigHistory-plugin</url>
-    </scm> 
-    
+    </scm>
+
     <licenses>
         <license>
             <name>MIT</name>
@@ -68,9 +71,7 @@
     </pluginRepositories>
 
     <properties>
-        <!--
-            compare: http://docs.codehaus.org/display/MAVENUSER/POM+Element+for+Source+File+Encoding
-        -->
+        <!-- compare: http://docs.codehaus.org/display/MAVENUSER/POM+Element+for+Source+File+Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
@@ -113,12 +114,12 @@
     </dependencies>
     <build>
         <plugins>
-           <plugin>
+            <plugin>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <goals>deploy</goals>
                 </configuration>
-            </plugin> 
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
@@ -183,10 +184,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>2.1.2</version>
-                <!--
-                    Avoid hanging site generation waiting for 'http://snapshots.maven.codehaus.org/maven2' see
-                    http://jira.codehaus.org/browse/MPIR-137
-                -->
+                <!-- Avoid hanging site generation waiting for 'http://snapshots.maven.codehaus.org/maven2' see http://jira.codehaus.org/browse/MPIR-137 -->
                 <configuration>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                     <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
@@ -236,7 +234,9 @@
                     <sourceEncoding>utf-8</sourceEncoding>
                     <minimumTokens>100</minimumTokens>
                     <targetJdk>1.5</targetJdk>
-                    <excludes><exclude>bmsi/util/*.java</exclude></excludes>
+                    <excludes>
+                        <exclude>bmsi/util/*.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -285,4 +285,10 @@
             </plugin>
         </plugins>
     </reporting>
+    <distributionManagement>
+        <repository>
+            <id>java.net-m2-repository</id>
+            <url>http://maven.hudson-labs.org/content/repositories/releases/</url>
+        </repository>
+    </distributionManagement>
 </project>
