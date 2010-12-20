@@ -10,7 +10,7 @@
 
     <artifactId>jobConfigHistory</artifactId>
     <packaging>hpi</packaging>
-    <version>1.6</version>
+    <version>1.7-SNAPSHOT</version>
     <name>Hudson Job Configuration History Plugin</name>
     <description>Saves copies of all job configurations.</description>
     <url>http://wiki.hudson-ci.org/display/HUDSON/JobConfigHistory+Plugin</url>
