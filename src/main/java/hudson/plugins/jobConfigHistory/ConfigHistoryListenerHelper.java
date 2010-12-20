@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 /**
  * Defines some helper functions needed by {@link JobConfigHistoryJobListener} and
  * {@link JobConfigHistorySaveableListener}.
- *
+ * 
  * @author mfriedenhagen
  */
 public enum ConfigHistoryListenerHelper {
@@ -47,7 +47,7 @@ public enum ConfigHistoryListenerHelper {
      * Helper for job deleted.
      */
     DELETED("Deleted");
-    
+
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistorySaveableListener.class.getName());
 
@@ -57,7 +57,7 @@ public enum ConfigHistoryListenerHelper {
     private final String operation;
 
     /**
-     *
+     * 
      * @param operation
      *            the operation we handle.
      */
@@ -67,19 +67,18 @@ public enum ConfigHistoryListenerHelper {
 
     /**
      * Returns the configuration history directory for the given {@link Item}.
-     *
+     * 
      * @param item
      *            for which we want to save the configuration.
      * @return base directory where to store the history.
      */
-    //private File getConfigsDir(Item item) {
-    //    return new File(item.getRootDir(), "config-history");
-    //}
+    // private File getConfigsDir(Item item) {
+    // return new File(item.getRootDir(), "config-history");
+    // }
 
     /**
-     * Creates a timestamped directory to save the configuration beneath.
-     * Purges old data if configured
-     *
+     * Creates a timestamped directory to save the configuration beneath. Purges old data if configured
+     * 
      * @param xmlFile
      *            the current xmlFile configuration file to save
      * @param timestamp
@@ -90,7 +89,7 @@ public enum ConfigHistoryListenerHelper {
         final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
         final File itemHistoryDir = plugin.getHistoryDir(xmlFile);
         // perform check for purge here, when we are actually going to create
-        //  a new directory, rather than just when we scan it in above method.
+        // a new directory, rather than just when we scan it in above method.
         plugin.checkForPurgeByQuantity(itemHistoryDir);
         final File f = new File(itemHistoryDir, getIdFormatter().format(timestamp.getTime()));
         // mkdirs sometimes fails although the directory exists afterwards,
@@ -103,7 +102,7 @@ public enum ConfigHistoryListenerHelper {
 
     /**
      * Creates a new backup of the job configuration.
-     *
+     * 
      * @param xmlFile
      *            configuration file for the item we want to backup
      */
@@ -121,12 +120,18 @@ public enum ConfigHistoryListenerHelper {
             // but continues as if it did.
             // Reference http://issues.hudson-ci.org/browse/HUDSON-8318
             LOG.log(Level.SEVERE, "Unable to create history entry for configuration file: " + xmlFile, e);
+        } catch (RuntimeException e) {
+            // If not able to create the history entry, log, but continue without it.
+            // A known issue is where Hudson core fails to move the folders on rename,
+            // but continues as if it did.
+            // Reference http://issues.hudson-ci.org/browse/HUDSON-8318
+            LOG.log(Level.SEVERE, "Unable to create history entry for configuration file: " + xmlFile, e);
         }
     }
 
     /**
      * Creates the historical description for this action.
-     *
+     * 
      * @param timestamp
      *            when the action did happen.
      * @param timestampedDir
@@ -154,7 +159,7 @@ public enum ConfigHistoryListenerHelper {
 
     /**
      * Returns the user who invoked the action.
-     *
+     * 
      * @return current user.
      */
     User getCurrentUser() {
@@ -163,7 +168,7 @@ public enum ConfigHistoryListenerHelper {
 
     /**
      * Saves a copy of this project's {@code config.xml} into {@code timestampedDir}.
-     *
+     * 
      * @param currentConfig
      *            which we want to copy.
      * @param timestampedDir
@@ -173,7 +178,8 @@ public enum ConfigHistoryListenerHelper {
      * @throws IOException
      *             if writing the file holding the copy fails.
      */
-    private void copyConfigFile(final File currentConfig, final File timestampedDir) throws FileNotFoundException, IOException {
+    private void copyConfigFile(final File currentConfig, final File timestampedDir) throws FileNotFoundException,
+            IOException {
 
         final FileOutputStream configCopy = new FileOutputStream(new File(timestampedDir, currentConfig.getName()));
         try {
@@ -191,7 +197,7 @@ public enum ConfigHistoryListenerHelper {
     /**
      * Returns a simple formatter used for creating timestamped directories. We create this every time as
      * {@link SimpleDateFormat} is <b>not</b> threadsafe.
-     *
+     * 
      * @return the idFormatter
      */
     SimpleDateFormat getIdFormatter() {
