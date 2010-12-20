@@ -10,14 +10,20 @@
 
     <artifactId>jobConfigHistory</artifactId>
     <packaging>hpi</packaging>
-    <version>1.6-SNAPSHOT</version>
+    <version>1.6</version>
     <name>Hudson Job Configuration History Plugin</name>
     <description>Saves copies of all job configurations.</description>
     <url>http://wiki.hudson-ci.org/display/HUDSON/JobConfigHistory+Plugin</url>
     <issueManagement>
         <system>JIRA</system>
         <url>http://issues.hudson-ci.org/secure/IssueNavigator.jspa?reset=true&amp;jqlQuery=project+%3D+HUDSON+AND+status+in+%28Open%2C+%22In+Progress%22%2C+Reopened%29+AND+component+%3D+%27jobConfigHistory%27</url>
-    </issueManagement>
+    </issueManagement>   
+    <scm>
+        <connection>scm:git:git://github.com/hudson/jobConfigHistory-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:hudson/jobConfigHistory-plugin.git</developerConnection>
+        <url>https://github.com/hudson/jobConfigHistory-plugin</url>
+    </scm> 
+    
     <licenses>
         <license>
             <name>MIT</name>
@@ -107,6 +113,12 @@
     </dependencies>
     <build>
         <plugins>
+           <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <goals>deploy</goals>
+                </configuration>
+            </plugin> 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
