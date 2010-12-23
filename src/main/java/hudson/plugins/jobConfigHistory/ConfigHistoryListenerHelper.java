@@ -49,7 +49,7 @@ public enum ConfigHistoryListenerHelper {
     DELETED("Deleted");
 
     /** Our logger. */
-    private static final Logger LOG = Logger.getLogger(JobConfigHistorySaveableListener.class.getName());
+    private static final Logger LOG = Logger.getLogger(ConfigHistoryListenerHelper.class.getName());
 
     /**
      * Name of the operation.
