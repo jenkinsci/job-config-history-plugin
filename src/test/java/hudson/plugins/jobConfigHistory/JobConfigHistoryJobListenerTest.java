@@ -20,11 +20,12 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
 
 /**
  * @author mirko
- *
+ * 
  */
 public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private File jobsDir;
+
     private WebClient webClient;
 
     @Override
@@ -38,7 +39,7 @@ public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDelet
     public void testCreation() throws IOException, SAXException {
         createFreeStyleProject("newjob");
         final List<File> historyFiles = Arrays.asList(new File(jobsDir, "newjob/config-history").listFiles());
-        assertTrue("Expected " + historyFiles.toString() + " to have at least one entry", historyFiles.size()>=1);
+        assertTrue("Expected " + historyFiles.toString() + " to have at least one entry", historyFiles.size() >= 1);
     }
 
     public void testRename() throws IOException, SAXException, InterruptedException {
@@ -49,7 +50,7 @@ public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDelet
         final File[] historyFiles = new File(jobsDir, "newjob/config-history").listFiles();
         assertNull("Got history files for old job", historyFiles);
         final List<File> historyFilesNew = Arrays.asList(new File(jobsDir, "renamedjob/config-history").listFiles());
-        assertTrue("Expected " + historyFilesNew.toString() + " to have at least two entries", historyFilesNew.size()>=1);
+        assertTrue("Expected " + historyFilesNew.toString() + " to have at least two entries", historyFilesNew.size() >= 1);
     }
 
     public void testNonAbstractProjects() {
@@ -59,49 +60,40 @@ public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDelet
         listener.onDeleted(null);
     }
 
-    public void testRenameErrors() {
+    public void testRenameErrors() throws Exception {
         JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        try {
-            HtmlForm form = webClient.goTo("configure").getFormByName("config");
-            form.getInputByName("historyRootDir").setValueAttribute("jobConfigHistory");
-            form.getInputByName("saveSystemConfiguration").setChecked(true);
-            submit(form);
-        } catch (Exception e) {
-            fail("unable to configure historyRootDir" + e);
-        }
-        try {
-            FreeStyleProject project = createFreeStyleProject("newproject");
-            File historyDir = jch.getHistoryDir(project.getConfigFile());
-            // force deletion of existing directory
-            (new FilePath(historyDir)).deleteRecursive();
-            project.renameTo("newproject1");
-            assertEquals("Verify only 1 history entry after rename.", 1, jch.getHistoryDir(project.getConfigFile()).list().length);
+        HtmlForm form = webClient.goTo("configure").getFormByName("config");
+        form.getInputByName("historyRootDir").setValueAttribute("jobConfigHistory");
+        form.getInputByName("saveSystemConfiguration").setChecked(true);
+        submit(form);
+        FreeStyleProject project = createFreeStyleProject("newproject");
+        File historyDir = jch.getHistoryDir(project.getConfigFile());
+        // force deletion of existing directory
+        (new FilePath(historyDir)).deleteRecursive();
+        project.renameTo("newproject1");
+        assertEquals("Verify only 1 history entry after rename.", 1,
+                jch.getHistoryDir(project.getConfigFile()).list().length);
 
-            // test rename failure - causes renameTo to fail if we lock the parent
-            // NOTE: Windows host seem to ignore the setWritable flag, so the following test will fail on Windows.
-            // A somewhat crude test for a windows host.
-            if ((new File("c:/")).exists()) {
-                System.out.println("Skipping permission based rename tests - Windows system detected.");
-            } else {
-                historyDir = jch.getHistoryDir(project.getConfigFile());
-                historyDir.getParentFile().setWritable(false);
+        // test rename failure - causes renameTo to fail if we lock the parent
+        // NOTE: Windows host seem to ignore the setWritable flag, so the following test will fail on Windows.
+        // A somewhat crude test for a windows host.
+        if ((new File("c:/")).exists()) {
+            System.out.println("Skipping permission based rename tests - Windows system detected.");
+        } else {
+            historyDir = jch.getHistoryDir(project.getConfigFile());
+            historyDir.getParentFile().setWritable(false);
+            project.renameTo("newproject2");
+            assertTrue("Verify history dir not able to be renamed.", historyDir.exists());
+            historyDir.getParentFile().setWritable(true);
 
-                project.renameTo("newproject2");
-                assertTrue("Verify history dir not able to be renamed.", historyDir.exists());
-                historyDir.getParentFile().setWritable(true);
+            // test delete rename failure
+            project = createFreeStyleProject("newproject_deleteme");
+            historyDir = jch.getHistoryDir(project.getConfigFile());
+            historyDir.getParentFile().setWritable(false);
 
-                // test delete rename failure
-                project = createFreeStyleProject("newproject_deleteme");
-                historyDir = jch.getHistoryDir(project.getConfigFile());
-                historyDir.getParentFile().setWritable(false);
-
-                project.delete();
-                assertTrue("Verify history dir not able to be renamed on delete.", historyDir.exists());
-                historyDir.getParentFile().setWritable(true);
-            }
-
-        } catch (Exception e) {
-            fail("Cannot complete rename errors test: " + e);
+            project.delete();
+            assertTrue("Verify history dir not able to be renamed on delete.", historyDir.exists());
+            historyDir.getParentFile().setWritable(true);
         }
     }
 }
