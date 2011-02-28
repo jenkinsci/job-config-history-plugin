@@ -32,8 +32,8 @@
                       </tr>
                       <tr>
                         <td colspan="5"></td>
-                        <td align="center" style="border-left: solid 1px #bbb;">File A</td>
-                        <td align="center" style="border-left: solid 1px #bbb;">File B</td>
+                        <td align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
+                        <td align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
                       </tr>
                     </j:when>
                     <j:otherwise>
