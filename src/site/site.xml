@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="project"
+    xsi:schemaLocation="project http://maven.apache.org/maven-navigation-1.0.xsd">
+    <publishDate format="MM-dd-yy HH:mm" />
+  <skin>
+    <groupId>org.kohsuke</groupId>
+    <artifactId>maven-skin</artifactId>
+    <version>1.1</version>
+  </skin>
+    <poweredBy>
+        <logo name="Jenkins" href="http://jenkins-ci.org/"
+            img="http://mirrors.jenkins-ci.org/art/jenkins-logo/24x24/logo+title.png" />
+        <logo name="Maven" href="http://maven.apache.org/"
+            img="http://maven.apache.org/images/logos/maven-feather.png" />
+    </poweredBy>
+    <body>
+        <links>
+            <item name="Jenkins" href="http://www.jenkins-ci.org/" />
+            <item name="Wiki" href="https://wiki.jenkins-ci.org/display/JENKINS/JobConfigHistory+Plugin" />
+        </links>
+        <menu ref="reports" />
+    </body>
+</project>
