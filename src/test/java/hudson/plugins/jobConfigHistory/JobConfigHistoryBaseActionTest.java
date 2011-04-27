@@ -52,24 +52,10 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
     }
 
     /**
-     * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffFile(java.lang.String, java.lang.String)}.
+     * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiff(File, File, String[], String[])}.
      */
     public void testGetDiffFileStringStringSameLineLength() {
-        final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
-            @Override
-            protected AccessControlled getAccessControlledObject() {
-                return getHudson();
-            }
-            @Override
-            protected void checkConfigurePermission() {
-                getAccessControlledObject().checkPermission(Permission.CONFIGURE);
-            }
-            @Override
-            protected boolean hasConfigurePermission() {
-                 return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
-            }
-        };
-
+        final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
         final String s1 = "123\n346";
         final String s2 = "123\n3467";
         assertEquals("--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,2 @@\n 123\n-346\n+3467\n",
@@ -80,27 +66,14 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
      * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffFile(java.lang.String, java.lang.String)}.
      */
     public void testGetDiffFileStringStringEmpty() {
-        final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
-            @Override
-            protected AccessControlled getAccessControlledObject() {
-                return getHudson();
-            }
-            @Override
-            protected void checkConfigurePermission() {
-                getAccessControlledObject().checkPermission(Permission.CONFIGURE);
-            }
-            @Override
-            protected boolean hasConfigurePermission() {
-                 return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
-            }
-        };
+        final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
         assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependant(action.getDiff(file1, file2, new String[0], new String[0])));
     }
 
     /**
-     * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffFile(java.lang.String, java.lang.String)}.
+     * @return
      */
-    public void testGetDiffFileStringStringDifferentLineLength() {
+    JobConfigHistoryBaseAction createJobConfigHistoryBaseAction() {
         final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
             @Override
             protected AccessControlled getAccessControlledObject() {
@@ -114,9 +87,15 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
             protected boolean hasConfigurePermission() {
                  return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
             }
-
         };
-        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependant(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n".split("\n"))));
+        return action;
+    }
+
+    /**
+     * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiff(File, File, String[], String[])}.
+     */
+    public void testGetDiffFileStringStringDifferentLineLength() {
+        final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependant(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n".split("\n"))));
         assertEquals("--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,3 @@\n 123\n 346\n+123\n", makeResultPlatformIndependant(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n123".split("\n"))));
     }
 
@@ -173,20 +152,7 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
     }
 
     private void testGetConfigXmlIllegalArgumentException(final String diffDir) {
-        final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
-            @Override
-            protected AccessControlled getAccessControlledObject() {
-                return getHudson();
-            }
-            @Override
-            protected void checkConfigurePermission() {
-                getAccessControlledObject().checkPermission(Permission.CONFIGURE);
-            }
-            @Override
-            protected boolean hasConfigurePermission() {
-                 return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
-            }
-        };
+        final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
         try {
             action.getConfigXml(diffDir);
             fail("Expected for " + diffDir + " " + IllegalArgumentException.class);
