@@ -1,32 +1,33 @@
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.jvnet.hudson.plugins</groupId>
+        <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.353</version>
+        <version>1.409</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>jobConfigHistory</artifactId>
     <packaging>hpi</packaging>
     <version>1.10-SNAPSHOT</version>
-    <name>Hudson Job Configuration History Plugin</name>
+    <name>Jenkins Job Configuration History Plugin</name>
     <description>Saves copies of all job configurations.</description>
-    <url>http://wiki.hudson-ci.org/display/HUDSON/JobConfigHistory+Plugin</url>
+    <url>http://wiki.jenkins-ci.org/display/JENKINS/JobConfigHistory+Plugin</url>
     <issueManagement>
         <system>JIRA</system>
-        <url>http://issues.hudson-ci.org/secure/IssueNavigator.jspa?reset=true&amp;jqlQuery=project+%3D+HUDSON+AND+status+in+%28Open%2C+%22In+Progress%22%2C+Reopened%29+AND+component+%3D+%27jobConfigHistory%27</url>
+        <url>http://issues.jenkins-ci.org/secure/IssueNavigator.jspa?reset=true&amp;jqlQuery=project+%3D+JENKINS+AND+status+in+%28Open%2C+%22In+Progress%22%2C+Reopened%29+AND+component+%3D+%27jobConfigHistory%27</url>
     </issueManagement>
     <scm>
         <connection>scm:git:git://github.com/hudson/jobConfigHistory-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:hudson/jobConfigHistory-plugin.git</developerConnection>
         <url>https://github.com/hudson/jobConfigHistory-plugin</url>
     </scm>
-
+    <ciManagement>
+        <system>Jenkins</system>
+        <url>http://huschteguzzel.de/hudson/job/jenkinsci-jobConfigHistory/</url>
+    </ciManagement>
     <licenses>
         <license>
             <name>MIT</name>
@@ -51,24 +52,14 @@
         <developer>
             <id>mfriedenhagen</id>
             <name>Mirko Friedenhagen</name>
-            <email>mfriedenhagen@dev.java.net</email>
+            <email>mfriedenhagen@gmail.com</email>
             <timezone>+1</timezone>
         </developer>
     </developers>
 
-    <repositories>
-        <repository>
-            <id>m.g.o-public</id>
-            <url>http://maven.glassfish.org/content/groups/public/</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>m.g.o-public</id>
-            <url>http://maven.glassfish.org/content/groups/public/</url>
-        </pluginRepository>
-    </pluginRepositories>
+    <!-- repositories> <repository> <id>m.g.o-public</id> <url>http://maven.glassfish.org/content/groups/public/</url> </repository>
+        </repositories> <pluginRepositories> <pluginRepository> <id>m.g.o-public</id> <url>http://maven.glassfish.org/content/groups/public/</url>
+        </pluginRepository> </pluginRepositories -->
 
     <properties>
         <!-- compare: http://docs.codehaus.org/display/MAVENUSER/POM+Element+for+Source+File+Encoding -->
@@ -82,9 +73,39 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>servlet-api-2.5</artifactId>
-            <version>6.1.14</version>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kohsuke.stapler</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.1-rev6</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kohsuke.stapler</groupId>
+            <artifactId>stapler</artifactId>
+            <version>1.165</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.localizer</groupId>
+            <artifactId>localizer</artifactId>
+            <version>1.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.hudson</groupId>
+            <artifactId>test-annotations</artifactId>
+            <version>1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -99,30 +120,13 @@
             <version>1.0.b2</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.7</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.kohsuke.stapler</groupId>
-            <artifactId>stapler</artifactId>
-            <version>1.139</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <goals>deploy</goals>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
+                <version>${cobertura-maven-plugin.version}</version>
                 <configuration>
                     <instrumentation>
                         <excludes>
@@ -142,6 +146,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>site</phase>
@@ -160,6 +165,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>-Xms256m -Xmx512m</argLine>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -167,23 +173,47 @@
                 </configuration>
             </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>2.1</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
-
+    <profiles>
+        <profile>
+            <id>maven3-site</id>
+            <activation>
+                <file>
+                    <exists>${basedir}</exists>
+                </file>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-site-plugin</artifactId>
+                            <version>3.0-beta-3</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-descriptor</id>
+                                <goals>
+                                    <goal>attach-descriptor</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <reporting>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.1.2</version>
+                <version>2.3.1</version>
                 <!-- Avoid hanging site generation waiting for 'http://snapshots.maven.codehaus.org/maven2' see http://jira.codehaus.org/browse/MPIR-137 -->
                 <configuration>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
@@ -192,15 +222,20 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>${maven-jxr-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
+                <version>${maven-javadoc-plugin.version}</version>
                 <configuration>
                     <show>private</show>
                     <quiet>true</quiet>
                     <links>
-                        <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
-                        <link>https://hudson.dev.java.net/nonav/javadoc/</link>
-                        <link>https://stapler.dev.java.net/nonav/javadoc/</link>
+                        <link>http://download.oracle.com/javase/1.5.0/docs/api/</link>
+                        <link>http://javadoc.jenkins-ci.org/</link>
+                        <link>http://stapler.java.net/apidocs/</link>
                     </links>
                 </configuration>
             </plugin>
@@ -212,12 +247,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.6</version>
+                <version>${maven-surefire-report-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.4</version>
+                <version>${maven-checkstyle-plugin.version}</version>
                 <configuration>
                     <enableRulesSummary>false</enableRulesSummary>
                     <configLocation>${basedir}/src/conf/checkstyle-ruleset.xml</configLocation>
@@ -227,11 +262,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>2.4</version>
+                <version>${maven-pmd-plugin.version}</version>
                 <configuration>
                     <linkXref>true</linkXref>
                     <includeTests>true</includeTests>
-                    <sourceEncoding>utf-8</sourceEncoding>
+                    <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                     <minimumTokens>100</minimumTokens>
                     <targetJdk>1.5</targetJdk>
                     <excludes>
@@ -242,7 +277,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.3.1</version>
+                <version>${findbugs-maven-plugin.version}</version>
                 <configuration>
                     <xmlOutput>true</xmlOutput>
                     <threshold>Low</threshold>
@@ -253,19 +288,9 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.2</version>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.4</version>
+                <version>${cobertura-maven-plugin.version}</version>
                 <configuration>
                     <formats>
                         <format>xml</format>
@@ -276,12 +301,12 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jdepend-maven-plugin</artifactId>
-                <version>2.0-beta-2</version>
+                <version>${jdepend-maven-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.1</version>
+                <version>${maven-dependency-plugin.version}</version>
             </plugin>
         </plugins>
     </reporting>
