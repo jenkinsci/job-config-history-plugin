@@ -77,7 +77,7 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
         public BasicHistoryPage(HtmlPage historyPage) throws IOException, SAXException {
             this.historyPage = historyPage;
-            //assertEquals("Job Configuration History [Hudson]", historyPage.getTitleText());
+            //assertEquals("Job Configuration History [Jenkins]", historyPage.getTitleText());
         }
 
         public List<HtmlAnchor> getConfigOutputLinks(final String type) {
@@ -92,7 +92,7 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
         public AllJobConfigHistoryPage(HtmlPage historyPage) throws IOException, SAXException {
             super(historyPage);
-            assertEquals("All Configuration History [Hudson]", historyPage.getTitleText());
+            assertEquals("All Configuration History [Jenkins]", historyPage.getTitleText());
             assertXPath(historyPage, "//h1[text()=\"All Configuration History\"]");
         }
 
@@ -102,7 +102,7 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
         public HistoryPage() throws IOException, SAXException {
             super(webClient.goTo("job/" + JOB_NAME + "/jobConfigHistory"));
-            assertEquals("Job Configuration History [Hudson]", historyPage.getTitleText());
+            assertEquals("Job Configuration History [Jenkins]", historyPage.getTitleText());
         }
 
         public TextPage getDiffPage() throws IOException {
