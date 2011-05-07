@@ -19,6 +19,13 @@
             <br/>
             <div>
             <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
+              <j:choose>
+                <j:when test="${it.isFiltered()}">
+                  <div align="right">
+                    <f:submit value="${%Show Diffs}" />
+                  </div>
+                </j:when>
+              </j:choose>
               <table class="pane sortable" style="width:100%">
                   <j:choose>
                     <j:when test="${it.isFiltered()}">
@@ -46,7 +53,9 @@
                       </tr>
                     </j:otherwise>
                   </j:choose>
+                <j:set var="configNr" value="0"/>
                 <j:forEach var="config" items="${it.configs}">
+                  <j:set var="configNr" value="${configNr + 1}"/>
                   <tr>
                     <td>${config.date}</td>
                     <j:choose>
@@ -69,8 +78,8 @@
                     </td>
                     <j:choose>
                       <j:when test="${it.isFiltered()}">
-                        <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir1" value="${config.file}" /></td>
-                        <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir2" value="${config.file}" /></td>
+                        <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir1" value="${config.file}" checked="${configNr == 2 ? true:false}"/></td>
+                        <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir2" value="${config.file}" checked="${configNr == 1 ? true:false}"/></td>
                       </j:when>
                     </j:choose>
                   </tr>
