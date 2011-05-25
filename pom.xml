@@ -25,7 +25,7 @@
     </scm>
     <ciManagement>
         <system>Jenkins</system>
-        <url>http://huschteguzzel.de/hudson/job/jenkinsci-jobConfigHistory/</url>
+        <url>http://huschteguzzel.de/hudson/job/jenkinsci-jobConfigHistory-plugin/</url>
     </ciManagement>
     <licenses>
         <license>
