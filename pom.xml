@@ -56,9 +56,20 @@
         </developer>
     </developers>
 
-    <!-- repositories> <repository> <id>m.g.o-public</id> <url>http://maven.glassfish.org/content/groups/public/</url> </repository>
-        </repositories> <pluginRepositories> <pluginRepository> <id>m.g.o-public</id> <url>http://maven.glassfish.org/content/groups/public/</url>
-        </pluginRepository> </pluginRepositories -->
+    <!-- get every artifact through maven.glassfish.org, which proxies all the artifacts that we need -->
+    <repositories>
+      <repository>
+        <id>m.g.o-public</id>
+        <url>http://maven.glassfish.org/content/groups/public/</url>
+      </repository>
+    </repositories>
+
+    <pluginRepositories>
+      <pluginRepository>
+        <id>m.g.o-public</id>
+        <url>http://maven.glassfish.org/content/groups/public/</url>
+      </pluginRepository>
+    </pluginRepositories>
 
     <properties>
         <!-- compare: http://docs.codehaus.org/display/MAVENUSER/POM+Element+for+Source+File+Encoding -->
