@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.409</version>
+        <version>1.435</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -129,6 +129,11 @@
             <artifactId>xml-apis</artifactId>
             <version>1.0.b2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.java-diff-utils</groupId>
+            <artifactId>diffutils</artifactId>
+            <version>1.2.1</version>
         </dependency>
     </dependencies>
     <build>
