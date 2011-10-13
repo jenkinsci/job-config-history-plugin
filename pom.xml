@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.435-SNAPSHOT</version>
+        <version>1.435</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
