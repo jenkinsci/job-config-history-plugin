@@ -41,7 +41,7 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
         /**
          * @return
          */
-        public String getJobConfigHistoryLink() {
+        public final String getJobConfigHistoryLink() {
             return "job/" + JOB_NAME + "/jobConfigHistory";
         }
 
@@ -80,7 +80,7 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
             //assertEquals("Job Configuration History [Jenkins]", historyPage.getTitleText());
         }
 
-        public List<HtmlAnchor> getConfigOutputLinks(final String type) {
+         public List<HtmlAnchor> getConfigOutputLinks(final String type) {
             final List<HtmlAnchor> hrefs = historyPage
                     .getByXPath("//a[contains(@href, \"configOutput?type=" + type + "\")]");
             return hrefs;
@@ -105,9 +105,9 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
             assertEquals("Job Configuration History [Jenkins]", historyPage.getTitleText());
         }
 
-        public TextPage getDiffPage() throws IOException {
+        public HtmlPage getDiffPage() throws IOException {
             final HtmlForm diffFilesForm = historyPage.getFormByName("diffFiles");
-            return (TextPage) diffFilesForm.submit((HtmlButton) last(diffFilesForm.getHtmlElementsByTagName("button")));
+            return  (HtmlPage) diffFilesForm.submit((HtmlButton) last(diffFilesForm.getHtmlElementsByTagName("button")));
         }
 
         public void setCheckedHistDir1RadioButton(int index, boolean isChecked) {
@@ -183,10 +183,8 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
         final HistoryPage historyPage = new HistoryPage();
         historyPage.setCheckedHistDir1RadioButton(0, true);
         historyPage.setCheckedHistDir2RadioButton(1, true);
-        final String diffPageContent = historyPage.getDiffPage().getContent();
-        assertThat(diffPageContent, containsString("@@ -1,7 +1,7 @@"));
-        assertThat(diffPageContent, containsString("-  <description>" + secondDescription + "</description>"));
-        assertThat(diffPageContent, containsString("+  <description>" + firstDescription + "</description>"));
+        final String diffPageContent = historyPage.getDiffPage().getTextContent();
+        assertThat(diffPageContent, containsString("4	 <description>just a second test</description>	4	 <description>just a test</description>"));
     }
 
 }

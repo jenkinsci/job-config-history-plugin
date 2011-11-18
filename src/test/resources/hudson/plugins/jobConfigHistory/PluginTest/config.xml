@@ -1,10 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson>
-  <version>1.323</version>
+  <version>1.439</version>
   <numExecutors>2</numExecutors>
   <mode>NORMAL</mode>
+ <useSecurity>true</useSecurity>
   <authorizationStrategy class="hudson.security.AuthorizationStrategy$Unsecured"/>
-  <securityRealm class="hudson.security.SecurityRealm$None"/>
+  <securityRealm class="hudson.security.HudsonPrivateSecurityRealm">
+    <disableSignup>false</disableSignup>
+    <enableCaptcha>false</enableCaptcha>
+  </securityRealm>
+  <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter">
+    <disableSyntaxHighlighting>true</disableSyntaxHighlighting>
+  </markupFormatter>
   <jdks/>
   <clouds/>
   <slaves/>
