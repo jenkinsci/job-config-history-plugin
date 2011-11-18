@@ -1,4 +1,47 @@
-<!--
-  Displays the config output as plain/text
--->
-<st:compress xmlns:j="jelly:core" xmlns:st="jelly:stapler"><st:contentType value="text/plain;charset=UTF-8" />${it.diffFile}</st:compress>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <link rel="stylesheet" href="${rootURL}/plugin/jobConfigHistory/diff_highlight.css" />
+  <l:layout title="Job Configuration History">
+    <st:include it="${it.project}" page="sidepanel.jelly" />
+    <l:main-panel>
+      <h1>${%Job Configuration History}</h1>
+      <div>
+        <j:choose>
+          <j:when test="${it.configs.size() == 0}">
+              ${%No job configuration history available}
+          </j:when>
+          <j:otherwise>
+            <div>
+              <j:choose>
+                <j:when test="${it.diffLines.size() == 0}">
+                  <p>${%No lines changed}</p>
+                </j:when>
+                <j:otherwise>
+                  <table class="pane" style="width:100%">
+                    <j:forEach items="${it.diffLines}" var="line">
+                      <tr>
+                        <j:choose>
+                          <j:when test="${line.skipping}">
+                            <th class="lineNum">...</th>
+                            <td class="skipping"></td>
+                            <th class="lineNum">...</th>
+                            <td class="skipping"></td>
+                          </j:when>
+                          <j:otherwise>
+                            <th class="lineNum">${line.left.lineNumber}</th>
+                            <td class="${line.left.cssClass}"><pre>${line.left.text}</pre></td>
+                            <th class="lineNum">${line.right.lineNumber}</th>
+                            <td class="${line.right.cssClass}"><pre>${line.right.text}</pre></td>
+                          </j:otherwise>
+                        </j:choose>
+                      </tr>
+                    </j:forEach>
+                  </table>
+                </j:otherwise>
+              </j:choose>
+            </div>
+          </j:otherwise>
+        </j:choose>
+      </div>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

@@ -3,26 +3,44 @@ package hudson.plugins.jobConfigHistory;
 import hudson.XmlFile;
 import hudson.model.Action;
 import hudson.model.Hudson;
+import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+
+import difflib.Chunk;
+import difflib.Delta;
+import difflib.DiffRow;
+import difflib.DiffRow.Tag;
+import difflib.DiffRowGenerator;
+import difflib.DiffUtils;
+import difflib.Patch;
 
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
 import bmsi.util.Diff.change;
 
 /**
- * Implements some basic methods needed by the {@link JobConfigHistoryRootAction} and {@link JobConfigHistoryProjectAction}.
- *
+ * Implements some basic methods needed by the
+ * {@link JobConfigHistoryRootAction} and {@link JobConfigHistoryProjectAction}.
+ * 
  * @author mfriedenhagen
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
@@ -41,7 +59,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * Make method final, as we always want the same display name.
      */
     // @Override
@@ -51,19 +69,22 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * {@inheritDoc}
-     *
-     * Make method final, as we always want the same icon file. Returns {@code null} to hide the icon if the user is not
-     * allowed to configure jobs.
+     * 
+     * Make method final, as we always want the same icon file. Returns
+     * {@code null} to hide the icon if the user is not allowed to configure
+     * jobs.
      */
     // @Override
     public final String getIconFileName() {
-        return hasConfigurePermission() ? JobConfigHistoryConsts.ICONFILENAME : null;
+        return hasConfigurePermission() ? JobConfigHistoryConsts.ICONFILENAME
+                : null;
     }
 
     /**
      * {@inheritDoc}
-     *
-     * Do not make this method final as {@link JobConfigHistoryRootAction} overrides this method.
+     * 
+     * Do not make this method final as {@link JobConfigHistoryRootAction}
+     * overrides this method.
      */
     // @Override
     public String getUrlName() {
@@ -72,7 +93,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Do we want 'raw' output?
-     *
+     * 
      * @return true if request parameter type is 'raw'.
      */
     public final boolean wantRawOutput() {
@@ -81,7 +102,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Do we want 'xml' output?
-     *
+     * 
      * @return true if request parameter type is 'xml'.
      */
     public final boolean wantXmlOutput() {
@@ -89,11 +110,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as String.
-     *
-     * @return content of the {@code config.xml} found in directory given by the request parameter {@code file}.
+     * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as
+     * String.
+     * 
+     * @return content of the {@code config.xml} found in directory given by the
+     *         request parameter {@code file}.
      * @throws IOException
-     *             if the config file could not be read or converted to an xml string.
+     *             if the config file could not be read or converted to an xml
+     *             string.
      */
     public final String getFile() throws IOException {
         checkConfigurePermission();
@@ -102,8 +126,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * Checks whether the type parameter of the current request equals {@code toCompare}.
-     *
+     * Checks whether the type parameter of the current request equals
+     * {@code toCompare}.
+     * 
      * @param toCompare
      *            the string we want to compare.
      * @return true if {@code toCompare} equals request parameter type.
@@ -113,35 +138,47 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * Returns the configuration file (default is {@code config.xml}) located in {@code diffDir}. 
-     * {@code diffDir} must either start with {@code HUDSON_HOME} and contain {@code config-history}
-     * or be located under the configured {@code historyRootDir}.  It also must not contain a '..' pattern.
-     * Otherwise an {@link IllegalArgumentException} will be thrown.
-     * <p>This is to ensure that this plugin will not be abused to get arbitrary 
+     * Returns the configuration file (default is {@code config.xml}) located in
+     * {@code diffDir}. {@code diffDir} must either start with
+     * {@code HUDSON_HOME} and contain {@code config-history} or be located
+     * under the configured {@code historyRootDir}. It also must not contain a
+     * '..' pattern. Otherwise an {@link IllegalArgumentException} will be
+     * thrown.
+     * <p>
+     * This is to ensure that this plugin will not be abused to get arbitrary
      * xml configuration files located anywhere on the system.
-     *
+     * 
      * @param diffDir
      *            timestamped history directory.
      * @return xmlfile.
      */
     protected XmlFile getConfigXml(final String diffDir) {
-        final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
-        final File configuredHistoryRootDir = plugin.getConfiguredHistoryRootDir();
-        final String allowedHistoryRootDir = configuredHistoryRootDir == null
-                ? getHudson().getRootDir().getAbsolutePath() : configuredHistoryRootDir.getAbsolutePath();
+        final JobConfigHistory plugin = hudson
+                .getPlugin(JobConfigHistory.class);
+        final File configuredHistoryRootDir = plugin
+                .getConfiguredHistoryRootDir();
+        final String allowedHistoryRootDir = configuredHistoryRootDir == null ? getHudson()
+                .getRootDir().getAbsolutePath() : configuredHistoryRootDir
+                .getAbsolutePath();
         File configFile = null;
         if (diffDir != null) {
-            if (!diffDir.startsWith(allowedHistoryRootDir) || diffDir.contains("..")) {
-                throw new IllegalArgumentException(diffDir + " does not start with "
-                        + allowedHistoryRootDir + " or contains '..'");
-            } else if (configuredHistoryRootDir == null && !diffDir.contains(JobConfigHistoryConsts.DEFAULT_HISTORY_DIR)) {
-                throw new IllegalArgumentException(diffDir + " does not contain '"
+            if (!diffDir.startsWith(allowedHistoryRootDir)
+                    || diffDir.contains("..")) {
+                throw new IllegalArgumentException(diffDir
+                        + " does not start with " + allowedHistoryRootDir
+                        + " or contains '..'");
+            } else if (configuredHistoryRootDir == null
+                    && !diffDir
+                            .contains(JobConfigHistoryConsts.DEFAULT_HISTORY_DIR)) {
+                throw new IllegalArgumentException(diffDir
+                        + " does not contain '"
                         + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR + "'");
             }
             configFile = plugin.getConfigFile(new File(diffDir));
         }
         if (configFile == null) {
-            throw new IllegalArgumentException("Unable to get history from: " + diffDir);
+            throw new IllegalArgumentException("Unable to get history from: "
+                    + diffDir);
         } else {
             return new XmlFile(configFile);
         }
@@ -149,7 +186,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Returns the parameter named {@code parameterName} from current request.
-     *
+     * 
      * @param parameterName
      *            name of the parameter.
      * @return value of the request parameter or null if it does not exist.
@@ -159,20 +196,24 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * See whether the current user may read configurations in the object returned by
+     * See whether the current user may read configurations in the object
+     * returned by
      * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
      */
-    protected abstract  void checkConfigurePermission();
+    protected abstract void checkConfigurePermission();
+
     /**
-     * Returns whether the current user may read configurations in the object returned by
+     * Returns whether the current user may read configurations in the object
+     * returned by
      * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
-     *
+     * 
      * @return true if the current user may read configurations.
      */
     protected abstract boolean hasConfigurePermission();
+
     /**
      * Returns the hudson instance.
-     *
+     * 
      * @return the hudson
      */
     protected final Hudson getHudson() {
@@ -181,6 +222,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Returns the JobConfigHistory plugin instance.
+     * 
      * @return the JobConfigHistory plugin
      */
     protected final JobConfigHistory getPlugin() {
@@ -189,33 +231,38 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Returns the object for which we want to provide access control.
-     *
+     * 
      * @return the access controlled object.
      */
     protected abstract AccessControlled getAccessControlledObject();
 
     /**
-     * Parses the incoming {@code POST} request and redirects as {@code GET showDiffFiles}.
-     *
+     * Parses the incoming {@code POST} request and redirects as
+     * {@code GET showDiffFiles}.
+     * 
      * @param req
      *            incoming request
      * @param rsp
      *            outgoing response
      * @throws ServletException
-     *             when parsing the request as {@link MultipartFormDataParser} does not succeed.
+     *             when parsing the request as {@link MultipartFormDataParser}
+     *             does not succeed.
      * @throws IOException
      *             when the redirection does not succeed.
      */
-    public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
+    public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
+            throws ServletException, IOException {
         final MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        rsp.sendRedirect("showDiffFiles?histDir1=" + parser.get("histDir1") + "&histDir2=" + parser.get("histDir2"));
+        rsp.sendRedirect("showDiffFiles?histDir1=" + parser.get("histDir1")
+                + "&histDir2=" + parser.get("histDir2"));
 
     }
 
     /**
-     * Returns a textual diff between two {@code config.xml} files located in {@code histDir1} and {@code histDir2}
-     * directories given as parameters of {@link Stapler#getCurrentRequest()}.
-     *
+     * Returns a textual diff between two {@code config.xml} files located in
+     * {@code histDir1} and {@code histDir2} directories given as parameters of
+     * {@link Stapler#getCurrentRequest()}.
+     * 
      * @return diff
      * @throws IOException
      *             if reading one of the config files does not succeed.
@@ -226,12 +273,163 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         final String[] configXml1Lines = configXml1.asString().split("\\n");
         final XmlFile configXml2 = getConfigXml(getRequestParameter("histDir2"));
         final String[] configXml2Lines = configXml2.asString().split("\\n");
-        return getDiff(configXml1.getFile(), configXml2.getFile(), configXml1Lines, configXml2Lines);
+        return getDiff(configXml1.getFile(), configXml2.getFile(),
+                configXml1Lines, configXml2Lines);
     }
 
     /**
+     * Returns side-by-side (i.e. human-readable) diff view lines.
+     * 
+     * @return diff lines
+     * @throws IOException
+     *             if reading one of the config files does not succeed.
+     */
+    public final List<Line> getDiffLines() throws IOException {
+        List<String> diffLines = Arrays.asList(getDiffFile().split("\n"));
+
+        Patch diff = DiffUtils.parseUnifiedDiff(diffLines);
+        SideBySideView view = new SideBySideView();
+        DiffRowGenerator.Builder builder = new DiffRowGenerator.Builder();
+        builder.columnWidth(Integer.MAX_VALUE);
+        DiffRowGenerator dfg = builder.build();
+        
+        int previousLeftPos = 0;
+        
+        for (Delta delta : diff.getDeltas()) {
+            Chunk original = delta.getOriginal();
+            Chunk revised = delta.getRevised();
+
+            List<DiffRow> diffRows = dfg.generateDiffRows(
+                    (List<String>) original.getLines(),
+                    (List<String>) revised.getLines());
+
+            // Chunk#getPosition() returns 0-origin line numbers, but we need 1-origin line numbers
+            int leftPos = original.getPosition() + 1;
+            int rightPos = revised.getPosition() + 1;
+
+            if (previousLeftPos > 0 && leftPos - previousLeftPos > 1) {
+                Line skippingLine = new Line();
+                skippingLine.skipping = true;
+                view.addLine(skippingLine);
+            }
+
+            for (DiffRow row : diffRows) {
+                Tag tag = row.getTag();
+                Line line = new Line();
+
+                if (tag == Tag.INSERT) {
+                    line.left.cssClass = "diff_original";
+                    
+                    line.right.lineNumber = rightPos;
+                    line.right.text = row.getNewLine();
+                    line.right.cssClass = "diff_revised";
+                    rightPos++;
+
+                } else if (tag == Tag.CHANGE) {
+                    if (StringUtils.isNotEmpty(row.getOldLine())) {
+                        line.left.lineNumber = leftPos;
+                        line.left.text = row.getOldLine();
+                        leftPos++;
+                    }
+                    line.left.cssClass = "diff_original";
+                    
+                    if (StringUtils.isNotEmpty(row.getNewLine())) {
+                        line.right.lineNumber = rightPos;
+                        line.right.text = row.getNewLine();
+                        rightPos++;
+                    }
+                    line.right.cssClass = "diff_revised";
+
+                } else if (tag == Tag.DELETE) {
+                    line.left.lineNumber = leftPos;
+                    line.left.text = row.getOldLine();
+                    line.left.cssClass = "diff_original";
+                    leftPos++;
+                    
+                    line.right.cssClass = "diff_revised";
+
+                } else if (tag == Tag.EQUAL) {
+                    line.left.lineNumber = leftPos;
+                    line.left.text = row.getOldLine();
+                    leftPos++;
+
+                    line.right.lineNumber = rightPos;
+                    line.right.text = row.getNewLine();
+                    rightPos++;
+
+                } else {
+                    throw new IllegalStateException("Unknown tag pattern: " + tag);
+                }
+
+                view.addLine(line);
+                previousLeftPos = leftPos;
+            }
+        }
+        view.clearDuplicateLines();
+        return view.getLines();
+    }
+
+    public static class SideBySideView {
+        private List<Line> lines = new ArrayList<Line>();
+
+        public List<Line> getLines() {
+            return Collections.unmodifiableList(lines);
+        }
+        public void addLine(Line line) {
+            lines.add(line);
+        }
+        public void clearDuplicateLines() {
+            Iterator<Line> iter = lines.iterator();
+            Set<String> duplicateLineChecker = new HashSet<String>();
+            while (iter.hasNext()) {
+                Line line = iter.next();
+                String lineNum = line.left.getLineNumber();
+                if (!lineNum.equals("")) {
+                    if (duplicateLineChecker.contains(lineNum)) {
+                        iter.remove();
+                    } else {
+                        duplicateLineChecker.add(lineNum);
+                    }
+                }
+            }
+        }
+        
+        public static class Line {
+            private Item left = new Item();
+            private Item right = new Item();
+            private boolean skipping = false;
+
+            public Item getLeft() {
+                return left;
+            }
+            public Item getRight() {
+                return right;
+            }
+            public boolean isSkipping() {
+                return skipping;
+            }
+
+            public static class Item {
+                private Integer lineNumber;
+                private String text;
+                private String cssClass;
+
+                public String getLineNumber() {
+                    return lineNumber == null ? "" : String.valueOf(lineNumber);
+                }
+                public String getText() {
+                    return text;
+                }
+                public String getCssClass() {
+                    return cssClass;
+                }
+            }
+        }
+    }
+    
+    /**
      * Returns a unified diff between two string arrays.
-     *
+     * 
      * @param file1
      *            first config file.
      * @param file2
@@ -242,13 +440,15 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *            the lines of the second file.
      * @return unified diff
      */
-    protected final String getDiff(final File file1, final File file2, final String[] file1Lines, final String[] file2Lines) {
+    protected final String getDiff(final File file1, final File file2,
+            final String[] file1Lines, final String[] file2Lines) {
         final change change = new Diff(file1Lines, file2Lines).diff_2(false);
-        final DiffPrint.UnifiedPrint unifiedPrint = new DiffPrint.UnifiedPrint(file1Lines, file2Lines);
+        final DiffPrint.UnifiedPrint unifiedPrint = new DiffPrint.UnifiedPrint(
+                file1Lines, file2Lines);
         final StringWriter output = new StringWriter();
         unifiedPrint.setOutput(output);
         unifiedPrint.print_header(file1.getPath(), file2.getPath());
         unifiedPrint.print_script(change);
         return output.toString();
-    }   
+    }
 }
