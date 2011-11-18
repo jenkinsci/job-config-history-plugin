@@ -9,7 +9,7 @@
 
     <artifactId>jobConfigHistory</artifactId>
     <packaging>hpi</packaging>
-    <version>1.12-SNAPSHOT</version>
+    <version>1.12</version>
     <name>Jenkins Job Configuration History Plugin</name>
     <description>Saves copies of all job configurations.</description>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/JobConfigHistory+Plugin</url>
