@@ -31,22 +31,22 @@ public enum ConfigHistoryListenerHelper {
     /**
      * Helper for job creation.
      */
-    CREATED("Created"),
+    CREATED(Messages.ConfigHistoryListenerHelper_CREATED()),
 
     /**
      * Helper for job rename.
      */
-    RENAMED("Renamed"),
+    RENAMED(Messages.ConfigHistoryListenerHelper_RENAMED()),
 
     /**
      * Helper for job change.
      */
-    CHANGED("Changed"),
+    CHANGED(Messages.ConfigHistoryListenerHelper_CHANGED()),
 
     /**
      * Helper for job deleted.
      */
-    DELETED("Deleted");
+    DELETED(Messages.ConfigHistoryListenerHelper_DELETED());
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(ConfigHistoryListenerHelper.class.getName());
@@ -148,7 +148,7 @@ public enum ConfigHistoryListenerHelper {
             userId = currentUser.getId();
         } else {
             user = "Anonym";
-            userId = "anonymous";
+            userId = Messages.ConfigHistoryListenerHelper_anonymous();
         }
 
         final XmlFile historyDescription = new XmlFile(new File(timestampedDir, JobConfigHistoryConsts.HISTORY_FILE));
