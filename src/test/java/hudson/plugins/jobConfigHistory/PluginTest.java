@@ -183,8 +183,12 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
         final HistoryPage historyPage = new HistoryPage();
         historyPage.setCheckedHistDir1RadioButton(0, true);
         historyPage.setCheckedHistDir2RadioButton(1, true);
-        final String diffPageContent = historyPage.getDiffPage().getTextContent();
-        assertThat(diffPageContent, containsString("4	 <description>just a second test</description>	4	 <description>just a test</description>"));
+        final HtmlPage diffPage = historyPage.getDiffPage();
+        final String diffPageContent = diffPage.asXml();
+        assertThat(diffPageContent, containsString("<td class=\"diff_original\">"));
+        assertThat(diffPageContent, containsString("<td class=\"diff_revised\">"));
+        assertThat(diffPageContent, containsString("&lt;description&gt;just a test&lt;/description&gt;"));
+        assertThat(diffPageContent, containsString("&lt;description&gt;just a second test&lt;/description&gt;"));
     }
 
 }
