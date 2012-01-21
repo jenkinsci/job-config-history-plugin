@@ -169,6 +169,20 @@
                 </configuration>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${maven-checkstyle-plugin.version}</version>
+                    <configuration>
+                        <enableRulesSummary>false</enableRulesSummary>
+                        <configLocation>${basedir}/src/conf/checkstyle-ruleset.xml</configLocation>
+                        <excludes>bmsi/util/*.java</excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
     <profiles>
         <profile>
@@ -184,7 +198,7 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-site-plugin</artifactId>
-                            <version>3.0-beta-3</version>
+                            <version>3.0</version>
                         </plugin>
                     </plugins>
                 </pluginManagement>
