@@ -285,21 +285,21 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *             if reading one of the config files does not succeed.
      */
     public final List<Line> getDiffLines() throws IOException {
-        List<String> diffLines = Arrays.asList(getDiffFile().split("\n"));
+        final List<String> diffLines = Arrays.asList(getDiffFile().split("\n"));
 
-        Patch diff = DiffUtils.parseUnifiedDiff(diffLines);
-        SideBySideView view = new SideBySideView();
-        DiffRowGenerator.Builder builder = new DiffRowGenerator.Builder();
+        final Patch diff = DiffUtils.parseUnifiedDiff(diffLines);
+        final SideBySideView view = new SideBySideView();
+        final DiffRowGenerator.Builder builder = new DiffRowGenerator.Builder();
         builder.columnWidth(Integer.MAX_VALUE);
-        DiffRowGenerator dfg = builder.build();
+        final DiffRowGenerator dfg = builder.build();
         
         int previousLeftPos = 0;
         
-        for (Delta delta : diff.getDeltas()) {
-            Chunk original = delta.getOriginal();
-            Chunk revised = delta.getRevised();
+        for (final Delta delta : diff.getDeltas()) {
+            final Chunk original = delta.getOriginal();
+            final Chunk revised = delta.getRevised();
 
-            List<DiffRow> diffRows = dfg.generateDiffRows(
+            final List<DiffRow> diffRows = dfg.generateDiffRows(
                     (List<String>) original.getLines(),
                     (List<String>) revised.getLines());
 
@@ -308,14 +308,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             int rightPos = revised.getPosition() + 1;
 
             if (previousLeftPos > 0 && leftPos - previousLeftPos > 1) {
-                Line skippingLine = new Line();
+                final Line skippingLine = new Line();
                 skippingLine.skipping = true;
                 view.addLine(skippingLine);
             }
 
-            for (DiffRow row : diffRows) {
-                Tag tag = row.getTag();
-                Line line = new Line();
+            for (final DiffRow row : diffRows) {
+                final Tag tag = row.getTag();
+                final Line line = new Line();
 
                 if (tag == Tag.INSERT) {
                     line.left.cssClass = "diff_original";
@@ -370,7 +370,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     public static class SideBySideView {
-        private List<Line> lines = new ArrayList<Line>();
+        final private List<Line> lines = new ArrayList<Line>();
 
         public List<Line> getLines() {
             return Collections.unmodifiableList(lines);
@@ -379,12 +379,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             lines.add(line);
         }
         public void clearDuplicateLines() {
-            Iterator<Line> iter = lines.iterator();
-            Set<String> duplicateLineChecker = new HashSet<String>();
+            final Iterator<Line> iter = lines.iterator();
+            final Set<String> duplicateLineChecker = new HashSet<String>();
             while (iter.hasNext()) {
-                Line line = iter.next();
-                String lineNum = line.left.getLineNumber();
-                if (!lineNum.equals("")) {
+                final Line line = iter.next();
+                final String lineNum = line.left.getLineNumber();
+                if (lineNum.length() != 0) {
                     if (duplicateLineChecker.contains(lineNum)) {
                         iter.remove();
                     } else {
@@ -395,8 +395,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         }
         
         public static class Line {
-            private Item left = new Item();
-            private Item right = new Item();
+            final private Item left = new Item();
+            final private Item right = new Item();
             private boolean skipping = false;
 
             public Item getLeft() {
