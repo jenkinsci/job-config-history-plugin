@@ -369,15 +369,38 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return view.getLines();
     }
 
+    /**
+     * Holds information for the SideBySideView.
+     */
     public static class SideBySideView {
+
+        /**
+         * All lines of the view.
+         */
         final private List<Line> lines = new ArrayList<Line>();
 
+        /**
+         * Returns the lines of the {@link SideBySideView}.
+         *
+         * @return an unmodifiable view of the lines.
+         */
         public List<Line> getLines() {
             return Collections.unmodifiableList(lines);
         }
+        /**
+         * Adds a line.
+         *
+         * @param line
+         */
         public void addLine(Line line) {
             lines.add(line);
         }
+        /**
+         * Deletes all dupes in the given lines.
+         * 
+         * TODO: encapsulate the call as we probably always want the
+         * deduplicated lines only.
+         */
         public void clearDuplicateLines() {
             final Iterator<Line> iter = lines.iterator();
             final Set<String> duplicateLineChecker = new HashSet<String>();
@@ -394,32 +417,74 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             }
         }
         
+        /**
+         * Holds information about a single line, which consists
+         * of the left and right information of the diff.
+         */
         public static class Line {
             final private Item left = new Item();
             final private Item right = new Item();
             private boolean skipping = false;
 
+            /**
+             * Returns the left version of a modificated line.
+             *
+             * @return left item.
+             */
             public Item getLeft() {
                 return left;
             }
+
+            /**
+             * Returns the right version of a modificated line.
+             *
+             * @return right item.
+             */
             public Item getRight() {
                 return right;
             }
+            /**
+             * Should we skip this line.
+             * 
+             * @return true when the line should be skipped.
+             */
             public boolean isSkipping() {
                 return skipping;
             }
 
+            /**
+             * Simple representation of a diff element.
+             *
+             * Additional to the the text rhis includes the linenumber
+             * as well as the corresponding cssClass which signals wether
+             * the item was modified, added or deleted.
+             */
             public static class Item {
                 private Integer lineNumber;
                 private String text;
                 private String cssClass;
 
+                /**
+                 * Returns the line number of the Item.
+                 * @return lineNumber.
+                 */
                 public String getLineNumber() {
                     return lineNumber == null ? "" : String.valueOf(lineNumber);
                 }
+
+                /**
+                 * Returns the text of the Item.
+                 * @return text.
+                 */
                 public String getText() {
                     return text;
                 }
+
+                /**
+                 * Returns the cssClass of the Item.
+                 *
+                 * @return cssClass.
+                 */
                 public String getCssClass() {
                     return cssClass;
                 }
