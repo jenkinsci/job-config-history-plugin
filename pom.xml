@@ -127,6 +127,7 @@
                     <instrumentation>
                         <excludes>
                             <exclude>hudson/plugins/jobConfigHistory/JobConfigHistoryConsts.class</exclude>
+                            <exclude>hudson/plugins/jobConfigHistory/Messages.class</exclude>
                             <exclude>bmsi/util/*.class</exclude>
                         </excludes>
                     </instrumentation>
