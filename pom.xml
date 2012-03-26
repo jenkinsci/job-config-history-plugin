@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.424.2</version>
+        <version>1.424.6</version>
     </parent>
 
     <artifactId>jobConfigHistory</artifactId>
@@ -115,6 +115,35 @@
             <groupId>com.googlecode.java-diff-utils</groupId>
             <artifactId>diffutils</artifactId>
             <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <!--
+                stapler-1.172 depends on r06, which is missing symbol
+                com.google.common.collect.ImmutableList.copyOf(Ljava/util/Collection;)
+                new version 11.0.1 with this symbol is provided in jenkins-1.424.6
+            -->
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>11.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kohsuke.stapler</groupId>
+            <artifactId>stapler</artifactId>
+            <version>1.172</version>
+            <scope>provided</scope>
+        </dependency>
+            <dependency>
+            <groupId>org.kohsuke.stapler</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.1-rev7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.localizer</groupId>
+            <artifactId>localizer</artifactId>
+            <version>1.10</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>
