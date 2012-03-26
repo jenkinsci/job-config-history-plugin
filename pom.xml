@@ -55,18 +55,18 @@
         </developer>
     </developers>
 
-    <!-- get every artifact through maven.glassfish.org, which proxies all the artifacts that we need -->
+    <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
     <repositories>
       <repository>
         <id>m.g.o-public</id>
-        <url>http://maven.glassfish.org/content/groups/public/</url>
+        <url>http://repo.jenkins-ci.org/repo/</url>
       </repository>
     </repositories>
 
     <pluginRepositories>
       <pluginRepository>
         <id>m.g.o-public</id>
-        <url>http://maven.glassfish.org/content/groups/public/</url>
+        <url>http://repo.jenkins-ci.org/repo/</url>
       </pluginRepository>
     </pluginRepositories>
 
