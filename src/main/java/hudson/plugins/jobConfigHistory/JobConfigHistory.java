@@ -4,6 +4,7 @@ import hudson.Plugin;
 import hudson.XmlFile;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
+import hudson.model.ItemGroup;
 import hudson.model.Saveable;
 import hudson.model.Descriptor.FormException;
 import hudson.util.FormValidation;
@@ -46,6 +47,9 @@ public class JobConfigHistory extends Plugin {
      */
     private boolean saveSystemConfiguration;
 
+    /** Flag to indicated ItemGroups configuration is saved as well */
+    private boolean saveItemGroupConfiguration;
+
     /** Flag to indicate if we should save history when it 
      *  is a duplication of the previous saved configuration.
      */
@@ -84,6 +88,7 @@ public class JobConfigHistory extends Plugin {
         historyRootDir = formData.getString("historyRootDir").trim();
         maxHistoryEntries = formData.getString("maxHistoryEntries").trim();
         saveSystemConfiguration = formData.getBoolean("saveSystemConfiguration");
+        saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
         skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
         excludePattern = formData.getString("excludePattern");
         save();
@@ -118,6 +123,10 @@ public class JobConfigHistory extends Plugin {
      */
     public boolean getSaveSystemConfiguration() {
         return saveSystemConfiguration;
+    }
+
+    public boolean getSaveItemGroupConfiguration() {
+        return saveItemGroupConfiguration;
     }
 
     /**
@@ -309,6 +318,8 @@ public class JobConfigHistory extends Plugin {
             } else {
                 saveable = true;
             }
+        } else if (saveItemGroupConfiguration && item instanceof ItemGroup) {
+            saveable = true;
         }
         if (saveable && skipDuplicateHistory && hasDuplicateHistory(xmlFile)) {
             LOG.fine("found duplicate history, skipping save of " + xmlFile);

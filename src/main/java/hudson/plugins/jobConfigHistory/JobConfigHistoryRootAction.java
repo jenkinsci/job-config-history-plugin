@@ -2,7 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
 import hudson.XmlFile;
-import hudson.model.AbstractProject;
+import hudson.model.AbstractItem;
 import hudson.model.Hudson;
 import hudson.model.RootAction;
 import hudson.security.AccessControlled;
@@ -37,9 +37,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     }
 
     /**
-     * Returns the configuration history entries for all {@link AbstractProject}s and System files in this Hudson instance.
+     * Returns the configuration history entries for all {@link AbstractItem}s and System files in this Hudson instance.
      *
-     * @return list for all {@link AbstractProject}s.
+     * @return list for all {@link AbstractItem}s.
      * @throws IOException
      *             if one of the history entries might not be read.
      */
@@ -49,12 +49,12 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         // we don't display any project info if we are filtered (applies to system configuration only)
         if (filter == null) {
             @SuppressWarnings("unchecked")
-            final List<AbstractProject> projects = Hudson.getInstance().getItems(AbstractProject.class);
-            for (final AbstractProject<?, ?> project : projects) {
-                LOG.finest("getConfigs: Getting configs for " + project.getName());
-                final JobConfigHistoryProjectAction action = new JobConfigHistoryProjectAction(project);
+            final List<AbstractItem> items = Hudson.getInstance().getAllItems(AbstractItem.class);
+            for (final AbstractItem item : items) {
+                LOG.finest("getConfigs: Getting configs for " + item.getFullName());
+                final JobConfigHistoryProjectAction action = new JobConfigHistoryProjectAction(item);
                 final List<ConfigInfo> jobConfigs = action.getConfigs();
-                LOG.finest("getConfigs: " + project.getName() + " has " + jobConfigs.size() + " history items");
+                LOG.finest("getConfigs: " + item.getFullName() + " has " + jobConfigs.size() + " history items");
                 configs.addAll(jobConfigs);
             }
         }

@@ -3,7 +3,7 @@ package hudson.plugins.jobConfigHistory;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Item;
-import hudson.model.AbstractProject;
+import hudson.model.AbstractItem;
 import hudson.model.Hudson;
 import hudson.model.listeners.ItemListener;
 
@@ -29,10 +29,10 @@ public final class JobConfigHistoryJobListener extends ItemListener {
     @Override
     public void onCreated(Item item) {
         LOG.finest("In onCreated for " + item);
-        if (item instanceof AbstractProject<?, ?>) {
-            ConfigHistoryListenerHelper.CREATED.createNewHistoryEntry(((AbstractProject<?, ?>) item).getConfigFile());
+        if (item instanceof AbstractItem) {
+            ConfigHistoryListenerHelper.CREATED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
         } else {
-            LOG.finest("onCreated: not an AbstractProject, skipping history save");
+            LOG.finest("onCreated: not an AbstractItem, skipping history save");
         }
         LOG.finest("onCreated for " + item + " done.");
         //        new Exception("STACKTRACE for double invocation").printStackTrace();
@@ -48,14 +48,14 @@ public final class JobConfigHistoryJobListener extends ItemListener {
     public void onRenamed(Item item, String oldName, String newName) {
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         LOG.finest("In onRenamed for " + item + onRenameDesc);
-        if (item instanceof AbstractProject<?, ?>) {
-            ConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry(((AbstractProject<?, ?>) item).getConfigFile());
+        if (item instanceof AbstractItem) {
+            ConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
             final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
 
             // move history items from previous name, if the directory exists
             // only applies if using a custom root directory for saving history
             if (plugin.getConfiguredHistoryRootDir() != null) {
-                final File currentHistoryDir = plugin.getHistoryDir(((AbstractProject<?, ?>) item).getConfigFile());
+                final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
                 final File historyParentDir = currentHistoryDir.getParentFile();
                 final File oldHistoryDir = new File(historyParentDir, oldName);
                 if (oldHistoryDir.exists()) {
@@ -83,7 +83,7 @@ public final class JobConfigHistoryJobListener extends ItemListener {
     @Override
     public void onDeleted(Item item) {
         LOG.finest("In onDeleted for " + item);
-        if (item instanceof AbstractProject<?, ?>) {
+        if (item instanceof AbstractItem) {
             final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
 
             // At this point, the /jobs/<job> directory has been deleted.  We do not want to take any
@@ -92,8 +92,8 @@ public final class JobConfigHistoryJobListener extends ItemListener {
             //
             // Also rename history directory to <job>_deleted_<timestamp> - should be a safe 'unique' name
             if (plugin.getConfiguredHistoryRootDir() != null) {
-                ConfigHistoryListenerHelper.DELETED.createNewHistoryEntry(((AbstractProject<?, ?>) item).getConfigFile());
-                final File currentHistoryDir = plugin.getHistoryDir(((AbstractProject<?, ?>) item).getConfigFile());
+                ConfigHistoryListenerHelper.DELETED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
+                final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
 
                 final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
                 final String timestamp = buildDateFormat.format(new Date());
