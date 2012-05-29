@@ -1,6 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
+import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.security.AccessControlled;
 
@@ -23,18 +24,18 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @param project
      *            for which configurations should be returned.
      */
-    public JobConfigHistoryProjectAction(AbstractProject<?, ?> project) {
+    public JobConfigHistoryProjectAction(AbstractItem project) {
         super();
         this.project = project;
     }
 
     /** The project. */
-    private final transient AbstractProject<?, ?> project;
+    private final transient AbstractItem project;
 
     /**
-     * Returns the configuration history entries for one {@link AbstractProject}.
+     * Returns the configuration history entries for one {@link AbstractItem}.
      *
-     * @return history list for one {@link AbstractProject}.
+     * @return history list for one {@link AbstractItem}.
      * @throws IOException
      *             if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be read or the path might not be urlencoded.
      */
@@ -61,7 +62,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      *
      * @return project
      */
-    public final AbstractProject<?, ?> getProject() {
+    public final AbstractItem getProject() {
         return project;
     }
 
