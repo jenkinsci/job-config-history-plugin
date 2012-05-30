@@ -1,5 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
+import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 
 import java.io.File;
@@ -43,7 +44,7 @@ public class ConfigInfo {
     /**
      * Returns a new ConfigInfo object for a Hudson job.
      *
-     * @param job
+     * @param item
      *            a project
      * @param file
      *            pointing to {@code config.xml}
@@ -54,10 +55,10 @@ public class ConfigInfo {
      * @throws UnsupportedEncodingException
      *             if UTF-8 is not available (probably a serious error).
      */
-    public static ConfigInfo create(final AbstractProject<?, ?> job, final File file, final HistoryDescr histDescr)
+    public static ConfigInfo create(final AbstractItem item, final File file, final HistoryDescr histDescr)
         throws UnsupportedEncodingException {
         return new ConfigInfo(
-                job.getName(),
+                item.getName(),
                 URLEncoder.encode(file.getAbsolutePath(), "utf-8"),
                 histDescr.getTimestamp(),
                 histDescr.getUser(),
