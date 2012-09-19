@@ -21,10 +21,11 @@
                     <td class="pane-header" align="left">${%Operation}</td>
                     <td class="pane-header" align="left">${%User}</td>
                     <td class="pane-header" align="left">${%Show File}</td>
+                    <td class="pane-header" align="left">${%Revert}</td>
                     <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">${%Diff}</td>
                   </tr>
                   <tr>
-                    <td colspan="4"></td>
+                    <td colspan="5"></td>
                     <td align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
                     <td align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
                   </tr>
@@ -41,6 +42,10 @@
                           <st:nbsp />
                           <a href="configOutput?type=raw&amp;file=${config.file}">
                             (${%RAW})
+                          </a>
+                      </td>
+                      <td><a href="revertQuestion?file=${config.file}">
+                            ${%Revert}
                           </a>
                       </td>
                       <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir1" value="${config.file}" checked="${configNr == 2 ? true:false}" /></td>

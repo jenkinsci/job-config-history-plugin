@@ -3,14 +3,22 @@ package hudson.plugins.jobConfigHistory;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
+import hudson.model.Hudson;
 import hudson.security.AccessControlled;
+import hudson.util.MultipartFormDataParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.servlet.ServletException;
+
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
  * @author Stefan Brausch
@@ -83,4 +91,29 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     protected boolean hasConfigurePermission() {
         return getAccessControlledObject().hasPermission(AbstractProject.CONFIGURE);
     }
+    
+ 
+    public final void doRevertOrNot(StaplerRequest req, StaplerResponse rsp)
+            throws IOException {
+        checkConfigurePermission();
+        final String bla = req.getParameter("file");
+        final Writer writer = rsp.getCompressedWriter(req);
+        try {
+            writer.append("HUHU! " + bla);              
+        } finally {
+            writer.close();
+        }
+        
+ //       String version = req.getParameter("version");
+ //       rsp.sendRedirect("showRevertQuestion?version=" + version);
+    }
+
+    /* Tut ned!
+    public final String getDate(StaplerRequest req){
+        final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
+
+        File configFile = plugin.getConfigFile(new File(req.getParameter("file")));
+        return configFile.getDate();
+    }*/
+    
 }

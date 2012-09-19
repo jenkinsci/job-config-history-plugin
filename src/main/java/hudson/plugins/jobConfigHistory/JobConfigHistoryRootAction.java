@@ -130,6 +130,4 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     protected boolean hasConfigurePermission() {
         return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
     }
-
-
 }
