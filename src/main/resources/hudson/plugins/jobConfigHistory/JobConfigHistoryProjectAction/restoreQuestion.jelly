@@ -1,0 +1,20 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <l:layout title="Job Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
+    <st:include it="${it.project}" page="sidepanel.jelly" />
+    <l:main-panel>
+		${%Replace the current configuration with the version from:}
+		<br />
+    	${%Date}: ${request.getParameter("date")}
+    	<br />
+    	${%User}: ${request.getParameter("user")}
+    	<br />
+		
+    	<f:form action="restore?file=${request.getParameter('file')}" name="restore" method="post">
+           	<f:entry>
+                <f:submit value="${%Yes}"/>
+           	</f:entry>
+        </f:form>
+
+    </l:main-panel>
+  </l:layout>
+</j:jelly>
