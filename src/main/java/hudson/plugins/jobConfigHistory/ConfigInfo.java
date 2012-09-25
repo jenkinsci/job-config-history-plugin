@@ -1,7 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.model.AbstractItem;
-import hudson.model.AbstractProject;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

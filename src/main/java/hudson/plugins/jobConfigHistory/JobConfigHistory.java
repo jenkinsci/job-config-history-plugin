@@ -37,7 +37,7 @@ import org.kohsuke.stapler.StaplerRequest;
 public class JobConfigHistory extends Plugin {
     /** Root directory for storing configuration history. */
     private String historyRootDir;
-
+    
     /** Maximum number of configuration history entries to keep. */
     private String maxHistoryEntries;
 
@@ -101,7 +101,7 @@ public class JobConfigHistory extends Plugin {
     public String getHistoryRootDir() {
         return historyRootDir;
     }
-
+    
     /**
      * @return The maximum number of history entries to keep.
      */

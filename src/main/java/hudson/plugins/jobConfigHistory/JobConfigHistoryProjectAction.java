@@ -5,20 +5,16 @@ import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.security.AccessControlled;
-import hudson.util.MultipartFormDataParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletException;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.kohsuke.stapler.StaplerRequest;
@@ -96,14 +92,19 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         return getAccessControlledObject().hasPermission(AbstractProject.CONFIGURE);
     }
     
- 
+    /**
+     * Action when 'restore' button is pressed.
+     * @param req incoming StaplerRequest
+     * @param rsp outgoing StaplerResponse
+     * @throws IOException if something goes wrong
+     */
     public final void doRestore(StaplerRequest req, StaplerResponse rsp)
-            throws IOException {
+        throws IOException {
         checkConfigurePermission();
         
-        XmlFile xmlFile = getConfigXml((req.getParameter("file")));
-        String oldConfig = xmlFile.asString();
-        InputStream is = new ByteArrayInputStream(oldConfig.getBytes("UTF-8"));
+        final XmlFile xmlFile = getConfigXml((req.getParameter("file")));
+        final String oldConfig = xmlFile.asString();
+        final InputStream is = new ByteArrayInputStream(oldConfig.getBytes("UTF-8"));
 
         project.updateByXml(new StreamSource(is));
         project.save();
