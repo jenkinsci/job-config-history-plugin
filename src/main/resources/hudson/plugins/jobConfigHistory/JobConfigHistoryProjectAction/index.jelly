@@ -21,10 +21,11 @@
                     <td class="pane-header" align="left">${%Operation}</td>
                     <td class="pane-header" align="left">${%User}</td>
                     <td class="pane-header" align="left">${%Show File}</td>
+                    <td class="pane-header" align="left">${%Restore old config}</td>
                     <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">${%Diff}</td>
                   </tr>
                   <tr>
-                    <td colspan="4"></td>
+                    <td colspan="5"></td>
                     <td align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
                     <td align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
                   </tr>
@@ -42,6 +43,12 @@
                           <a href="configOutput?type=raw&amp;file=${config.file}">
                             (${%RAW})
                           </a>
+                      </td>
+                      <td><j:if test="${configNr > 1}">
+							<a href="restoreQuestion?file=${config.file}&amp;date=${config.date}&amp;user=${config.userID}">
+								<img src="${rootURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
+							</a>
+                          </j:if>
                       </td>
                       <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir1" value="${config.file}" checked="${configNr == 2 ? true:false}" /></td>
                       <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir2" value="${config.file}" checked="${configNr == 1 ? true:false}" /></td>

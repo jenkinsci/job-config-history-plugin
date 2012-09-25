@@ -94,11 +94,12 @@ public final class JobConfigHistoryJobListener extends ItemListener {
             if (plugin.getConfiguredHistoryRootDir() != null) {
                 ConfigHistoryListenerHelper.DELETED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
                 final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
-
+                
                 final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
                 final String timestamp = buildDateFormat.format(new Date());
                 final String deletedHistoryName = currentHistoryDir.getName() + "_deleted_" + timestamp;
                 final File deletedHistoryDir = new File(currentHistoryDir.getParentFile(), deletedHistoryName);
+                
                 if (!currentHistoryDir.renameTo(deletedHistoryDir)) {
                     LOG.warning("unable to rename deleted history dir to: " + deletedHistoryDir);
                 }

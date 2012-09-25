@@ -516,4 +516,5 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         unifiedPrint.print_script(change);
         return output.toString();
     }
+
 }
