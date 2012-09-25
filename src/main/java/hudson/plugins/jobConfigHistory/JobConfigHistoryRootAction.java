@@ -45,6 +45,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      */
     public final List<ConfigInfo> getConfigs() throws IOException {
         final String filter = getRequestParameter("filter");
+
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         // we don't display any project info if we are filtered (applies to system configuration only)
         if (filter == null) {
@@ -57,6 +58,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
                 LOG.finest("getConfigs: " + item.getFullName() + " has " + jobConfigs.size() + " history items");
                 configs.addAll(jobConfigs);
             }
+            //TODO hier muss gelistet werden
         }
         final List<ConfigInfo> systemConfigs = getSystemConfigs(filter);
         LOG.finest("getSystemConfigs: has " + systemConfigs.size() + " history items");
