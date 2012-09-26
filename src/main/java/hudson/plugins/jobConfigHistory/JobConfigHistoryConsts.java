@@ -23,6 +23,9 @@ public final class JobConfigHistoryConsts {
     /** Default directory for storing history. */
     public static final String DEFAULT_HISTORY_DIR = "config-history";
 
+    /** Directory for keeping deleted jobs. */
+    public static final String DELETED_JOBS_DIR ="deletedjobs";
+    
     /** name of history xml file. */
     public static final String HISTORY_FILE = "history.xml";
 

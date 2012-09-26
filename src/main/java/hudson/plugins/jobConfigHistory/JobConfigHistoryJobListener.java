@@ -85,13 +85,25 @@ public final class JobConfigHistoryJobListener extends ItemListener {
         LOG.finest("In onDeleted for " + item);
         if (item instanceof AbstractItem) {
             final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
-
+            
+            ConfigHistoryListenerHelper.DELETED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
+            final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
+            
+            final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
+            final String timestamp = buildDateFormat.format(new Date());
+            final String deletedHistoryName = currentHistoryDir.getName() + "_deleted_" + timestamp;
+            final File deletedHistoryDir = new File(plugin.getDeletedJobsDir(), deletedHistoryName);
+            
+            if (!currentHistoryDir.renameTo(deletedHistoryDir)) {
+                LOG.warning("unable to rename deleted history dir to: " + deletedHistoryDir);
+            }
+            
             // At this point, the /jobs/<job> directory has been deleted.  We do not want to take any
             // further action unless the history root dir is customized: otherwise we will re-create
             // the /jobs/<job>/config-history directory that we just deleted.
             //
             // Also rename history directory to <job>_deleted_<timestamp> - should be a safe 'unique' name
-            if (plugin.getConfiguredHistoryRootDir() != null) {
+/*            if (plugin.getConfiguredHistoryRootDir() != null) {
                 ConfigHistoryListenerHelper.DELETED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
                 final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
                 
@@ -104,7 +116,7 @@ public final class JobConfigHistoryJobListener extends ItemListener {
                     LOG.warning("unable to rename deleted history dir to: " + deletedHistoryDir);
                 }
             }
-        }
+*/        }
         LOG.finest("onDeleted for " + item + " done.");
     }
 }

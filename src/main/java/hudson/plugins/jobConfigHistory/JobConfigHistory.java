@@ -38,6 +38,12 @@ public class JobConfigHistory extends Plugin {
     /** Root directory for storing configuration history. */
     private String historyRootDir;
     
+    /**
+     * Whether job configurations should be saved in one directory together 
+     * or with the individual jobs
+     */
+    private boolean useRootDir;
+    
     /** Maximum number of configuration history entries to keep. */
     private String maxHistoryEntries;
 
@@ -85,7 +91,14 @@ public class JobConfigHistory extends Plugin {
     @Override
     public void configure(StaplerRequest req, JSONObject formData)
         throws IOException, ServletException, FormException {
-        historyRootDir = formData.getString("historyRootDir").trim();
+
+        if (formData.containsKey("useRootDir")){
+            useRootDir = true;
+            historyRootDir = formData.getJSONObject("useRootDir").getString("historyRootDir").trim();
+        } else {
+            useRootDir = false;
+        }
+        
         maxHistoryEntries = formData.getString("maxHistoryEntries").trim();
         saveSystemConfiguration = formData.getBoolean("saveSystemConfiguration");
         saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
@@ -100,6 +113,10 @@ public class JobConfigHistory extends Plugin {
      */
     public String getHistoryRootDir() {
         return historyRootDir;
+    }
+    
+    public boolean getUseRootDir(){
+        return useRootDir;
     }
     
     /**
@@ -250,7 +267,6 @@ public class JobConfigHistory extends Plugin {
      *
      * @return The directory used for storing system configurations.
      */
-
     protected File getSystemHistoryDir() {
         final File actualHistoryRoot = getConfiguredHistoryRootDir();
         if (actualHistoryRoot != null) {
@@ -259,6 +275,25 @@ public class JobConfigHistory extends Plugin {
             return new File(Hudson.getInstance().root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
         }
     }
+    
+
+    /**
+     * Returns the directory for storing deleted jobs.
+     *
+     * @return The directory used for storing deleted jobs.
+     */
+    protected File getDeletedJobsDir() {
+        final File deletedJobsDir = new File(Hudson.getInstance().root, JobConfigHistoryConsts.DELETED_JOBS_DIR);
+        if (!deletedJobsDir.exists()){
+            try {
+                deletedJobsDir.mkdir();
+            } catch (SecurityException ex) {
+                LOG.warning("Could not create directory: " + deletedJobsDir);
+            }
+        }
+        return deletedJobsDir;
+    }
+
 
     /**
      * Returns the configuration data file stored in the specified history directory.
