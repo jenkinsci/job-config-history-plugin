@@ -1,6 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
+import hudson.model.AbstractItem;
 import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
@@ -17,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -44,6 +46,9 @@ import bmsi.util.Diff.change;
  * @author mfriedenhagen
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
+
+    /** Our logger. */
+    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
 
     /**
      * The hudson instance.
@@ -138,6 +143,102 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
+     * Returns the configuration history entries 
+     * for either {@link AbstractItem}s or system changes or deleted jobs 
+     * or all of the above.
+     *
+     * @return list of configuration histories (as ConfigInfo)
+     * @throws IOException
+     *             if one of the history entries might not be read.
+     */
+     public final List<ConfigInfo> getConfigs() throws IOException {
+        final String filter = getRequestParameter("filter");
+        final List<ConfigInfo> configs;
+
+        if ("jobs".equals(filter)) {
+            configs = getAllJobConfigs();
+        } else if ("deleted".equals(filter)) {
+            configs = getDeletedJobs();
+        } else if ("all".equals(filter)) {
+            configs = getAllJobConfigs();
+            configs.addAll(getSystemConfigs());
+            configs.addAll(getDeletedJobs());
+        } else {
+            configs = getSystemConfigs();
+        }
+        return configs;
+     }
+
+     /**
+      * Returns the configuration history entries for all {@link AbstractItem}s.
+      *
+      * @return list for all {@link AbstractItem}s.
+      * @throws IOException
+      *             if one of the history entries might not be read.
+      */
+     private final List<ConfigInfo> getAllJobConfigs() throws IOException {
+         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+
+         final List<AbstractItem> items = Hudson.getInstance().getAllItems(AbstractItem.class);
+         for (final AbstractItem item : items) {
+             LOG.finest("getConfigs: Getting configs for " + item.getFullName());
+             final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(item);
+             final List<ConfigInfo> jobConfigs = projectAction.getJobConfigs();
+             LOG.finest("getConfigs: " + item.getFullName() + " has " + jobConfigs.size() + " history items");
+             configs.addAll(jobConfigs);
+         }
+         Collections.sort(configs, ConfigInfoComparator.INSTANCE);
+         return configs;
+     }
+     
+     
+     /**
+      * Returns the configuration history entries for all System files in this Hudson instance.
+      * @param filter
+      *            name of the system configuration entity to show
+      * @return list for all System configuration files.
+      * @throws IOException
+      *             if one of the history entries might not be read.
+      */
+     protected List<ConfigInfo> getSystemConfigs() throws IOException {
+         checkConfigurePermission();
+         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+         final File systemHistoryRootDir = new File (getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.SYSTEM_HISTORY_DIR);
+         if (!systemHistoryRootDir.isDirectory()) {
+             LOG.fine(systemHistoryRootDir + " is not a directory, assuming that no history exists yet.");
+         } else {
+             for (final File folders : systemHistoryRootDir.listFiles()) {
+                 for (final File historyDir : folders.listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                     final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+                     final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
+                     final ConfigInfo config = ConfigInfo.create(folders.getName(), historyDir, histDescr);
+                     configs.add(config);
+                 }
+             }
+         }
+         return configs; 
+     }
+     
+     
+     public final List<ConfigInfo> getDeletedJobs() throws IOException {
+         checkConfigurePermission();
+         List<ConfigInfo> list = new ArrayList<ConfigInfo>();
+         final File jobHistoryDir = new File (getPlugin().getConfiguredHistoryRootDir(), "jobs");
+         if (jobHistoryDir.isDirectory()) {
+                 for (final File deletedJobDir : jobHistoryDir.listFiles(JobConfigHistory.DELETED_FILTER)) {
+                     //TODO: hier muss wegen anderer Verzeichnisstruktur Verabreitung anders laufen
+                     //als bei system config history
+/*                     final XmlFile historyXml = new XmlFile(new File(deletedJobDir, JobConfigHistoryConsts.HISTORY_FILE));
+                     final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
+                     final ConfigInfo config = ConfigInfo.create(jobDir.getName(), deletedJobDir, histDescr);
+                     list.add(config);
+*/             }
+         }
+         return list;
+     }
+
+    
+    /**
      * Returns the configuration file (default is {@code config.xml}) located in
      * {@code diffDir}. {@code diffDir} must either start with
      * {@code HUDSON_HOME} and contain {@code config-history} or be located
@@ -153,13 +254,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return xmlfile.
      */
     protected XmlFile getConfigXml(final String diffDir) {
-        final JobConfigHistory plugin = hudson
-                .getPlugin(JobConfigHistory.class);
-        final File configuredHistoryRootDir = plugin
-                .getConfiguredHistoryRootDir();
+        final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
+        final File configuredHistoryRootDir = plugin.getConfiguredHistoryRootDir();
+        
+        //TODO aendern? reicht, wenn configuredRootDir 
         final String allowedHistoryRootDir = configuredHistoryRootDir == null ? getHudson()
                 .getRootDir().getAbsolutePath() : configuredHistoryRootDir
                 .getAbsolutePath();
+        
         File configFile = null;
         if (diffDir != null) {
             if (!diffDir.startsWith(allowedHistoryRootDir)
@@ -168,8 +270,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                         + " does not start with " + allowedHistoryRootDir
                         + " or contains '..'");
             } else if (configuredHistoryRootDir == null
-                    && !diffDir
-                            .contains(JobConfigHistoryConsts.DEFAULT_HISTORY_DIR)) {
+                    && !diffDir.contains(JobConfigHistoryConsts.DEFAULT_HISTORY_DIR)) {
                 throw new IllegalArgumentException(diffDir
                         + " does not contain '"
                         + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR + "'");

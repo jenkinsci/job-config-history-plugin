@@ -22,12 +22,15 @@ public final class JobConfigHistoryConsts {
 
     /** Default directory for storing history. */
     public static final String DEFAULT_HISTORY_DIR = "config-history";
-
-    /** Directory for keeping deleted jobs. */
-    public static final String DELETED_JOBS_DIR ="deletedjobs";
     
+    /** Default directory for storing history. */
+    public static final String SYSTEM_HISTORY_DIR = "system-history";
+
     /** name of history xml file. */
     public static final String HISTORY_FILE = "history.xml";
+
+    /** name of history xml file. */
+    public static final String DELETED_MARKER = "_deleted_";
 
     /** Default regexp pattern of configuration files not to save. */
     public static final String DEFAULT_EXCLUDE = "queue|nodeMonitors|UpdateCenter|global-build-stats";

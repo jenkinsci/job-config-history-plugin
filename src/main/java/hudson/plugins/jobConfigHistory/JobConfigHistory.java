@@ -35,14 +35,11 @@ import org.kohsuke.stapler.StaplerRequest;
  *
  */
 public class JobConfigHistory extends Plugin {
-    /** Root directory for storing configuration history. */
+    /** Root directory for storing histories. */
     private String historyRootDir;
     
-    /**
-     * Whether job configurations should be saved in one directory together 
-     * or with the individual jobs
-     */
-    private boolean useRootDir;
+    /** Whether default root dir for histories should be used. */
+    private boolean useDifferentRootDir;
     
     /** Maximum number of configuration history entries to keep. */
     private String maxHistoryEntries;
@@ -82,6 +79,20 @@ public class JobConfigHistory extends Plugin {
         }
     };
 
+    /**
+     * A filter to return only those directories of a file listing
+     * that represent deleted jobs history directories.
+     */
+    public static final FileFilter DELETED_FILTER = new FileFilter() {
+        public boolean accept(File file) {
+            LOG.finest("QQQQQQQQQQQQQQQQQQQQQQ - file.getName()" + file.getName());
+            LOG.finest("QQQQQQQQ - return" + file.getName().contains(JobConfigHistoryConsts.DELETED_MARKER));
+            
+            return (file.getName().contains(JobConfigHistoryConsts.DELETED_MARKER));
+        }
+    };
+
+    
     @Override 
     public void start() throws Exception {
         load();
@@ -92,11 +103,11 @@ public class JobConfigHistory extends Plugin {
     public void configure(StaplerRequest req, JSONObject formData)
         throws IOException, ServletException, FormException {
 
-        if (formData.containsKey("useRootDir")){
-            useRootDir = true;
-            historyRootDir = formData.getJSONObject("useRootDir").getString("historyRootDir").trim();
+        if (formData.containsKey("useDifferentRootDir")){
+            useDifferentRootDir = true;
+            historyRootDir = formData.getJSONObject("useDifferentRootDir").getString("historyRootDir").trim();
         } else {
-            useRootDir = false;
+            useDifferentRootDir = false;
         }
         
         maxHistoryEntries = formData.getString("maxHistoryEntries").trim();
@@ -115,8 +126,12 @@ public class JobConfigHistory extends Plugin {
         return historyRootDir;
     }
     
-    public boolean getUseRootDir(){
-        return useRootDir;
+    public String getDefaultRootDir(){
+        return JobConfigHistoryConsts.DEFAULT_HISTORY_DIR;
+    }
+    
+    public boolean getUseDifferentRootDir(){
+        return useDifferentRootDir;
     }
     
     /**
@@ -201,23 +216,72 @@ public class JobConfigHistory extends Plugin {
         return null;
     }
 
+    
     /**
      * Returns the File object representing the configured root history directory.
      *
      * @return The configured root history File object, or null if this configuration has not been set.
      */
-    protected File getConfiguredHistoryRootDir() {
-        File rootFile = null;
-        if (StringUtils.isNotBlank(historyRootDir)) {
+     protected File getConfiguredHistoryRootDir() {
+        File rootDir;
+ 
+        if (useDifferentRootDir){
             if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*")) {
-                rootFile = new File(historyRootDir);
+                rootDir = new File(historyRootDir);
             } else {
-                rootFile = new File(Hudson.getInstance().root.getPath() + "/" + historyRootDir);
+                rootDir = new File(Hudson.getInstance().root.getPath() + "/" + historyRootDir);
             }
+        } else {
+            rootDir = new File(Hudson.getInstance().root.getPath() + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
         }
-        return rootFile;
+        return rootDir;
     }
 
+     /**
+      * Returns the configuration history directory for the given configuration file.
+      *
+      * @param xmlFile
+      *            The configuration file whose content we are saving.
+      * @return The base directory where to store the history, 
+      *         or null if the file is not a valid Hudson configuration file.
+      */
+      
+      protected File getHistoryDir(final XmlFile xmlFile) {
+         final String configRootDir = xmlFile.getFile().getParent();
+         final String hudsonRootDir = Hudson.getInstance().root.getPath();
+
+         if (!configRootDir.startsWith(hudsonRootDir)) {
+             LOG.warning("Trying to get history dir for object outside of HUDSON: " + xmlFile);
+             return null;
+         }
+
+         //if the file is stored directly under HUDSON_ROOT, it's a system config 
+         //so create a distinct directory
+         String underRootDir = null;
+         if (configRootDir.equals(hudsonRootDir)) {
+             final String xmlFileName = xmlFile.getFile().getName();
+             underRootDir = JobConfigHistoryConsts.SYSTEM_HISTORY_DIR + "/" 
+                 + xmlFileName.substring(0, xmlFileName.lastIndexOf('.'));
+         }
+         
+
+         File historyDir;
+         final File actualHistoryRoot = getConfiguredHistoryRootDir();
+         if (underRootDir == null) {
+             final String remainingPath = configRootDir.substring(hudsonRootDir.length() + 1);
+             historyDir = new File(actualHistoryRoot, remainingPath);
+         } else {
+             historyDir = new File(actualHistoryRoot, underRootDir);
+         }
+         
+         LOG.finest("historyDir: " + historyDir);
+         LOG.finest("actualHistoryRoot: " + actualHistoryRoot);
+         LOG.finest("underRootDir: " + underRootDir);
+
+         return historyDir;
+     }
+     
+     
     /**
      * Returns the configuration history directory for the given configuration file.
      *
@@ -226,7 +290,9 @@ public class JobConfigHistory extends Plugin {
      * @return The base directory where to store the history, 
      *         or null if the file is not a valid Hudson configuration file.
      */
-    protected File getHistoryDir(final XmlFile xmlFile) {
+     
+     //TODO aendern?
+/*     protected File getHistoryDir(final XmlFile xmlFile) {
         final String configRootDir = xmlFile.getFile().getParent();
         final String hudsonRootDir = Hudson.getInstance().root.getPath();
 
@@ -261,13 +327,13 @@ public class JobConfigHistory extends Plugin {
         }
         return historyDir;
     }
-
+*/
     /**
      * Returns the directory for storing system configurations.
      *
      * @return The directory used for storing system configurations.
      */
-    protected File getSystemHistoryDir() {
+/*     protected File getSystemHistoryDir() {
         final File actualHistoryRoot = getConfiguredHistoryRootDir();
         if (actualHistoryRoot != null) {
             return new File(actualHistoryRoot, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
@@ -275,26 +341,7 @@ public class JobConfigHistory extends Plugin {
             return new File(Hudson.getInstance().root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
         }
     }
-    
-
-    /**
-     * Returns the directory for storing deleted jobs.
-     *
-     * @return The directory used for storing deleted jobs.
-     */
-    protected File getDeletedJobsDir() {
-        final File deletedJobsDir = new File(Hudson.getInstance().root, JobConfigHistoryConsts.DELETED_JOBS_DIR);
-        if (!deletedJobsDir.exists()){
-            try {
-                deletedJobsDir.mkdir();
-            } catch (SecurityException ex) {
-                LOG.warning("Could not create directory: " + deletedJobsDir);
-            }
-        }
-        return deletedJobsDir;
-    }
-
-
+*/    
     /**
      * Returns the configuration data file stored in the specified history directory.
      * It looks for a file with an 'xml' extension that is not named 

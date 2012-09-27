@@ -47,7 +47,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @throws IOException
      *             if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be read or the path might not be urlencoded.
      */
-    public final List<ConfigInfo> getConfigs() throws IOException {
+    public final List<ConfigInfo> getJobConfigs() throws IOException {
         checkConfigurePermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getHistoryDir(project.getConfigFile());

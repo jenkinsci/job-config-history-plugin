@@ -76,7 +76,7 @@ public final class JobConfigHistoryJobListener extends ItemListener {
             }
         }
         LOG.finest("Completed onRename for" + item + " done.");
-        //        new Exception("STACKTRACE for double invocation").printStackTrace();
+//        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
 
     /** {@inheritDoc} */
@@ -88,11 +88,11 @@ public final class JobConfigHistoryJobListener extends ItemListener {
             
             ConfigHistoryListenerHelper.DELETED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
             final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
-            
+
             final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
             final String timestamp = buildDateFormat.format(new Date());
-            final String deletedHistoryName = currentHistoryDir.getName() + "_deleted_" + timestamp;
-            final File deletedHistoryDir = new File(plugin.getDeletedJobsDir(), deletedHistoryName);
+            final String deletedHistoryName = item.getName() + JobConfigHistoryConsts.DELETED_MARKER + timestamp;
+            final File deletedHistoryDir = new File(currentHistoryDir.getParentFile(), deletedHistoryName);
             
             if (!currentHistoryDir.renameTo(deletedHistoryDir)) {
                 LOG.warning("unable to rename deleted history dir to: " + deletedHistoryDir);
