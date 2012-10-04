@@ -20,11 +20,14 @@ public final class JobConfigHistoryConsts {
     /** Path to the icon. */
     public static final String ICONFILENAME = "/plugin/jobConfigHistory/img/confighistory.png";
 
-    /** Default directory for storing history. */
+    /** Default root directory for storing history. */
     public static final String DEFAULT_HISTORY_DIR = "config-history";
     
-    /** Default directory for storing history. */
+    /** Default directory for storing system history. */
     public static final String SYSTEM_HISTORY_DIR = "system-history";
+
+    /** Default directory for storing job history. */
+    public static final String JOBS_HISTORY_DIR = "jobs";
 
     /** name of history xml file. */
     public static final String HISTORY_FILE = "history.xml";

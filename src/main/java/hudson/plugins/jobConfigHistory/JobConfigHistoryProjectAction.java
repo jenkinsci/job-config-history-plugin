@@ -51,10 +51,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         checkConfigurePermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getHistoryDir(project.getConfigFile());
-        if (!historyRootDir.isDirectory()) {
-            LOG.info(historyRootDir + " is not a directory, assuming that no history exists yet.");
-            return Collections.emptyList();
-        }
         for (final File historyDir : historyRootDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
             final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
             final HistoryDescr histDescr = (HistoryDescr) historyXml.read();

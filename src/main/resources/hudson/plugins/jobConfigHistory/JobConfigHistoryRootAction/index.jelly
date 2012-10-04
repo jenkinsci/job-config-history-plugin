@@ -64,13 +64,13 @@
                     <td>${config.date}</td>
                     <j:choose>
                       <j:when test="${config.isJob}">
-                        <td><a href="${rootURL}/job/${config.job}">${config.job}</a></td>
+                        <td><a href="${rootURL}/job/${config.job}/jobConfigHistory">${config.job}</a></td>
                       </j:when>
                       <j:when test="${config.job.contains('_deleted_')}">
-                        <td>${config.job}</td>
+                        <td><a href="history?name=${config.job}&amp;type=deleted">${config.job}</a></td>
                       </j:when>
                       <j:otherwise>
-                        <td>${config.job} (system)</td>
+                        <td><a href="history?name=${config.job}">${config.job} (system)</a></td>
                       </j:otherwise>
                     </j:choose>
                     <td>${config.operation}</td>

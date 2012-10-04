@@ -5,7 +5,7 @@
       <h1>${%Job Configuration Difference}</h1>
       <div>
         <j:choose>
-          <j:when test="${it.configs.size() == 0}">
+          <j:when test="${it.getJobConfigs().size() == 0}">
               ${%No job configuration history available}
           </j:when>
           <j:otherwise>
