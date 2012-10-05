@@ -106,4 +106,20 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         project.save();
         rsp.sendRedirect(Hudson.getInstance().getRootUrl() + project.getUrl());
     }
+    
+    /**
+     * Action when 'restore' button in showDiffFiles.jelly is pressed.
+     * Gets required parameters and forwards to restoreQuestion.jelly.
+     * @param req StaplerRequest created by pressing the button
+     * @param rsp outgoing StaplerResponse
+     * @throws IOException If XML file can't be read
+     */
+    public final void doForwardToRestoreQuestion(StaplerRequest req, StaplerResponse rsp)
+            throws IOException {
+        final String histDir = req.getParameter("histDir");
+        final XmlFile historyXml = new XmlFile(new File(histDir, JobConfigHistoryConsts.HISTORY_FILE));
+        final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
+        rsp.sendRedirect("restoreQuestion?file=" + historyXml.getFile().getParent() 
+                + "&date=" + histDescr.getTimestamp() + "&user=" + histDescr.getUser());
+    }
 }

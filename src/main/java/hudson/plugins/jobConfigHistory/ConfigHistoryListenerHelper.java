@@ -86,6 +86,7 @@ public enum ConfigHistoryListenerHelper {
         if (!(f.mkdirs() || f.exists())) {
             throw new RuntimeException("Could not create rootDir " + f);
         }
+        plugin.useCache(f);
         return f;
     }
 

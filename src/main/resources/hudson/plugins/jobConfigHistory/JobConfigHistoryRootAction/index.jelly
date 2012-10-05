@@ -58,19 +58,23 @@
                   <td class="pane-header" align="left">${%File(raw)}</td>
                 </tr>
                 <j:set var="configNr" value="0"/>
-                <j:forEach var="config" items="${it.configs}">
+                <j:forEach var="config" items="${it.getConfigs()}">
                   <j:set var="configNr" value="${configNr + 1}"/>
                   <tr>
                     <td>${config.date}</td>
                     <j:choose>
-                      <j:when test="${config.isJob}">
+                      <j:when test="${config.getIsJob()}">
                         <td><a href="${rootURL}/job/${config.job}/jobConfigHistory">${config.job}</a></td>
                       </j:when>
-                      <j:when test="${config.job.contains('_deleted_')}">
-                        <td><a href="history?name=${config.job}&amp;type=deleted">${config.job}</a></td>
-                      </j:when>
                       <j:otherwise>
-                        <td><a href="history?name=${config.job}">${config.job} (system)</a></td>
+                        <j:choose>
+                          <j:when test="${config.job.contains('_deleted_')}">
+                            <td><a href="history?name=${config.job}&amp;type=deleted">${config.job}</a></td>
+                          </j:when>
+                          <j:otherwise>
+                            <td><a href="history?name=${config.job}&amp;type=system">${config.job} (system)</a></td>
+                          </j:otherwise>
+                        </j:choose>
                       </j:otherwise>
                     </j:choose>
                     <td>${config.operation}</td>

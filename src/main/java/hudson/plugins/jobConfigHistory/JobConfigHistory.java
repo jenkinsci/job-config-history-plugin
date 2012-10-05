@@ -43,6 +43,9 @@ public class JobConfigHistory extends Plugin {
     
     /** Maximum number of configuration history entries to keep. */
     private String maxHistoryEntries;
+    
+    /** Maximum number of config changes to get cached. */
+    private int maxCacheSize;
 
     /** Flag to indicate we should save 'system' level configurations
      *  A 'system' level configuration is defined as one stored directly
@@ -89,18 +92,7 @@ public class JobConfigHistory extends Plugin {
         }
     };
 
-    /**
-     * A filter to return only those directories of a file listing
-     * that do not represent deleted jobs history directories.
-     */
-    public static final FileFilter NON_DELETED_FILTER = new FileFilter() {
-        public boolean accept(File file) {
-            return (!file.getName().contains(JobConfigHistoryConsts.DELETED_MARKER));
-        }
-    };
-
-    
-    
+   
     @Override 
     public void start() throws Exception {
         load();
@@ -492,4 +484,11 @@ public class JobConfigHistory extends Plugin {
             return FormValidation.error("Invalid regexp:\n" + e);
         }
     }
+    
+    public void useCache(File file){
+        if (maxCacheSize != 0) {
+        }
+    }
+    
 }
+

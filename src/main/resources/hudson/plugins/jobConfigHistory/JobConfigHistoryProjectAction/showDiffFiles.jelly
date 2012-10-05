@@ -35,6 +35,11 @@
                       </tr>
                     </j:forEach>
                   </table>
+                  <f:form method="post" action="forwardToRestoreQuestion?histDir=${request.getParameter('histDir1')}" name="forward">
+                    <div align="right">
+                      <f:submit value="${%Restore old version}" />
+                    </div>
+                  </f:form>
                 </j:otherwise>
               </j:choose>
             </div>

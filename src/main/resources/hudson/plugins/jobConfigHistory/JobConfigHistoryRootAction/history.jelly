@@ -3,8 +3,7 @@
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
       <h1>${%Job Configuration History}</h1>
-      <j:set var="name" value="${request.getParameter('name')}"/>
-      <j:set var="configs" value="${it.getSingleConfigs(${request})}">
+      <j:set var="configs" value="${it.getSingleConfigs(request)}" />
       <div>
         <j:choose>
           <j:when test="${configs.size() == 0}">
@@ -26,7 +25,7 @@
                     <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">${%Diff}</td>
                   </tr>
                   <tr>
-                    <td colspan="5"></td>
+                    <td colspan="4"></td>
                     <td align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
                     <td align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
                   </tr>

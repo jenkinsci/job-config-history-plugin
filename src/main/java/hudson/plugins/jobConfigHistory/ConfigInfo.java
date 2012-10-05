@@ -32,7 +32,7 @@ public class ConfigInfo {
     /** The name of the job or file. */
     private final String job;
 
-    /** One of created, changed or renamed. */
+    /** One of created, changed, renamed or deleted. */
     private final String operation;
 
     /** true if this information is for a Hudson job, 
@@ -77,7 +77,7 @@ public class ConfigInfo {
      * @throws UnsupportedEncodingException
      *             if UTF-8 is not available
      */
-    public static ConfigInfo create(final String name, final File file, final HistoryDescr histDescr)
+    public static ConfigInfo create(final String name, final File file, final HistoryDescr histDescr, final boolean isJob)
         throws UnsupportedEncodingException {
         return new ConfigInfo(
                 name,
@@ -86,7 +86,7 @@ public class ConfigInfo {
                 histDescr.getUser(),
                 histDescr.getOperation(),
                 histDescr.getUserID(),
-                false);
+                isJob);
     }
 
     /**
