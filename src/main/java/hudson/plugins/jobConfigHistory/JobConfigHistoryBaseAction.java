@@ -11,6 +11,7 @@ import hudson.util.MultipartFormDataParser;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,8 +82,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     // @Override
     public final String getIconFileName() {
-        return hasConfigurePermission() ? JobConfigHistoryConsts.ICONFILENAME
-                : null;
+        return JobConfigHistoryConsts.ICONFILENAME;
     }
 
     /**
@@ -130,6 +130,17 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return xmlFile.asString();
     }
 
+    protected void writeMessage(StaplerRequest req, StaplerResponse rsp, String s)
+            throws IOException{
+        
+        final Writer writer = rsp.getCompressedWriter(req);
+        try {
+            writer.append(s);
+        } finally {
+            writer.close();
+        }
+    }
+    
     /**
      * Checks whether the type parameter of the current request equals
      * {@code toCompare}.

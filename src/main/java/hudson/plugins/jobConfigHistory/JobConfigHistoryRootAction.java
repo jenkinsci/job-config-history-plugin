@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.acegisecurity.AccessDeniedException;
 import org.kohsuke.stapler.StaplerRequest;
 
 import hudson.Extension;
@@ -51,7 +52,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      */
     public final List<ConfigInfo> getConfigs() throws IOException {
         final String filter = getRequestParameter("filter");
-        final List<ConfigInfo> configs;
+        List<ConfigInfo> configs = null;
 
         if (filter == null){
             configs = getAllConfigs("system");
@@ -62,6 +63,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         } else {
             configs = getAllConfigs(filter);
         }
+
         return configs;
     }
 
@@ -74,10 +76,10 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     *             if one of the history entries might not be read.
     */
    protected List<ConfigInfo> getAllConfigs(String type) throws IOException {
-       checkConfigurePermission();
        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
        final File historyRootDir;
        if ("system".equals(type)) {
+//           checkConfigurePermission();
            historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.SYSTEM_HISTORY_DIR);
        } else {
            historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.JOBS_HISTORY_DIR);
@@ -119,12 +121,12 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      *             if one of the history entries might not be read.
      */
     public final List<ConfigInfo> getSingleConfigs(StaplerRequest req) throws IOException {
-        checkConfigurePermission();
         String name = req.getParameter("name");
         String type = req.getParameter("type");
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir;
         if ("system".equals(type)) {
+//            checkConfigurePermission();
             historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.SYSTEM_HISTORY_DIR);
         } else {
             historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.JOBS_HISTORY_DIR);
@@ -149,49 +151,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         return configs; 
     }
 
-    /**
-     * Returns the configuration history entries for one group of system files.
-     * @return Configs list for one group of system configuration files.
-     * @throws IOException
-     *             if one of the history entries might not be read.
-     */
-/*    protected List<ConfigInfo> getSingleSystemConfigs(String name) throws IOException {
-        checkConfigurePermission();
-        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final File systemHistoryRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), 
-                JobConfigHistoryConsts.SYSTEM_HISTORY_DIR);
-        for (final File folder : systemHistoryRootDir.listFiles()) {
-            if (folder.getName().equals(name)){
-                for (final File historyDir : folder.listFiles(JobConfigHistory.HISTORY_FILTER)) {
-                    final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
-                    final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-                    final ConfigInfo config = ConfigInfo.create(folder.getName(), historyDir, histDescr);
-                    configs.add(config);
-                }
-                return configs; 
-            }
-        }
-        return configs; 
-    }
-*/
-    
-    /**
-     * Returns the configuration history entries for a single {@link AbstractItem}.
-     *
-     * @return Configs list for one {@link AbstractItem}.
-     * @throws IOException
-     *             if one of the history entries might not be read.
-     */
-/*    protected List<ConfigInfo> getSingleJobConfigs(String name) throws IOException {
-        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final AbstractItem item = (AbstractItem)Hudson.getInstance().getItem(name);
-        final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(item);
-        final List<ConfigInfo> jobConfigs = projectAction.getJobConfigs();
-        configs.addAll(jobConfigs);
-        Collections.sort(configs, ConfigInfoComparator.INSTANCE);
-        return configs;
-    }
-*/    
+
     /**
      * {@inheritDoc}
      *
@@ -208,7 +168,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     }
 
     @Override
-    protected boolean hasConfigurePermission() {
+    public boolean hasConfigurePermission() {
         return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
     }
 }

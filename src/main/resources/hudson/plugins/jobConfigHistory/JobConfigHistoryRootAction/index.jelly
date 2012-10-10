@@ -23,7 +23,7 @@
           <h1>${%Job Deletion History}</h1>
         </j:when>
         <j:otherwise>
-          <h1>${%System Configuration History}</h1>
+		  <h1>${%System Configuration History}</h1>
         </j:otherwise>
       </j:choose>
       
@@ -34,6 +34,9 @@
 
       <div>
         <j:choose>
+          <j:when test="${!it.hasConfigurePermission() &amp;&amp; !(filter == 'jobs' || filter == 'deleted')}">
+            ${%No permission to view system changes}
+          </j:when>
           <j:when test="${it.getConfigs().size() == 0}">
             ${%No configuration history available}
           </j:when>
