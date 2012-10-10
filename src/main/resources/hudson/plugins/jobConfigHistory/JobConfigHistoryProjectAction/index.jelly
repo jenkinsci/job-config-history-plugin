@@ -3,6 +3,7 @@
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
       <h1>${%Job Configuration History}</h1>
+      <h2>${it.getProject().getName()}</h2>
       <div>
         <j:choose>
           <j:when test="${it.getJobConfigs().size() == 0}">

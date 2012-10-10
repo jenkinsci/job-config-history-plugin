@@ -97,7 +97,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
                    final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
                    final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
                    final ConfigInfo config;
-                   if ("jobs".equals(type)){
+                   if ("jobs".equals(type) && !itemDir.getName().contains(JobConfigHistoryConsts.DELETED_MARKER)){
                        config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, true);
                    } else {
                        config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, false);

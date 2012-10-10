@@ -20,7 +20,7 @@
           <h1>${%Job Configuration History}</h1>
         </j:when>
         <j:when test="${filter == 'deleted'}">
-          <h1>${%Deleted Jobs Configuration History}</h1>
+          <h1>${%Job Deletion History}</h1>
         </j:when>
         <j:otherwise>
           <h1>${%System Configuration History}</h1>

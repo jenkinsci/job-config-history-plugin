@@ -3,6 +3,7 @@
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
       <h1>${%Job Configuration History}</h1>
+      <h2>${request.getParameter('name')}</h2>
       <j:set var="configs" value="${it.getSingleConfigs(request)}" />
       <div>
         <j:choose>
