@@ -5,8 +5,9 @@
       <h1>${%Job Configuration History}</h1>
       <h2>${it.getProject().getName()}</h2>
       <div>
+        <j:set var="configs" value="${it.getJobConfigs()}" />
         <j:choose>
-          <j:when test="${it.getJobConfigs().size() == 0}">
+          <j:when test="${configs.size() == 0}">
               ${%No job configuration history available}
           </j:when>
           <j:otherwise>
@@ -31,7 +32,7 @@
                     <td align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
                   </tr>
                   <j:set var="configNr" value="0"/>
-                  <j:forEach var="config" items="${it.getJobConfigs()}">
+                  <j:forEach var="config" items="${configs}">
                     <j:set var="configNr" value="${configNr + 1}"/>
                     <tr>
                       <td>${config.date}</td>

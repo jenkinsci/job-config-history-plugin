@@ -33,11 +33,12 @@
       <a href="?filter=all">${%Show all configs}</a> <br />
 
       <div>
+        <j:set var="configs" value="${it.getConfigs()}" />
         <j:choose>
           <j:when test="${!it.hasConfigurePermission() &amp;&amp; !(filter == 'jobs' || filter == 'deleted')}">
             ${%No permission to view system changes}
           </j:when>
-          <j:when test="${it.getConfigs().size() == 0}">
+          <j:when test="${configs.size() == 0}">
             ${%No configuration history available}
           </j:when>
           <j:otherwise>
@@ -61,7 +62,7 @@
                   <td class="pane-header" align="left">${%File(raw)}</td>
                 </tr>
                 <j:set var="configNr" value="0"/>
-                <j:forEach var="config" items="${it.getConfigs()}">
+                <j:forEach var="config" items="${configs}">
                   <j:set var="configNr" value="${configNr + 1}"/>
                   <tr>
                     <td>${config.date}</td>

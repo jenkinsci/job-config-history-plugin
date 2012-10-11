@@ -11,7 +11,7 @@
     <packaging>hpi</packaging>
     <version>1.14-SNAPSHOT</version>
     <name>Jenkins Job Configuration History Plugin</name>
-    <description>Saves copies of all job configurations.</description>
+    <description>Saves copies of job and system configurations.</description>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/JobConfigHistory+Plugin</url>
     <issueManagement>
         <system>JIRA</system>

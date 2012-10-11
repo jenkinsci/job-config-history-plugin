@@ -64,7 +64,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         } else {
             configs = getAllConfigs(filter);
         }
-
+        
+        Collections.sort(configs, ConfigInfoComparator.INSTANCE);
         return configs;
     }
 
@@ -80,7 +81,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
        final File historyRootDir;
        if ("system".equals(type)) {
-           historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.SYSTEM_HISTORY_DIR);
+           historyRootDir = getPlugin().getConfiguredHistoryRootDir();
        } else {
            historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.JOBS_HISTORY_DIR);
        }
@@ -95,6 +96,10 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
                itemDirs = historyRootDir.listFiles();
            }
            for (final File itemDir : itemDirs) {
+               //skip the "jobs" directory if we're looking at system changes
+               if ("system".equals(type) && itemDir.getName().equals(JobConfigHistoryConsts.JOBS_HISTORY_DIR)){
+                   continue;
+               }
                for (final File historyDir : itemDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
                    final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
                    final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
@@ -126,7 +131,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir;
         if ("system".equals(type)) {
-            historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.SYSTEM_HISTORY_DIR);
+            historyRootDir = getPlugin().getConfiguredHistoryRootDir();
         } else {
             historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.JOBS_HISTORY_DIR);
         }
@@ -144,17 +149,17 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
                     }
                     configs.add(config);
                 }
+                Collections.sort(configs, ConfigInfoComparator.INSTANCE);
                 return configs; 
             }
         }
-        return configs; 
+        Collections.sort(configs, ConfigInfoComparator.INSTANCE);
+        return configs;
     }
 
     public final void doRestoreDeleted(StaplerRequest req, StaplerResponse rsp)
             throws IOException {
-        
         //TODO: restore deleted Jobs
-        
     }
 
     /**

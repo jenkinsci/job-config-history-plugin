@@ -38,9 +38,6 @@ public class JobConfigHistory extends Plugin {
     /** Root directory for storing histories. */
     private String historyRootDir;
     
-    /** Whether default root dir for histories should be used. */
-    private boolean useDifferentRootDir;
-    
     /** Maximum number of configuration history entries to keep. */
     private String maxHistoryEntries;
     
@@ -103,13 +100,7 @@ public class JobConfigHistory extends Plugin {
     public void configure(StaplerRequest req, JSONObject formData)
         throws IOException, ServletException, FormException {
 
-        if (formData.containsKey("useDifferentRootDir")) {
-            useDifferentRootDir = true;
-            historyRootDir = formData.getJSONObject("useDifferentRootDir").getString("historyRootDir").trim();
-        } else {
-            useDifferentRootDir = false;
-        }
-        
+        historyRootDir = formData.getString("historyRootDir").trim();
         maxHistoryEntries = formData.getString("maxHistoryEntries").trim();
         saveSystemConfiguration = formData.getBoolean("saveSystemConfiguration");
         saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
@@ -131,14 +122,6 @@ public class JobConfigHistory extends Plugin {
      */
     public String getDefaultRootDir() {
         return JobConfigHistoryConsts.DEFAULT_HISTORY_DIR;
-    }
-    
-    /**
-     * Whether a different than the default history root directory should be used.
-     * @return True if a different history root directory is used.
-     */
-    public boolean getUseDifferentRootDir() {
-        return useDifferentRootDir;
     }
     
     /**
@@ -235,14 +218,14 @@ public class JobConfigHistory extends Plugin {
     protected File getConfiguredHistoryRootDir() {
         File rootDir;
  
-        if (useDifferentRootDir) {
-            if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*")) {
-                rootDir = new File(historyRootDir);
-            } else {
-                rootDir = new File(Hudson.getInstance().root.getPath() + "/" + historyRootDir);
-            }
-        } else {
+        if (historyRootDir.isEmpty()) {
             rootDir = new File(Hudson.getInstance().root.getPath() + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
+        } else {
+            if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*")) {
+                rootDir = new File(historyRootDir + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
+            } else {
+                rootDir = new File(Hudson.getInstance().root.getPath() + "/" + historyRootDir + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
+            }
         }
         return rootDir;
     }
@@ -269,8 +252,7 @@ public class JobConfigHistory extends Plugin {
         String underRootDir = null;
         if (configRootDir.equals(hudsonRootDir)) {
             final String xmlFileName = xmlFile.getFile().getName();
-            underRootDir = JobConfigHistoryConsts.SYSTEM_HISTORY_DIR + "/" 
-                 + xmlFileName.substring(0, xmlFileName.lastIndexOf('.'));
+            underRootDir = xmlFileName.substring(0, xmlFileName.lastIndexOf('.'));
         }
          
         File historyDir;

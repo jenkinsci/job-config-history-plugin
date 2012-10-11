@@ -23,9 +23,6 @@ public final class JobConfigHistoryConsts {
     /** Default root directory for storing history. */
     public static final String DEFAULT_HISTORY_DIR = "config-history";
     
-    /** Default directory for storing system history. */
-    public static final String SYSTEM_HISTORY_DIR = "system-history";
-
     /** Default directory for storing job history. */
     public static final String JOBS_HISTORY_DIR = "jobs";
 
