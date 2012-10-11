@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import org.acegisecurity.AccessDeniedException;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.Extension;
 import hudson.XmlFile;
@@ -79,7 +80,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
        final File historyRootDir;
        if ("system".equals(type)) {
-//           checkConfigurePermission();
            historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.SYSTEM_HISTORY_DIR);
        } else {
            historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.JOBS_HISTORY_DIR);
@@ -126,7 +126,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir;
         if ("system".equals(type)) {
-//            checkConfigurePermission();
             historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.SYSTEM_HISTORY_DIR);
         } else {
             historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.JOBS_HISTORY_DIR);
@@ -151,6 +150,12 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         return configs; 
     }
 
+    public final void doRestoreDeleted(StaplerRequest req, StaplerResponse rsp)
+            throws IOException {
+        
+        //TODO: restore deleted Jobs
+        
+    }
 
     /**
      * {@inheritDoc}
