@@ -8,7 +8,18 @@
  	</l:side-panel>
     
     <l:main-panel>
-      <h1>${%Job Configuration History}</h1>
+      <j:set var="type" value="${request.getParameter('type')}"/>
+      <j:choose>
+        <j:when test="${type == 'jobs'}">
+          <h1>${%Job Configuration History}</h1>
+        </j:when>
+        <j:when test="${type == 'deleted'}">
+          <h1>${%Job Deletion History}</h1>
+        </j:when>
+        <j:otherwise>
+		  <h1>${%System Configuration History}</h1>
+        </j:otherwise>
+      </j:choose>
       <h2>${request.getParameter('name')}</h2>
       <j:set var="configs" value="${it.getSingleConfigs(request)}" />
       <div>

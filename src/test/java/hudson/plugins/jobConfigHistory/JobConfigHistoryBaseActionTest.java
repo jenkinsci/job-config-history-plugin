@@ -169,7 +169,7 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
         assertThat(withoutSecurity.asXml(), containsString(JobConfigHistoryConsts.ICONFILENAME));
         withoutSecurity.getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
         // with security enabled the jobConfigHistory-badge should not show anymore.
-        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(false));
+        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(false, false, null));
         hudson.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
         final HtmlPage withSecurityEnabled = webClient.goTo("/");
         assertThat(withSecurityEnabled.asXml(), not(containsString(JobConfigHistoryConsts.ICONFILENAME)));

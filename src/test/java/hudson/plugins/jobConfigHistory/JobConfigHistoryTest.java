@@ -37,7 +37,7 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true));
+        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true, false, null));
         webClient = new WebClient();
     }
 
@@ -57,7 +57,7 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
         assertEquals("Verify history entries to keep setting.", "10", jch.getMaxHistoryEntries());
         assertTrue("Verify system level configurations setting.", jch.getSaveSystemConfiguration());
         assertFalse("Verify skip duplicate history setting.", jch.getSkipDuplicateHistory());
-        assertEquals("Verify configured history root directory.",new File(hudson.root, "jobConfigHistory"), jch.getConfiguredHistoryRootDir());
+        assertEquals("Verify configured history root directory.", new File(hudson.root + "/jobConfigHistory/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
         assertEquals("Verify exclude pattern setting.", JobConfigHistoryConsts.DEFAULT_EXCLUDE, jch.getExcludePattern());
 
         XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(),"config.xml"));
@@ -76,7 +76,6 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
         assertNull("Verify number of history entries to keep default setting.", jch.getMaxHistoryEntries());
         assertFalse("Verify system level configurations default setting.", jch.getSaveSystemConfiguration());
         assertFalse("Verify skip duplicate history default setting.", jch.getSkipDuplicateHistory());
-        assertNull("Verify history root directory default.", jch.getConfiguredHistoryRootDir());
         assertNull("Verify unconfigured exclude pattern.", jch.getExcludePattern());
 
         XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
@@ -264,7 +263,7 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             final HtmlForm form = webClient.goTo("configure").getFormByName("config");
             form.getInputByName("historyRootDir").setValueAttribute(absolutePath);
             submit(form);
-            assertEquals("Verify history root configured at absolute path.", root, jch.getConfiguredHistoryRootDir());
+            assertEquals("Verify history root configured at absolute path.", new File(root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
 
             // save something
             createFreeStyleProject();

@@ -1,16 +1,9 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:section title="${%Job Config History}">
 
-	<f:entry title="${%Use different history directory than default} (${it.getDefaultRootDir()}):" help="/plugin/jobConfigHistory/help/help-historyRootDir.html">
+	<f:entry title="${%Use different history directory than default}:" help="/plugin/jobConfigHistory/help/help-historyRootDir.html">
  		<f:textbox value="${it.historyRootDir}" name="historyRootDir"/>
 	</f:entry>
-
-	<!--f:optionalBlock title="${%Save config history files in other directory than default} (${it.getDefaultRootDir()})" checked="${it.useDifferentRootDir}" name="useDifferentRootDir" help="/plugin/jobConfigHistory/help/help-historyRootDir.html">
-	    <f:entry title="${%New path to history directory}:" >
-    	   	<f:textbox value="${it.historyRootDir}" name="historyRootDir"/>
-		</f:entry>
-    </f:optionalBlock-->
-
     <f:advanced>
       <f:entry title="${%Max number of history entries to keep}" help="/plugin/jobConfigHistory/help/help-maxHistoryEntries.html">
         <f:textbox name="maxHistoryEntries" value="${it.maxHistoryEntries}"

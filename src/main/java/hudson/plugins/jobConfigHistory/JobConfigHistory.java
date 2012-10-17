@@ -41,9 +41,6 @@ public class JobConfigHistory extends Plugin {
     /** Maximum number of configuration history entries to keep. */
     private String maxHistoryEntries;
     
-    /** Maximum number of config changes to get cached. */
-    private int maxCacheSize;
-
     /** Flag to indicate we should save 'system' level configurations
      *  A 'system' level configuration is defined as one stored directly
      *  under the HUDSON_ROOT directory.
@@ -218,7 +215,7 @@ public class JobConfigHistory extends Plugin {
     protected File getConfiguredHistoryRootDir() {
         File rootDir;
  
-        if (historyRootDir.isEmpty()) {
+        if (historyRootDir == null || historyRootDir.isEmpty()) {
             rootDir = new File(Hudson.getInstance().root.getPath() + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
         } else {
             if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*")) {
@@ -466,11 +463,5 @@ public class JobConfigHistory extends Plugin {
             return FormValidation.error("Invalid regexp:\n" + e);
         }
     }
-    
-    public void useCache(File file){
-        if (maxCacheSize != 0) {
-        }
-    }
-    
 }
 

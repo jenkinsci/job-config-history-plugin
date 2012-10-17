@@ -25,31 +25,37 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
 public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private File jobsDir;
-
+    private File jobHistoryDir;
     private WebClient webClient;
+    private File rootDir;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         jobsDir = new File(hudson.root, "jobs");
-        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true));
+        rootDir = hudson.getPlugin(JobConfigHistory.class).getConfiguredHistoryRootDir();
+        jobHistoryDir = new File(rootDir, JobConfigHistoryConsts.JOBS_HISTORY_DIR);
+        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true, false, null));
         webClient = new WebClient();
     }
 
     public void testCreation() throws IOException, SAXException {
-        createFreeStyleProject("newjob");
-        final List<File> historyFiles = Arrays.asList(new File(jobsDir, "newjob/config-history").listFiles());
+        final String jobName = "newjob";
+        createFreeStyleProject(jobName);
+        final List<File> historyFiles = Arrays.asList(new File(jobHistoryDir, jobName).listFiles());
         assertTrue("Expected " + historyFiles.toString() + " to have at least one entry", historyFiles.size() >= 1);
     }
 
     public void testRename() throws IOException, SAXException, InterruptedException {
-        final FreeStyleProject project = createFreeStyleProject("newjob");
+        final String jobName1 = "newjob";
+        final String jobName2 = "renamedjob";
+        final FreeStyleProject project = createFreeStyleProject(jobName1);
         // Sleep two seconds to make sure we have at least two history entries.
         Thread.sleep(TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
-        project.renameTo("renamedjob");
-        final File[] historyFiles = new File(jobsDir, "newjob/config-history").listFiles();
+        project.renameTo(jobName2);
+        final File[] historyFiles = new File(jobHistoryDir, jobName1).listFiles();
         assertNull("Got history files for old job", historyFiles);
-        final List<File> historyFilesNew = Arrays.asList(new File(jobsDir, "renamedjob/config-history").listFiles());
+        final List<File> historyFilesNew = Arrays.asList(new File(jobHistoryDir, jobName2).listFiles());
         assertTrue("Expected " + historyFilesNew.toString() + " to have at least two entries", historyFilesNew.size() >= 1);
     }
 

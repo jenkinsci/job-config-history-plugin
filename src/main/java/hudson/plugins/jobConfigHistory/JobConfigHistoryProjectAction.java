@@ -51,11 +51,13 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         checkConfigurePermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getHistoryDir(project.getConfigFile());
-        for (final File historyDir : historyRootDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
-            final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
-            final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-            final ConfigInfo config = ConfigInfo.create(project, historyDir, histDescr);
-            configs.add(config);
+        if (historyRootDir.exists()){
+            for (final File historyDir : historyRootDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+                final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
+                final ConfigInfo config = ConfigInfo.create(project, historyDir, histDescr);
+                configs.add(config);
+            }
         }
         Collections.sort(configs, ConfigInfoComparator.INSTANCE);
         return configs;
