@@ -170,9 +170,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected XmlFile getConfigXml(final String diffDir) {
         final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
-        final File configuredHistoryRootDir = plugin.getConfiguredHistoryRootDir();
-        final String allowedHistoryRootDir = configuredHistoryRootDir.getAbsolutePath();
-
+//        final File configuredHistoryRootDir = plugin.getConfiguredHistoryRootDir();
+        final String allowedHistoryRootDir;
+        if (plugin.getHistoryRootDir() == null || plugin.getHistoryRootDir().isEmpty()){
+            allowedHistoryRootDir = plugin.getConfiguredHistoryRootDir().getAbsolutePath();
+        } else {
+            allowedHistoryRootDir = plugin.getConfiguredHistoryRootDir().getParent();
+        }
+        
         File configFile = null;
         if (diffDir != null) {
             if (!diffDir.startsWith(allowedHistoryRootDir)

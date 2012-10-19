@@ -206,6 +206,26 @@ public class JobConfigHistory extends Plugin {
         return null;
     }
 
+    /**
+     * Returns the File object representing the job history directory,
+     * which is for reasons of backwards compatibility either a sibling or child
+     * of the configured history root dir.
+     *
+     * @return The job history File object.
+     */
+    protected File getJobHistoryRootDir() {
+        File rootDir;
+ 
+        if (historyRootDir == null || historyRootDir.isEmpty()) {
+            //ROOT/config-history/jobs
+            rootDir = new File(getConfiguredHistoryRootDir() + "/" + JobConfigHistoryConsts.JOBS_HISTORY_DIR);
+        } else {
+            //ROOT/MYNAME/jobs -> backwards compatibility
+            rootDir = new File(getConfiguredHistoryRootDir().getParent() + "/" + JobConfigHistoryConsts.JOBS_HISTORY_DIR);
+        }
+        return rootDir;
+    }
+
     
     /**
      * Returns the File object representing the configured root history directory.
@@ -253,13 +273,21 @@ public class JobConfigHistory extends Plugin {
         }
          
         File historyDir;
-        final File actualHistoryRoot = getConfiguredHistoryRootDir();
+        if (underRootDir == null) {
+            final String remainingPath = configRootDir.substring(hudsonRootDir.length() + 5);
+            historyDir = new File(getJobHistoryRootDir(), remainingPath);
+        } else {
+            historyDir = new File(getConfiguredHistoryRootDir(), underRootDir);
+        }
+
+/*        final File actualHistoryRoot = getConfiguredHistoryRootDir();
         if (underRootDir == null) {
             final String remainingPath = configRootDir.substring(hudsonRootDir.length() + 1);
             historyDir = new File(actualHistoryRoot, remainingPath);
         } else {
             historyDir = new File(actualHistoryRoot, underRootDir);
         }
+*/      
         return historyDir;
     }
      

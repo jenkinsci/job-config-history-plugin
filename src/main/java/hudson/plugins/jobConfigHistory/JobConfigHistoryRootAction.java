@@ -83,7 +83,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
        if ("system".equals(type)) {
            historyRootDir = getPlugin().getConfiguredHistoryRootDir();
        } else {
-           historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.JOBS_HISTORY_DIR);
+           historyRootDir = getPlugin().getJobHistoryRootDir();
        }
 
        if (!historyRootDir.isDirectory()) {
@@ -133,7 +133,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         if ("system".equals(type)) {
             historyRootDir = getPlugin().getConfiguredHistoryRootDir();
         } else {
-            historyRootDir = new File(getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.JOBS_HISTORY_DIR);
+            historyRootDir = getPlugin().getJobHistoryRootDir();
         }
 
         for (final File itemDir : historyRootDir.listFiles()) {
