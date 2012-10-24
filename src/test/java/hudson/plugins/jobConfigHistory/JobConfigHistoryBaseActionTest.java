@@ -59,7 +59,7 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
         final String s1 = "123\n346";
         final String s2 = "123\n3467";
         assertEquals("--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,2 @@\n 123\n-346\n+3467\n",
-                makeResultPlatformIndependant(action.getDiff(file1, file2, s1.split("\n"), s2.split("\n"))));
+                makeResultPlatformIndependent(action.getDiff(file1, file2, s1.split("\n"), s2.split("\n"))));
     }
 
     /**
@@ -67,7 +67,7 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
      */
     public void testGetDiffFileStringStringEmpty() {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
-        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependant(action.getDiff(file1, file2, new String[0], new String[0])));
+        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependent(action.getDiff(file1, file2, new String[0], new String[0])));
     }
 
     /**
@@ -95,11 +95,11 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
      * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiff(File, File, String[], String[])}.
      */
     public void testGetDiffFileStringStringDifferentLineLength() {
-        final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependant(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n".split("\n"))));
-        assertEquals("--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,3 @@\n 123\n 346\n+123\n", makeResultPlatformIndependant(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n123".split("\n"))));
+        final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependent(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n".split("\n"))));
+        assertEquals("--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,3 @@\n 123\n 346\n+123\n", makeResultPlatformIndependent(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n123".split("\n"))));
     }
 
-    private String makeResultPlatformIndependant(final String result) {
+    private String makeResultPlatformIndependent(final String result) {
         return result.replace("\\", "/");
     }
 

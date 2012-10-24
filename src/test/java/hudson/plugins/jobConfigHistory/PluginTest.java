@@ -160,12 +160,6 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
         {
             new ConfigPage().setNewDescription(firstDescription);
             final List<HtmlAnchor> hrefs = new HistoryPage().getConfigOutputLinks("xml");
-            for (HtmlAnchor bla : hrefs){
-                System.out.println("Hallo!");
-                System.out.println("1 - " + bla.getHrefAttribute());
-                System.out.println("2 - " + bla.getTargetAttribute());
-                System.out.println("3 - " + bla.getNameAttribute());
-            }
             assertEquals(1, hrefs.size());
             final HtmlAnchor xmlAnchor = hrefs.get(0);
             final XmlPage xmlPage = (XmlPage) xmlAnchor.click();

@@ -301,7 +301,6 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
                     break;
                 }
             }
-            
             assertTrue("Verify one \'created\' history entry on creation.", createdEntryFound);
             final int historyEntryCount = expectedConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length;
 
@@ -318,7 +317,30 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             // delete project and verify the history directory is gone
             project.delete();
             assertFalse("Verify on delete project config history directory removed(renamed): " + newExpectedConfigDir, newExpectedConfigDir.exists());
+            
+            String deletedDir = null;
+            for (File file : expectedConfigDir.getParentFile().listFiles()) {
+//                System.out.println("JJJJJJJJJJJJJJJJJ " + file.getPath());
+//                System.out.println("WWWWWWWWWWW " + file.getName());
+                
+                if (file.getName().contains("renamed_testproject" + JobConfigHistoryConsts.DELETED_MARKER)) {
+                    deletedDir = file.getPath();
+                    break;
+                }
+            }
+            assertTrue("Verify config history directory of deleted job exists.", deletedDir != null);
+            assertTrue("Verify config history directory of deleted job is not empty", (new File(deletedDir)).listFiles().length > 0);
 
+            boolean deletedEntryFound = false;
+            for (File file : (new File(deletedDir)).listFiles(JobConfigHistory.HISTORY_FILTER)) {
+//                System.out.println(file.getPath());
+                if (new XmlFile(new File(file, "history.xml")).asString().contains("Deleted")) {
+                    deletedEntryFound = true;
+                    break;
+                }
+            }
+            assertTrue("Verify one \'deleted\' history entry exists.", deletedEntryFound);
+            
         } catch (IOException e) {
             fail("Unable to complete project creation/rename test: " + e);
         } catch (InterruptedException e) {

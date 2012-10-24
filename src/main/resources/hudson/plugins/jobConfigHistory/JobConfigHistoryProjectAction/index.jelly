@@ -47,7 +47,7 @@
                           </a>
                       </td>
                       <td><j:if test="${configNr > 1}">
-							<a href="restoreQuestion?file=${config.file}&amp;date=${config.date}&amp;user=${config.userID}">
+							<a id="restore${configNr}" href="restoreQuestion?file=${config.file}&amp;date=${config.date}&amp;user=${config.userID}">
 								<img src="${rootURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
 							</a>
                           </j:if>

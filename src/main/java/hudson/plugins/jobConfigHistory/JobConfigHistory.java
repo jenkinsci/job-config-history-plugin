@@ -445,10 +445,7 @@ public class JobConfigHistory extends Plugin {
     }
 
     /**
-     * Determines if the specified {@code dir} stores
-     * history information.  This is needed as Hudson creates
-     * 'modules' directories under the 'job' folder, and these will
-     * be mixed in with the timestamped history configurations.
+     * Determines if the specified {@code dir} stores history information.
      *
      * @param dir
      *            The directory under consideration.
