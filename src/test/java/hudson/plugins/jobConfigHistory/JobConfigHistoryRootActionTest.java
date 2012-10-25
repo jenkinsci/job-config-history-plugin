@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.model.FreeStyleProject;
 import hudson.model.Hudson;
+import hudson.security.LegacyAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 
 import java.io.IOException;
@@ -27,94 +28,77 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true, false, null));
         webClient = createWebClient();
     }
     
-    //TODO: history.jelly testen
-    
-    //TODO: index.jelly testen
-    //-> wird jobs/deleted/system/all richtig angezeigt?
-    //-> führen Links an die richtige Stelle?
-    //sieht man system-Links nicht, wenn man keine Rechte hat?
-
-    public void testFilter() {
+    public void testFilterWithoutData() {
+        try {
+            final HtmlPage htmlPage = webClient.goTo("jobConfigHistory");
+            assertTrue(htmlPage.asText().contains("No configuration history"));
+        } catch (Exception ex) {
+            fail("Unable to complete testFilterWithoutData: " + ex);
+        }
+    }
+            
+    public void testFilterWithData() {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        
+        jch.setSaveSystemConfiguration(true);
+
+        //create some config history data
         try {
             final FreeStyleProject project = createFreeStyleProject("Test1");
             Thread.sleep(SLEEP_TIME);
             project.disable();
             Thread.sleep(SLEEP_TIME);
-            project.enable();
-            Thread.sleep(SLEEP_TIME);
             
-            Jenkins jenkins = Hudson.getInstance();
-            jenkins.setSystemMessage("First Testmessage");
+            hudson.setSystemMessage("First Testmessage");
             Thread.sleep(SLEEP_TIME);
-            jenkins.setSystemMessage("Second Testmessage");
             
             final FreeStyleProject secondProject = createFreeStyleProject("Test2");
             Thread.sleep(SLEEP_TIME);
             secondProject.delete();
-            
-//            final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
-
-            final HtmlPage htmlPage = webClient.goTo("jobConfigHistory");
-            
-            //warum "no system config history available"?
-            for (String bla : htmlPage.asXml().split("document.gif")){
-                System.out.println("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-                System.out.println(bla);
-            }
-            
-            System.out.println(htmlPage.asXml().split("document.gif").length);
-            
-//            assertEquals(3, htmlPage.asXml().split("document.gif").length);
-
-/*            final DomNodeList<HtmlElement> linkNodes = htmlPage.getElementsByTagName("a");
-            for (HtmlElement link : linkNodes){
-                
-                System.out.println("HHHHHHHHHHHH: " + getHrefAttribute());
-                
-                for (HtmlElement text: link.getChildElements()){
-                    System.out.println(text.getNodeName());
-                    System.out.println(text.getNodeValue());
-                }
-            }
-*/            
-            assertTrue(true);
-            
-            
-            
         } catch (Exception ex) {
-            fail("Unable to complete filter test: " + ex);
-        }
-    }
-    
-    
-    //TODO: ersetzen
-    // test filter page
-/*    public void testFilteredGetConfigs() throws IOException, SAXException {
+            fail("Unable to prepare Hudson instance: " + ex);
+        }            
+
         try {
-            HtmlForm form = webClient.goTo("configure").getFormByName("config");
-            form.getInputByName("saveSystemConfiguration").setChecked(true);
-            submit(form);
-        } catch (Exception e) {
-            fail("unable to configure save system history" +e);
+            checkSystemPage(webClient.goTo(JobConfigHistoryConsts.URLNAME));
+            checkSystemPage(webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=system"));
+                
+            final HtmlPage htmlPageJobs = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=jobs");
+            assertTrue("Verify history entry for job is listed.", htmlPageJobs.getAnchorByText("Test1") != null);
+            assertTrue("Verify history entry for deleted job is listed.", htmlPageJobs.asText().contains(JobConfigHistoryConsts.DELETED_MARKER));
+            assertFalse("Verify that no history entry for system change is listed.", htmlPageJobs.asText().contains("config (system)"));
+            assertTrue("Check link to job page.", htmlPageJobs.asXml().contains("job/Test1/" + JobConfigHistoryConsts.URLNAME));
+
+            final HtmlPage htmlPageDeleted = webClient.goTo("jobConfigHistory/?filter=deleted");
+            final String page = htmlPageDeleted.asXml();
+            assertTrue("Verify history entry for deleted job is listed.", page.contains(JobConfigHistoryConsts.DELETED_MARKER));
+            assertFalse("Verify no history entry for job is listed.", page.contains("Test1"));
+            assertFalse("Verify no history entry for system change is listed.", page.contains("(system)"));
+            assertTrue("Check link to historypage exists.", page.contains("history?name"));
+            assertFalse("Verify that only \'Deleted\' entries are listed.", page.contains("Created") || page.contains("Changed"));
+        } catch (Exception ex) {
+            fail("Unable to complete testFilterWithData: " + ex);
         }
-        // get a history entry for this plugin
-        JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        jch.save();
-
-        HtmlPage page = webClient.goTo("jobConfigHistory/");
-        assertTrue("Verify jobConfigHistory link shows on unfiltered page.", page.getAnchorByText("jobConfigHistory") != null);
-
-        page = webClient.goTo("jobConfigHistory/?filter=jobConfigHistory");
-        assertTrue("Verify jobConfigHistory link shows on filtered page.", page.getAnchorByText("jobConfigHistory") != null);
-
-        page = webClient.goTo("jobConfigHistory/?filter=nosuchobject");
-        assertTrue("Verify no history message shown with invalid filter.", page.asText().contains("No job configuration history available"));
     }
-*/
+
+    private void checkSystemPage(HtmlPage htmlPage){
+        final String page = htmlPage.asXml();
+        assertTrue("Verify history entry for system change is listed.", htmlPage.getAnchorByText("config") != null);
+        assertFalse("Verify no job history entry is listed.", page.contains("Test1"));
+        assertFalse("Verify history entry for deleted job is listed.", page.contains(JobConfigHistoryConsts.DELETED_MARKER));
+        assertTrue("Check link to historypage exists.", page.contains("history?name"));
+    }
+
+    public void testFilterWithoutPermissions(){
+        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(false, false, null));
+        hudson.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
+        try {
+            final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME);
+            assertTrue("Verify nothing is shown without permission", htmlPage.asText().contains("No permission to view"));
+        } catch (Exception ex) {
+            fail("Unable to complete testFilterWithoutPermissions: " + ex);
+        }
+    }
 }

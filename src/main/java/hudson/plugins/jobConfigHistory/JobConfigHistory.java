@@ -145,6 +145,14 @@ public class JobConfigHistory extends Plugin {
     }
 
     /**
+     * Used for testing only.
+     * @param bool True if system configuration should be saved.
+     */
+    public void setSaveSystemConfiguration(boolean bool) {
+        saveSystemConfiguration = bool;
+    }
+
+    /**
      * @return True if item group configurations should be saved.
      */
     public boolean getSaveItemGroupConfiguration() {
@@ -241,7 +249,8 @@ public class JobConfigHistory extends Plugin {
             if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*")) {
                 rootDir = new File(historyRootDir + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
             } else {
-                rootDir = new File(Hudson.getInstance().root.getPath() + "/" + historyRootDir + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
+                rootDir = new File(Hudson.getInstance().root.getPath() + "/" + historyRootDir + "/" 
+                            + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
             }
         }
         return rootDir;
@@ -274,24 +283,16 @@ public class JobConfigHistory extends Plugin {
          
         File historyDir;
         if (underRootDir == null) {
-            final String remainingPath = configRootDir.substring(hudsonRootDir.length() + 5);
+            final String remainingPath = configRootDir.substring(hudsonRootDir.length() 
+                                        + JobConfigHistoryConsts.JOBS_HISTORY_DIR.length() + 1);
             historyDir = new File(getJobHistoryRootDir(), remainingPath);
         } else {
             historyDir = new File(getConfiguredHistoryRootDir(), underRootDir);
         }
 
-/*        final File actualHistoryRoot = getConfiguredHistoryRootDir();
-        if (underRootDir == null) {
-            final String remainingPath = configRootDir.substring(hudsonRootDir.length() + 1);
-            historyDir = new File(actualHistoryRoot, remainingPath);
-        } else {
-            historyDir = new File(actualHistoryRoot, underRootDir);
-        }
-*/      
         return historyDir;
     }
-     
-     
+
     /**
      * Returns the configuration data file stored in the specified history directory.
      * It looks for a file with an 'xml' extension that is not named 
@@ -489,4 +490,3 @@ public class JobConfigHistory extends Plugin {
         }
     }
 }
-

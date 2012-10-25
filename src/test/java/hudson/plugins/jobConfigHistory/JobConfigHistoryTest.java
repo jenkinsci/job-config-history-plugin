@@ -320,9 +320,6 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             
             String deletedDir = null;
             for (File file : expectedConfigDir.getParentFile().listFiles()) {
-//                System.out.println("JJJJJJJJJJJJJJJJJ " + file.getPath());
-//                System.out.println("WWWWWWWWWWW " + file.getName());
-                
                 if (file.getName().contains("renamed_testproject" + JobConfigHistoryConsts.DELETED_MARKER)) {
                     deletedDir = file.getPath();
                     break;
@@ -333,7 +330,6 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
 
             boolean deletedEntryFound = false;
             for (File file : (new File(deletedDir)).listFiles(JobConfigHistory.HISTORY_FILTER)) {
-//                System.out.println(file.getPath());
                 if (new XmlFile(new File(file, "history.xml")).asString().contains("Deleted")) {
                     deletedEntryFound = true;
                     break;

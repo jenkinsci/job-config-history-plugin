@@ -73,6 +73,8 @@ public class ConfigInfo {
      *            The file with configuration data.
      * @param histDescr
      *            metadata of the change.
+     * @param isJob
+     *            whether it is a job's config info or not. 
      * @return a new ConfigInfo object.
      * @throws UnsupportedEncodingException
      *             if UTF-8 is not available

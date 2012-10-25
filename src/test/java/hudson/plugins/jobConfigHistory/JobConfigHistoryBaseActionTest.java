@@ -95,14 +95,14 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
      * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiff(File, File, String[], String[])}.
      */
     public void testGetDiffFileStringStringDifferentLineLength() {
-        final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependent(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n".split("\n"))));
+        final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();        
+        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependent(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n".split("\n"))));
         assertEquals("--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,3 @@\n 123\n 346\n+123\n", makeResultPlatformIndependent(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n123".split("\n"))));
     }
 
     private String makeResultPlatformIndependent(final String result) {
         return result.replace("\\", "/");
     }
-
 
     public void testGetConfigXmlIllegalArgumentExceptionNoConfigHistory() throws IOException, SAXException {
         // config-history not in diffDir
@@ -157,26 +157,6 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
             action.getConfigXml(diffDir);
             fail("Expected for " + diffDir + " " + IllegalArgumentException.class);
         } catch (IllegalArgumentException e) {
-            System.err.println(e);
-        }
-    }
-
-
-    @Bug(5534)
-    public void testSecuredAccessToJobConfigHistoryPage() throws IOException, SAXException {
-        // without security the jobConfigHistory-badge should show.
-        final HtmlPage withoutSecurity = webClient.goTo("/");
-        assertThat(withoutSecurity.asXml(), containsString(JobConfigHistoryConsts.ICONFILENAME));
-        withoutSecurity.getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
-        // with security enabled the jobConfigHistory-badge should not show anymore.
-        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(false, false, null));
-        hudson.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
-        final HtmlPage withSecurityEnabled = webClient.goTo("/");
-        assertThat(withSecurityEnabled.asXml(), not(containsString(JobConfigHistoryConsts.ICONFILENAME)));
-        try {
-            withSecurityEnabled.getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
-            fail("Expected a " + ElementNotFoundException.class + " to be thrown");
-        } catch (ElementNotFoundException e) {
             System.err.println(e);
         }
     }

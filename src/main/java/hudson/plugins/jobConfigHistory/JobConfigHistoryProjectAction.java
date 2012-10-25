@@ -13,8 +13,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
-
 import javax.xml.transform.stream.StreamSource;
 
 import org.kohsuke.stapler.StaplerRequest;
@@ -26,7 +24,7 @@ import org.kohsuke.stapler.StaplerResponse;
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
     /** Our logger. */
-    private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
+//  private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
 
     /**
      * @param project
@@ -51,7 +49,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         checkConfigurePermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getHistoryDir(project.getConfigFile());
-        if (historyRootDir.exists()){
+        if (historyRootDir.exists()) {
             for (final File historyDir : historyRootDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
                 final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
                 final HistoryDescr histDescr = (HistoryDescr) historyXml.read();

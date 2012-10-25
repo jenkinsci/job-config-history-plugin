@@ -1,21 +1,16 @@
 package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.acegisecurity.AccessDeniedException;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.Extension;
 import hudson.XmlFile;
-import hudson.model.AbstractItem;
-import hudson.model.Hudson;
 import hudson.model.RootAction;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
@@ -55,9 +50,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         final String filter = getRequestParameter("filter");
         List<ConfigInfo> configs = null;
 
-        if (filter == null){
+        if (filter == null) {
             configs = getAllConfigs("system");
-        } else if ("all".equals(filter)){
+        } else if ("all".equals(filter)) {
             configs = getAllConfigs("jobs");
             configs.addAll(getAllConfigs("system"));
             configs.addAll(getAllConfigs("deleted"));
@@ -77,57 +72,59 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     * @throws IOException
     *             if one of the history entries might not be read.
     */
-   protected List<ConfigInfo> getAllConfigs(String type) throws IOException {
-       final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-       final File historyRootDir;
-       if ("system".equals(type)) {
-           historyRootDir = getPlugin().getConfiguredHistoryRootDir();
-       } else {
-           historyRootDir = getPlugin().getJobHistoryRootDir();
-       }
+    protected List<ConfigInfo> getAllConfigs(String type) throws IOException {
+        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+        final File historyRootDir;
+        if ("system".equals(type)) {
+            historyRootDir = getPlugin().getConfiguredHistoryRootDir();
+        } else {
+            historyRootDir = getPlugin().getJobHistoryRootDir();
+        }
 
-       if (!historyRootDir.isDirectory()) {
-           LOG.fine(historyRootDir + " is not a directory, assuming that no history exists yet.");
-       } else {
-           final File[] itemDirs;
-           if ("deleted".equals(type)){
-               itemDirs = historyRootDir.listFiles(JobConfigHistory.DELETED_FILTER);
-           } else {
-               itemDirs = historyRootDir.listFiles();
-           }
-           for (final File itemDir : itemDirs) {
-               //skip the "jobs" directory if we're looking at system changes
-               if ("system".equals(type) && itemDir.getName().equals(JobConfigHistoryConsts.JOBS_HISTORY_DIR)){
-                   continue;
-               }
-               for (final File historyDir : itemDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
-                   final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
-                   final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-                   final ConfigInfo config;
-                   if ("jobs".equals(type) && !itemDir.getName().contains(JobConfigHistoryConsts.DELETED_MARKER)){
-                       config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, true);
-                   } else {
-                       config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, false);
-                   }
-                   if (!("deleted".equals(type) && !"Deleted".equals(config.getOperation()))){
-                       configs.add(config);
-                   }
-               }
-           }
-       }
-       return configs; 
+        if (!historyRootDir.isDirectory()) {
+            LOG.fine(historyRootDir + " is not a directory, assuming that no history exists yet.");
+        } else {
+            final File[] itemDirs;
+            if ("deleted".equals(type)) {
+                itemDirs = historyRootDir.listFiles(JobConfigHistory.DELETED_FILTER);
+            } else {
+                itemDirs = historyRootDir.listFiles();
+            }
+            for (final File itemDir : itemDirs) {
+                //skip the "jobs" directory if we're looking at system changes
+                if ("system".equals(type) && itemDir.getName().equals(JobConfigHistoryConsts.JOBS_HISTORY_DIR)) {
+                    continue;
+                }
+                for (final File historyDir : itemDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                    final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+                    final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
+                    final ConfigInfo config;
+                    if ("jobs".equals(type) && !itemDir.getName().contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+                        config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, true);
+                    } else {
+                        config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, false);
+                    }
+                    if (!("deleted".equals(type) && !"Deleted".equals(config.getOperation()))) {
+                        configs.add(config);
+                    }
+                }
+            }
+        }
+        return configs; 
     }
 
 
     /**
      * Returns the configuration history entries for one group of system files.
+     * 
+     * @param req The incoming StaplerRequest
      * @return Configs list for one group of system configuration files.
      * @throws IOException
      *             if one of the history entries might not be read.
      */
     public final List<ConfigInfo> getSingleConfigs(StaplerRequest req) throws IOException {
-        String name = req.getParameter("name");
-        String type = req.getParameter("type");
+        final String name = req.getParameter("name");
+        final String type = req.getParameter("type");
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir;
         if ("system".equals(type)) {
@@ -137,12 +134,12 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         }
 
         for (final File itemDir : historyRootDir.listFiles()) {
-            if (itemDir.getName().equals(name)){
+            if (itemDir.getName().equals(name)) {
                 for (final File historyDir : itemDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
                     final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
                     final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
                     final ConfigInfo config;
-                    if ("jobs".equals(type)){
+                    if ("jobs".equals(type)) {
                         config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, true);
                     } else {
                         config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, false);
@@ -155,11 +152,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         }
         Collections.sort(configs, ConfigInfoComparator.INSTANCE);
         return configs;
-    }
-
-    public final void doRestoreDeleted(StaplerRequest req, StaplerResponse rsp)
-            throws IOException {
-        //TODO: restore deleted Jobs
     }
 
     /**

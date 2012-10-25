@@ -1,7 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
-import hudson.model.AbstractItem;
 import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
@@ -19,7 +18,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -49,7 +47,7 @@ import bmsi.util.Diff.change;
 public abstract class JobConfigHistoryBaseAction implements Action {
 
     /** Our logger. */
-    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
+//    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
 
     /**
      * The hudson instance.
@@ -130,12 +128,19 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return xmlFile.asString();
     }
 
-    protected void writeMessage(StaplerRequest req, StaplerResponse rsp, String s)
-            throws IOException{
-        
+    /**
+     * Writes message to the website.
+     * 
+     * @param req   The incoming StaplerRequest
+     * @param rsp   The outgoing StaplerResponse
+     * @param message     Message to be sent
+     * @throws IOException If writer doesn't work.
+     */
+    protected void writeMessage(StaplerRequest req, StaplerResponse rsp, String message)
+        throws IOException {
         final Writer writer = rsp.getCompressedWriter(req);
         try {
-            writer.append(s);
+            writer.append(message);
         } finally {
             writer.close();
         }
@@ -170,9 +175,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected XmlFile getConfigXml(final String diffDir) {
         final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
-//        final File configuredHistoryRootDir = plugin.getConfiguredHistoryRootDir();
         final String allowedHistoryRootDir;
-        if (plugin.getHistoryRootDir() == null || plugin.getHistoryRootDir().isEmpty()){
+        if (plugin.getHistoryRootDir() == null || plugin.getHistoryRootDir().isEmpty()) {
             allowedHistoryRootDir = plugin.getConfiguredHistoryRootDir().getAbsolutePath();
         } else {
             allowedHistoryRootDir = plugin.getConfiguredHistoryRootDir().getParent();
@@ -389,7 +393,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         /**
          * All lines of the view.
          */
-        final private List<Line> lines = new ArrayList<Line>();
+        private final List<Line> lines = new ArrayList<Line>();
 
         /**
          * Returns the lines of the {@link SideBySideView}.
@@ -402,7 +406,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         /**
          * Adds a line.
          *
-         * @param line
+         * @param line A single line.
          */
         public void addLine(Line line) {
             lines.add(line);
@@ -434,8 +438,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
          * of the left and right information of the diff.
          */
         public static class Line {
-            final private Item left = new Item();
-            final private Item right = new Item();
+            private final Item left = new Item();
+            private final Item right = new Item();
             private boolean skipping = false;
 
             /**
