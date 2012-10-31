@@ -10,7 +10,6 @@ import hudson.util.MultipartFormDataParser;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -128,24 +127,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return xmlFile.asString();
     }
 
-    /**
-     * Writes message to the website.
-     * 
-     * @param req   The incoming StaplerRequest
-     * @param rsp   The outgoing StaplerResponse
-     * @param message     Message to be sent
-     * @throws IOException If writer doesn't work.
-     */
-    protected void writeMessage(StaplerRequest req, StaplerResponse rsp, String message)
-        throws IOException {
-        final Writer writer = rsp.getCompressedWriter(req);
-        try {
-            writer.append(message);
-        } finally {
-            writer.close();
-        }
-    }
-    
     /**
      * Checks whether the type parameter of the current request equals
      * {@code toCompare}.

@@ -23,34 +23,58 @@ public class JobConfigHistoryProjectActionTest extends AbstractHudsonTestCaseDel
     public void testRestore() {
         final String firstDescription = "first test";
         final String secondDescription = "second test";
+        final String projectName = "Test1";
         
         try {
-            final FreeStyleProject project = createFreeStyleProject("Test1");
+            final FreeStyleProject project = createFreeStyleProject(projectName);
             Thread.sleep(SLEEP_TIME);
             project.setDescription(firstDescription);
             Thread.sleep(SLEEP_TIME);
             project.setDescription(secondDescription);
             Thread.sleep(SLEEP_TIME);
-/*            final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
-            
-            for (ConfigInfo config : projectAction.getJobConfigs()){
-                System.out.println("Operation: " + config.getOperation());
-                System.out.println("Timestamp: " + config.getDate());
-            }
-*/
+
             assertEquals(project.getDescription(), secondDescription);
 
-            final HtmlPage htmlpage = webClient.goTo("job/Test1/jobConfigHistory");
-            final HtmlAnchor restoreLink = (HtmlAnchor)htmlpage.getElementById("restore2");
+            final HtmlPage htmlPage = webClient.goTo("job/" + projectName + "/" + JobConfigHistoryConsts.URLNAME);
+            final HtmlAnchor restoreLink = (HtmlAnchor)htmlPage.getElementById("restore2");
             final HtmlPage reallyRestorePage = restoreLink.click();
             final HtmlForm restoreForm = reallyRestorePage.getFormByName("restore");
-            final HtmlPage results = submit(restoreForm, "Submit");
+            final HtmlPage jobPage = submit(restoreForm, "Submit");
             
-            assertStringContains(results.getTitleText(), "Test1");
-            assertEquals(project.getDescription(), firstDescription);
+            assertTrue("Verify return to job page and changed description.", jobPage.asText().contains(firstDescription));
+            assertEquals("Verify changed description.", project.getDescription(), firstDescription);
             
         } catch (Exception ex) {
             fail("Unable to complete restore config test: " + ex);
         }
     }
+    
+    public void testRestoreFromDiffFiles() {
+        final String firstDescription = "first test";
+        final String secondDescription = "second test";
+        final String projectName = "Test1";
+        final FreeStyleProject project;
+        
+        try {
+            project = createFreeStyleProject(projectName);
+            Thread.sleep(SLEEP_TIME);
+            project.setDescription(firstDescription);
+            Thread.sleep(SLEEP_TIME);
+            project.setDescription(secondDescription);
+            Thread.sleep(SLEEP_TIME);
+
+            assertEquals(project.getDescription(), secondDescription);
+
+            final HtmlPage htmlPage = webClient.goTo("job/" + projectName + "/" + JobConfigHistoryConsts.URLNAME);
+            final HtmlPage diffPage = submit(htmlPage.getFormByName("diffFiles"), "Submit");
+            final HtmlPage reallyRestorePage = submit(diffPage.getFormByName("forward"), "Submit");
+            final HtmlPage jobPage = submit(reallyRestorePage.getFormByName("restore"), "Submit");
+            
+            assertTrue("Verify return to job page and changed description.", jobPage.asText().contains(firstDescription));
+            assertEquals("Verify changed description.", project.getDescription(), firstDescription);
+        } catch (Exception ex) {
+            fail("Unable to complete restore config test: " + ex);
+        }
+    }
+
 }

@@ -98,7 +98,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         throws IOException {
         checkConfigurePermission();
         
-        final XmlFile xmlFile = getConfigXml((req.getParameter("file")));
+        final XmlFile xmlFile = getConfigXml(req.getParameter("file"));
         final String oldConfig = xmlFile.asString();
         final InputStream is = new ByteArrayInputStream(oldConfig.getBytes("UTF-8"));
 
@@ -115,7 +115,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @throws IOException If XML file can't be read
      */
     public final void doForwardToRestoreQuestion(StaplerRequest req, StaplerResponse rsp)
-            throws IOException {
+        throws IOException {
         final String histDir = req.getParameter("histDir");
         final XmlFile historyXml = new XmlFile(new File(histDir, JobConfigHistoryConsts.HISTORY_FILE));
         final HistoryDescr histDescr = (HistoryDescr) historyXml.read();

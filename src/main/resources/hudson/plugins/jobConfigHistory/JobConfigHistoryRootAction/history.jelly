@@ -8,12 +8,9 @@
  	</l:side-panel>
     
     <l:main-panel>
-      <j:set var="type" value="${request.getParameter('type')}"/>
+      <j:set var="name" value="${request.getParameter('name')}"/>
       <j:choose>
-        <j:when test="${type == 'jobs'}">
-          <h1>${%Job Configuration History}</h1>
-        </j:when>
-        <j:when test="${type == 'deleted'}">
+        <j:when test="${name.contains('_deleted_')}">
           <h1>${%Job Deletion History}</h1>
         </j:when>
         <j:otherwise>

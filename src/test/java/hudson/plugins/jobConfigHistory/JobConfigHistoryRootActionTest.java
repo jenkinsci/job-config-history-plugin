@@ -3,6 +3,8 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.FreeStyleProject;
 import hudson.security.LegacyAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
+
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeletingInstanceDir {
@@ -18,15 +20,6 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
         webClient = createWebClient();
     }
     
-    public void testFilterWithoutData() {
-        try {
-            final HtmlPage htmlPage = webClient.goTo("jobConfigHistory");
-            assertTrue(htmlPage.asText().contains("No configuration history"));
-        } catch (Exception ex) {
-            fail("Unable to complete testFilterWithoutData: " + ex);
-        }
-    }
-            
     public void testFilterWithData() {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
         jch.setSaveSystemConfiguration(true);
@@ -38,7 +31,7 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
             project.disable();
             Thread.sleep(SLEEP_TIME);
             
-            hudson.setSystemMessage("First Testmessage");
+            hudson.setSystemMessage("Testmessage");
             Thread.sleep(SLEEP_TIME);
             
             final FreeStyleProject secondProject = createFreeStyleProject("Test2");
@@ -78,6 +71,15 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
         assertTrue("Check link to historypage exists.", page.contains("history?name"));
     }
 
+    public void testFilterWithoutData() {
+        try {
+            final HtmlPage htmlPage = webClient.goTo("jobConfigHistory");
+            assertTrue(htmlPage.asText().contains("No configuration history"));
+        } catch (Exception ex) {
+            fail("Unable to complete testFilterWithoutData: " + ex);
+        }
+    }
+
     public void testFilterWithoutPermissions(){
         hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(false, false, null));
         hudson.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
@@ -86,6 +88,51 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
             assertTrue("Verify nothing is shown without permission", htmlPage.asText().contains("No permission to view"));
         } catch (Exception ex) {
             fail("Unable to complete testFilterWithoutPermissions: " + ex);
+        }
+    }
+    
+    public void testSingleSystemHistoryPage() {
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        jch.setSaveSystemConfiguration(true);
+
+        //create some config history data
+        try {
+            hudson.setSystemMessage("First Testmessage");
+            Thread.sleep(SLEEP_TIME);
+            hudson.setSystemMessage("Second Testmessage");
+            Thread.sleep(SLEEP_TIME);
+        } catch (Exception ex) {
+            fail("Unable to prepare Hudson instance: " + ex);
+        }
+        
+        try {
+            final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/history?name=config");
+            final String page = htmlPage.asXml();
+            assertFalse("Check whether configuration data is found.", page.contains("No configuration history"));
+            assertTrue("Verify several entries for config changes exist.", page.split("Changed").length > 2);
+        } catch (Exception ex) {
+            fail("Unable to complete testHistoryPage: " + ex);
+        }
+    }
+    
+    public void testSingleDeletedJobHistoryPage() {
+        //create some config history data
+        try {
+            final FreeStyleProject secondProject = createFreeStyleProject("Test");
+            Thread.sleep(SLEEP_TIME);
+            secondProject.delete();
+        } catch (Exception ex) {
+            fail("Unable to prepare Hudson instance: " + ex);
+        }            
+        try {
+            final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
+            final HtmlAnchor deletedLink = (HtmlAnchor)htmlPage.getElementById("deleted");
+            final String historyPage = ((HtmlPage)deletedLink.click()).asXml();
+            assertFalse("Check whether configuration data is found.", historyPage.contains("No configuration history"));
+            assertTrue("Verify entry for creation exists.", historyPage.contains("Created"));
+            assertTrue("Verify entry for deletion exists.", historyPage.contains("Deleted"));
+        } catch (Exception ex) {
+            fail("Unable to complete testHistoryPage: " + ex);
         }
     }
 }

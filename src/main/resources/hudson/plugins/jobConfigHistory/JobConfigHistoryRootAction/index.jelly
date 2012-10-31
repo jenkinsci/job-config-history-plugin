@@ -73,10 +73,10 @@
                       <j:otherwise>
                         <j:choose>
                           <j:when test="${config.job.contains('_deleted_')}">
-                            <td><a href="history?name=${config.job}&amp;type=deleted">${config.job}</a></td>
+                            <td><a href="history?name=${config.job}" id="deleted">${config.job}</a></td>
                           </j:when>
                           <j:otherwise>
-                            <td><a href="history?name=${config.job}&amp;type=system">${config.job}</a>&amp;nbsp;(system)</td>
+                            <td><a href="history?name=${config.job}">${config.job}</a>&amp;nbsp;(system)</td>
                           </j:otherwise>
                         </j:choose>
                       </j:otherwise>

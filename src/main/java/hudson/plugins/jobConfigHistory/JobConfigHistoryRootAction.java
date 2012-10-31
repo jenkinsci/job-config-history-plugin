@@ -149,13 +149,12 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      */
     public final List<ConfigInfo> getSingleConfigs(StaplerRequest req) throws IOException {
         final String name = req.getParameter("name");
-        final String type = req.getParameter("type");
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir;
-        if ("system".equals(type)) {
-            historyRootDir = getPlugin().getConfiguredHistoryRootDir();
-        } else {
+        if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
             historyRootDir = getPlugin().getJobHistoryRootDir();
+        } else {
+            historyRootDir = getPlugin().getConfiguredHistoryRootDir();
         }
 
         for (final File itemDir : historyRootDir.listFiles()) {
@@ -163,16 +162,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
                 for (final File historyDir : itemDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
                     final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
                     final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-                    final ConfigInfo config;
-                    if ("jobs".equals(type)) {
-                        config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, true);
-                    } else {
-                        config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, false);
-                    }
+                    final ConfigInfo config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, false);
                     configs.add(config);
                 }
-                Collections.sort(configs, ConfigInfoComparator.INSTANCE);
-                return configs; 
             }
         }
         Collections.sort(configs, ConfigInfoComparator.INSTANCE);
