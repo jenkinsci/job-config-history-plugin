@@ -1,21 +1,8 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.model.FreeStyleProject;
-import hudson.model.Hudson;
 import hudson.security.LegacyAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
-
-import java.io.IOException;
-
-import jenkins.model.Jenkins;
-
-import org.xml.sax.SAXException;
-
-import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeletingInstanceDir {

@@ -24,7 +24,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
  */
 public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
-    private File jobsDir;
     private File jobHistoryDir;
     private WebClient webClient;
     private File rootDir;
@@ -32,7 +31,6 @@ public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDelet
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        jobsDir = new File(hudson.root, "jobs");
         rootDir = hudson.getPlugin(JobConfigHistory.class).getConfiguredHistoryRootDir();
         jobHistoryDir = new File(rootDir, JobConfigHistoryConsts.JOBS_HISTORY_DIR);
         hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true, false, null));

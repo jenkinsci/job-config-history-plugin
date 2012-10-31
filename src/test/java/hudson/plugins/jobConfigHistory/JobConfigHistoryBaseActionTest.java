@@ -4,24 +4,16 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.containsString;
 import hudson.security.AccessControlled;
-import hudson.security.HudsonPrivateSecurityRealm;
-import hudson.security.LegacyAuthorizationStrategy;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 
-import org.jvnet.hudson.test.Bug;
 import org.xml.sax.SAXException;
 
-import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import hudson.security.Permission;
 
