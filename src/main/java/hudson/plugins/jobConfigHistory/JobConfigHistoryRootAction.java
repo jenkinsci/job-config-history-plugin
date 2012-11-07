@@ -72,7 +72,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      * @throws IOException
      *             if one of the history entries might not be read.
      */
-
     protected List<ConfigInfo> getSystemConfigs() throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getConfiguredHistoryRootDir();

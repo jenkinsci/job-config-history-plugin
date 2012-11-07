@@ -20,6 +20,9 @@ public class JobConfigHistoryProjectActionTest extends AbstractHudsonTestCaseDel
         webClient = createWebClient();
     }
 
+    /**
+     * Tests restore link on job config history page.
+     */
     public void testRestore() {
         final String firstDescription = "first test";
         final String secondDescription = "second test";
@@ -36,7 +39,7 @@ public class JobConfigHistoryProjectActionTest extends AbstractHudsonTestCaseDel
             assertEquals(project.getDescription(), secondDescription);
 
             final HtmlPage htmlPage = webClient.goTo("job/" + projectName + "/" + JobConfigHistoryConsts.URLNAME);
-            final HtmlAnchor restoreLink = (HtmlAnchor)htmlPage.getElementById("restore2");
+            final HtmlAnchor restoreLink = (HtmlAnchor) htmlPage.getElementById("restore2");
             final HtmlPage reallyRestorePage = restoreLink.click();
             final HtmlForm restoreForm = reallyRestorePage.getFormByName("restore");
             final HtmlPage jobPage = submit(restoreForm, "Submit");
@@ -49,6 +52,9 @@ public class JobConfigHistoryProjectActionTest extends AbstractHudsonTestCaseDel
         }
     }
     
+    /**
+     * Tests restore button on "Really restore?" page.
+     */
     public void testRestoreFromDiffFiles() {
         final String firstDescription = "first test";
         final String secondDescription = "second test";
@@ -76,5 +82,4 @@ public class JobConfigHistoryProjectActionTest extends AbstractHudsonTestCaseDel
             fail("Unable to complete restore config test: " + ex);
         }
     }
-
 }

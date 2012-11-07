@@ -77,7 +77,7 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
             }
             @Override
             protected boolean hasConfigurePermission() {
-                 return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
+                return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
             }
         };
         return action;
@@ -118,7 +118,7 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
     public void testGetConfigXmlIllegalArgumentExceptionNotUnderConfigRoot() throws IOException, SAXException {
         // request file not under historyRootDir when historyRootDir is configured
         try {
-            HtmlForm form = webClient.goTo("configure").getFormByName("config");
+            final HtmlForm form = webClient.goTo("configure").getFormByName("config");
             form.getInputByName("historyRootDir").setValueAttribute("jobConfigHistory");
             form.getInputByName("saveSystemConfiguration").setChecked(true);
             submit(form);
@@ -134,12 +134,12 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
 
         // request for non-history directory
         final File baseDir = new File(hudson.getRootDir(), "jobConfigHistory");
-        TextPage page = (TextPage) webClient.goTo("jobConfigHistory/configOutput?type=raw&file=" + URLEncoder.encode(baseDir.getPath(),"UTF-8"),"text/plain");
+        TextPage page = (TextPage) webClient.goTo("jobConfigHistory/configOutput?type=raw&file=" + URLEncoder.encode(baseDir.getPath(), "UTF-8"), "text/plain");
         assertTrue("Verify empty return on non-history directory request.", page.getContent().trim().isEmpty());
 
         // request for non-existent directory
         final File invalidDir = new File(baseDir, "no_such_dir");
-        page = (TextPage) webClient.goTo("jobConfigHistory/configOutput?type=raw&file=" + URLEncoder.encode(invalidDir.getPath(),"UTF-8"),"text/plain");
+        page = (TextPage) webClient.goTo("jobConfigHistory/configOutput?type=raw&file=" + URLEncoder.encode(invalidDir.getPath(), "UTF-8"), "text/plain");
         assertTrue("Verify empty return on non-existent directory request.", page.getContent().trim().isEmpty());
     }
 

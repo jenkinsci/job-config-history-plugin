@@ -19,7 +19,9 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
         super.setUp();
         webClient = createWebClient();
     }
-    
+    /**
+     * Tests whether info gets displayed correctly for filter parameter none/system/jobs/deleted.
+     */
     public void testFilterWithData() {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
         jch.setSaveSystemConfiguration(true);
@@ -47,8 +49,10 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
                 
             final HtmlPage htmlPageJobs = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=jobs");
             assertTrue("Verify history entry for job is listed.", htmlPageJobs.getAnchorByText("Test1") != null);
-            assertTrue("Verify history entry for deleted job is listed.", htmlPageJobs.asText().contains(JobConfigHistoryConsts.DELETED_MARKER));
-            assertFalse("Verify that no history entry for system change is listed.", htmlPageJobs.asText().contains("config (system)"));
+            assertTrue("Verify history entry for deleted job is listed.", 
+                    htmlPageJobs.asText().contains(JobConfigHistoryConsts.DELETED_MARKER));
+            assertFalse("Verify that no history entry for system change is listed.", 
+                    htmlPageJobs.asText().contains("config (system)"));
             assertTrue("Check link to job page.", htmlPageJobs.asXml().contains("job/Test1/" + JobConfigHistoryConsts.URLNAME));
 
             final HtmlPage htmlPageDeleted = webClient.goTo("jobConfigHistory/?filter=deleted");
@@ -63,7 +67,11 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
         }
     }
 
-    private void checkSystemPage(HtmlPage htmlPage){
+    /**
+     * Checks whether system config history is displayed correctly.
+     * @param htmlPage
+     */
+    private void checkSystemPage(HtmlPage htmlPage) {
         final String page = htmlPage.asXml();
         assertTrue("Verify history entry for system change is listed.", htmlPage.getAnchorByText("config") != null);
         assertFalse("Verify no job history entry is listed.", page.contains("Test1"));
@@ -71,6 +79,9 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
         assertTrue("Check link to historypage exists.", page.contains("history?name"));
     }
 
+    /**
+     * If there is no config history available, it should say so.
+     */
     public void testFilterWithoutData() {
         try {
             final HtmlPage htmlPage = webClient.goTo("jobConfigHistory");
@@ -80,7 +91,10 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
         }
     }
 
-    public void testFilterWithoutPermissions(){
+    /**
+     * System config history should only be visible with the right permissions.
+     */
+    public void testFilterWithoutPermissions() {
         hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(false, false, null));
         hudson.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
         try {
@@ -91,6 +105,9 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
         }
     }
     
+    /**
+     * Tests whether the config history of a single system feature is displayed correctly.
+     */
     public void testSingleSystemHistoryPage() {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
         jch.setSaveSystemConfiguration(true);
@@ -115,6 +132,9 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
         }
     }
     
+    /**
+     * Tests whether config history of single deleted job is displayed correctly.
+     */
     public void testSingleDeletedJobHistoryPage() {
         //create some config history data
         try {
@@ -126,8 +146,8 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
         }            
         try {
             final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
-            final HtmlAnchor deletedLink = (HtmlAnchor)htmlPage.getElementById("deleted");
-            final String historyPage = ((HtmlPage)deletedLink.click()).asXml();
+            final HtmlAnchor deletedLink = (HtmlAnchor) htmlPage.getElementById("deleted");
+            final String historyPage = ((HtmlPage) deletedLink.click()).asXml();
             assertFalse("Check whether configuration data is found.", historyPage.contains("No configuration history"));
             assertTrue("Verify entry for creation exists.", historyPage.contains("Created"));
             assertTrue("Verify entry for deletion exists.", historyPage.contains("Deleted"));

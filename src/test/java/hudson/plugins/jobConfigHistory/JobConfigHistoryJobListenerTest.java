@@ -66,8 +66,8 @@ public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDelet
     }
 
     public void testRenameErrors() throws Exception {
-        JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        HtmlForm form = webClient.goTo("configure").getFormByName("config");
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        final HtmlForm form = webClient.goTo("configure").getFormByName("config");
         form.getInputByName("historyRootDir").setValueAttribute("jobConfigHistory");
         form.getInputByName("saveSystemConfiguration").setChecked(true);
         submit(form);
