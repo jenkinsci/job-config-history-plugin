@@ -3,10 +3,10 @@
     <st:include page="sidepanel.jelly"/>
     <l:side-panel>
       <l:tasks>
-      	<l:task icon="plugin/jobConfigHistory/img/a-32x32.png" href="?filter=system" title="${%Show system configs only}" />
-      	<l:task icon="plugin/jobConfigHistory/img/a-32x32.png" href="?filter=jobs" title="${%Show job configs only}" />
-      	<l:task icon="plugin/jobConfigHistory/img/a-32x32.png" href="?filter=deleted" title="${%Show deleted jobs only}" />
-      	<l:task icon="plugin/jobConfigHistory/img/a-32x32.png" href="?filter=all" title="${%Show all configs}" />
+      	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=system" title="${%Show system configs only}" />
+      	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=jobs" title="${%Show job configs only}" />
+      	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=deleted" title="${%Show deleted jobs only}" />
+      	<l:task icon="plugin/jobConfigHistory/img/text-x-generic.png" href="?filter=all" title="${%Show all configs}" />
       </l:tasks>
  	</l:side-panel>
     
@@ -28,8 +28,8 @@
       </j:choose>
       
       <a href="?filter=system">${%Show system configs only}</a> <br />
-      <a href="?filter=jobs">${%Show job configs}</a> <br />
-      <a href="?filter=deleted">${%Show deleted jobs}</a> <br />
+      <a href="?filter=jobs">${%Show job configs only}</a> <br />
+      <a href="?filter=deleted">${%Show deleted jobs only}</a> <br />
       <a href="?filter=all">${%Show all configs}</a> <br />
 
       <div>
