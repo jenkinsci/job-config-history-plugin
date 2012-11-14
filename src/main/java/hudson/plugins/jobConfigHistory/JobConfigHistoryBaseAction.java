@@ -45,6 +45,9 @@ import bmsi.util.Diff.change;
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
 
+    /** Our logger. */
+//    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
+
     /**
      * The hudson instance.
      */
@@ -76,8 +79,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     // @Override
     public final String getIconFileName() {
-        return hasConfigurePermission() ? JobConfigHistoryConsts.ICONFILENAME
-                : null;
+        return JobConfigHistoryConsts.ICONFILENAME;
     }
 
     /**
@@ -153,13 +155,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return xmlfile.
      */
     protected XmlFile getConfigXml(final String diffDir) {
-        final JobConfigHistory plugin = hudson
-                .getPlugin(JobConfigHistory.class);
-        final File configuredHistoryRootDir = plugin
-                .getConfiguredHistoryRootDir();
-        final String allowedHistoryRootDir = configuredHistoryRootDir == null ? getHudson()
-                .getRootDir().getAbsolutePath() : configuredHistoryRootDir
-                .getAbsolutePath();
+        final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
+        final String allowedHistoryRootDir;
+        if (plugin.getHistoryRootDir() == null || plugin.getHistoryRootDir().isEmpty()) {
+            allowedHistoryRootDir = plugin.getConfiguredHistoryRootDir().getAbsolutePath();
+        } else {
+            allowedHistoryRootDir = plugin.getConfiguredHistoryRootDir().getParent();
+        }
+        
         File configFile = null;
         if (diffDir != null) {
             if (!diffDir.startsWith(allowedHistoryRootDir)
@@ -167,12 +170,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 throw new IllegalArgumentException(diffDir
                         + " does not start with " + allowedHistoryRootDir
                         + " or contains '..'");
-            } else if (configuredHistoryRootDir == null
-                    && !diffDir
-                            .contains(JobConfigHistoryConsts.DEFAULT_HISTORY_DIR)) {
-                throw new IllegalArgumentException(diffDir
-                        + " does not contain '"
-                        + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR + "'");
             }
             configFile = plugin.getConfigFile(new File(diffDir));
         }
@@ -251,7 +248,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *             when the redirection does not succeed.
      */
     public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
-            throws ServletException, IOException {
+        throws ServletException, IOException {
         final MultipartFormDataParser parser = new MultipartFormDataParser(req);
         rsp.sendRedirect("showDiffFiles?histDir1=" + parser.get("histDir1")
                 + "&histDir2=" + parser.get("histDir2"));
@@ -377,7 +374,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         /**
          * All lines of the view.
          */
-        final private List<Line> lines = new ArrayList<Line>();
+        private final List<Line> lines = new ArrayList<Line>();
 
         /**
          * Returns the lines of the {@link SideBySideView}.
@@ -390,7 +387,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         /**
          * Adds a line.
          *
-         * @param line
+         * @param line A single line.
          */
         public void addLine(Line line) {
             lines.add(line);
@@ -422,8 +419,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
          * of the left and right information of the diff.
          */
         public static class Line {
-            final private Item left = new Item();
-            final private Item right = new Item();
+            private final Item left = new Item();
+            private final Item right = new Item();
             private boolean skipping = false;
 
             /**
@@ -516,5 +513,4 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         unifiedPrint.print_script(change);
         return output.toString();
     }
-
 }

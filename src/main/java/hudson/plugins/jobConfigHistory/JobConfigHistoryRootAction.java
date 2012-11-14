@@ -1,19 +1,20 @@
 package hudson.plugins.jobConfigHistory;
 
-import hudson.Extension;
-import hudson.XmlFile;
-import hudson.model.AbstractItem;
-import hudson.model.Hudson;
-import hudson.model.RootAction;
-import hudson.security.AccessControlled;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+
+import org.kohsuke.stapler.StaplerRequest;
+
+import hudson.Extension;
+import hudson.XmlFile;
+import hudson.model.RootAction;
+import hudson.security.AccessControlled;
 import hudson.security.Permission;
+
 /**
  *
  * @author Stefan Brausch, mfriedenhagen
@@ -37,59 +38,57 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     }
 
     /**
-     * Returns the configuration history entries for all {@link AbstractItem}s and System files in this Hudson instance.
+     * Returns the configuration history entries 
+     * for either {@link AbstractItem}s or system changes or deleted jobs 
+     * or all of the above.
      *
-     * @return list for all {@link AbstractItem}s.
+     * @return list of configuration histories (as ConfigInfo)
      * @throws IOException
      *             if one of the history entries might not be read.
      */
     public final List<ConfigInfo> getConfigs() throws IOException {
         final String filter = getRequestParameter("filter");
+        List<ConfigInfo> configs = null;
 
-        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        // we don't display any project info if we are filtered (applies to system configuration only)
-        if (filter == null) {
-            @SuppressWarnings("unchecked")
-            final List<AbstractItem> items = Hudson.getInstance().getAllItems(AbstractItem.class);
-            for (final AbstractItem item : items) {
-                LOG.finest("getConfigs: Getting configs for " + item.getFullName());
-                final JobConfigHistoryProjectAction action = new JobConfigHistoryProjectAction(item);
-                final List<ConfigInfo> jobConfigs = action.getConfigs();
-                LOG.finest("getConfigs: " + item.getFullName() + " has " + jobConfigs.size() + " history items");
-                configs.addAll(jobConfigs);
-            }
-            //TODO hier muss gelistet werden
+        if (filter == null || "system".equals(filter)) {
+            configs = getSystemConfigs();
+        } else if ("all".equals(filter)) {
+            configs = getJobConfigs("jobs");
+            configs.addAll(getJobConfigs("deleted"));
+            configs.addAll(getSystemConfigs());
+        } else {
+            configs = getJobConfigs(filter);
         }
-        final List<ConfigInfo> systemConfigs = getSystemConfigs(filter);
-        LOG.finest("getSystemConfigs: has " + systemConfigs.size() + " history items");
-        configs.addAll(systemConfigs);
+        
         Collections.sort(configs, ConfigInfoComparator.INSTANCE);
         return configs;
     }
 
     /**
-     * Returns the configuration history entries for all System files in this Hudson instance.
-     * @param filter
-     *            name of the system configuration entity to show
-     * @return list for all System configuration files.
+     * Returns the configuration history entries for all system files
+     * in this Hudson instance.
+     * 
+     * @return List of config infos.
      * @throws IOException
      *             if one of the history entries might not be read.
      */
-    protected List<ConfigInfo> getSystemConfigs(final String filter) throws IOException {
-        checkConfigurePermission();
+    protected List<ConfigInfo> getSystemConfigs() throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final File systemHistoryRootDir = getPlugin().getSystemHistoryDir();
-        if (!systemHistoryRootDir.isDirectory()) {
-            LOG.fine(systemHistoryRootDir + " is not a directory, assuming that no history exists yet.");
+        final File historyRootDir = getPlugin().getConfiguredHistoryRootDir();
+
+        if (!historyRootDir.isDirectory()) {
+            LOG.fine(historyRootDir + " is not a directory, assuming that no history exists yet.");
         } else {
-            for (final File systemConfigEntry : systemHistoryRootDir.listFiles()) {
-                if (filter != null && !filter.equals(systemConfigEntry.getName())) {
+            final File[] itemDirs = historyRootDir.listFiles();
+            for (final File itemDir : itemDirs) {
+                //skip the "jobs" directory since we're looking for system changes
+                if (itemDir.getName().equals(JobConfigHistoryConsts.JOBS_HISTORY_DIR)) {
                     continue;
                 }
-                for (final File historyDir : systemConfigEntry.listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                for (final File historyDir : itemDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
                     final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
                     final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-                    final ConfigInfo config = ConfigInfo.create(systemConfigEntry.getName(), historyDir, histDescr);
+                    final ConfigInfo config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, false);
                     configs.add(config);
                 }
             }
@@ -98,19 +97,77 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     }
 
     /**
-     *
-     * @return true is the page is loaded with a filter applied
+     * Returns the configuration history entries for all jobs 
+     * or deleted jobs in this Hudson instance.
+     * 
+     * @param type Whether we want to see all jobs or just the deleted jobs.
+     * @return List of config infos.
+     * @throws IOException
+     *             if one of the history entries might not be read.
      */
-    public boolean isFiltered() {
-        return getRequestParameter("filter") != null;
+    protected List<ConfigInfo> getJobConfigs(String type) throws IOException {
+        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+        final File historyRootDir = getPlugin().getJobHistoryRootDir();
+
+        if (!historyRootDir.isDirectory()) {
+            LOG.fine(historyRootDir + " is not a directory, assuming that no history exists yet.");
+        } else {
+            final File[] itemDirs;
+            if ("deleted".equals(type)) {
+                itemDirs = historyRootDir.listFiles(JobConfigHistory.DELETED_FILTER);
+            } else {
+                itemDirs = historyRootDir.listFiles();
+            }
+            for (final File itemDir : itemDirs) {
+                for (final File historyDir : itemDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                    final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+                    final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
+                    final ConfigInfo config;
+                    if ("jobs".equals(type) && !itemDir.getName().contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+                        config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, true);
+                    } else {
+                        config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, false);
+                    }
+                    if (!("deleted".equals(type) && !"Deleted".equals(config.getOperation()))) {
+                        configs.add(config);
+                    }
+                }
+            }
+        }
+        return configs; 
     }
 
+    
     /**
-     *
-     * @return the filter text used when loading the page, or null if not filtered
+     * Returns the configuration history entries for one group of system files.
+     * 
+     * @param req The incoming StaplerRequest
+     * @return Configs list for one group of system configuration files.
+     * @throws IOException
+     *             if one of the history entries might not be read.
      */
-    public String getFilter() {
-        return getRequestParameter("filter");
+    public final List<ConfigInfo> getSingleConfigs(StaplerRequest req) throws IOException {
+        final String name = req.getParameter("name");
+        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+        final File historyRootDir;
+        if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+            historyRootDir = getPlugin().getJobHistoryRootDir();
+        } else {
+            historyRootDir = getPlugin().getConfiguredHistoryRootDir();
+        }
+
+        for (final File itemDir : historyRootDir.listFiles()) {
+            if (itemDir.getName().equals(name)) {
+                for (final File historyDir : itemDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                    final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+                    final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
+                    final ConfigInfo config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, false);
+                    configs.add(config);
+                }
+            }
+        }
+        Collections.sort(configs, ConfigInfoComparator.INSTANCE);
+        return configs;
     }
 
     /**
@@ -129,7 +186,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     }
 
     @Override
-    protected boolean hasConfigurePermission() {
+    public boolean hasConfigurePermission() {
         return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
     }
 }
