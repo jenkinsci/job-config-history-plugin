@@ -5,20 +5,14 @@ import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.security.AccessControlled;
-import hudson.util.MultipartFormDataParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
-
-import javax.servlet.ServletException;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.kohsuke.stapler.StaplerRequest;
@@ -30,7 +24,7 @@ import org.kohsuke.stapler.StaplerResponse;
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
     /** Our logger. */
-    private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
+//  private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
 
     /**
      * @param project
@@ -51,19 +45,17 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @throws IOException
      *             if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be read or the path might not be urlencoded.
      */
-    public final List<ConfigInfo> getConfigs() throws IOException {
+    public final List<ConfigInfo> getJobConfigs() throws IOException {
         checkConfigurePermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getHistoryDir(project.getConfigFile());
-        if (!historyRootDir.isDirectory()) {
-            LOG.info(historyRootDir + " is not a directory, assuming that no history exists yet.");
-            return Collections.emptyList();
-        }
-        for (final File historyDir : historyRootDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
-            final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
-            final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-            final ConfigInfo config = ConfigInfo.create(project, historyDir, histDescr);
-            configs.add(config);
+        if (historyRootDir.exists()) {
+            for (final File historyDir : historyRootDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+                final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
+                final ConfigInfo config = ConfigInfo.create(project, historyDir, histDescr);
+                configs.add(config);
+            }
         }
         Collections.sort(configs, ConfigInfoComparator.INSTANCE);
         return configs;
@@ -96,17 +88,38 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         return getAccessControlledObject().hasPermission(AbstractProject.CONFIGURE);
     }
     
- 
+    /**
+     * Action when 'restore' button is pressed.
+     * @param req incoming StaplerRequest
+     * @param rsp outgoing StaplerResponse
+     * @throws IOException if something goes wrong
+     */
     public final void doRestore(StaplerRequest req, StaplerResponse rsp)
-            throws IOException {
+        throws IOException {
         checkConfigurePermission();
         
-        XmlFile xmlFile = getConfigXml((req.getParameter("file")));
-        String oldConfig = xmlFile.asString();
-        InputStream is = new ByteArrayInputStream(oldConfig.getBytes("UTF-8"));
+        final XmlFile xmlFile = getConfigXml(req.getParameter("file"));
+        final String oldConfig = xmlFile.asString();
+        final InputStream is = new ByteArrayInputStream(oldConfig.getBytes("UTF-8"));
 
         project.updateByXml(new StreamSource(is));
         project.save();
         rsp.sendRedirect(Hudson.getInstance().getRootUrl() + project.getUrl());
+    }
+    
+    /**
+     * Action when 'restore' button in showDiffFiles.jelly is pressed.
+     * Gets required parameters and forwards to restoreQuestion.jelly.
+     * @param req StaplerRequest created by pressing the button
+     * @param rsp outgoing StaplerResponse
+     * @throws IOException If XML file can't be read
+     */
+    public final void doForwardToRestoreQuestion(StaplerRequest req, StaplerResponse rsp)
+        throws IOException {
+        final String histDir = req.getParameter("histDir");
+        final XmlFile historyXml = new XmlFile(new File(histDir, JobConfigHistoryConsts.HISTORY_FILE));
+        final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
+        rsp.sendRedirect("restoreQuestion?file=" + historyXml.getFile().getParent() 
+                + "&date=" + histDescr.getTimestamp() + "&user=" + histDescr.getUser());
     }
 }

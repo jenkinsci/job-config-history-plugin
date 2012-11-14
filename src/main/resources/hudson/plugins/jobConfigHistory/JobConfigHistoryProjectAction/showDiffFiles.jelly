@@ -5,7 +5,7 @@
       <h1>${%Job Configuration Difference}</h1>
       <div>
         <j:choose>
-          <j:when test="${it.configs.size() == 0}">
+          <j:when test="${it.getJobConfigs().size() == 0}">
               ${%No job configuration history available}
           </j:when>
           <j:otherwise>
@@ -35,6 +35,11 @@
                       </tr>
                     </j:forEach>
                   </table>
+                  <f:form method="post" action="forwardToRestoreQuestion?histDir=${request.getParameter('histDir1')}" name="forward">
+                    <div align="right">
+                      <f:submit value="${%Restore old version}" />
+                    </div>
+                  </f:form>
                 </j:otherwise>
               </j:choose>
             </div>

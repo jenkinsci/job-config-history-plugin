@@ -1,14 +1,28 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="Job Configuration History">
-    <st:include it="${it.project}" page="sidepanel.jelly" />
+    <st:include page="sidepanel.jelly" />
+    <l:side-panel>
+      <l:tasks>
+      	<l:task icon="plugin/jobConfigHistory/img/confighistory.png" href="${rootURL}/jobConfigHistory" title="${%Back to Overview}" />
+      </l:tasks>
+ 	</l:side-panel>
+    
     <l:main-panel>
-      <h1>${%Job Configuration History}</h1>
-      <h2>${it.getProject().getName()}</h2>
+      <j:set var="name" value="${request.getParameter('name')}"/>
+      <j:choose>
+        <j:when test="${name.contains('_deleted_')}">
+          <h1>${%Job Deletion History}</h1>
+        </j:when>
+        <j:otherwise>
+		  <h1>${%System Configuration History}</h1>
+        </j:otherwise>
+      </j:choose>
+      <h2>${request.getParameter('name')}</h2>
+      <j:set var="configs" value="${it.getSingleConfigs(request)}" />
       <div>
-        <j:set var="configs" value="${it.getJobConfigs()}" />
         <j:choose>
           <j:when test="${configs.size() == 0}">
-              ${%No job configuration history available}
+              ${%No configuration history available}
           </j:when>
           <j:otherwise>
             <br/>
@@ -23,11 +37,10 @@
                     <td class="pane-header" align="left">${%Operation}</td>
                     <td class="pane-header" align="left">${%User}</td>
                     <td class="pane-header" align="left">${%Show File}</td>
-                    <td class="pane-header" align="left">${%Restore old config}</td>
                     <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">${%Diff}</td>
                   </tr>
                   <tr>
-                    <td colspan="5"></td>
+                    <td colspan="4"></td>
                     <td align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
                     <td align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
                   </tr>
@@ -45,12 +58,6 @@
                           <a href="configOutput?type=raw&amp;file=${config.file}">
                             (${%RAW})
                           </a>
-                      </td>
-                      <td><j:if test="${configNr > 1}">
-							<a id="restore${configNr}" href="restoreQuestion?file=${config.file}&amp;date=${config.date}&amp;user=${config.userID}">
-								<img src="${rootURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
-							</a>
-                          </j:if>
                       </td>
                       <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir1" value="${config.file}" checked="${configNr == 2 ? true:false}" /></td>
                       <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir2" value="${config.file}" checked="${configNr == 1 ? true:false}" /></td>

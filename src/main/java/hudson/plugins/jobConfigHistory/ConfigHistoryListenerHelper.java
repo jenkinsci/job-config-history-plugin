@@ -66,17 +66,6 @@ public enum ConfigHistoryListenerHelper {
     }
 
     /**
-     * Returns the configuration history directory for the given {@link Item}.
-     * 
-     * @param item
-     *            for which we want to save the configuration.
-     * @return base directory where to store the history.
-     */
-    // private File getConfigsDir(Item item) {
-    // return new File(item.getRootDir(), "config-history");
-    // }
-
-    /**
      * Creates a timestamped directory to save the configuration beneath. Purges old data if configured
      * 
      * @param xmlFile

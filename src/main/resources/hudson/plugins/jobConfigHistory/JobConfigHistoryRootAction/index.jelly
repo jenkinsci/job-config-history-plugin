@@ -1,69 +1,84 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="${%All Configuration History}">
     <st:include page="sidepanel.jelly"/>
+    <l:side-panel>
+      <l:tasks>
+      	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=system" title="${%Show system configs only}" />
+      	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=jobs" title="${%Show job configs only}" />
+      	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=deleted" title="${%Show deleted jobs only}" />
+      	<l:task icon="plugin/jobConfigHistory/img/text-x-generic.png" href="?filter=all" title="${%Show all configs}" />
+      </l:tasks>
+ 	</l:side-panel>
+    
     <l:main-panel>
+      <j:set var="filter" value="${request.getParameter('filter')}"/>
       <j:choose>
-        <j:when test="${it.isFiltered()}">
-          <h1>${it.filter} ${%Configuration History}</h1>
+        <j:when test="${filter == 'all'}">
+          <h1>${%All Configuration History}</h1>
+        </j:when>
+        <j:when test="${filter == 'jobs'}">
+          <h1>${%Job Configuration History}</h1>
+        </j:when>
+        <j:when test="${filter == 'deleted'}">
+          <h1>${%Job Deletion History}</h1>
         </j:when>
         <j:otherwise>
-          <h1>${%All Configuration History}</h1>
+		  <h1>${%System Configuration History}</h1>
         </j:otherwise>
       </j:choose>
+      
+      <a href="?filter=system">${%Show system configs only}</a> <br />
+      <a href="?filter=jobs">${%Show job configs only}</a> <br />
+      <a href="?filter=deleted">${%Show deleted jobs only}</a> <br />
+      <a href="?filter=all">${%Show all configs}</a> <br />
+
       <div>
+        <j:set var="configs" value="${it.getConfigs()}" />
         <j:choose>
-          <j:when test="${it.configs.size() == 0}">
-            ${%No job configuration history available}
+          <j:when test="${!it.hasConfigurePermission() &amp;&amp; !(filter == 'jobs' || filter == 'deleted')}">
+            ${%No permission to view system changes}
+          </j:when>
+          <j:when test="${configs.size() == 0}">
+            ${%No configuration history available}
           </j:when>
           <j:otherwise>
-            <br/>
             <div>
-            <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
-              <j:choose>
-                <j:when test="${it.isFiltered()}">
-                  <div align="right">
-                    <f:submit value="${%Show Diffs}" />
-                  </div>
-                </j:when>
-              </j:choose>
               <table class="pane sortable" style="width:100%">
+                <tr>
+                  <td class="pane-header" initialSortDir="down" align="left">${%Date}</td>
                   <j:choose>
-                    <j:when test="${it.isFiltered()}">
-                      <tr>
-                        <td class="pane-header" initialSortDir="down" align="left">${%Date}</td>
-                        <td class="pane-header" align="left">${%Job/System configuration}</td>
-                        <td class="pane-header" align="left">${%Operation}</td>
-                        <td class="pane-header" align="left">${%User}</td>
-                        <td class="pane-header" align="left">${%File(raw)}</td>
-                        <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">${%Diff}</td>
-                      </tr>
-                      <tr>
-                        <td colspan="5"></td>
-                        <td align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
-                        <td align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
-                      </tr>
+                    <j:when test="${filter == 'jobs' || filter == 'deleted'}">
+                      <td class="pane-header" align="left">${%Job configuration}</td>
+                    </j:when>
+                    <j:when test="${filter == 'all'}">
+                      <td class="pane-header" align="left">${%Job/System configuration}</td>
                     </j:when>
                     <j:otherwise>
-                      <tr>
-                      <td class="pane-header" initialSortDir="down" align="left">${%Date}</td>
-                      <td class="pane-header" align="left">${%Job/System configuration}</td>
-                      <td class="pane-header" align="left">${%Operation}</td>
-                      <td class="pane-header" align="left">${%User}</td>
-                      <td class="pane-header" align="left">${%File(raw)}</td>
-                      </tr>
+                      <td class="pane-header" align="left">${%System configuration}</td>
                     </j:otherwise>
                   </j:choose>
+                  <td class="pane-header" align="left">${%Operation}</td>
+                  <td class="pane-header" align="left">${%User}</td>
+                  <td class="pane-header" align="left">${%File(raw)}</td>
+                </tr>
                 <j:set var="configNr" value="0"/>
-                <j:forEach var="config" items="${it.configs}">
+                <j:forEach var="config" items="${configs}">
                   <j:set var="configNr" value="${configNr + 1}"/>
                   <tr>
                     <td>${config.date}</td>
                     <j:choose>
-                      <j:when test="${config.isJob}">
-                        <td><a href="${rootURL}/job/${config.job}">${config.job}</a></td>
+                      <j:when test="${config.getIsJob()}">
+                        <td><a href="${rootURL}/job/${config.job}/jobConfigHistory">${config.job}</a></td>
                       </j:when>
                       <j:otherwise>
-                        <td><a href="?filter=${config.job}">${config.job}</a> (system)</td>
+                        <j:choose>
+                          <j:when test="${config.job.contains('_deleted_')}">
+                            <td><a href="history?name=${config.job}" id="deleted">${config.job}</a></td>
+                          </j:when>
+                          <j:otherwise>
+                            <td><a href="history?name=${config.job}">${config.job}</a>&amp;nbsp;(system)</td>
+                          </j:otherwise>
+                        </j:choose>
                       </j:otherwise>
                     </j:choose>
                     <td>${config.operation}</td>
@@ -76,23 +91,9 @@
                           (${%RAW})
                         </a>
                     </td>
-                    <j:choose>
-                      <j:when test="${it.isFiltered()}">
-                        <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir1" value="${config.file}" checked="${configNr == 2 ? true:false}"/></td>
-                        <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir2" value="${config.file}" checked="${configNr == 1 ? true:false}"/></td>
-                      </j:when>
-                    </j:choose>
                   </tr>
                 </j:forEach>
               </table>
-              <j:choose>
-                <j:when test="${it.isFiltered()}">
-                  <div align="right">
-                    <f:submit value="${%Show Diffs}" />
-                  </div>
-                </j:when>
-              </j:choose>
-            </f:form>
             </div>
           </j:otherwise>
         </j:choose>

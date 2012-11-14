@@ -37,14 +37,14 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true));
+        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true, false, null));
         webClient = new WebClient();
     }
 
     public void testJobConfigHistoryPreConfigured() {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
         try {
-            HtmlForm form = webClient.goTo("configure").getFormByName("config");
+            final HtmlForm form = webClient.goTo("configure").getFormByName("config");
             form.getInputByName("maxHistoryEntries").setValueAttribute("10");
             form.getInputByName("saveSystemConfiguration").setChecked(true);
             form.getInputByName("skipDuplicateHistory").setChecked(false);
@@ -57,13 +57,13 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
         assertEquals("Verify history entries to keep setting.", "10", jch.getMaxHistoryEntries());
         assertTrue("Verify system level configurations setting.", jch.getSaveSystemConfiguration());
         assertFalse("Verify skip duplicate history setting.", jch.getSkipDuplicateHistory());
-        assertEquals("Verify configured history root directory.",new File(hudson.root, "jobConfigHistory"), jch.getConfiguredHistoryRootDir());
+        assertEquals("Verify configured history root directory.", new File(hudson.root + "/jobConfigHistory/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
         assertEquals("Verify exclude pattern setting.", JobConfigHistoryConsts.DEFAULT_EXCLUDE, jch.getExcludePattern());
 
-        XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(),"config.xml"));
+        final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertTrue("Verify a system level configuration is saveable.", jch.isSaveable(hudson, hudsonConfig));
 
-        assertTrue("Verify system configuration history location", jch.getHistoryDir(hudsonConfig).getParentFile().equals(jch.getSystemHistoryDir()));
+//       assertTrue("Verify system configuration history location", jch.getHistoryDir(hudsonConfig).getParentFile().equals(jch.getSystemHistoryDir()));
         testCreateRenameDeleteProject(jch);
 
         assertNull("Verify null when attempting to get history dir for a file outside of HUDSON_ROOT.", jch.getHistoryDir(new XmlFile(new File("/tmp"))));
@@ -76,15 +76,15 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
         assertNull("Verify number of history entries to keep default setting.", jch.getMaxHistoryEntries());
         assertFalse("Verify system level configurations default setting.", jch.getSaveSystemConfiguration());
         assertFalse("Verify skip duplicate history default setting.", jch.getSkipDuplicateHistory());
-        assertNull("Verify history root directory default.", jch.getConfiguredHistoryRootDir());
         assertNull("Verify unconfigured exclude pattern.", jch.getExcludePattern());
 
-        XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
+        final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertFalse("Verify a system level configuration is not saveable.", jch.isSaveable(hudson, hudsonConfig));
 
-        assertTrue("Verify system configuration history location", jch.getHistoryDir(hudsonConfig).getParentFile().equals(jch.getSystemHistoryDir()));
+        //getConfiguredHistoryRootDir() statt getSystemHistoryDir()?
+        assertTrue("Verify system configuration history location", jch.getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
         testCreateRenameDeleteProject(jch);
-}
+    }
 
     public void testSkipDuplicateHistory() {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
@@ -104,15 +104,15 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
 
             // reset to empty value
             jch.setMaxHistoryEntries("");
-            for (int i = 0 ; i < 3 ; i++) {
+            for (int i = 0; i < 3; i++) {
                 Thread.sleep(SLEEP_TIME);
                 project.save();
             }
-            assertEquals("Verify 1 project history entry after 3 duplicate saves.", 1, projectAction.getConfigs().size());
+            assertEquals("Verify 1 project history entry after 3 duplicate saves.", 1, projectAction.getJobConfigs().size());
 
             // system history test - skip duplicate history -hardcode path to Hudson config
             final File hudsonConfigDir = new File(hudson.root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR + "/config");
-            for (int i = 0 ; i < 3 ; i++) {
+            for (int i = 0; i < 3; i++) {
                 Thread.sleep(SLEEP_TIME);
                 hudson.save();
             }
@@ -121,7 +121,7 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             // verify non-duplicate history is saved
             project.setDescription("new description");
             project.save();
-            assertEquals("Verify non duplicate project history saved.", 2, projectAction.getConfigs().size());
+            assertEquals("Verify non duplicate project history saved.", 2, projectAction.getJobConfigs().size());
 
             // corrupt history record and verify new entry will be saved
             final File[] historyDirs = jch.getHistoryDir(project.getConfigFile()).listFiles(JobConfigHistory.HISTORY_FILTER);
@@ -139,7 +139,7 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             Thread.sleep(SLEEP_TIME);
             hudson.save();
             project.save();
-            assertTrue("Verify duplicate project history entries.", projectAction.getConfigs().size() > 2);
+            assertTrue("Verify duplicate project history entries.", projectAction.getJobConfigs().size() > 2);
             assertTrue("Verify duplicate system history entries.", hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length > 1);
 
         } catch (Exception e) {
@@ -154,9 +154,9 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             assertFalse("Check no error message present for history entry.", form.getTextContent().contains("Enter a valid positive integer"));
             form.getInputByName("maxHistoryEntries").setValueAttribute("-2");
             assertTrue("Check error message on invalid history entry.", form.getTextContent().contains("Enter a valid positive integer"));
-            assertFalse("Check no error messgae present for regexp excludePattern.",form.getTextContent().contains("Invalid regexp"));
+            assertFalse("Check no error messgae present for regexp excludePattern.", form.getTextContent().contains("Invalid regexp"));
             form.getInputByName("excludePattern").setValueAttribute("**");
-            assertTrue("Check error message on invalid regexp excludePattern.",form.getTextContent().contains("Invalid regexp"));
+            assertTrue("Check error message on invalid regexp excludePattern.", form.getTextContent().contains("Invalid regexp"));
             submit(form);
             assertEquals("Verify invalid regexp string is saved.", "**", jch.getExcludePattern());
             assertNull("Verify invalid regexp has not been loaded.", jch.getExcludeRegexpPattern());
@@ -176,18 +176,18 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             final FreeStyleProject project = createFreeStyleProject("testproject");
             final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
 
-            assertEquals("Verify 1 history entry created.", 1, projectAction.getConfigs().size());
-            for (int i = 0 ; i < 3 ; i++) {
+            assertEquals("Verify 1 history entry created.", 1, projectAction.getJobConfigs().size());
+            for (int i = 0; i < 3; i++) {
                 Thread.sleep(SLEEP_TIME);
                 project.save();
             }
-            assertEquals("Verify 4 history entries.", 4, projectAction.getConfigs().size());
+            assertEquals("Verify 4 history entries.", 4, projectAction.getJobConfigs().size());
 
-            for (int i = 0 ; i < 3 ; i++) {
+            for (int i = 0; i < 3; i++) {
                 Thread.sleep(SLEEP_TIME);
                 project.save();
             }
-            assertEquals("Verify no more than 5 history entries created.", 5, projectAction.getConfigs().size());
+            assertEquals("Verify no more than 5 history entries created.", 5, projectAction.getJobConfigs().size());
 
         } catch (Exception e) {
             fail("Unable to complete max history entries test: " + e);
@@ -203,25 +203,25 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
 
             // check with default value
             jch.checkForPurgeByQuantity(historyDir);
-            assertEquals("Verify 1 history entry exists, default purge quantity.", 1, projectAction.getConfigs().size());
+            assertEquals("Verify 1 history entry exists, default purge quantity.", 1, projectAction.getJobConfigs().size());
 
             // set to negative value, ensure no purge happens
             jch.setMaxHistoryEntries("-1");
             jch.checkForPurgeByQuantity(historyDir);
-            assertEquals("Verify 1 history entry, invalid max quantity.", 1, projectAction.getConfigs().size());
+            assertEquals("Verify 1 history entry, invalid max quantity.", 1, projectAction.getJobConfigs().size());
 
             // set to 2, ensure no purge happens
             jch.setMaxHistoryEntries("2");
-            assertEquals("Verify 1 history entry, max entries > current.", 1, projectAction.getConfigs().size());
+            assertEquals("Verify 1 history entry, max entries > current.", 1, projectAction.getJobConfigs().size());
 
             // purge attempt on invalid directory
             jch.checkForPurgeByQuantity(new File("/invaliddir"));
-            assertEquals("Verify history unaffected (still 1 entry) after attempt to purge invalid directory.", 1, projectAction.getConfigs().size());
+            assertEquals("Verify history unaffected (still 1 entry) after attempt to purge invalid directory.", 1, projectAction.getJobConfigs().size());
 
             // clear out all history - setting to 1 will clear out all with the expectation that we are creating a new entry
             jch.setMaxHistoryEntries("1");
             jch.checkForPurgeByQuantity(historyDir);
-            assertEquals("Verify no history entries remain.", 0, projectAction.getConfigs().size());
+            assertEquals("Verify no history entries remain.", 0, projectAction.getJobConfigs().size());
 
             // recreate a history entry, set to read-only status, verify it is not deleted
             // NOTE: Windows host seem to ignore the setWritable flag, so the following test will fail on Windows.
@@ -233,16 +233,16 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
 
                 // create a new history entry
                 project.save();
-                for(final File file : historyDir.listFiles()) {
+                for (final File file : historyDir.listFiles()) {
                     file.setWritable(false);
                     toRestore.add(file);
                 }
                 historyDir.setWritable(false);
                 toRestore.add(historyDir);
                 jch.checkForPurgeByQuantity(historyDir);
-                assertEquals("Verify purge did not happen.", 1, projectAction.getConfigs().size());
+                assertEquals("Verify purge did not happen.", 1, projectAction.getJobConfigs().size());
 
-                for(final File file : toRestore) {
+                for (final File file : toRestore) {
                     file.setWritable(true);
                 }
             }
@@ -263,7 +263,7 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             final HtmlForm form = webClient.goTo("configure").getFormByName("config");
             form.getInputByName("historyRootDir").setValueAttribute(absolutePath);
             submit(form);
-            assertEquals("Verify history root configured at absolute path.", root, jch.getConfiguredHistoryRootDir());
+            assertEquals("Verify history root configured at absolute path.", new File(root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
 
             // save something
             createFreeStyleProject();
@@ -283,22 +283,26 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
     private void testCreateRenameDeleteProject(final JobConfigHistory jch) {
         try {
             final FreeStyleProject project = createFreeStyleProject("testproject");
-            final File configuredHistoryRootFile = jch.getConfiguredHistoryRootDir();
+            final File jobHistoryRootFile = jch.getJobHistoryRootDir();
 
             // project configs should always be saveable
             assertTrue("Verify new project is a saveable item.", jch.isSaveable(project, project.getConfigFile()));
 
-            // by default, the expected config dir is in a 'config-history' directory under the project
-            // otherwise it is located under the configured root directory
-            final File expectedConfigDir;
-            if (jch.getConfiguredHistoryRootDir() == null) {
-                expectedConfigDir = new File(hudson.root, "jobs/testproject/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
-            } else {
-                expectedConfigDir = new File(configuredHistoryRootFile, "jobs/testproject");
-            }
+            final File expectedConfigDir = new File(jobHistoryRootFile, "testproject");
             assertEquals("Verify history dir configured as expected.", expectedConfigDir, jch.getHistoryDir(project.getConfigFile()));
             assertTrue("Verify project config history directory created: " + expectedConfigDir, expectedConfigDir.exists());
-            assertEquals("Verify one history entry on creation.", 1, expectedConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+            
+            //since sometimes two history entries are created, we just check
+            //if one of them contains "Created"
+            boolean createdEntryFound = false;
+            for (File file : expectedConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                if (new XmlFile(new File(file, "history.xml")).asString().contains("Created")) {
+                    createdEntryFound = true;
+                    break;
+                }
+            }
+            assertTrue("Verify one \'created\' history entry on creation.", createdEntryFound);
+            final int historyEntryCount = expectedConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length;
 
             // sleep so we don't overwrite our existing history directory
             Thread.sleep(SLEEP_TIME);
@@ -306,14 +310,33 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
 
             // verify rename moves the history directory as expected
             assertFalse("Verify on rename old project config history directory removed.", expectedConfigDir.exists());
-            final File newExpectedConfigDir = new File(expectedConfigDir.toString().replace("testproject","renamed_testproject"));
+            final File newExpectedConfigDir = new File(expectedConfigDir.toString().replace("testproject", "renamed_testproject"));
             assertTrue("Verify renamed project config history created: " + newExpectedConfigDir, newExpectedConfigDir.exists());
-            assertEquals("Verify two history entries after rename.", 2, newExpectedConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+            assertEquals("Verify two history entries after rename.", historyEntryCount + 1, newExpectedConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
 
             // delete project and verify the history directory is gone
             project.delete();
             assertFalse("Verify on delete project config history directory removed(renamed): " + newExpectedConfigDir, newExpectedConfigDir.exists());
+            
+            String deletedDir = null;
+            for (File file : expectedConfigDir.getParentFile().listFiles()) {
+                if (file.getName().contains("renamed_testproject" + JobConfigHistoryConsts.DELETED_MARKER)) {
+                    deletedDir = file.getPath();
+                    break;
+                }
+            }
+            assertTrue("Verify config history directory of deleted job exists.", deletedDir != null);
+            assertTrue("Verify config history directory of deleted job is not empty", (new File(deletedDir)).listFiles().length > 0);
 
+            boolean deletedEntryFound = false;
+            for (File file : (new File(deletedDir)).listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                if (new XmlFile(new File(file, "history.xml")).asString().contains("Deleted")) {
+                    deletedEntryFound = true;
+                    break;
+                }
+            }
+            assertTrue("Verify one \'deleted\' history entry exists.", deletedEntryFound);
+            
         } catch (IOException e) {
             fail("Unable to complete project creation/rename test: " + e);
         } catch (InterruptedException e) {
@@ -321,4 +344,3 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
         }
     }
 }
-
