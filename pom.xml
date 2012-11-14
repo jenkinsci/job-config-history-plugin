@@ -9,7 +9,7 @@
 
     <artifactId>jobConfigHistory</artifactId>
     <packaging>hpi</packaging>
-    <version>1.14-SNAPSHOT</version>
+    <version>2.0-SNAPSHOT</version>
     <name>Jenkins Job Configuration History Plugin</name>
     <description>Saves copies of job and system configurations.</description>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/JobConfigHistory+Plugin</url>
@@ -51,6 +51,12 @@
             <id>mfriedenhagen</id>
             <name>Mirko Friedenhagen</name>
             <email>mfriedenhagen@gmail.com</email>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>kstutz</id>
+            <name>Kathi Stutz</name>
+            <email>kathi.stutz@1und1.de</email>
             <timezone>+1</timezone>
         </developer>
     </developers>
