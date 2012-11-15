@@ -67,6 +67,7 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
      */
     JobConfigHistoryBaseAction createJobConfigHistoryBaseAction() {
         final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
+            
             @Override
             protected AccessControlled getAccessControlledObject() {
                 return getHudson();
@@ -78,6 +79,9 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
             @Override
             protected boolean hasConfigurePermission() {
                 return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
+            }
+            public String getIconFileName() {
+                return null;
             }
         };
         return action;
