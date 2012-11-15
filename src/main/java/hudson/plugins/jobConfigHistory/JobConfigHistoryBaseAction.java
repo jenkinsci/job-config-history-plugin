@@ -73,18 +73,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     /**
      * {@inheritDoc}
      * 
-     * Make method final, as we always want the same icon file. Returns
-     * {@code null} to hide the icon if the user is not allowed to configure
-     * jobs.
-     */
-    // @Override
-    public final String getIconFileName() {
-        return JobConfigHistoryConsts.ICONFILENAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * Do not make this method final as {@link JobConfigHistoryRootAction}
      * overrides this method.
      */
@@ -207,7 +195,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return true if the current user may read configurations.
      */
     protected abstract boolean hasConfigurePermission();
-
+    
     /**
      * Returns the hudson instance.
      * 
