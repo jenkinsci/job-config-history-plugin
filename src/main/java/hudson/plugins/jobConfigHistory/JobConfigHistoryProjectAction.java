@@ -26,6 +26,9 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     /** Our logger. */
 //  private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
 
+    /** The project. */
+    private final transient AbstractItem project;
+
     /**
      * @param project
      *            for which configurations should be returned.
@@ -35,9 +38,18 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         this.project = project;
     }
 
-    /** The project. */
-    private final transient AbstractItem project;
-
+    /**
+     * {@inheritDoc}
+     * 
+     * Make method final, as we always want the same icon file. Returns
+     * {@code null} to hide the icon if the user is not allowed to configure
+     * jobs.
+     */
+    public final String getIconFileName() {
+        return hasConfigurePermission() ? JobConfigHistoryConsts.ICONFILENAME
+               : null;
+    }
+    
     /**
      * Returns the configuration history entries for one {@link AbstractItem}.
      *

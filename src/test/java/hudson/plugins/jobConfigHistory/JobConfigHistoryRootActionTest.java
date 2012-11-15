@@ -41,7 +41,7 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
             secondProject.delete();
         } catch (Exception ex) {
             fail("Unable to prepare Hudson instance: " + ex);
-        }            
+        }
 
         try {
             checkSystemPage(webClient.goTo(JobConfigHistoryConsts.URLNAME));

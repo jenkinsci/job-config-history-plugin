@@ -5,17 +5,25 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.security.AccessControlled;
+import hudson.security.LegacyAuthorizationStrategy;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import org.jvnet.hudson.test.Bug;
 import org.xml.sax.SAXException;
 
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.containsString;
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import hudson.security.Permission;
+import hudson.security.HudsonPrivateSecurityRealm;
 
 /**
  * @author mfriedenhagen
@@ -67,6 +75,7 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
      */
     JobConfigHistoryBaseAction createJobConfigHistoryBaseAction() {
         final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
+            
             @Override
             protected AccessControlled getAccessControlledObject() {
                 return getHudson();
@@ -78,6 +87,9 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
             @Override
             protected boolean hasConfigurePermission() {
                 return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
+            }
+            public String getIconFileName() {
+                return null;
             }
         };
         return action;
@@ -149,6 +161,25 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
             action.getConfigXml(diffDir);
             fail("Expected for " + diffDir + " " + IllegalArgumentException.class);
         } catch (IllegalArgumentException e) {
+            System.err.println(e);
+        }
+    }
+    
+    @Bug(5534)
+    public void testSecuredAccessToJobConfigHistoryPage() throws IOException, SAXException {
+        // without security the jobConfigHistory-badge should show.
+        final HtmlPage withoutSecurity = webClient.goTo("/");
+        assertThat(withoutSecurity.asXml(), containsString(JobConfigHistoryConsts.ICONFILENAME));
+        withoutSecurity.getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
+        // with security enabled the jobConfigHistory-badge should not show anymore.
+        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(false, false, null));
+        hudson.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
+        final HtmlPage withSecurityEnabled = webClient.goTo("/");
+        assertThat(withSecurityEnabled.asXml(), not(containsString(JobConfigHistoryConsts.ICONFILENAME)));
+        try {
+            withSecurityEnabled.getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
+            fail("Expected a " + ElementNotFoundException.class + " to be thrown");
+        } catch (ElementNotFoundException e) {
             System.err.println(e);
         }
     }

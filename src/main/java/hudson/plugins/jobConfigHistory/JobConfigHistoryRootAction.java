@@ -11,6 +11,7 @@ import org.kohsuke.stapler.StaplerRequest;
 
 import hudson.Extension;
 import hudson.XmlFile;
+import hudson.model.Item;
 import hudson.model.RootAction;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
@@ -35,6 +36,21 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     @Override
     public final String getUrlName() {
         return "/" + JobConfigHistoryConsts.URLNAME;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * Make method final, as we always want the same icon file. Returns
+     * {@code null} to hide the icon if the user is not allowed to configure
+     * jobs.
+     */
+    public final String getIconFileName() {
+        if (hasConfigurePermission() || hasJobConfigurePermission()) {
+            return JobConfigHistoryConsts.ICONFILENAME;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -75,6 +91,10 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     protected List<ConfigInfo> getSystemConfigs() throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getConfiguredHistoryRootDir();
+        
+        if (!hasConfigurePermission()) {
+            return configs;
+        }
 
         if (!historyRootDir.isDirectory()) {
             LOG.fine(historyRootDir + " is not a directory, assuming that no history exists yet.");
@@ -108,6 +128,10 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     protected List<ConfigInfo> getJobConfigs(String type) throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getJobHistoryRootDir();
+        
+        if (!hasJobConfigurePermission()) {
+            return configs;
+        }
 
         if (!historyRootDir.isDirectory()) {
             LOG.fine(historyRootDir + " is not a directory, assuming that no history exists yet.");
@@ -188,5 +212,14 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     @Override
     public boolean hasConfigurePermission() {
         return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
+    }
+    
+    /**
+     * Returns whether the current user may configure jobs.
+     * 
+     * @return true if the current user may configure jobs.
+     */
+    public boolean hasJobConfigurePermission() {
+        return getAccessControlledObject().hasPermission(Item.CONFIGURE);
     }
 }
