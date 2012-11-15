@@ -195,7 +195,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return true if the current user may read configurations.
      */
     protected abstract boolean hasConfigurePermission();
-
+    
     /**
      * Returns the hudson instance.
      * 

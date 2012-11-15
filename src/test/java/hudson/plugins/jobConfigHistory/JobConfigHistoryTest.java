@@ -176,12 +176,12 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             final FreeStyleProject project = createFreeStyleProject("testproject");
             final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
 
-            assertEquals("Verify 1 history entry created.", 1, projectAction.getJobConfigs().size());
+            assertTrue("Verify at least 1 history entry created.", projectAction.getJobConfigs().size() >= 1);
             for (int i = 0; i < 3; i++) {
                 Thread.sleep(SLEEP_TIME);
                 project.save();
             }
-            assertEquals("Verify 4 history entries.", 4, projectAction.getJobConfigs().size());
+            assertTrue("Verify at least 4 history entries.", projectAction.getJobConfigs().size() >= 4);
 
             for (int i = 0; i < 3; i++) {
                 Thread.sleep(SLEEP_TIME);

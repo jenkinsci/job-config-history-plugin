@@ -13,8 +13,6 @@ import hudson.Extension;
 import hudson.XmlFile;
 import hudson.model.Item;
 import hudson.model.RootAction;
-import hudson.model.AbstractItem;
-import hudson.model.AbstractProject;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
 
@@ -94,7 +92,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getConfiguredHistoryRootDir();
         
-        if (!hasConfigurePermission()){
+        if (!hasConfigurePermission()) {
             return configs;
         }
 
@@ -131,7 +129,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getJobHistoryRootDir();
         
-        if (!hasJobConfigurePermission()){
+        if (!hasJobConfigurePermission()) {
             return configs;
         }
 
@@ -216,6 +214,11 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
     }
     
+    /**
+     * Returns whether the current user may configure jobs.
+     * 
+     * @return true if the current user may configure jobs.
+     */
     public boolean hasJobConfigurePermission() {
         return getAccessControlledObject().hasPermission(Item.CONFIGURE);
     }
