@@ -1,0 +1,9 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<j:if test="${it.hasConfigChanged()}">
+		<a href="${it.getLink()}">
+			<img width="16" height="16"
+    		title="${it.getTooltip()}" alt="x"
+   			src="${rootURL}${it.getIcon()}"/>
+   		</a>
+   	</j:if>
+</j:jelly>

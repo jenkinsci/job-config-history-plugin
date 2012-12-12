@@ -150,7 +150,7 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
     public void testHistoryPageWithOutEntries() throws IOException, SAXException {
         new HistoryPage().assertNoHistoryEntriesAvailable();
     }
-
+    
     @LocalData
     public void testSaveConfiguration() throws Exception {
         final String firstDescription = "just a test";
