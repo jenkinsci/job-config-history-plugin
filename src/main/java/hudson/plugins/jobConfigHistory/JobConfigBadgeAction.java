@@ -38,9 +38,6 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     /**The logger.*/
     private static final Logger LOG = Logger.getLogger(JobConfigBadgeAction.class.getName());
     
-    /**True if the config.xml has changed.*/
-    private boolean isNewConfig;
-    
     /**Link to the page that shows the differences between old and new config.*/
     private String linkTarget;
 
@@ -49,12 +46,10 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     
     /**
      * Creates a new JobConfigBadgeAction.
-     * @param isNewConfig True if config has changed since last build
      * @param linkTarget The link target
      */
-    public JobConfigBadgeAction(boolean isNewConfig, String linkTarget) {
+    public JobConfigBadgeAction(String linkTarget) {
         super(AbstractBuild.class);
-        this.isNewConfig = isNewConfig;
         this.linkTarget = linkTarget;
     }
 
@@ -86,8 +81,9 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         try {
             final Date lastConfigChange = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(lastChange.getDate());
             if (lastConfigChange.after(lastBuildDate)) {
+                LOG.finest("JJJJJJJJJJJJJJJJJJJJ");
                 final String link = createLinkTarget(lastChange, penultimateChange);
-                build.addAction(new JobConfigBadgeAction(true, link));
+                build.addAction(new JobConfigBadgeAction(link));
             }
         } catch (ParseException e) {
             LOG.finest("Could not parse Date: " + e);
@@ -116,14 +112,6 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         return linkTarget;
     }
     
-    /**
-     * True if config has changed since the build before this one.
-     * @return True if config has changed.
-     */
-    public boolean hasConfigChanged() {
-        return isNewConfig;
-    }
-
     /**
      * Returns tooltip so users know what our nice little icon stands for.
      * @return Explanatory text as string
