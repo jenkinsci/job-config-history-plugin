@@ -1,13 +1,7 @@
-/*
- * JobConfigChangeBadge.java Nov 21, 2012
- * 
- * Copyright (c) 2012 1&1 Internet AG. All rights reserved.
- * 
- * $Id$
- */
 package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,9 +9,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.logging.Logger;
 
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+
 import jenkins.model.Jenkins;
 
 import hudson.Extension;
+import hudson.Functions;
 import hudson.XmlFile;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -38,8 +36,8 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     /**The logger.*/
     private static final Logger LOG = Logger.getLogger(JobConfigBadgeAction.class.getName());
     
-    /**Link to the page that shows the differences between old and new config.*/
-    private String linkTarget;
+    /***/
+    private String[] configDates;
 
     /**No arguments about a no-argument constructor (necessary because of annotation).*/
     public JobConfigBadgeAction() { }
@@ -48,9 +46,9 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
      * Creates a new JobConfigBadgeAction.
      * @param linkTarget The link target
      */
-    public JobConfigBadgeAction(String linkTarget) {
+    public JobConfigBadgeAction(String[] configDates) {
         super(AbstractBuild.class);
-        this.linkTarget = linkTarget;
+        this.configDates = configDates;
     }
 
     @Override
@@ -61,17 +59,17 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         //get timestamp of config-change
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = Hudson.getInstance().getPlugin(JobConfigHistory.class).getHistoryDir(project.getConfigFile());
-        try {
-            if (historyRootDir.exists()) {
+        if (historyRootDir.exists()) {
+            try {
                 for (final File historyDir : historyRootDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
                     final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
                     final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
                     final ConfigInfo config = ConfigInfo.create(project, historyDir, histDescr);
                     configs.add(config);
                 }
+            } catch (IOException ex) {
+                LOG.finest("Could not parse history files: " + ex);
             }
-        } catch (Exception ex) {
-            LOG.finest("Could not parse history files: " + ex);
         }
 
         Collections.sort(configs, ConfigInfoComparator.INSTANCE);
@@ -81,9 +79,8 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         try {
             final Date lastConfigChange = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(lastChange.getDate());
             if (lastConfigChange.after(lastBuildDate)) {
-                LOG.finest("JJJJJJJJJJJJJJJJJJJJ");
-                final String link = createLinkTarget(lastChange, penultimateChange);
-                build.addAction(new JobConfigBadgeAction(link));
+                final String[] dates = {lastChange.getFile(), penultimateChange.getFile()};
+                build.addAction(new JobConfigBadgeAction(dates));
             }
         } catch (ParseException e) {
             LOG.finest("Could not parse Date: " + e);
@@ -93,23 +90,21 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     }
     
     /**
-     * Concatenates strings in order to create the correct link to the showDiffFiles page.
-     * @param last newest saved configuration
-     * @param secondLast next to newest saved configuration  
-     * @return the link
-     */
-    private String createLinkTarget(ConfigInfo last, ConfigInfo secondLast) {
-        return (Jenkins.getInstance().getRootUrl() + "job/" + last.getJob()
-            + "/jobConfigHistory/showDiffFiles?histDir1=" + secondLast.getFile()
-            + "&histDir2=" + last.getFile());
-    }
-    
-    /**
-     * Returns the target for the link to the showDiffFiles page.
+     * Creates the target for the link to the showDiffFiles page.
      * @return link target as string
      */
-    public String getLink() {
-        return linkTarget;
+    public String createLink() {
+        
+        final StaplerRequest req = Stapler.getCurrentRequest();
+        final String firstPart = req.getRootPath() + req.getOriginalRequestURI();
+        final String secondPart = "?histDir1=" + configDates[0]
+                                    + "&histDir2=" + configDates[1];
+        
+        if (firstPart.contains(JobConfigHistoryConsts.URLNAME)) {
+            return firstPart + secondPart;
+        } else {
+            return firstPart + JobConfigHistoryConsts.URLNAME + "/showDiffFiles" + secondPart;
+        }
     }
     
     /**

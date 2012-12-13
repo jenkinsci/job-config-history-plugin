@@ -1,10 +1,3 @@
-/*
- * JobConfigBadgeActionTest.java Dec 12, 2012
- * 
- * Copyright (c) 2012 1&1 Internet AG. All rights reserved.
- * 
- * $Id$
- */
 package hudson.plugins.jobConfigHistory;
 
 import hudson.model.FreeStyleProject;
