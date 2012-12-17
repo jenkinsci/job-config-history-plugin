@@ -54,6 +54,10 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     @Override
     public void onStarted(AbstractBuild build, TaskListener listener) {
         final AbstractProject<?, ?> project = (AbstractProject<?, ?>) build.getProject();
+        if (project.getNextBuildNumber() == 2) {
+            super.onStarted(build, listener);
+            return;
+        }
         final Date lastBuildDate = project.getLastBuild().getPreviousBuild().getTime();
         
         //get timestamp of config-change
@@ -94,12 +98,12 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
      * @return link target as string
      */
     public String createLink() {
-        
         final StaplerRequest req = Stapler.getCurrentRequest();
         final String firstPart = req.getRootPath() + req.getOriginalRequestURI();
         final String secondPart = "?histDir1=" + configDates[0]
                                     + "&histDir2=" + configDates[1];
-        
+       
+//        String fileName = url.substring( url.lastIndexOf('/')+1, url.length() );
         if (firstPart.contains(JobConfigHistoryConsts.URLNAME)) {
             return firstPart + secondPart;
         } else {
