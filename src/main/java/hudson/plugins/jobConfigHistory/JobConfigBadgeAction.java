@@ -12,10 +12,7 @@ import java.util.logging.Logger;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 
-import jenkins.model.Jenkins;
-
 import hudson.Extension;
-import hudson.Functions;
 import hudson.XmlFile;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -36,7 +33,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     /**The logger.*/
     private static final Logger LOG = Logger.getLogger(JobConfigBadgeAction.class.getName());
     
-    /***/
+    /**The dates of the last two config changes as Strings.*/
     private String[] configDates;
 
     /**No arguments about a no-argument constructor (necessary because of annotation).*/
@@ -44,7 +41,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     
     /**
      * Creates a new JobConfigBadgeAction.
-     * @param linkTarget The link target
+     * @param configDates The dates of the last two config changes
      */
     public JobConfigBadgeAction(String[] configDates) {
         super(AbstractBuild.class);

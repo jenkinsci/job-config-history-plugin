@@ -1,13 +1,8 @@
 package hudson.plugins.jobConfigHistory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import hudson.model.Build;
 import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.FreeStyleProject;
-import hudson.model.Hudson;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
