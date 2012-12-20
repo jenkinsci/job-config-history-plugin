@@ -35,6 +35,9 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     
     /**The dates of the last two config changes as Strings.*/
     private String[] configDates;
+    
+    /**The project to which the build belongs*/
+    private AbstractProject<?, ?> project;
 
     /**No arguments about a no-argument constructor (necessary because of annotation).*/
     public JobConfigBadgeAction() { }
@@ -43,9 +46,10 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
      * Creates a new JobConfigBadgeAction.
      * @param configDates The dates of the last two config changes
      */
-    public JobConfigBadgeAction(String[] configDates) {
+    public JobConfigBadgeAction(String[] configDates, AbstractProject<?,?> project) {
         super(AbstractBuild.class);
         this.configDates = configDates;
+        this.project = project;
     }
 
     @Override
@@ -80,8 +84,8 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         try {
             final Date lastConfigChange = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(lastChange.getDate());
             if (lastConfigChange.after(lastBuildDate)) {
-                final String[] dates = {lastChange.getFile(), penultimateChange.getFile()};
-                build.addAction(new JobConfigBadgeAction(dates));
+                final String[] dates = {lastChange.getDate(), penultimateChange.getDate()};
+                build.addAction(new JobConfigBadgeAction(dates, project));
             }
         } catch (ParseException e) {
             LOG.finest("Could not parse Date: " + e);
@@ -95,17 +99,10 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
      * @return link target as string
      */
     public String createLink() {
-        final StaplerRequest req = Stapler.getCurrentRequest();
-        final String firstPart = req.getRootPath() + req.getOriginalRequestURI();
-        final String secondPart = "?histDir1=" + configDates[0]
-                                    + "&histDir2=" + configDates[1];
-       
-//        String fileName = url.substring( url.lastIndexOf('/')+1, url.length() );
-        if (firstPart.contains(JobConfigHistoryConsts.URLNAME)) {
-            return firstPart + secondPart;
-        } else {
-            return firstPart + JobConfigHistoryConsts.URLNAME + "/showDiffFiles" + secondPart;
-        }
+        //TODO: hier muss Link noch richtig zusammengebaut werden
+        return Hudson.getInstance().getRootUrl() + "job/" + project.getName() + "/"
+                + JobConfigHistoryConsts.URLNAME + "/showDiffFiles?timestamp1=" + configDates[1]
+                + "&timestamp2=" + configDates[0] + "&name=" + project.getName() + "&isjob=true";
     }
     
     /**

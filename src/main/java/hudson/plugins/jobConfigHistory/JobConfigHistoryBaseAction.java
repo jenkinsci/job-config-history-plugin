@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -46,7 +47,7 @@ import bmsi.util.Diff.change;
 public abstract class JobConfigHistoryBaseAction implements Action {
 
     /** Our logger. */
-//    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
+    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
 
     /**
      * The hudson instance.
@@ -111,7 +112,22 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     public final String getFile() throws IOException {
         checkConfigurePermission();
-        final XmlFile xmlFile = getConfigXml(getRequestParameter("file"));
+        //man braucht Projektnamen, isJob und Timestamp
+        
+        final boolean isJob = Boolean.parseBoolean(getRequestParameter("isJob"));
+        final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
+        final String rootDir;
+        
+        if (isJob) {
+            rootDir = plugin.getJobHistoryRootDir().getPath();
+        } else {
+            rootDir = plugin.getConfiguredHistoryRootDir().getPath();
+        }
+
+        final String name = getRequestParameter("name");
+        final String path = rootDir + "/" + name + "/" + getRequestParameter("timestamp");
+        
+        final XmlFile xmlFile = getConfigXml(path);
         return xmlFile.asString();
     }
 
@@ -142,7 +158,10 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *            timestamped history directory.
      * @return xmlfile.
      */
-    protected XmlFile getConfigXml(final String diffDir) {
+    protected XmlFile getConfigXml(final String path) {
+        //hier sollte nur Datum übergeben werden, Rest zusammengebaut
+        LOG.finest("path - " + path);
+        
         final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
         final String allowedHistoryRootDir;
         if (plugin.getHistoryRootDir() == null || plugin.getHistoryRootDir().isEmpty()) {
@@ -151,7 +170,13 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             allowedHistoryRootDir = plugin.getConfiguredHistoryRootDir().getParent();
         }
         
+        
         File configFile = null;
+        if (path != null) {
+            configFile = plugin.getConfigFile(new File(path));
+        }
+        
+/*        File configFile = null;
         if (diffDir != null) {
             if (!diffDir.startsWith(allowedHistoryRootDir)
                     || diffDir.contains("..")) {
@@ -161,9 +186,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             }
             configFile = plugin.getConfigFile(new File(diffDir));
         }
-        if (configFile == null) {
+*/        if (configFile == null) {
             throw new IllegalArgumentException("Unable to get history from: "
-                    + diffDir);
+                    + path);
         } else {
             return new XmlFile(configFile);
         }
@@ -254,9 +279,25 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     public final String getDiffFile() throws IOException {
         checkConfigurePermission();
-        final XmlFile configXml1 = getConfigXml(getRequestParameter("histDir1"));
+        //man braucht Projektnamen, isJob und zwei Timestamps
+        
+        final boolean isJob = Boolean.parseBoolean(getRequestParameter("isJob"));
+        final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
+        final String rootDir;
+        
+        if (isJob) {
+            rootDir = plugin.getJobHistoryRootDir().getPath();
+        } else {
+            rootDir = plugin.getConfiguredHistoryRootDir().getPath();
+        }
+
+        final String name = getRequestParameter("name");
+        final String path1 = rootDir + "/" + name + "/" + getRequestParameter("timestamp1");
+        final String path2 = rootDir + "/" + name + "/" + getRequestParameter("timestamp2");
+
+        final XmlFile configXml1 = getConfigXml(path1);
         final String[] configXml1Lines = configXml1.asString().split("\\n");
-        final XmlFile configXml2 = getConfigXml(getRequestParameter("histDir2"));
+        final XmlFile configXml2 = getConfigXml(path2);
         final String[] configXml2Lines = configXml2.asString().split("\\n");
         return getDiff(configXml1.getFile(), configXml2.getFile(),
                 configXml1Lines, configXml2Lines);

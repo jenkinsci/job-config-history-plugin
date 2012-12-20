@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
+
 import javax.xml.transform.stream.StreamSource;
 
 import org.kohsuke.stapler.StaplerRequest;
@@ -24,7 +26,7 @@ import org.kohsuke.stapler.StaplerResponse;
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
     /** Our logger. */
-//  private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
+  private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
 
     /** The project. */
     private final transient AbstractItem project;
@@ -110,7 +112,14 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         throws IOException {
         checkConfigurePermission();
         
-        final XmlFile xmlFile = getConfigXml(req.getParameter("file"));
+        final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
+        final String timestamp = req.getParameter("date");
+        final String name = req.getParameter("name");
+        final String path = plugin.getJobHistoryRootDir().getPath() + "/" + name + "/" + timestamp;
+        
+        LOG.finest("ProjectAction doRestore Path: " + path);
+
+        final XmlFile xmlFile = getConfigXml(path);
         final String oldConfig = xmlFile.asString();
         final InputStream is = new ByteArrayInputStream(oldConfig.getBytes("UTF-8"));
 

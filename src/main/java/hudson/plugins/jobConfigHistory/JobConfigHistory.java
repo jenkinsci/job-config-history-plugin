@@ -238,7 +238,7 @@ public class JobConfigHistory extends Plugin {
     /**
      * Returns the File object representing the configured root history directory.
      *
-     * @return The configured root history File object, or null if this configuration has not been set.
+     * @return The configured root history File object.
      */
     protected File getConfiguredHistoryRootDir() {
         File rootDir;
