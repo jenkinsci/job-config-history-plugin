@@ -263,9 +263,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
         throws ServletException, IOException {
         final MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        rsp.sendRedirect("showDiffFiles?histDir1=" + parser.get("histDir1")
-                + "&histDir2=" + parser.get("histDir2"));
-
+        rsp.sendRedirect("showDiffFiles?timestamp1=" + parser.get("timestamp1")
+                + "&timestamp2=" + parser.get("timestamp2") + "&name=" + parser.get("name")
+                + "&isJob=" + parser.get("isJob"));
     }
 
     /**

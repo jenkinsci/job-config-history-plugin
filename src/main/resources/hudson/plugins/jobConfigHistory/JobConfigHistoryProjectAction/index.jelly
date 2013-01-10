@@ -52,9 +52,13 @@
 							</a>
                           </j:if>
                       </td>
-                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir1" value="${config.getDate()}" checked="${configNr == 2 ? true:false}" /></td>
-                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" /></td>
+                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == 2 ? true:false}" /></td>
+                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" /></td>
                     </tr>
+                      <f:invisibleEntry>
+              	        <f:textbox name="name" value="${config.getJob()}" />
+              	        <f:textbox name="isJob" value="${config.getIsJob()}" />
+                      </f:invisibleEntry>
                   </j:forEach>
                 </table>
                 <div align="right">

@@ -113,7 +113,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         checkConfigurePermission();
         
         final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
-        final String timestamp = req.getParameter("date");
+        final String timestamp = req.getParameter("timestamp");
         final String name = req.getParameter("name");
         final String path = plugin.getJobHistoryRootDir().getPath() + "/" + name + "/" + timestamp;
         
@@ -137,10 +137,10 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      */
     public final void doForwardToRestoreQuestion(StaplerRequest req, StaplerResponse rsp)
         throws IOException {
-        final String histDir = req.getParameter("histDir");
+        final String histDir = req.getParameter("timestamp");
         final XmlFile historyXml = new XmlFile(new File(histDir, JobConfigHistoryConsts.HISTORY_FILE));
         final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
         rsp.sendRedirect("restoreQuestion?file=" + historyXml.getFile().getParent() 
-                + "&date=" + histDescr.getTimestamp() + "&user=" + histDescr.getUser());
+                + "&timestamp=" + histDescr.getTimestamp() + "&user=" + histDescr.getUser());
     }
 }

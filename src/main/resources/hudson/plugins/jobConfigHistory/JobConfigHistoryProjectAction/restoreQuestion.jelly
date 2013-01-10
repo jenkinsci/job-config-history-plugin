@@ -4,12 +4,12 @@
     <l:main-panel>
 		${%Replace the current configuration with the version from:}
 		<br />
-    	${%Date}: ${request.getParameter("date")}
+    	${%Date}: ${request.getParameter("timestamp")}
     	<br />
     	${%User}: ${request.getParameter("user")}
     	<br />
 		
-    	<f:form action="restore?file=${request.getParameter('file')}" name="restore" method="post">
+    	<f:form action="restore?file=${request.getParameter('timestamp')}" name="restore" method="post">
            	<f:entry>
                 <f:submit value="${%Yes}"/>
            	</f:entry>
