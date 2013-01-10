@@ -35,7 +35,7 @@
                       </tr>
                     </j:forEach>
                   </table>
-                  <f:form method="post" action="forwardToRestoreQuestion?name=${request.getParameter('name')}&amp;isjob=true&amp;timestamp=${request.getParameter('timestamp1')}" name="forward">
+                  <f:form method="post" action="forwardToRestoreQuestion?name=${request.getParameter('name')}&amp;timestamp=${request.getParameter('timestamp1')}" name="forward">
                     <div align="right">
                       <f:submit value="${%Restore old version}" />
                     </div>

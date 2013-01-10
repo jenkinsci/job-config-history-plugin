@@ -10,8 +10,12 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -137,10 +141,20 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      */
     public final void doForwardToRestoreQuestion(StaplerRequest req, StaplerResponse rsp)
         throws IOException {
-        final String histDir = req.getParameter("timestamp");
-        final XmlFile historyXml = new XmlFile(new File(histDir, JobConfigHistoryConsts.HISTORY_FILE));
-        final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-        rsp.sendRedirect("restoreQuestion?file=" + historyXml.getFile().getParent() 
-                + "&timestamp=" + histDescr.getTimestamp() + "&user=" + histDescr.getUser());
+        final String timestamp = req.getParameter("timestamp");
+        final String name = req.getParameter("name");
+        rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp + "&name=" + name);
+    }
+    
+    public final Calendar getDateFromString(String dateString) {
+        Date date = null;
+        Calendar cal = Calendar.getInstance();
+        try {
+            date = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(dateString);
+            cal.setTime(date);
+        } catch (ParseException e) {
+            LOG.finest("Could not parse Date: " + e);
+        }
+        return cal;
     }
 }

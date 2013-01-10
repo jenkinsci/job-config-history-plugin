@@ -108,19 +108,19 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
             return  (HtmlPage) diffFilesForm.submit((HtmlButton) last(diffFilesForm.getHtmlElementsByTagName("button")));
         }
 
-        public void setCheckedHistDir1RadioButton(int index, boolean isChecked) {
-            getHistDirRadioButton("histDir1", index).setChecked(isChecked);
+        public void setCheckedTimestamp1RadioButton(int index, boolean isChecked) {
+            getTimestampRadioButton("timestamp1", index).setChecked(isChecked);
         }
 
-        public void setCheckedHistDir2RadioButton(int index, boolean isChecked) {
-            getHistDirRadioButton("histDir2", index).setChecked(isChecked);
+        public void setCheckedTimestamp2RadioButton(int index, boolean isChecked) {
+            getTimestampRadioButton("timestamp2", index).setChecked(isChecked);
         }
 
         public void assertNoHistoryEntriesAvailable() {
             assertThat(historyPage.asXml(), containsString("No job configuration history available"));
         }
 
-        private HtmlRadioButtonInput getHistDirRadioButton(final String name, int index) {
+        private HtmlRadioButtonInput getTimestampRadioButton(final String name, int index) {
             final HtmlForm diffFilesForm = historyPage.getFormByName("diffFiles");
             return (HtmlRadioButtonInput) diffFilesForm.getInputsByName(name).get(index);
         }
@@ -179,8 +179,8 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
         final TextPage firstRawOfAll = (TextPage) allRawHRefs.get(0).click();
         assertThat(firstRawOfAll.getContent(), containsString(secondDescription));
         final HistoryPage historyPage = new HistoryPage();
-        historyPage.setCheckedHistDir1RadioButton(0, true);
-        historyPage.setCheckedHistDir2RadioButton(1, true);
+        historyPage.setCheckedTimestamp1RadioButton(0, true);
+        historyPage.setCheckedTimestamp2RadioButton(1, true);
         final HtmlPage diffPage = historyPage.getDiffPage();
         final String diffPageContent = diffPage.asXml();
         assertThat(diffPageContent, containsString("<td class=\"diff_original\">"));

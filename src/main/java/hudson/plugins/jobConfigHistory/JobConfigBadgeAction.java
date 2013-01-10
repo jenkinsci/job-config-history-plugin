@@ -54,22 +54,22 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
 
     @Override
     public void onStarted(AbstractBuild build, TaskListener listener) {
-        final AbstractProject<?, ?> project = (AbstractProject<?, ?>) build.getProject();
-        if (project.getNextBuildNumber() == 2) {
+        final AbstractProject<?, ?> job = (AbstractProject<?, ?>) build.getProject();
+        if (job.getNextBuildNumber() == 2) {
             super.onStarted(build, listener);
             return;
         }
-        final Date lastBuildDate = project.getLastBuild().getPreviousBuild().getTime();
+        final Date lastBuildDate = job.getLastBuild().getPreviousBuild().getTime();
         
         //get timestamp of config-change
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final File historyRootDir = Hudson.getInstance().getPlugin(JobConfigHistory.class).getHistoryDir(project.getConfigFile());
+        final File historyRootDir = Hudson.getInstance().getPlugin(JobConfigHistory.class).getHistoryDir(job.getConfigFile());
         if (historyRootDir.exists()) {
             try {
                 for (final File historyDir : historyRootDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
                     final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
                     final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-                    final ConfigInfo config = ConfigInfo.create(project, historyDir, histDescr);
+                    final ConfigInfo config = ConfigInfo.create(job, historyDir, histDescr);
                     configs.add(config);
                 }
             } catch (IOException ex) {
@@ -85,7 +85,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
             final Date lastConfigChange = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(lastChange.getDate());
             if (lastConfigChange.after(lastBuildDate)) {
                 final String[] dates = {lastChange.getDate(), penultimateChange.getDate()};
-                build.addAction(new JobConfigBadgeAction(dates, project));
+                build.addAction(new JobConfigBadgeAction(dates, job));
             }
         } catch (ParseException e) {
             LOG.finest("Could not parse Date: " + e);
@@ -99,10 +99,9 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
      * @return link target as string
      */
     public String createLink() {
-        //TODO: hier muss Link noch richtig zusammengebaut werden
         return Hudson.getInstance().getRootUrl() + "job/" + project.getName() + "/"
                 + JobConfigHistoryConsts.URLNAME + "/showDiffFiles?timestamp1=" + configDates[1]
-                + "&timestamp2=" + configDates[0] + "&name=" + project.getName() + "&isjob=true";
+                + "&timestamp2=" + configDates[0] + "&name=" + project.getName() + "&isJob=true";
     }
     
     /**

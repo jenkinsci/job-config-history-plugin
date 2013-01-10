@@ -145,48 +145,25 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Returns the configuration file (default is {@code config.xml}) located in
-     * {@code diffDir}. {@code diffDir} must either start with
-     * {@code HUDSON_HOME} and contain {@code config-history} or be located
-     * under the configured {@code historyRootDir}. It also must not contain a
-     * '..' pattern. Otherwise an {@link IllegalArgumentException} will be
-     * thrown.
-     * <p>
-     * This is to ensure that this plugin will not be abused to get arbitrary
-     * xml configuration files located anywhere on the system.
+     * {@code path}. The path used to be checked thoroughly so that it could 
+     * not be abused to retrieve arbitrary xml configuration files located 
+     * anywhere on the system. This is obsolete now since we no longer pass entire 
+     * paths as url parameters.
      * 
-     * @param diffDir
+     * @param path
      *            timestamped history directory.
      * @return xmlfile.
      */
     protected XmlFile getConfigXml(final String path) {
-        //hier sollte nur Datum übergeben werden, Rest zusammengebaut
         LOG.finest("path - " + path);
-        
         final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
-        final String allowedHistoryRootDir;
-        if (plugin.getHistoryRootDir() == null || plugin.getHistoryRootDir().isEmpty()) {
-            allowedHistoryRootDir = plugin.getConfiguredHistoryRootDir().getAbsolutePath();
-        } else {
-            allowedHistoryRootDir = plugin.getConfiguredHistoryRootDir().getParent();
-        }
-        
         
         File configFile = null;
         if (path != null) {
             configFile = plugin.getConfigFile(new File(path));
         }
         
-/*        File configFile = null;
-        if (diffDir != null) {
-            if (!diffDir.startsWith(allowedHistoryRootDir)
-                    || diffDir.contains("..")) {
-                throw new IllegalArgumentException(diffDir
-                        + " does not start with " + allowedHistoryRootDir
-                        + " or contains '..'");
-            }
-            configFile = plugin.getConfigFile(new File(diffDir));
-        }
-*/        if (configFile == null) {
+        if (configFile == null) {
             throw new IllegalArgumentException("Unable to get history from: "
                     + path);
         } else {
@@ -279,7 +256,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     public final String getDiffFile() throws IOException {
         checkConfigurePermission();
-        //man braucht Projektnamen, isJob und zwei Timestamps
         
         final boolean isJob = Boolean.parseBoolean(getRequestParameter("isJob"));
         final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
@@ -448,8 +424,11 @@ public abstract class JobConfigHistoryBaseAction implements Action {
          * of the left and right information of the diff.
          */
         public static class Line {
+            /**The left version of a modificated line.*/
             private final Item left = new Item();
+            /**The right version of a modificated line.*/
             private final Item right = new Item();
+            /**True when line should be skipped.*/
             private boolean skipping = false;
 
             /**
@@ -486,8 +465,11 @@ public abstract class JobConfigHistoryBaseAction implements Action {
              * the item was modified, added or deleted.
              */
             public static class Item {
+                /**Line number of Item.*/
                 private Integer lineNumber;
+                /**Text of Item.*/
                 private String text;
+                /**CSS Class of Item.*/
                 private String cssClass;
 
                 /**

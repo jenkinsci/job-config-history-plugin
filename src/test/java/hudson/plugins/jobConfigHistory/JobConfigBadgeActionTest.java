@@ -36,32 +36,57 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         assertTrue("Page should contain build badge", htmlPage2.asXml().contains("buildbadge.png"));
     }
     
-    public void testCorrectLinkTargets() throws Exception {
+    public void testBadgeAfterRename() throws Exception {
         final String oldJobName = "firstjobname";
         final String newJobName = "secondjobname";
 
         final FreeStyleProject project = createFreeStyleProject(oldJobName);
-        Thread.sleep(SLEEP_TIME);
         AbstractBuild<?,?> build = project.scheduleBuild2(0).get();
         assertTrue("Build should succeed", build.getResult().equals(Result.SUCCESS));
+        Thread.sleep(SLEEP_TIME);
 
         project.renameTo(newJobName);
         Thread.sleep(SLEEP_TIME);
         project.scheduleBuild2(0).get();
 
         final HtmlPage htmlPage = webClient.goTo("job/" + newJobName);
-        System.out.println(htmlPage.asXml());
-        
         assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
 
         final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage.getElementById("showDiff");
         final HtmlPage showDiffPage = showDiffLink.click();
+        assertTrue("ShowDiffFiles page should be reached now", showDiffPage.asText().contains("No lines changed"));
+    }
+    
+    
+    public void testCorrectLinkTargetsAfterRename() throws Exception {
+        final String oldJobName = "jobname1";
+        final String newJobName = "jobname2";
+        final String oldDescription = "first description";
+        final String newDescription = "second description";
+
+        final FreeStyleProject project = createFreeStyleProject(oldJobName);
+        project.setDescription(oldDescription);
+        AbstractBuild<?,?> build = project.scheduleBuild2(0).get();
+        assertTrue("Build should succeed", build.getResult().equals(Result.SUCCESS));
+        Thread.sleep(SLEEP_TIME);
+
+        project.setDescription(newDescription);
+        Thread.sleep(SLEEP_TIME);
+        project.scheduleBuild2(0).get();
+
+        final HtmlPage htmlPage = webClient.goTo("job/" + oldJobName);
+        final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage.getElementById("showDiff");
+        final HtmlPage showDiffPage = showDiffLink.click();
         assertTrue("ShowDiffFiles page should be reached now", showDiffPage.asText().contains("Restore old version"));
-        
-        //Same procedure again in order to test whether the link 
-        //is still correct on the showDiffFiles page
-        final HtmlAnchor showDiffLink2 = (HtmlAnchor) htmlPage.getElementById("showDiff");
-        final HtmlPage showDiffPage2 = showDiffLink2.click();
+
+        project.renameTo(newJobName);
+        Thread.sleep(SLEEP_TIME);
+        project.scheduleBuild2(0).get();
+
+        //Test whether build badge link that was created before rename still leads to correct page
+        final HtmlPage htmlPage2 = webClient.goTo("job/" + newJobName);
+        final HtmlAnchor oldShowDiffLink = (HtmlAnchor) htmlPage2.getByXPath("//a[@id='showDiff']").get(1);
+        final HtmlPage showDiffPage2 = oldShowDiffLink.click();
         assertTrue("ShowDiffFiles page should be reached now", showDiffPage2.asText().contains("Restore old version"));
     }
 }
