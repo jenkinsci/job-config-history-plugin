@@ -10,6 +10,9 @@ import hudson.util.MultipartFormDataParser;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -145,29 +148,31 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected XmlFile getConfigXml(final String name, final String timestamp, final boolean isJob) {
         final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
-        final String requestURI = Stapler.getCurrentRequest().getRequestURI();
         final String rootDir;
-        
-        if (isJob) {
-            rootDir = plugin.getJobHistoryRootDir().getPath();
-        } else {
-            rootDir = plugin.getConfiguredHistoryRootDir().getPath();
-        }
-        
         File configFile = null;
-        final String path = rootDir + "/" + name + "/" + timestamp;
-        LOG.finest("path - " + path);
+        String path = null;
+
         if (name != null && timestamp != null) {
-            if (name.contains("..") || timestamp.contains("..")) {
-                throw new IllegalArgumentException("Path contains '..'");
+            if (isJob || name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+                rootDir = plugin.getJobHistoryRootDir().getPath();
+            } else {
+                rootDir = plugin.getConfiguredHistoryRootDir().getPath();
             }
-            final String nameWithSlashes = "/" + name + "/";
-            if (!requestURI.contains(nameWithSlashes)) {
-                LOG.finest("!!!!!!!!RequestURI does not contain " + nameWithSlashes);
-                throw new IllegalArgumentException("RequestURI does not contain " + nameWithSlashes);
+
+            if (name.contains("..")) {
+                throw new IllegalArgumentException("Invalid directory name because of '..': " + name);
             }
+            if (isJob && Hudson.getInstance().getItem(name) == null) {
+                throw new IllegalArgumentException("A job with this name could not be found: " + name);
+            }
+            try {
+                new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timestamp);
+            } catch (ParseException pe) {
+                throw new IllegalArgumentException("Timestamp does not contain a valid date: " + timestamp);
+            }
+            path = rootDir + "/" + name + "/" + timestamp;
             configFile = plugin.getConfigFile(new File(path));
-        }
+            }
 
         if (configFile == null) {
             throw new IllegalArgumentException("Unable to get history from: "
@@ -252,8 +257,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * Returns a textual diff between two {@code config.xml} files located in
-     * {@code histDir1} and {@code histDir2} directories given as parameters of
+     * Returns a textual diff between two {@code config.xml} files which are identified 
+     * by their timestamps and the project they belong to, given as parameters of
      * {@link Stapler#getCurrentRequest()}.
      * 
      * @return diff
