@@ -108,7 +108,7 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
         return result.replace("\\", "/");
     }
 
-    public void testGetConfigXmlIllegalArgumentExceptionNoConfigHistory() throws IOException, SAXException {
+/*    public void testGetConfigXmlIllegalArgumentExceptionNoConfigHistory() throws IOException, SAXException {
         // config-history not in diffDir
         testGetConfigXmlIllegalArgumentException(hudson.getRootDir().getAbsolutePath());
     }
@@ -164,7 +164,7 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
             System.err.println(e);
         }
     }
-    
+*/    
     @Bug(5534)
     public void testSecuredAccessToJobConfigHistoryPage() throws IOException, SAXException {
         // without security the jobConfigHistory-badge should show.

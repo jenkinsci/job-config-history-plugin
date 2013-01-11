@@ -145,6 +145,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected XmlFile getConfigXml(final String name, final String timestamp, final boolean isJob) {
         final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
+        final String requestURI = Stapler.getCurrentRequest().getRequestURI();
         final String rootDir;
         
         if (isJob) {
@@ -159,6 +160,11 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         if (name != null && timestamp != null) {
             if (name.contains("..") || timestamp.contains("..")) {
                 throw new IllegalArgumentException("Path contains '..'");
+            }
+            final String nameWithSlashes = "/" + name + "/";
+            if (!requestURI.contains(nameWithSlashes)) {
+                LOG.finest("!!!!!!!!RequestURI does not contain " + nameWithSlashes);
+                throw new IllegalArgumentException("RequestURI does not contain " + nameWithSlashes);
             }
             configFile = plugin.getConfigFile(new File(path));
         }
