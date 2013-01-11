@@ -112,22 +112,11 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     public final String getFile() throws IOException {
         checkConfigurePermission();
-        //man braucht Projektnamen, isJob und Timestamp
-        
         final boolean isJob = Boolean.parseBoolean(getRequestParameter("isJob"));
-        final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
-        final String rootDir;
-        
-        if (isJob) {
-            rootDir = plugin.getJobHistoryRootDir().getPath();
-        } else {
-            rootDir = plugin.getConfiguredHistoryRootDir().getPath();
-        }
-
         final String name = getRequestParameter("name");
-        final String path = rootDir + "/" + name + "/" + getRequestParameter("timestamp");
-        
-        final XmlFile xmlFile = getConfigXml(path);
+        final String timestamp = getRequestParameter("timestamp");
+
+        final XmlFile xmlFile = getConfigXml(name, timestamp, isJob);
         return xmlFile.asString();
     }
 
@@ -145,24 +134,35 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Returns the configuration file (default is {@code config.xml}) located in
-     * {@code path}. The path used to be checked thoroughly so that it could 
+     * {@code path}. The path must not contain '..' so that it can
      * not be abused to retrieve arbitrary xml configuration files located 
-     * anywhere on the system. This is obsolete now since we no longer pass entire 
-     * paths as url parameters.
+     * anywhere on the system. 
      * 
-     * @param path
-     *            timestamped history directory.
-     * @return xmlfile.
+     * @param name The name of the project.
+     * @param timestamp The timestamp of the saved configuration as String.
+     * @param isJob True if the configuration file belongs to a job (as opposed to a system property).
+     * @return The configuration file as XmlFile.
      */
-    protected XmlFile getConfigXml(final String path) {
-        LOG.finest("path - " + path);
+    protected XmlFile getConfigXml(final String name, final String timestamp, final boolean isJob) {
         final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
+        final String rootDir;
         
-        File configFile = null;
-        if (path != null) {
-            configFile = plugin.getConfigFile(new File(path));
+        if (isJob) {
+            rootDir = plugin.getJobHistoryRootDir().getPath();
+        } else {
+            rootDir = plugin.getConfiguredHistoryRootDir().getPath();
         }
         
+        File configFile = null;
+        final String path = rootDir + "/" + name + "/" + timestamp;
+        LOG.finest("path - " + path);
+        if (name != null && timestamp != null) {
+            if (name.contains("..") || timestamp.contains("..")) {
+                throw new IllegalArgumentException("Path contains '..'");
+            }
+            configFile = plugin.getConfigFile(new File(path));
+        }
+
         if (configFile == null) {
             throw new IllegalArgumentException("Unable to get history from: "
                     + path);
@@ -258,22 +258,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         checkConfigurePermission();
         
         final boolean isJob = Boolean.parseBoolean(getRequestParameter("isJob"));
-        final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
-        final String rootDir;
-        
-        if (isJob) {
-            rootDir = plugin.getJobHistoryRootDir().getPath();
-        } else {
-            rootDir = plugin.getConfiguredHistoryRootDir().getPath();
-        }
-
         final String name = getRequestParameter("name");
-        final String path1 = rootDir + "/" + name + "/" + getRequestParameter("timestamp1");
-        final String path2 = rootDir + "/" + name + "/" + getRequestParameter("timestamp2");
 
-        final XmlFile configXml1 = getConfigXml(path1);
+        final String timestamp1 = getRequestParameter("timestamp1");
+        final String timestamp2 = getRequestParameter("timestamp2");
+
+        final XmlFile configXml1 = getConfigXml(name, timestamp1, isJob);
         final String[] configXml1Lines = configXml1.asString().split("\\n");
-        final XmlFile configXml2 = getConfigXml(path2);
+        final XmlFile configXml2 = getConfigXml(name, timestamp2, isJob);
         final String[] configXml2Lines = configXml2.asString().split("\\n");
         return getDiff(configXml1.getFile(), configXml2.getFile(),
                 configXml1Lines, configXml2Lines);

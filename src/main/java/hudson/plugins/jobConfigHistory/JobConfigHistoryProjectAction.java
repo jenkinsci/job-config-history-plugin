@@ -10,12 +10,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -30,7 +26,7 @@ import org.kohsuke.stapler.StaplerResponse;
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
     /** Our logger. */
-  private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
+//    private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
 
     /** The project. */
     private final transient AbstractItem project;
@@ -108,22 +104,18 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     
     /**
      * Action when 'restore' button is pressed.
-     * @param req incoming StaplerRequest
-     * @param rsp outgoing StaplerResponse
-     * @throws IOException if something goes wrong
+     * @param req Incoming StaplerRequest
+     * @param rsp Outgoing StaplerResponse
+     * @throws IOException If something goes wrong
      */
     public final void doRestore(StaplerRequest req, StaplerResponse rsp)
         throws IOException {
         checkConfigurePermission();
         
-        final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
         final String timestamp = req.getParameter("timestamp");
         final String name = req.getParameter("name");
-        final String path = plugin.getJobHistoryRootDir().getPath() + "/" + name + "/" + timestamp;
-        
-        LOG.finest("ProjectAction doRestore Path: " + path);
 
-        final XmlFile xmlFile = getConfigXml(path);
+        final XmlFile xmlFile = getConfigXml(name, timestamp, true);
         final String oldConfig = xmlFile.asString();
         final InputStream is = new ByteArrayInputStream(oldConfig.getBytes("UTF-8"));
 
@@ -144,17 +136,5 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         final String timestamp = req.getParameter("timestamp");
         final String name = req.getParameter("name");
         rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp + "&name=" + name);
-    }
-    
-    public final Calendar getDateFromString(String dateString) {
-        Date date = null;
-        Calendar cal = Calendar.getInstance();
-        try {
-            date = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(dateString);
-            cal.setTime(date);
-        } catch (ParseException e) {
-            LOG.finest("Could not parse Date: " + e);
-        }
-        return cal;
     }
 }

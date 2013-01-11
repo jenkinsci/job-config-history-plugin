@@ -9,9 +9,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.logging.Logger;
 
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
-
 import hudson.Extension;
 import hudson.XmlFile;
 import hudson.model.AbstractBuild;
@@ -36,7 +33,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     /**The dates of the last two config changes as Strings.*/
     private String[] configDates;
     
-    /**The project to which the build belongs*/
+    /**The project to which the build belongs.*/
     private AbstractProject<?, ?> project;
 
     /**No arguments about a no-argument constructor (necessary because of annotation).*/
@@ -45,10 +42,11 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     /**
      * Creates a new JobConfigBadgeAction.
      * @param configDates The dates of the last two config changes
+     * @param project The respective project
      */
-    public JobConfigBadgeAction(String[] configDates, AbstractProject<?,?> project) {
+    public JobConfigBadgeAction(String[] configDates, AbstractProject<?, ?> project) {
         super(AbstractBuild.class);
-        this.configDates = configDates;
+        this.configDates = configDates.clone();
         this.project = project;
     }
 
