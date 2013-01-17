@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.xml.transform.stream.StreamSource;
 
@@ -24,9 +23,6 @@ import org.kohsuke.stapler.StaplerResponse;
  * @author Stefan Brausch
  */
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
-
-    /** Our logger. */
-//    private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
 
     /** The project. */
     private final transient AbstractItem project;

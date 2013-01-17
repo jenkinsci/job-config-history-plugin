@@ -1,16 +1,18 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
+import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Hudson;
+import hudson.model.Item;
 import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
 import hudson.security.AccessControlled;
+import hudson.security.Permission;
 import hudson.util.MultipartFormDataParser;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,7 +22,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -48,9 +49,6 @@ import bmsi.util.Diff.change;
  * @author mfriedenhagen
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
-
-    /** Our logger. */
-    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
 
     /**
      * The hudson instance.
@@ -137,9 +135,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Returns the configuration file (default is {@code config.xml}) located in
-     * {@code path}. The path must not contain '..' so that it can
+     * {@code path}. The submitted parameters get checked so that they can
      * not be abused to retrieve arbitrary xml configuration files located 
-     * anywhere on the system. 
+     * anywhere on the system.
      * 
      * @param name The name of the project.
      * @param timestamp The timestamp of the saved configuration as String.
@@ -152,27 +150,29 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         File configFile = null;
         String path = null;
 
-        if (name != null && timestamp != null) {
+        if (checkParameters(name, timestamp)) {
             if (isJob || name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
                 rootDir = plugin.getJobHistoryRootDir().getPath();
             } else {
                 rootDir = plugin.getConfiguredHistoryRootDir().getPath();
             }
 
-            if (name.contains("..")) {
-                throw new IllegalArgumentException("Invalid directory name because of '..': " + name);
+            if (isJob) {
+                final Item job = Hudson.getInstance().getItem(name);
+                if (job == null) {
+                    throw new IllegalArgumentException("A job with this name could not be found: " + name);
+                } else {
+                    job.checkPermission(AbstractProject.CONFIGURE);
+                }
+            } else {
+                if (!name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+                    hudson.checkPermission(Permission.CONFIGURE);
+                }
             }
-            if (isJob && Hudson.getInstance().getItem(name) == null) {
-                throw new IllegalArgumentException("A job with this name could not be found: " + name);
-            }
-            try {
-                new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timestamp);
-            } catch (ParseException pe) {
-                throw new IllegalArgumentException("Timestamp does not contain a valid date: " + timestamp);
-            }
+            
             path = rootDir + "/" + name + "/" + timestamp;
             configFile = plugin.getConfigFile(new File(path));
-            }
+        }
 
         if (configFile == null) {
             throw new IllegalArgumentException("Unable to get history from: "
@@ -182,6 +182,29 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         }
     }
 
+    /**
+     * Checks the parameters 'name' and 'timestamp' and returns true if they are neither null 
+     * nor suspicious.
+     * @param name Name of job or system property.
+     * @param timestamp Timestamp of config change.
+     * @return True if parameters are okay.
+     */
+    private boolean checkParameters(String name, String timestamp) {
+        if (name == null || timestamp == null) {
+            throw new IllegalArgumentException("Name (" + name + ") or timestamp (" + timestamp + ") missing");
+        }
+        if (name.contains("..")) {
+            throw new IllegalArgumentException("Invalid directory name because of '..': " + name);
+        }
+        try {
+            new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timestamp);
+        } catch (ParseException pe) {
+            throw new IllegalArgumentException("Timestamp does not contain a valid date: " + timestamp);
+        }
+
+        return true;
+    }
+    
     /**
      * Returns the parameter named {@code parameterName} from current request.
      * 
@@ -432,7 +455,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             /**The right version of a modificated line.*/
             private final Item right = new Item();
             /**True when line should be skipped.*/
-            private boolean skipping = false;
+            private boolean skipping;
 
             /**
              * Returns the left version of a modificated line.

@@ -33,7 +33,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     /**The dates of the last two config changes as Strings.*/
     private String[] configDates;
     
-    /***/
+    /**We need the build in order to get the project name.*/
     private AbstractBuild build;
 
     /**No arguments about a no-argument constructor (necessary because of annotation).*/
@@ -94,7 +94,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     
     /**
      * Creates the target for the link to the showDiffFiles page.
-     * @return link target as string
+     * @return Link target as String.
      */
     public String createLink() {
         return Hudson.getInstance().getRootUrl() + "job/" + build.getProject().getName() + "/"
