@@ -37,9 +37,6 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
             this.jobConfigHistoryLink = getJobConfigHistoryLink();
         }
 
-        /**
-         * @return
-         */
         public final String getJobConfigHistoryLink() {
             return "job/" + JOB_NAME + "/jobConfigHistory";
         }
@@ -108,19 +105,19 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
             return  (HtmlPage) diffFilesForm.submit((HtmlButton) last(diffFilesForm.getHtmlElementsByTagName("button")));
         }
 
-        public void setCheckedHistDir1RadioButton(int index, boolean isChecked) {
-            getHistDirRadioButton("histDir1", index).setChecked(isChecked);
+        public void setCheckedTimestamp1RadioButton(int index, boolean isChecked) {
+            getTimestampRadioButton("timestamp1", index).setChecked(isChecked);
         }
 
-        public void setCheckedHistDir2RadioButton(int index, boolean isChecked) {
-            getHistDirRadioButton("histDir2", index).setChecked(isChecked);
+        public void setCheckedTimestamp2RadioButton(int index, boolean isChecked) {
+            getTimestampRadioButton("timestamp2", index).setChecked(isChecked);
         }
 
         public void assertNoHistoryEntriesAvailable() {
             assertThat(historyPage.asXml(), containsString("No job configuration history available"));
         }
 
-        private HtmlRadioButtonInput getHistDirRadioButton(final String name, int index) {
+        private HtmlRadioButtonInput getTimestampRadioButton(final String name, int index) {
             final HtmlForm diffFilesForm = historyPage.getFormByName("diffFiles");
             return (HtmlRadioButtonInput) diffFilesForm.getInputsByName(name).get(index);
         }
@@ -150,7 +147,7 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
     public void testHistoryPageWithOutEntries() throws IOException, SAXException {
         new HistoryPage().assertNoHistoryEntriesAvailable();
     }
-
+    
     @LocalData
     public void testSaveConfiguration() throws Exception {
         final String firstDescription = "just a test";
@@ -172,20 +169,50 @@ public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
             assertThat(firstRaw.getContent(), containsString(secondDescription));
         }
         final AllJobConfigHistoryPage allJobConfigHistoryPage = new AllJobConfigHistoryPage(webClient.goTo("jobConfigHistory/?filter=jobs"));
-        List<HtmlAnchor> allRawHRefs = allJobConfigHistoryPage.getConfigOutputLinks("raw");
+        final List<HtmlAnchor> allRawHRefs = allJobConfigHistoryPage.getConfigOutputLinks("raw");
         assertTrue(allRawHRefs.size() >= 2);
-        List<? extends HtmlAnchor> allXmlHRefs = allJobConfigHistoryPage.getConfigOutputLinks("xml");
+        final List<? extends HtmlAnchor> allXmlHRefs = allJobConfigHistoryPage.getConfigOutputLinks("xml");
         assertTrue(allXmlHRefs.size() >= 2);
         final TextPage firstRawOfAll = (TextPage) allRawHRefs.get(0).click();
         assertThat(firstRawOfAll.getContent(), containsString(secondDescription));
         final HistoryPage historyPage = new HistoryPage();
-        historyPage.setCheckedHistDir1RadioButton(0, true);
-        historyPage.setCheckedHistDir2RadioButton(1, true);
+        historyPage.setCheckedTimestamp1RadioButton(0, true);
+        historyPage.setCheckedTimestamp2RadioButton(1, true);
         final HtmlPage diffPage = historyPage.getDiffPage();
         final String diffPageContent = diffPage.asXml();
         assertThat(diffPageContent, containsString("<td class=\"diff_original\">"));
         assertThat(diffPageContent, containsString("<td class=\"diff_revised\">"));
         assertThat(diffPageContent, containsString("&lt;description&gt;just a test&lt;/description&gt;"));
         assertThat(diffPageContent, containsString("&lt;description&gt;just a second test&lt;/description&gt;"));
+    }
+    
+    /**
+     * Checks whether history of a single system configuration is displayed correctly 
+     * and contains correct link targets.
+     */
+    public void testHistoryPageOfSingleSystemConfig() {
+        final String firstDescription = "just a test";
+        final String secondDescription = "just a second test";
+        final int sleepTime = 1100;
+        hudson.getPlugin(JobConfigHistory.class).setSaveSystemConfiguration(true);
+
+        try {
+            hudson.setSystemMessage(firstDescription);
+            Thread.sleep(sleepTime);
+            hudson.setSystemMessage(secondDescription);
+            Thread.sleep(sleepTime);
+        } catch (Exception ex) {
+            fail("Unable to prepare Hudson instance: " + ex);
+        }
+        
+        try {
+            final HtmlPage historyPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/history?name=config");
+            final List<HtmlAnchor> allRawHRefs = historyPage.getByXPath("//a[contains(@href, \"configOutput?type=raw\")]");
+            assertTrue("Check that there are at least 2 links for raw output.", allRawHRefs.size() >= 2);
+            final TextPage firstRawOfAll = (TextPage) allRawHRefs.get(0).click();
+            assertThat("Check that the first raw output link leads to the right target.", firstRawOfAll.getContent(), containsString(secondDescription));
+        } catch (Exception ex) {
+            fail("Unable to complete testHistoryPageOfSingleSystemConfig: " + ex);
+        }
     }
 }

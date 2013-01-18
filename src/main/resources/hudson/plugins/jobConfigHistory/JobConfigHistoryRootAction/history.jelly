@@ -51,17 +51,21 @@
                       <td>${config.date}</td>
                       <td>${config.operation}</td>
                       <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                      <td><a href="configOutput?type=xml&amp;file=${config.file}">
+                      <td><a href="configOutput?type=xml&amp;isJob=${config.getIsJob()}&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
                             <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
                           </a>
                           <st:nbsp />
-                          <a href="configOutput?type=raw&amp;file=${config.file}">
+                          <a href="configOutput?type=raw&amp;isJob=${config.getIsJob()}&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
                             (${%RAW})
                           </a>
                       </td>
-                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir1" value="${config.file}" checked="${configNr == 2 ? true:false}" /></td>
-                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="histDir2" value="${config.file}" checked="${configNr == 1 ? true:false}" /></td>
+                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == 2 ? true:false}" /></td>
+                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" /></td>
                     </tr>
+                    <f:invisibleEntry>
+                      <f:textbox name="name" value="${config.getJob()}" />
+             	      <f:textbox name="isJob" value="${config.getIsJob()}" />
+                    </f:invisibleEntry>
                   </j:forEach>
                 </table>
                 <div align="right">

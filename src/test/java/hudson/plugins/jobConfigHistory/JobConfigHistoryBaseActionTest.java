@@ -9,7 +9,8 @@ import hudson.security.LegacyAuthorizationStrategy;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
 
 import org.jvnet.hudson.test.Bug;
 import org.xml.sax.SAXException;
@@ -19,7 +20,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.TextPage;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import hudson.security.Permission;
@@ -107,63 +107,34 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
     private String makeResultPlatformIndependent(final String result) {
         return result.replace("\\", "/");
     }
-
-    public void testGetConfigXmlIllegalArgumentExceptionNoConfigHistory() throws IOException, SAXException {
-        // config-history not in diffDir
-        testGetConfigXmlIllegalArgumentException(hudson.getRootDir().getAbsolutePath());
+    
+    public void testGetConfigXmlIllegalArgumentExceptionNonExistingJobName() throws IOException, SAXException {
+        TextPage page = (TextPage) webClient.goTo(JobConfigHistoryConsts.URLNAME 
+                    + "/configOutput?type=raw&isJob=true&name=bogus&timestamp=2013-01-11_17-26-27", "text/plain");
+        assertTrue("Page should be empty.", page.getContent().trim().isEmpty());
     }
-
-    public void testGetConfigXmlIllegalArgumentExceptionNoHudsonHome() throws IOException, SAXException {
-        // HUDSON_HOME not in diffDir
-        testGetConfigXmlIllegalArgumentException("/etc/config-history/");
-    }
-
-    public void testGetConfigXmlIllegalArgumentExceptionHasDoubleDots() throws IOException, SAXException {
-        // diffDir has double dots.
-        testGetConfigXmlIllegalArgumentException(hudson.getRootDir().getAbsolutePath() + "/../config-history/2010_02_09");
-    }
-
-    public void testGetConfigXmlIllegalArgumentExceptionNull() {
-        testGetConfigXmlIllegalArgumentException(null);
-    }
-
-    public void testGetConfigXmlIllegalArgumentExceptionNotUnderConfigRoot() throws IOException, SAXException {
-        // request file not under historyRootDir when historyRootDir is configured
-        try {
-            final HtmlForm form = webClient.goTo("configure").getFormByName("config");
-            form.getInputByName("historyRootDir").setValueAttribute("jobConfigHistory");
-            form.getInputByName("saveSystemConfiguration").setChecked(true);
-            submit(form);
-        } catch (Exception e) {
-            fail("Unable to configure historyRootDir" + e);
-        }
-        // request outside of configured history root
-        //testGetConfigXmlIllegalArgumentException(hudson.getRootDir().getParent());
-        testGetConfigXmlIllegalArgumentException(hudson.getRootDir().getPath());
-
-        // request contains '..'
-        testGetConfigXmlIllegalArgumentException(hudson.getRootDir() + "/jobConfigHistory/../jobs/");
-
-        // request for non-history directory
-        final File baseDir = new File(hudson.getRootDir(), "jobConfigHistory");
-        TextPage page = (TextPage) webClient.goTo("jobConfigHistory/configOutput?type=raw&file=" + URLEncoder.encode(baseDir.getPath(), "UTF-8"), "text/plain");
-        assertTrue("Verify empty return on non-history directory request.", page.getContent().trim().isEmpty());
-
-        // request for non-existent directory
-        final File invalidDir = new File(baseDir, "no_such_dir");
-        page = (TextPage) webClient.goTo("jobConfigHistory/configOutput?type=raw&file=" + URLEncoder.encode(invalidDir.getPath(), "UTF-8"), "text/plain");
-        assertTrue("Verify empty return on non-existent directory request.", page.getContent().trim().isEmpty());
-    }
-
-    private void testGetConfigXmlIllegalArgumentException(final String diffDir) {
+    
+    public void testGetConfigXmlIllegalArgumentExceptionInvalidTimestamp() throws IOException, SAXException {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
         try {
-            action.getConfigXml(diffDir);
-            fail("Expected for " + diffDir + " " + IllegalArgumentException.class);
+            action.getConfigXml("bla", "bogus", false);
+            fail("Expected " + IllegalArgumentException.class + " because of invalid timestamp.");
         } catch (IllegalArgumentException e) {
             System.err.println(e);
         }
     }
+    
+    public void testGetConfigXmlIllegalArgumentExceptionDotsInName() throws IOException, SAXException {
+        final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
+        try {
+            final String timestamp = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).format(new GregorianCalendar().getTime());
+            action.getConfigXml("bla..blubb", timestamp, false);
+            fail("Expected " + IllegalArgumentException.class + " because of '..' in parameter name.");
+        } catch (IllegalArgumentException e) {
+            System.err.println(e);
+        }
+    }
+
     
     @Bug(5534)
     public void testSecuredAccessToJobConfigHistoryPage() throws IOException, SAXException {

@@ -1,0 +1,7 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<a href="${it.createLink()}" id="showDiff">
+		<img width="16" height="16"
+    	title="${it.getTooltip()}" alt="x"
+   		src="${rootURL}${it.getIcon()}"/>
+   	</a>
+</j:jelly>

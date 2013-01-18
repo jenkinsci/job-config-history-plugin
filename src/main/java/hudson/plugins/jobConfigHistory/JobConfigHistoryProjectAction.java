@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import javax.xml.transform.stream.StreamSource;
 
 import org.kohsuke.stapler.StaplerRequest;
@@ -22,9 +23,6 @@ import org.kohsuke.stapler.StaplerResponse;
  * @author Stefan Brausch
  */
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
-
-    /** Our logger. */
-//  private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
 
     /** The project. */
     private final transient AbstractItem project;
@@ -102,15 +100,18 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     
     /**
      * Action when 'restore' button is pressed.
-     * @param req incoming StaplerRequest
-     * @param rsp outgoing StaplerResponse
-     * @throws IOException if something goes wrong
+     * @param req Incoming StaplerRequest
+     * @param rsp Outgoing StaplerResponse
+     * @throws IOException If something goes wrong
      */
     public final void doRestore(StaplerRequest req, StaplerResponse rsp)
         throws IOException {
         checkConfigurePermission();
         
-        final XmlFile xmlFile = getConfigXml(req.getParameter("file"));
+        final String timestamp = req.getParameter("timestamp");
+        final String name = req.getParameter("name");
+
+        final XmlFile xmlFile = getConfigXml(name, timestamp, true);
         final String oldConfig = xmlFile.asString();
         final InputStream is = new ByteArrayInputStream(oldConfig.getBytes("UTF-8"));
 
@@ -128,10 +129,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      */
     public final void doForwardToRestoreQuestion(StaplerRequest req, StaplerResponse rsp)
         throws IOException {
-        final String histDir = req.getParameter("histDir");
-        final XmlFile historyXml = new XmlFile(new File(histDir, JobConfigHistoryConsts.HISTORY_FILE));
-        final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-        rsp.sendRedirect("restoreQuestion?file=" + historyXml.getFile().getParent() 
-                + "&date=" + histDescr.getTimestamp() + "&user=" + histDescr.getUser());
+        final String timestamp = req.getParameter("timestamp");
+        final String name = req.getParameter("name");
+        rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp + "&name=" + name);
     }
 }
