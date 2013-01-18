@@ -1,15 +1,20 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
+import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Hudson;
+import hudson.model.Item;
 import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
 import hudson.security.AccessControlled;
+import hudson.security.Permission;
 import hudson.util.MultipartFormDataParser;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,9 +49,6 @@ import bmsi.util.Diff.change;
  * @author mfriedenhagen
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
-
-    /** Our logger. */
-//    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
 
     /**
      * The hudson instance.
@@ -111,7 +113,11 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     public final String getFile() throws IOException {
         checkConfigurePermission();
-        final XmlFile xmlFile = getConfigXml(getRequestParameter("file"));
+        final boolean isJob = Boolean.parseBoolean(getRequestParameter("isJob"));
+        final String name = getRequestParameter("name");
+        final String timestamp = getRequestParameter("timestamp");
+
+        final XmlFile xmlFile = getConfigXml(name, timestamp, isJob);
         return xmlFile.asString();
     }
 
@@ -129,46 +135,76 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Returns the configuration file (default is {@code config.xml}) located in
-     * {@code diffDir}. {@code diffDir} must either start with
-     * {@code HUDSON_HOME} and contain {@code config-history} or be located
-     * under the configured {@code historyRootDir}. It also must not contain a
-     * '..' pattern. Otherwise an {@link IllegalArgumentException} will be
-     * thrown.
-     * <p>
-     * This is to ensure that this plugin will not be abused to get arbitrary
-     * xml configuration files located anywhere on the system.
+     * {@code path}. The submitted parameters get checked so that they can
+     * not be abused to retrieve arbitrary xml configuration files located 
+     * anywhere on the system.
      * 
-     * @param diffDir
-     *            timestamped history directory.
-     * @return xmlfile.
+     * @param name The name of the project.
+     * @param timestamp The timestamp of the saved configuration as String.
+     * @param isJob True if the configuration file belongs to a job (as opposed to a system property).
+     * @return The configuration file as XmlFile.
      */
-    protected XmlFile getConfigXml(final String diffDir) {
+    protected XmlFile getConfigXml(final String name, final String timestamp, final boolean isJob) {
         final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
-        final String allowedHistoryRootDir;
-        if (plugin.getHistoryRootDir() == null || plugin.getHistoryRootDir().isEmpty()) {
-            allowedHistoryRootDir = plugin.getConfiguredHistoryRootDir().getAbsolutePath();
-        } else {
-            allowedHistoryRootDir = plugin.getConfiguredHistoryRootDir().getParent();
-        }
-        
+        final String rootDir;
         File configFile = null;
-        if (diffDir != null) {
-            if (!diffDir.startsWith(allowedHistoryRootDir)
-                    || diffDir.contains("..")) {
-                throw new IllegalArgumentException(diffDir
-                        + " does not start with " + allowedHistoryRootDir
-                        + " or contains '..'");
+        String path = null;
+
+        if (checkParameters(name, timestamp)) {
+            if (isJob || name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+                rootDir = plugin.getJobHistoryRootDir().getPath();
+            } else {
+                rootDir = plugin.getConfiguredHistoryRootDir().getPath();
             }
-            configFile = plugin.getConfigFile(new File(diffDir));
+
+            if (isJob) {
+                final Item job = Hudson.getInstance().getItem(name);
+                if (job == null) {
+                    throw new IllegalArgumentException("A job with this name could not be found: " + name);
+                } else {
+                    job.checkPermission(AbstractProject.CONFIGURE);
+                }
+            } else {
+                if (!name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+                    hudson.checkPermission(Permission.CONFIGURE);
+                }
+            }
+            
+            path = rootDir + "/" + name + "/" + timestamp;
+            configFile = plugin.getConfigFile(new File(path));
         }
+
         if (configFile == null) {
             throw new IllegalArgumentException("Unable to get history from: "
-                    + diffDir);
+                    + path);
         } else {
             return new XmlFile(configFile);
         }
     }
 
+    /**
+     * Checks the parameters 'name' and 'timestamp' and returns true if they are neither null 
+     * nor suspicious.
+     * @param name Name of job or system property.
+     * @param timestamp Timestamp of config change.
+     * @return True if parameters are okay.
+     */
+    private boolean checkParameters(String name, String timestamp) {
+        if (name == null || timestamp == null) {
+            throw new IllegalArgumentException("Name (" + name + ") or timestamp (" + timestamp + ") missing");
+        }
+        if (name.contains("..")) {
+            throw new IllegalArgumentException("Invalid directory name because of '..': " + name);
+        }
+        try {
+            new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timestamp);
+        } catch (ParseException pe) {
+            throw new IllegalArgumentException("Timestamp does not contain a valid date: " + timestamp);
+        }
+
+        return true;
+    }
+    
     /**
      * Returns the parameter named {@code parameterName} from current request.
      * 
@@ -238,14 +274,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
         throws ServletException, IOException {
         final MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        rsp.sendRedirect("showDiffFiles?histDir1=" + parser.get("histDir1")
-                + "&histDir2=" + parser.get("histDir2"));
-
+        rsp.sendRedirect("showDiffFiles?timestamp1=" + parser.get("timestamp1")
+                + "&timestamp2=" + parser.get("timestamp2") + "&name=" + parser.get("name")
+                + "&isJob=" + parser.get("isJob"));
     }
 
     /**
-     * Returns a textual diff between two {@code config.xml} files located in
-     * {@code histDir1} and {@code histDir2} directories given as parameters of
+     * Returns a textual diff between two {@code config.xml} files which are identified 
+     * by their timestamps and the project they belong to, given as parameters of
      * {@link Stapler#getCurrentRequest()}.
      * 
      * @return diff
@@ -254,9 +290,16 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     public final String getDiffFile() throws IOException {
         checkConfigurePermission();
-        final XmlFile configXml1 = getConfigXml(getRequestParameter("histDir1"));
+        
+        final boolean isJob = Boolean.parseBoolean(getRequestParameter("isJob"));
+        final String name = getRequestParameter("name");
+
+        final String timestamp1 = getRequestParameter("timestamp1");
+        final String timestamp2 = getRequestParameter("timestamp2");
+
+        final XmlFile configXml1 = getConfigXml(name, timestamp1, isJob);
         final String[] configXml1Lines = configXml1.asString().split("\\n");
-        final XmlFile configXml2 = getConfigXml(getRequestParameter("histDir2"));
+        final XmlFile configXml2 = getConfigXml(name, timestamp2, isJob);
         final String[] configXml2Lines = configXml2.asString().split("\\n");
         return getDiff(configXml1.getFile(), configXml2.getFile(),
                 configXml1Lines, configXml2Lines);
@@ -407,9 +450,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
          * of the left and right information of the diff.
          */
         public static class Line {
+            /**The left version of a modificated line.*/
             private final Item left = new Item();
+            /**The right version of a modificated line.*/
             private final Item right = new Item();
-            private boolean skipping = false;
+            /**True when line should be skipped.*/
+            private boolean skipping;
 
             /**
              * Returns the left version of a modificated line.
@@ -445,8 +491,11 @@ public abstract class JobConfigHistoryBaseAction implements Action {
              * the item was modified, added or deleted.
              */
             public static class Item {
+                /**Line number of Item.*/
                 private Integer lineNumber;
+                /**Text of Item.*/
                 private String text;
+                /**CSS Class of Item.*/
                 private String cssClass;
 
                 /**
