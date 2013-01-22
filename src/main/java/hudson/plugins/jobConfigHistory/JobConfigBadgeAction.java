@@ -75,18 +75,21 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
             }
         }
 
-        Collections.sort(configs, ConfigInfoComparator.INSTANCE);
-        final ConfigInfo lastChange = Collections.min(configs, ConfigInfoComparator.INSTANCE);
-        final ConfigInfo penultimateChange = configs.get(1);
-        
-        try {
-            final Date lastConfigChange = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(lastChange.getDate());
-            if (lastConfigChange.after(lastBuildDate)) {
-                final String[] dates = {lastChange.getDate(), penultimateChange.getDate()};
-                build.addAction(new JobConfigBadgeAction(dates, build));
+        if (configs.size() > 1) {
+            Collections.sort(configs, ConfigInfoComparator.INSTANCE);
+            final ConfigInfo lastChange = Collections.min(configs, ConfigInfoComparator.INSTANCE);
+            final ConfigInfo penultimateChange = configs.get(1);
+            
+            try {
+                final Date lastConfigChange = new SimpleDateFormat(
+                        JobConfigHistoryConsts.ID_FORMATTER).parse(lastChange.getDate());
+                if (lastConfigChange.after(lastBuildDate)) {
+                    final String[] dates = {lastChange.getDate(), penultimateChange.getDate()};
+                    build.addAction(new JobConfigBadgeAction(dates, build));
+                }
+            } catch (ParseException e) {
+                LOG.finest("Could not parse Date: " + e);
             }
-        } catch (ParseException e) {
-            LOG.finest("Could not parse Date: " + e);
         }
 
         super.onStarted(build, listener);
