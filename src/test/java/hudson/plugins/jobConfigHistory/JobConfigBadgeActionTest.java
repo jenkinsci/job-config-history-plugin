@@ -25,8 +25,7 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         final String jobName = "newjob";
         final String description = "a description";
         final FreeStyleProject project = createFreeStyleProject(jobName);
-        AbstractBuild<?,?> build = project.scheduleBuild2(0).get();
-        assertTrue("Build should succeed", build.getResult().equals(Result.SUCCESS));
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
         final HtmlPage htmlPage = webClient.goTo("job/" + jobName);
         assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
@@ -44,8 +43,7 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         final String newJobName = "secondjobname";
 
         final FreeStyleProject project = createFreeStyleProject(oldJobName);
-        AbstractBuild<?,?> build = project.scheduleBuild2(0).get();
-        assertTrue("Build should succeed", build.getResult().equals(Result.SUCCESS));
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
         Thread.sleep(SLEEP_TIME);
 
         project.renameTo(newJobName);
@@ -69,8 +67,7 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
 
         final FreeStyleProject project = createFreeStyleProject(oldJobName);
         project.setDescription(oldDescription);
-        AbstractBuild<?,?> build = project.scheduleBuild2(0).get();
-        assertTrue("Build should succeed", build.getResult().equals(Result.SUCCESS));
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
         Thread.sleep(SLEEP_TIME);
 
         project.setDescription(newDescription);
@@ -91,5 +88,11 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         final HtmlAnchor oldShowDiffLink = (HtmlAnchor) htmlPage2.getByXPath("//a[@id='showDiff']").get(1);
         final HtmlPage showDiffPage2 = oldShowDiffLink.click();
         assertTrue("ShowDiffFiles page should be reached now", showDiffPage2.asText().contains("Restore old version"));
+    }
+    
+    public void testProjectAfterBuildsDeleted() throws Exception {
+        final FreeStyleProject project = createFreeStyleProject("bla");
+        project.updateNextBuildNumber(5);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
     }
 }
