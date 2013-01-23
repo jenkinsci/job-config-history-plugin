@@ -92,26 +92,4 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         final HtmlPage showDiffPage2 = oldShowDiffLink.click();
         assertTrue("ShowDiffFiles page should be reached now", showDiffPage2.asText().contains("Restore old version"));
     }
-    
-    @LocalData
-    public void testBuildWithNoConfigHistoryEntries() throws Exception {
-        System.out.println("****************");
-        final FreeStyleProject project = (FreeStyleProject) hudson.getItem("TestJob1");
-        System.out.println("project.getName() - " + project.getName());
-        
-        final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
-        assertEquals("Verify project history entry is empty.", 0, projectAction.getJobConfigs().size());
-
-        final FreeStyleBuild build = project.scheduleBuild2(0).get();
-        assertBuildStatus(Result.SUCCESS, build);
-        project.setDescription("bla");
-        Thread.sleep(SLEEP_TIME);
-        project.setDescription("blubb");
-        Thread.sleep(SLEEP_TIME);
-        assertEquals("Verify two project history entries.", 2, projectAction.getJobConfigs().size());
-        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-    }
-    
-    
-    
 }

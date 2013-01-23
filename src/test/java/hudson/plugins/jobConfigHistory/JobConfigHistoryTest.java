@@ -1,7 +1,10 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
+import hudson.model.AbstractBuild;
+import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
+import hudson.model.Result;
 import hudson.security.HudsonPrivateSecurityRealm;
 
 import java.io.File;
@@ -341,6 +344,32 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             fail("Unable to complete project creation/rename test: " + e);
         } catch (InterruptedException e) {
             fail("Interrupted, unable to test project deletion: " + e);
+        }
+    }
+    
+    /**
+     * Tests if project can still be built after the config history root dir has been changed.
+     * (I.e. the project exists but has no configs.)
+     */
+    public void testChangedRootDir() {
+        try {
+            final FreeStyleProject project = createFreeStyleProject("bla");
+            final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
+            assertTrue("Verify project history entry is not empty.", projectAction.getJobConfigs().size() > 0);
+            
+            final HtmlForm form = webClient.goTo("configure").getFormByName("config");
+            form.getInputByName("historyRootDir").setValueAttribute("newDir");
+            submit(form);
+
+            assertEquals("Verify project history entry is empty.", 0, projectAction.getJobConfigs().size());
+            assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+
+            project.save();
+            Thread.sleep(SLEEP_TIME);
+            assertTrue("Verify project history entry is not empty.", projectAction.getJobConfigs().size() > 0);
+            assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        } catch (Exception e) {
+            fail("Unable to complete changed root dir test: " + e);
         }
     }
 }
