@@ -41,6 +41,9 @@ public class JobConfigHistory extends Plugin {
     /** Maximum number of configuration history entries to keep. */
     private String maxHistoryEntries;
     
+    /** Maximum number of days to keep entries. */
+    private String maxDaysToKeepEntries;
+    
     /** Flag to indicate we should save 'system' level configurations
      *  A 'system' level configuration is defined as one stored directly
      *  under the HUDSON_ROOT directory.
@@ -53,7 +56,7 @@ public class JobConfigHistory extends Plugin {
     /** Flag to indicate if we should save history when it 
      *  is a duplication of the previous saved configuration.
      */
-    private boolean skipDuplicateHistory;
+    private boolean skipDuplicateHistory = true;
 
     /** Regular expression pattern for 'system' configuration
      *  files to exclude from saving.
@@ -99,6 +102,7 @@ public class JobConfigHistory extends Plugin {
 
         historyRootDir = formData.getString("historyRootDir").trim();
         maxHistoryEntries = formData.getString("maxHistoryEntries").trim();
+        maxDaysToKeepEntries = formData.getString("maxDaysToKeepEntries").trim();
         saveSystemConfiguration = formData.getBoolean("saveSystemConfiguration");
         saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
         skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
@@ -136,7 +140,23 @@ public class JobConfigHistory extends Plugin {
     protected void setMaxHistoryEntries(final String maxHistoryEntries) {
         this.maxHistoryEntries = maxHistoryEntries;
     }
+    
+    /**
+     * @return The maximum number of days to keep history entries.
+     */
+    public String getMaxDaysToKeepEntries() {
+        return maxDaysToKeepEntries;
+    }
 
+    /**
+     * This method is for convenience in testing.
+     * @param maxDays
+     *        For how long history entries should be kept (in days)
+     */
+    protected void setMaxDaysToKeepEntries(final String maxDays) {
+        this.maxDaysToKeepEntries = maxDays;
+    }
+    
     /**
      * @return true if we should save 'system' configurations.
      */
@@ -464,6 +484,24 @@ public class JobConfigHistory extends Plugin {
      * @return ok if the entry is blank or a non-negative integer.
      */
     public FormValidation doCheckMaxHistoryEntries(@QueryParameter final String value) {
+        try {
+            if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
+                throw new NumberFormatException();
+            }
+            return FormValidation.ok();
+        } catch (NumberFormatException ex) {
+            return FormValidation.error("Enter a valid positive integer");
+        }
+    }
+    
+    /**
+     * Validates the user entry for the maximum number of days to keep history items.
+     * Must be blank or a non-negative integer.
+     * @param value
+     *            The form input entered by the user.
+     * @return ok if the entry is blank or a non-negative integer.
+     */
+    public FormValidation doCheckMaxDaysToKeepEntries(@QueryParameter final String value) {
         try {
             if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
                 throw new NumberFormatException();

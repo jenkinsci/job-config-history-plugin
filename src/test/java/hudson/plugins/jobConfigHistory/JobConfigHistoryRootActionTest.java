@@ -143,7 +143,7 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
             secondProject.delete();
         } catch (Exception ex) {
             fail("Unable to prepare Hudson instance: " + ex);
-        }            
+        }
         try {
             final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
             final HtmlAnchor deletedLink = (HtmlAnchor) htmlPage.getElementById("deleted");

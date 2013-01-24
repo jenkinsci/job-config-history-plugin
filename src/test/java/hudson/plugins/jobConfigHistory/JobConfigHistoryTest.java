@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 
@@ -66,7 +67,7 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
         final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertTrue("Verify a system level configuration is saveable.", jch.isSaveable(hudson, hudsonConfig));
 
-//       assertTrue("Verify system configuration history location", jch.getHistoryDir(hudsonConfig).getParentFile().equals(jch.getSystemHistoryDir()));
+        assertTrue("Verify system configuration history location", jch.getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
         testCreateRenameDeleteProject(jch);
 
         assertNull("Verify null when attempting to get history dir for a file outside of HUDSON_ROOT.", jch.getHistoryDir(new XmlFile(new File("/tmp"))));
@@ -78,13 +79,12 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
 
         assertNull("Verify number of history entries to keep default setting.", jch.getMaxHistoryEntries());
         assertFalse("Verify system level configurations default setting.", jch.getSaveSystemConfiguration());
-        assertFalse("Verify skip duplicate history default setting.", jch.getSkipDuplicateHistory());
+        assertTrue("Verify skip duplicate history default setting.", jch.getSkipDuplicateHistory());
         assertNull("Verify unconfigured exclude pattern.", jch.getExcludePattern());
 
         final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertFalse("Verify a system level configuration is not saveable.", jch.isSaveable(hudson, hudsonConfig));
 
-        //getConfiguredHistoryRootDir() statt getSystemHistoryDir()?
         assertTrue("Verify system configuration history location", jch.getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
         testCreateRenameDeleteProject(jch);
     }
@@ -94,7 +94,6 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
         try {
             HtmlForm form = webClient.goTo("configure").getFormByName("config");
             form.getInputByName("saveSystemConfiguration").setChecked(true);
-            form.getInputByName("skipDuplicateHistory").setChecked(true);
             submit(form);
 
             final FreeStyleProject project = createFreeStyleProject("testproject");
@@ -287,9 +286,6 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
         try {
             final FreeStyleProject project = createFreeStyleProject("testproject");
             final File jobHistoryRootFile = jch.getJobHistoryRootDir();
-
-            // project configs should always be saveable
-            assertTrue("Verify new project is a saveable item.", jch.isSaveable(project, project.getConfigFile()));
 
             final File expectedConfigDir = new File(jobHistoryRootFile, "testproject");
             assertEquals("Verify history dir configured as expected.", expectedConfigDir, jch.getHistoryDir(project.getConfigFile()));
