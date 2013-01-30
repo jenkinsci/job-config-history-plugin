@@ -5,7 +5,9 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.FilePath;
+import hudson.model.AbstractProject;
 import hudson.model.FreeStyleProject;
+import hudson.model.Hudson;
 import hudson.security.HudsonPrivateSecurityRealm;
 
 import java.io.File;
@@ -14,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.jvnet.hudson.test.Bug;
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
@@ -100,5 +103,14 @@ public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDelet
             assertTrue("Verify history dir not able to be renamed on delete.", historyDir.exists());
             historyDir.getParentFile().setWritable(true);
         }
+    }
+    
+    @Bug(16499)
+    public void testCopyJob() throws Exception {
+        final String text = "This is a description.";
+        final FreeStyleProject project1 = createFreeStyleProject();
+        project1.setDescription(text);
+        final AbstractProject project2 = Hudson.getInstance().copy((AbstractProject)project1, "project2");
+        assertEquals("Copied project should have same description as original.", project2.getDescription(), text);
     }
 }
