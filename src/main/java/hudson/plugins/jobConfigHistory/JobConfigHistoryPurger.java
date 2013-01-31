@@ -34,8 +34,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     
     @Override
     public long getRecurrencePeriod() {
-        return MIN;
-//        return DAY;
+        return DAY;
     }
 
     @Override
