@@ -1,10 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
-import org.jvnet.hudson.test.recipes.LocalData;
-
-import hudson.model.FreeStyleBuild;
 import hudson.model.Result;
-import hudson.model.AbstractBuild;
 import hudson.model.FreeStyleProject;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;

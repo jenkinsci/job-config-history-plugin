@@ -1,7 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -27,9 +26,6 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     /**The logger.*/
     private static final Logger LOG = Logger.getLogger(JobConfigHistoryPurger.class.getName());
     
-    /**Number of milliseconds in a day.*/
-    private static final long MILLIS_IN_DAY = 24 * 60 * 60 * 1000;
-    
     /**Our plugin.*/
     private final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
     
@@ -38,8 +34,8 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     
     @Override
     public long getRecurrencePeriod() {
-//        return MIN;
-        return DAY;
+        return MIN;
+//        return DAY;
     }
 
     @Override
@@ -73,7 +69,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     
     /**
      * Traverse directories in order to find files which are too old.
-     * @param itemDirs 
+     * @param itemDirs Config history directories as file arrays.
      */
     private void purgeSystemOrJobHistory(File[] itemDirs) {
         for (File itemDir : itemDirs) {
@@ -83,8 +79,8 @@ public class JobConfigHistoryPurger extends PeriodicWork {
                 Arrays.sort(historyDirs);
                 for (File historyDir : historyDirs) {
                     //historyDir: z.B. 2013-01-18_17-33-51
-                    Calendar oldestAllowedDate = new GregorianCalendar();
-                    oldestAllowedDate.add(Calendar.DAY_OF_YEAR,-maxAge);
+                    final Calendar oldestAllowedDate = new GregorianCalendar();
+                    oldestAllowedDate.add(Calendar.DAY_OF_YEAR, -maxAge);
                     Date parsedDate = null;
                     final SimpleDateFormat dateParser = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);
                     try {
@@ -92,14 +88,16 @@ public class JobConfigHistoryPurger extends PeriodicWork {
                     } catch (ParseException ex) {
                         LOG.warning("Unable to parse Date: " + ex);
                     }
-                    Calendar historyDate = new GregorianCalendar();
-                    historyDate.setTime(parsedDate);
-                    
-                    if (historyDate.before(oldestAllowedDate)) {
-                        LOG.finest("Should delete: " + historyDir);
-                        deleteDirectory(historyDir);
-                    } else {
-                        break;
+                    final Calendar historyDate = new GregorianCalendar();
+                    if (parsedDate != null) {
+                        historyDate.setTime(parsedDate);
+                        
+                        if (historyDate.before(oldestAllowedDate)) {
+                            LOG.finest("Should delete: " + historyDir);
+                            deleteDirectory(historyDir);
+                        } else {
+                            break;
+                        }
                     }
                 }
             }

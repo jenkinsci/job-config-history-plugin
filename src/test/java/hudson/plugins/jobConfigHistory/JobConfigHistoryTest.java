@@ -1,8 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
-import hudson.model.AbstractBuild;
-import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.security.HudsonPrivateSecurityRealm;
@@ -13,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 

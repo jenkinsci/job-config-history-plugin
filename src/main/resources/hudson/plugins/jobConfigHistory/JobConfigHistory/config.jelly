@@ -9,6 +9,10 @@
         <f:textbox name="maxHistoryEntries" value="${it.maxHistoryEntries}"
            checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxHistoryEntries?value='+escape(this.value)"/>
       </f:entry>
+      <f:entry title="${%Max number of days to keep history entries}" help="/plugin/jobConfigHistory/help/help-maxDaysToKeepEntries.html">
+        <f:textbox name="maxDaysToKeepEntries" value="${it.maxDaysToKeepEntries}"
+           checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxDaysToKeepEntries?value='+escape(this.value)"/>
+      </f:entry>
       <f:entry title="${%Save ItemGroups configuration changes}" help="/plugin/jobConfigHistory/help/help-saveItemGroupConfiguration.html">
         <f:checkbox name="saveItemGroupConfiguration" checked="${it.saveItemGroupConfiguration}"/>
       </f:entry>

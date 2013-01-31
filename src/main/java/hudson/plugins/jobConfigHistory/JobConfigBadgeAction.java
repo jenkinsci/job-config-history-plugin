@@ -53,7 +53,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     @Override
     public void onStarted(AbstractBuild build, TaskListener listener) {
         final AbstractProject<?, ?> project = (AbstractProject<?, ?>) build.getProject();
-        if (project.getNextBuildNumber() == 2) {
+        if (project.getNextBuildNumber() <= 2) {
             super.onStarted(build, listener);
             return;
         }
