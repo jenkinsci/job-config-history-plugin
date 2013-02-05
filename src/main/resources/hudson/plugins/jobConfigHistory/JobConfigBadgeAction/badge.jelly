@@ -2,6 +2,6 @@
 	<a href="${it.createLink()}" id="showDiff">
 		<img width="16" height="16"
     	title="${it.getTooltip()}" alt="x"
-   		src="${rootURL}${it.getIcon()}"/>
+   		src="${resURL}${it.getIcon()}"/>
    	</a>
 </j:jelly>
