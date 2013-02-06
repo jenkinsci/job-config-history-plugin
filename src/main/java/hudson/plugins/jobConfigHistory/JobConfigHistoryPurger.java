@@ -91,6 +91,12 @@ public class JobConfigHistoryPurger extends PeriodicWork {
         }
     }
     
+    /**
+     * Checks if the history directory is too old by parsing its name as a date
+     * and comparing it to the current date minus the maximal allowed age in days.
+     * @param historyDir The history directory, e.g. 2013-01-18_17-33-51
+     * @return True if it is too old.
+     */
     private boolean isTooOld(File historyDir) {
         Date parsedDate = null;
         final SimpleDateFormat dateParser = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);

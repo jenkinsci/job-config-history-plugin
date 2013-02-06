@@ -47,6 +47,27 @@ public class JobConfigHistoryPurgerTest extends AbstractHudsonTestCaseDeletingIn
         assertTrue("Verify remaining entry is the newest one", lastEntry.asString().contains(message));
     }
     
+    @LocalData
+    public void testWithNegativeMaxAge() throws Exception {
+        testWithWrongMaxAge("-1");
+    }
+
+    @LocalData
+    public void testWithEmptyMaxAge() throws Exception {
+        testWithWrongMaxAge("");
+    }
+    
+    private void testWithWrongMaxAge(String maxAge) throws Exception {
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        final File hudsonConfigDir = new File(jch.getConfiguredHistoryRootDir() + "/config");
+        assertEquals("Verify 5 original system config history entries.", 5, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+
+        jch.setMaxDaysToKeepEntries(maxAge);
+        JobConfigHistoryPurger purger = new JobConfigHistoryPurger();
+        purger.run();
+        assertEquals("Verify that 5 original entries are still there.", 5, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+    }
+    
     public void testJobHistoryPurger() throws Exception {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
         jch.setMaxDaysToKeepEntries("10");
@@ -81,4 +102,5 @@ public class JobConfigHistoryPurgerTest extends AbstractHudsonTestCaseDeletingIn
         final SimpleDateFormat formatter = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);
         return formatter.format(calendar.getTime());
     }
+    
 }
