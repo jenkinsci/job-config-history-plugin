@@ -71,27 +71,15 @@ public class JobConfigHistoryPurger extends PeriodicWork {
      * @param itemDirs Config history directories as file arrays.
      */
     private void purgeSystemOrJobHistory(File[] itemDirs) {
-        for (File itemDir : itemDirs) {
-            //itemDir: z.B. Test2 oder hudson.tasks.Ant
-            final File[] historyDirs = itemDir.listFiles(JobConfigHistory.HISTORY_FILTER);
-            if (historyDirs != null) {
-                Arrays.sort(historyDirs);
-                for (File historyDir : historyDirs) {
-                    //historyDir: z.B. 2013-01-18_17-33-51
-                    final Calendar oldestAllowedDate = new GregorianCalendar();
-                    oldestAllowedDate.add(Calendar.DAY_OF_YEAR, -maxAge);
-                    Date parsedDate = null;
-                    final SimpleDateFormat dateParser = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);
-                    try {
-                        parsedDate = dateParser.parse(historyDir.getName());
-                    } catch (ParseException ex) {
-                        LOG.warning("Unable to parse Date: " + ex);
-                    }
-                    final Calendar historyDate = new GregorianCalendar();
-                    if (parsedDate != null) {
-                        historyDate.setTime(parsedDate);
-                        
-                        if (historyDate.before(oldestAllowedDate)) {
+        if (itemDirs != null && itemDirs.length > 0) {
+            for (File itemDir : itemDirs) {
+                //itemDir: z.B. Test2 or hudson.tasks.Ant
+                final File[] historyDirs = itemDir.listFiles(JobConfigHistory.HISTORY_FILTER);
+                if (historyDirs != null) {
+                    Arrays.sort(historyDirs);
+                    for (File historyDir : historyDirs) {
+                        //historyDir: e.g. 2013-01-18_17-33-51
+                        if (isTooOld(historyDir)) {
                             LOG.finest("Should delete: " + historyDir);
                             deleteDirectory(historyDir);
                         } else {
@@ -101,6 +89,26 @@ public class JobConfigHistoryPurger extends PeriodicWork {
                 }
             }
         }
+    }
+    
+    private boolean isTooOld(File historyDir) {
+        Date parsedDate = null;
+        final SimpleDateFormat dateParser = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);
+        try {
+            parsedDate = dateParser.parse(historyDir.getName());
+        } catch (ParseException ex) {
+            LOG.warning("Unable to parse Date: " + ex);
+        }
+        final Calendar historyDate = new GregorianCalendar();
+        if (parsedDate != null) {
+            historyDate.setTime(parsedDate);
+            final Calendar oldestAllowedDate = new GregorianCalendar();
+            oldestAllowedDate.add(Calendar.DAY_OF_YEAR, -maxAge);
+            if (historyDate.before(oldestAllowedDate)) {
+                return true;
+            }
+        }
+        return false;
     }
  
     /**

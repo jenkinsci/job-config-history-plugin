@@ -48,15 +48,17 @@ public class JobConfigHistoryPurgerTest extends AbstractHudsonTestCaseDeletingIn
     }
     
     public void testJobHistoryPurger() throws Exception {
-        final String name = "TestJob";
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        jch.setMaxDaysToKeepEntries("10");
+        JobConfigHistoryPurger purger = new JobConfigHistoryPurger();
+        purger.run();
+
+        final String name = "TestJob";
         final File historyDir = new File(jch.getJobHistoryRootDir(), name);
-        
         createDirectories(historyDir);
         assertEquals("Verify 3 original project history entries.", 3,  historyDir.listFiles().length);
 
         jch.setMaxDaysToKeepEntries("3");
-        JobConfigHistoryPurger purger = new JobConfigHistoryPurger();
         purger.run();
         assertEquals("Verify only 1 history entry left after purging.", 1,  historyDir.listFiles().length);
     }
