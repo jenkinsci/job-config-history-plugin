@@ -110,11 +110,7 @@ public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDelet
         final String text = "This is a description.";
         final FreeStyleProject project1 = createFreeStyleProject();
         project1.setDescription(text);
-<<<<<<< HEAD
-
-=======
         final AbstractProject project2 = hudson.copy((AbstractProject)project1, "project2");
->>>>>>> 5b55dbf17580cfa17bccfa786a876c75c02ee922
         assertEquals("Copied project should have same description as original.", project2.getDescription(), text);
     }
 }
