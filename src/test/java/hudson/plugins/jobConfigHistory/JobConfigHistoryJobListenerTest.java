@@ -7,7 +7,6 @@ package hudson.plugins.jobConfigHistory;
 import hudson.FilePath;
 import hudson.model.AbstractProject;
 import hudson.model.FreeStyleProject;
-import hudson.model.Hudson;
 import hudson.security.HudsonPrivateSecurityRealm;
 
 import java.io.File;
