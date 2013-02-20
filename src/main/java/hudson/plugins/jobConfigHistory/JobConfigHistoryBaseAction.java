@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -49,6 +50,9 @@ import bmsi.util.Diff.change;
  * @author mfriedenhagen
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
+
+    /** Our logger. */
+    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());    
 
     /**
      * The hudson instance.
@@ -190,8 +194,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return True if parameters are okay.
      */
     private boolean checkParameters(String name, String timestamp) {
-        if (name == null || timestamp == null) {
-            throw new IllegalArgumentException("Name (" + name + ") or timestamp (" + timestamp + ") missing");
+        if (name == null || timestamp == null || "null".equals(name) || "null".equals(timestamp)) {
+            return false;
         }
         if (name.contains("..")) {
             throw new IllegalArgumentException("Invalid directory name because of '..': " + name);
