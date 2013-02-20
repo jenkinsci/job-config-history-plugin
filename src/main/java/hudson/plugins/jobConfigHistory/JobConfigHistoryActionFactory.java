@@ -37,4 +37,8 @@ public class JobConfigHistoryActionFactory extends TransientProjectActionFactory
         actions.add(newAction);
         return actions;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 5b55dbf17580cfa17bccfa786a876c75c02ee922

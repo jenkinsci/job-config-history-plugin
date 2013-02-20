@@ -1,7 +1,8 @@
 package hudson.plugins.jobConfigHistory;
 
+import org.jvnet.hudson.test.recipes.LocalData;
+
 import hudson.model.Result;
-import hudson.model.AbstractBuild;
 import hudson.model.FreeStyleProject;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
@@ -22,18 +23,22 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         final String jobName = "newjob";
         final String description = "a description";
         final FreeStyleProject project = createFreeStyleProject(jobName);
-        AbstractBuild<?,?> build = project.scheduleBuild2(0).get();
-        assertTrue("Build should succeed", build.getResult().equals(Result.SUCCESS));
 
-        final HtmlPage htmlPage = webClient.goTo("job/" + jobName);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        HtmlPage htmlPage = webClient.goTo("job/" + jobName);
         assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        htmlPage = (HtmlPage)htmlPage.refresh();
+        assertFalse("Page should still not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
         
         project.setDescription(description);
         Thread.sleep(SLEEP_TIME);
-        project.scheduleBuild2(0).get();
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
         
-        final HtmlPage htmlPage2 = webClient.goTo("job/" + jobName);
-        assertTrue("Page should contain build badge", htmlPage2.asXml().contains("buildbadge.png"));
+        htmlPage = (HtmlPage)htmlPage.refresh();
+        System.out.println(htmlPage.asXml());
+        assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
     }
     
     public void testBadgeAfterRename() throws Exception {
@@ -41,8 +46,7 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         final String newJobName = "secondjobname";
 
         final FreeStyleProject project = createFreeStyleProject(oldJobName);
-        AbstractBuild<?,?> build = project.scheduleBuild2(0).get();
-        assertTrue("Build should succeed", build.getResult().equals(Result.SUCCESS));
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
         Thread.sleep(SLEEP_TIME);
 
         project.renameTo(newJobName);
@@ -66,8 +70,7 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
 
         final FreeStyleProject project = createFreeStyleProject(oldJobName);
         project.setDescription(oldDescription);
-        AbstractBuild<?,?> build = project.scheduleBuild2(0).get();
-        assertTrue("Build should succeed", build.getResult().equals(Result.SUCCESS));
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
         Thread.sleep(SLEEP_TIME);
 
         project.setDescription(newDescription);
@@ -88,5 +91,26 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         final HtmlAnchor oldShowDiffLink = (HtmlAnchor) htmlPage2.getByXPath("//a[@id='showDiff']").get(1);
         final HtmlPage showDiffPage2 = oldShowDiffLink.click();
         assertTrue("ShowDiffFiles page should be reached now", showDiffPage2.asText().contains("Restore old version"));
+    }
+    
+    public void testProjectWithConfigsButMissingBuilds() throws Exception {
+        final FreeStyleProject project = createFreeStyleProject();
+        Thread.sleep(SLEEP_TIME);
+        project.setDescription("bla");
+        Thread.sleep(SLEEP_TIME);
+        project.updateNextBuildNumber(5);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+    }
+   
+    @LocalData
+    public void testBuildWithoutHistoryDir() throws Exception {
+        final FreeStyleProject project = (FreeStyleProject) hudson.getItem("Test1");
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+    }
+    
+    @LocalData
+    public void testBuildWithoutHistoryEntries() throws Exception {
+        final FreeStyleProject project = (FreeStyleProject) hudson.getItem("Test2");
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
     }
 }

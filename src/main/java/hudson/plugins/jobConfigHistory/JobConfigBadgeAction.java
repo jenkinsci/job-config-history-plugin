@@ -53,11 +53,15 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     @Override
     public void onStarted(AbstractBuild build, TaskListener listener) {
         final AbstractProject<?, ?> project = (AbstractProject<?, ?>) build.getProject();
-        if (project.getNextBuildNumber() == 2) {
+        if (project.getNextBuildNumber() <= 2) {
             super.onStarted(build, listener);
             return;
         }
-        final Date lastBuildDate = project.getLastBuild().getPreviousBuild().getTime();
+
+        Date lastBuildDate = null;
+        if (project.getLastBuild().getPreviousBuild() != null) {
+            lastBuildDate = project.getLastBuild().getPreviousBuild().getTime();
+        }
         
         //get timestamp of config-change
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
@@ -83,12 +87,12 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
             try {
                 final Date lastConfigChange = new SimpleDateFormat(
                         JobConfigHistoryConsts.ID_FORMATTER).parse(lastChange.getDate());
-                if (lastConfigChange.after(lastBuildDate)) {
+                if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
                     final String[] dates = {lastChange.getDate(), penultimateChange.getDate()};
                     build.addAction(new JobConfigBadgeAction(dates, build));
                 }
-            } catch (ParseException e) {
-                LOG.finest("Could not parse Date: " + e);
+            } catch (ParseException ex) {
+                LOG.finest("Could not parse Date: " + ex);
             }
         }
 
@@ -110,7 +114,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
      * @return Explanatory text as string
      */
     public String getTooltip() {
-        return "Config changed since last build.";
+        return Messages.JobConfigBadgeAction_ToolTip();
     }
 
     /**
