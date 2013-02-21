@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -50,9 +49,6 @@ import bmsi.util.Diff.change;
  * @author mfriedenhagen
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
-
-    /** Our logger. */
-    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());    
 
     /**
      * The hudson instance.
