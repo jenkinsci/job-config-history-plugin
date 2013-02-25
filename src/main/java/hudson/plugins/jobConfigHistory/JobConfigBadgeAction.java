@@ -52,8 +52,11 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
 
     @Override
     public void onStarted(AbstractBuild build, TaskListener listener) {
+        
         final AbstractProject<?, ?> project = (AbstractProject<?, ?>) build.getProject();
-        if (project.getNextBuildNumber() <= 2) {
+
+        if (!Hudson.getInstance().getPlugin(JobConfigHistory.class).showBuildBadges(project)
+                || project.getNextBuildNumber() <= 2) {
             super.onStarted(build, listener);
             return;
         }
@@ -97,6 +100,37 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         }
 
         super.onStarted(build, listener);
+    }
+    
+    private void findNextChangeDate(ArrayList<ConfigInfo> configs, Date lastBuildDate) {
+        Collections.sort(configs, ConfigInfoComparator.INSTANCE);
+        final ConfigInfo lastChange = Collections.min(configs, ConfigInfoComparator.INSTANCE);
+        final Date lastConfigChange = parseDate(lastChange);
+
+        if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
+            ConfigInfo olderConfigChange = configs.get(1);
+            for (int i=2; i<configs.size(); i++) {
+                Date olderChangeDate = parseDate(configs.get(i));
+                if (olderChangeDate != null && olderChangeDate.after(lastBuildDate)) {
+                    olderConfigChange = configs.get(i);
+                } else {
+                    break;
+                }
+            }
+
+            final String[] dates = {lastChange.getDate(), olderConfigChange.getDate()};
+            build.addAction(new JobConfigBadgeAction(dates, build));
+        }
+    }
+    
+    private Date parseDate (ConfigInfo config) {
+        Date date = null;
+        try {
+            date = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(config.getDate());
+        } catch (ParseException ex) {
+            LOG.finest("Could not parse Date: " + ex);
+        }
+        return date;
     }
     
     /**
