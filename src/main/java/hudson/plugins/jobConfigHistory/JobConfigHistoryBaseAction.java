@@ -190,8 +190,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return True if parameters are okay.
      */
     private boolean checkParameters(String name, String timestamp) {
-        if (name == null || timestamp == null) {
-            throw new IllegalArgumentException("Name (" + name + ") or timestamp (" + timestamp + ") missing");
+        if (name == null || timestamp == null || "null".equals(name) || "null".equals(timestamp)) {
+            return false;
         }
         if (name.contains("..")) {
             throw new IllegalArgumentException("Invalid directory name because of '..': " + name);
