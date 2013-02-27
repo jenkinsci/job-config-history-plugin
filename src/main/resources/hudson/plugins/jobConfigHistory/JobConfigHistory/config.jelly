@@ -27,12 +27,13 @@
         <f:checkbox name="skipDuplicateHistory" checked="${it.skipDuplicateHistory}"/>
       </f:entry>
       <f:entry title="${%Show build badges}" help="/plugin/jobConfigHistory/help/help-showBuildBadges.html">
-        <f:radio name="showBuildBadges" value="never" checked="${it.getShowBuildBadges() == 'never'}"/>
-        ${%Never}<br />
-    	<f:radio name="showBuildBadges" value="always" checked="${it.getShowBuildBadges() == 'always'}"/>
-        ${%Always}<br />
-    	<f:radio name="showBuildBadges" value="userWithPermission" checked="${it.getShowBuildBadges() == 'userWithPermission'}"/>
-        ${%Only for users with configuration permission}<br />
+        <f:radio name="showBuildBadges" title="${%Never}" value="never" checked="${it.getShowBuildBadges() == 'never'}"/>
+        <br />
+    	<f:radio name="showBuildBadges" title="${%Always}" value="always" checked="${it.getShowBuildBadges() == 'always'}"/>
+        <br />
+    	<f:radio name="showBuildBadges" title="${%Only for users with configuration permission}" value="userWithConfigPermission" checked="${it.getShowBuildBadges() == 'userWithConfigPermission'}"/>
+        <br />
+        <f:radio name="showBuildBadges" title="${%Only for administrators}" value="adminUser" checked="${it.getShowBuildBadges() == 'adminUser'}"/>
       </f:entry>
     </f:advanced>
   </f:section>

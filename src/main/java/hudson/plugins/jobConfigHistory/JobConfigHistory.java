@@ -21,6 +21,8 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletException;
 
+import jenkins.model.Jenkins;
+
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -70,7 +72,7 @@ public class JobConfigHistory extends Plugin {
      * Whether build badges should appear when the config of a job has changed since the last build.
      * Three possible settings: Never, always, only for users with config permission. 
      */
-    private String showBuildBadges;
+    private String showBuildBadges = "always";
 
     /** our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistory.class.getName());
@@ -219,13 +221,14 @@ public class JobConfigHistory extends Plugin {
      * Whether build badges should appear for the builds of this project for this user.
      * 
      * @param project The project to which the build history belongs.
-     * @return True if the option is set to 'always' or 'userWithPermission' 
-     *          and user has configure permission for the respective project.
+     * @return False if the option is set to 'never' or the user doesn't have the required permissions.
      */
     boolean showBuildBadges(AbstractProject<?, ?> project) {
         if ("always".equals(showBuildBadges)) {
             return true;
-        } else if ("userWithPermission".equals(showBuildBadges) && project.hasPermission(AbstractProject.CONFIGURE)) {
+        } else if ("userWithConfigPermission".equals(showBuildBadges) && project.hasPermission(AbstractProject.CONFIGURE)) {
+            return true;
+        } else if ("adminUser".equals(showBuildBadges) && Hudson.getInstance().hasPermission(Jenkins.ADMINISTER)) {
             return true;
         }
         return false;

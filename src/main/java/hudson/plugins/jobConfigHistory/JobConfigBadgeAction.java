@@ -54,9 +54,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     public void onStarted(AbstractBuild build, TaskListener listener) {
         
         final AbstractProject<?, ?> project = (AbstractProject<?, ?>) build.getProject();
-
-        if (!Hudson.getInstance().getPlugin(JobConfigHistory.class).showBuildBadges(project)
-                || project.getNextBuildNumber() <= 2) {
+        if (project.getNextBuildNumber() <= 2) {
             super.onStarted(build, listener);
             return;
         }
@@ -131,6 +129,10 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
             LOG.finest("Could not parse Date: " + ex);
         }
         return date;
+    }
+    
+    public boolean showBadge() {
+        return Hudson.getInstance().getPlugin(JobConfigHistory.class).showBuildBadges(build.getProject());
     }
     
     /**
