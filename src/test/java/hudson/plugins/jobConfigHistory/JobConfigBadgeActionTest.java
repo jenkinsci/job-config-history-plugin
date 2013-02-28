@@ -4,6 +4,9 @@ import org.jvnet.hudson.test.recipes.LocalData;
 
 import hudson.model.Result;
 import hudson.model.FreeStyleProject;
+import hudson.security.GlobalMatrixAuthorizationStrategy;
+import hudson.security.HudsonPrivateSecurityRealm;
+import hudson.security.LegacyAuthorizationStrategy;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -37,7 +40,6 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
         
         htmlPage = (HtmlPage)htmlPage.refresh();
-        System.out.println(htmlPage.asXml());
         assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
     }
     
@@ -113,4 +115,38 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         final FreeStyleProject project = (FreeStyleProject) hudson.getItem("Test2");
         assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
     }
+    
+    public void testBadgeConfigurationOptions() throws Exception {
+        final String jobName = "newjob";
+        final String description = "a description";
+        final FreeStyleProject project = createFreeStyleProject(jobName);
+
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
+        project.setDescription(description);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        
+        HtmlPage htmlPage = webClient.goTo("job/" + jobName);
+        //default = always
+        assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        jch.setShowBuildBadges("never");
+        htmlPage = (HtmlPage)htmlPage.refresh();
+        assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+
+        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(false, false, null));
+        hudson.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
+        jch.setShowBuildBadges("userWithConfigPermission");
+        htmlPage = (HtmlPage)htmlPage.refresh();
+        assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        
+        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true, false, null));
+        hudson.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
+        jch.setShowBuildBadges("userWithConfigPermission");
+        htmlPage = (HtmlPage)htmlPage.refresh();
+        assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+    }
+    
 }

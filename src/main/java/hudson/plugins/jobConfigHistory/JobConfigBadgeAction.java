@@ -79,46 +79,32 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
                 LOG.finest("Could not parse history files: " + ex);
             }
         }
-
+        
         if (configs.size() > 1) {
             Collections.sort(configs, ConfigInfoComparator.INSTANCE);
             final ConfigInfo lastChange = Collections.min(configs, ConfigInfoComparator.INSTANCE);
-            final ConfigInfo penultimateChange = configs.get(1);
-            
-            try {
-                final Date lastConfigChange = new SimpleDateFormat(
-                        JobConfigHistoryConsts.ID_FORMATTER).parse(lastChange.getDate());
-                if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
-                    final String[] dates = {lastChange.getDate(), penultimateChange.getDate()};
-                    build.addAction(new JobConfigBadgeAction(dates, build));
-                }
-            } catch (ParseException ex) {
-                LOG.finest("Could not parse Date: " + ex);
+            final Date lastConfigChange = parseDate(lastChange);
+
+            if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
+                final String[] dates = {lastChange.getDate(), findLastChangeDate(configs, lastBuildDate)};
+                build.addAction(new JobConfigBadgeAction(dates, build));
             }
         }
 
         super.onStarted(build, listener);
     }
     
-    private void findNextChangeDate(ArrayList<ConfigInfo> configs, Date lastBuildDate) {
-        Collections.sort(configs, ConfigInfoComparator.INSTANCE);
-        final ConfigInfo lastChange = Collections.min(configs, ConfigInfoComparator.INSTANCE);
-        final Date lastConfigChange = parseDate(lastChange);
-
-        if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
-            ConfigInfo olderConfigChange = configs.get(1);
-            for (int i=2; i<configs.size(); i++) {
-                Date olderChangeDate = parseDate(configs.get(i));
-                if (olderChangeDate != null && olderChangeDate.after(lastBuildDate)) {
-                    olderConfigChange = configs.get(i);
-                } else {
-                    break;
-                }
+    private String findLastChangeDate(ArrayList<ConfigInfo> configs, Date lastBuildDate) {
+        ConfigInfo olderConfigChange = configs.get(1);
+        for (int i=2; i<configs.size(); i++) {
+            Date olderChangeDate = parseDate(configs.get(i));
+            if (olderChangeDate != null && olderChangeDate.after(lastBuildDate)) {
+                olderConfigChange = configs.get(i);
+            } else {
+                break;
             }
-
-            final String[] dates = {lastChange.getDate(), olderConfigChange.getDate()};
-            build.addAction(new JobConfigBadgeAction(dates, build));
         }
+        return olderConfigChange.getDate();
     }
     
     private Date parseDate (ConfigInfo config) {

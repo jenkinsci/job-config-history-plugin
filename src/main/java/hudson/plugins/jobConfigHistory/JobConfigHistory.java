@@ -218,6 +218,14 @@ public class JobConfigHistory extends Plugin {
     }
     
     /**
+     * Used for testing only.
+     * @param String Never, always, userWithConfigPermission or adminUser.
+     */
+    public void setShowBuildBadges(String showBadges) {
+        showBuildBadges = showBadges;
+    }
+
+    /**
      * Whether build badges should appear for the builds of this project for this user.
      * 
      * @param project The project to which the build history belongs.

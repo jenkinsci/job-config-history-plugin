@@ -51,6 +51,7 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             form.getInputByName("skipDuplicateHistory").setChecked(false);
             form.getInputByName("excludePattern").setValueAttribute(JobConfigHistoryConsts.DEFAULT_EXCLUDE);
             form.getInputByName("historyRootDir").setValueAttribute("jobConfigHistory");
+            form.getInputByValue("never").setChecked(true);
             submit(form);
         } catch (Exception e) {
             fail("unable to configure Hudson instance " + e);
@@ -60,6 +61,7 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
         assertFalse("Verify skip duplicate history setting.", jch.getSkipDuplicateHistory());
         assertEquals("Verify configured history root directory.", new File(hudson.root + "/jobConfigHistory/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
         assertEquals("Verify exclude pattern setting.", JobConfigHistoryConsts.DEFAULT_EXCLUDE, jch.getExcludePattern());
+        assertEquals("Verify build badges setting.", "never", jch.getShowBuildBadges());
 
         final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertTrue("Verify a system level configuration is saveable.", jch.isSaveable(hudson, hudsonConfig));
@@ -78,6 +80,7 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
         assertFalse("Verify system level configurations default setting.", jch.getSaveSystemConfiguration());
         assertTrue("Verify skip duplicate history default setting.", jch.getSkipDuplicateHistory());
         assertNull("Verify unconfigured exclude pattern.", jch.getExcludePattern());
+        assertEquals("Verify build badges setting.", "always", jch.getShowBuildBadges());
 
         final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertFalse("Verify a system level configuration is not saveable.", jch.isSaveable(hudson, hudsonConfig));
