@@ -1,9 +1,17 @@
 package hudson.plugins.jobConfigHistory;
 
+import java.io.IOException;
+
+import org.acegisecurity.context.SecurityContextHolder;
 import org.jvnet.hudson.test.recipes.LocalData;
+import org.jvnet.hudson.test.recipes.PresetData;
+import org.jvnet.hudson.test.recipes.PresetData.DataSet;
 
 import hudson.model.Result;
+import hudson.model.AbstractProject;
 import hudson.model.FreeStyleProject;
+import hudson.model.Hudson;
+import hudson.model.User;
 import hudson.security.GlobalMatrixAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.security.LegacyAuthorizationStrategy;
@@ -116,6 +124,7 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
     }
     
+    @PresetData(DataSet.ANONYMOUS_READONLY)
     public void testBadgeConfigurationOptions() throws Exception {
         final String jobName = "newjob";
         final String description = "a description";
@@ -127,26 +136,35 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         Thread.sleep(SLEEP_TIME);
         assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
         
-        HtmlPage htmlPage = webClient.goTo("job/" + jobName);
         //default = always
-        assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        shouldPageContainBadge(true);
 
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
         jch.setShowBuildBadges("never");
-        htmlPage = (HtmlPage)htmlPage.refresh();
-        assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        shouldPageContainBadge(false);
 
-        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(false, false, null));
-        hudson.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
+        hudson.setSecurityRealm(createDummySecurityRealm());
+        SecurityContextHolder.getContext().setAuthentication(Hudson.ANONYMOUS);
         jch.setShowBuildBadges("userWithConfigPermission");
-        htmlPage = (HtmlPage)htmlPage.refresh();
-        assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        shouldPageContainBadge(false);
         
-        hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true, false, null));
-        hudson.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
+        jch.setShowBuildBadges("adminUser");
+        shouldPageContainBadge(false);
+
+        webClient.login("gustav");
+        shouldPageContainBadge(true);
+        
         jch.setShowBuildBadges("userWithConfigPermission");
-        htmlPage = (HtmlPage)htmlPage.refresh();
-        assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        shouldPageContainBadge(true);
+
     }
     
+    private void shouldPageContainBadge(boolean bool) throws Exception{
+        HtmlPage htmlPage = webClient.goTo("job/newJob");
+        if (bool) {
+            assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        } else {
+            assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        }
+    }
 }
