@@ -1,20 +1,13 @@
 package hudson.plugins.jobConfigHistory;
 
-import java.io.IOException;
-
 import org.acegisecurity.context.SecurityContextHolder;
 import org.jvnet.hudson.test.recipes.LocalData;
 import org.jvnet.hudson.test.recipes.PresetData;
 import org.jvnet.hudson.test.recipes.PresetData.DataSet;
 
 import hudson.model.Result;
-import hudson.model.AbstractProject;
 import hudson.model.FreeStyleProject;
 import hudson.model.Hudson;
-import hudson.model.User;
-import hudson.security.GlobalMatrixAuthorizationStrategy;
-import hudson.security.HudsonPrivateSecurityRealm;
-import hudson.security.LegacyAuthorizationStrategy;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;

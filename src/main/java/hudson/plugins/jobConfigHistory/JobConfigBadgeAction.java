@@ -95,16 +95,15 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     }
     
     private String findLastChangeDate(ArrayList<ConfigInfo> configs, Date lastBuildDate) {
-        ConfigInfo olderConfigChange = configs.get(1);
-        for (int i=2; i<configs.size(); i++) {
-            Date olderChangeDate = parseDate(configs.get(i));
-            if (olderChangeDate != null && olderChangeDate.after(lastBuildDate)) {
+        for (int i=1; i<configs.size(); i++) {
+            ConfigInfo olderConfigChange = configs.get(i);
+            Date olderChangeDate = parseDate(olderConfigChange);
+            if (olderChangeDate != null && olderChangeDate.before(lastBuildDate)) {
                 olderConfigChange = configs.get(i);
-            } else {
-                break;
+                return olderConfigChange.getDate();
             }
         }
-        return olderConfigChange.getDate();
+        return configs.get(1).getDate();
     }
     
     private Date parseDate (ConfigInfo config) {
