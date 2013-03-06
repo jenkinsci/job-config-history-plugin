@@ -86,7 +86,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
             final Date lastConfigChange = parseDate(lastChange);
 
             if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
-                final String[] dates = {lastChange.getDate(), findLastChangeDate(configs, lastBuildDate)};
+                final String[] dates = {lastChange.getDate(), findLastRelevantConfigChangeDate(configs, lastBuildDate)};
                 build.addAction(new JobConfigBadgeAction(dates, build));
             }
         }
@@ -94,19 +94,33 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         super.onStarted(build, listener);
     }
     
-    private String findLastChangeDate(ArrayList<ConfigInfo> configs, Date lastBuildDate) {
-        for (int i=1; i<configs.size(); i++) {
-            ConfigInfo olderConfigChange = configs.get(i);
-            Date olderChangeDate = parseDate(olderConfigChange);
-            if (olderChangeDate != null && olderChangeDate.before(lastBuildDate)) {
-                olderConfigChange = configs.get(i);
-                return olderConfigChange.getDate();
+    /**
+     * Finds the date of the last config change that happened before the last build.
+     * This is needed for the link in the build history that shows the difference between the current
+     * configuration and the version that was in place when the last build happened. 
+     * 
+     * @param configs An ArrayList full of ConfigInfos.
+     * @param lastBuildDate The date of the lastBuild (as Date).
+     * @return The date of the last relevant config change (as String).
+     */
+    private String findLastRelevantConfigChangeDate(ArrayList<ConfigInfo> configs, Date lastBuildDate) {
+        for (int i = 1; i < configs.size(); i++) {
+            final ConfigInfo oldConfigChange = configs.get(i);
+            final Date changeDate = parseDate(oldConfigChange);
+            if (changeDate != null && changeDate.before(lastBuildDate)) {
+                return oldConfigChange.getDate();
             }
         }
         return configs.get(1).getDate();
     }
     
-    private Date parseDate (ConfigInfo config) {
+    /**
+     * Parses the date from a config info into a java.util.Date.
+     * 
+     * @param config A ConfigInfo.
+     * @return The parsed date as a java.util.Date.
+     */
+    private Date parseDate(ConfigInfo config) {
         Date date = null;
         try {
             date = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(config.getDate());
@@ -116,6 +130,13 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         return date;
     }
     
+    /**
+     * Returns true if the config change build badges should appear
+     * (depending on plugin settings and user permissions).
+     * Called from badge.jelly.
+     * 
+     * @return True if badges should appear.
+     */
     public boolean showBadge() {
         return Hudson.getInstance().getPlugin(JobConfigHistory.class).showBuildBadges(build.getProject());
     }

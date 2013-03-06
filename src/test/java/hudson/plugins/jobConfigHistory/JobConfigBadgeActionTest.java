@@ -153,11 +153,69 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
     }
     
     private void shouldPageContainBadge(boolean bool) throws Exception{
-        HtmlPage htmlPage = webClient.goTo("job/newJob");
+        HtmlPage htmlPage = webClient.goTo("job/newjob");
         if (bool) {
             assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
         } else {
             assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
         }
+    }
+    
+    public void testCorrectShowDiffLinkWithSingleChange() throws Exception {
+        final String jobName = "testjob";
+        final FreeStyleProject project = createFreeStyleProject(jobName);
+        project.setDescription("first description");
+        Thread.sleep(SLEEP_TIME);
+
+        final String secondDescription = "second description";
+        project.setDescription(secondDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
+        
+        final String lastDescription = "last description";
+        project.setDescription(lastDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+
+        HtmlPage htmlPage = webClient.goTo("job/" + jobName);
+        assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+
+        final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage.getElementById("showDiff");
+        final HtmlPage showDiffPage = showDiffLink.click();
+        final String page = showDiffPage.asText();
+        assertTrue("ShowDiffFiles page should be reached now", page.contains("Restore old version"));
+        assertTrue("ShowDiff page should contain second description", page.contains(secondDescription));
+        assertTrue("ShowDiff page should contain last description", page.contains(lastDescription));
+    }
+
+    public void testCorrectShowDiffLinkWithMultipleChanges() throws Exception {
+        final String jobName = "testjob";
+
+        final FreeStyleProject project = createFreeStyleProject(jobName);
+        project.setDescription("first description");
+        Thread.sleep(SLEEP_TIME);
+        final String secondDescription = "second description";
+        project.setDescription(secondDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
+
+        for (int i = 3; i < 6; i++) {
+            project.setDescription("decription no. " + i);
+            Thread.sleep(SLEEP_TIME);
+        }
+        final String lastDescription = "last description";
+        project.setDescription(lastDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+
+        HtmlPage htmlPage = webClient.goTo("job/" + jobName);
+        final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage.getElementById("showDiff");
+        final HtmlPage showDiffPage = showDiffLink.click();
+        final String page = showDiffPage.asText();
+        assertTrue("ShowDiffFiles page should be reached now", page.contains("Restore old version"));
+        assertTrue("ShowDiff page should contain second description", page.contains(secondDescription));
+        assertTrue("ShowDiff page should contain last description", page.contains(lastDescription));
     }
 }
