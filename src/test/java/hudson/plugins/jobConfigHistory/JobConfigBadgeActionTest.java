@@ -40,7 +40,6 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         project.setDescription(description);
         Thread.sleep(SLEEP_TIME);
         assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-        Thread.sleep(SLEEP_TIME);
         
         htmlPage = (HtmlPage)htmlPage.refresh();
         assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));

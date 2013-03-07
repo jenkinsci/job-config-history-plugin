@@ -486,7 +486,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             /**
              * Simple representation of a diff element.
              *
-             * Additional to the the text rhis includes the linenumber
+             * Additional to the the text this includes the linenumber
              * as well as the corresponding cssClass which signals wether
              * the item was modified, added or deleted.
              */
