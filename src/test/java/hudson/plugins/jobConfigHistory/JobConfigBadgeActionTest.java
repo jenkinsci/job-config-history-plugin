@@ -8,6 +8,7 @@ import org.jvnet.hudson.test.recipes.PresetData.DataSet;
 import hudson.model.Result;
 import hudson.model.FreeStyleProject;
 import hudson.model.Hudson;
+import hudson.model.User;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -39,6 +40,7 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         project.setDescription(description);
         Thread.sleep(SLEEP_TIME);
         assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
         
         htmlPage = (HtmlPage)htmlPage.refresh();
         assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
@@ -116,9 +118,9 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         final FreeStyleProject project = (FreeStyleProject) hudson.getItem("Test2");
         assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
     }
-    
+
     @PresetData(DataSet.ANONYMOUS_READONLY)
-    public void testBadgeConfigurationOptions() throws Exception {
+    public void testBadgeConfigurationAnonymous() throws Exception {
         final String jobName = "newjob";
         final String description = "a description";
         final FreeStyleProject project = createFreeStyleProject(jobName);
@@ -129,38 +131,61 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         Thread.sleep(SLEEP_TIME);
         assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
         
-        //default = always
-        shouldPageContainBadge(true);
-
-        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        jch.setShowBuildBadges("never");
-        shouldPageContainBadge(false);
-
         hudson.setSecurityRealm(createDummySecurityRealm());
         SecurityContextHolder.getContext().setAuthentication(Hudson.ANONYMOUS);
-        jch.setShowBuildBadges("userWithConfigPermission");
-        shouldPageContainBadge(false);
-        
-        jch.setShowBuildBadges("adminUser");
-        shouldPageContainBadge(false);
-
-        webClient.login("gustav");
-        shouldPageContainBadge(true);
-        
-        jch.setShowBuildBadges("userWithConfigPermission");
-        shouldPageContainBadge(true);
-
+        shouldPageContainBadge("anonymous");
     }
-    
-    private void shouldPageContainBadge(boolean bool) throws Exception{
+
+    @LocalData
+    public void testBadgeConfigurationWithPermissions() throws Exception {
+        final String jobName = "newjob";
+        final String description = "a description";
+        final FreeStyleProject project = createFreeStyleProject(jobName);
+
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
+        project.setDescription(description);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        
+        hudson.setSecurityRealm(createDummySecurityRealm());
+        webClient.login("configUser");
+        shouldPageContainBadge("configUser");
+        
+        webClient.login("administrator");
+        shouldPageContainBadge("admin");
+    }
+
+    private void shouldPageContainBadge(String user) throws Exception{
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
         HtmlPage htmlPage = webClient.goTo("job/newjob");
-        if (bool) {
+        
+        //default = always
+        assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+
+        jch.setShowBuildBadges("never");
+        htmlPage = (HtmlPage) htmlPage.refresh();
+        assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        
+        jch.setShowBuildBadges("userWithConfigPermission");
+        htmlPage = (HtmlPage) htmlPage.refresh();
+        
+        if (("configUser").equals(user) || ("admin").equals(user)) {
+            assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        } else {
+            assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        }
+
+        jch.setShowBuildBadges("adminUser");
+        htmlPage = (HtmlPage) htmlPage.refresh();
+        
+        if (("admin").equals(user)) {
             assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
         } else {
             assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
         }
     }
-    
+
     public void testCorrectShowDiffLinkWithSingleChange() throws Exception {
         final String jobName = "testjob";
         final FreeStyleProject project = createFreeStyleProject(jobName);

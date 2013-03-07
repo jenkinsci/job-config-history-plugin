@@ -219,7 +219,7 @@ public class JobConfigHistory extends Plugin {
     
     /**
      * Used for testing only.
-     * @param String Never, always, userWithConfigPermission or adminUser.
+     * @param showBadges Never, always, userWithConfigPermission or adminUser.
      */
     public void setShowBuildBadges(String showBadges) {
         showBuildBadges = showBadges;
