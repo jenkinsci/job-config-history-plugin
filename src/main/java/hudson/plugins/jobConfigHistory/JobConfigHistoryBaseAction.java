@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 
@@ -388,7 +389,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 } else {
                     throw new IllegalStateException("Unknown tag pattern: " + tag);
                 }
-
+                line.tag = tag;
                 view.addLine(line);
                 previousLeftPos = leftPos;
             }
@@ -396,7 +397,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         view.clearDuplicateLines();
         return view.getLines();
     }
-
+    
     /**
      * Holds information for the SideBySideView.
      */
@@ -415,6 +416,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         public List<Line> getLines() {
             return Collections.unmodifiableList(lines);
         }
+
         /**
          * Adds a line.
          *
@@ -423,26 +425,31 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         public void addLine(Line line) {
             lines.add(line);
         }
+        
         /**
          * Deletes all dupes in the given lines.
-         * 
-         * TODO: encapsulate the call as we probably always want the
-         * deduplicated lines only.
          */
         public void clearDuplicateLines() {
+            final TreeMap<Integer, Line> linesByNumbers = new TreeMap<Integer, Line>();
+            final ArrayList<Line> dupes = new ArrayList<Line>();
             final Iterator<Line> iter = lines.iterator();
-            final Set<String> duplicateLineChecker = new HashSet<String>();
             while (iter.hasNext()) {
                 final Line line = iter.next();
                 final String lineNum = line.left.getLineNumber();
                 if (lineNum.length() != 0) {
-                    if (duplicateLineChecker.contains(lineNum)) {
-                        iter.remove();
+                    final int lineNumInt = Integer.parseInt(lineNum);
+                    if (linesByNumbers.containsKey(lineNumInt)) {
+                        if (line.tag == Tag.EQUAL) {
+                            iter.remove();
+                        } else {
+                            dupes.add(linesByNumbers.get(lineNumInt));
+                        }
                     } else {
-                        duplicateLineChecker.add(lineNum);
+                        linesByNumbers.put(lineNumInt, line);
                     }
                 }
             }
+            lines.removeAll(dupes);
         }
         
         /**
@@ -456,6 +463,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             private final Item right = new Item();
             /**True when line should be skipped.*/
             private boolean skipping;
+            /**EQUAL, INSERT, CHANGE or DELETE.*/
+            private Tag tag;
+            
 
             /**
              * Returns the left version of a modificated line.
