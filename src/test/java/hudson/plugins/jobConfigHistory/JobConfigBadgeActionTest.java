@@ -8,7 +8,6 @@ import org.jvnet.hudson.test.recipes.PresetData.DataSet;
 import hudson.model.Result;
 import hudson.model.FreeStyleProject;
 import hudson.model.Hudson;
-import hudson.model.User;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;

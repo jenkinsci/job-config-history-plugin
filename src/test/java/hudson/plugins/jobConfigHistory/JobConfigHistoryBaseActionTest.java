@@ -4,7 +4,6 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import hudson.model.Descriptor;
 import hudson.model.FreeStyleProject;
 import hudson.security.AccessControlled;
 import hudson.security.LegacyAuthorizationStrategy;
@@ -28,10 +27,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import hudson.security.Permission;
 import hudson.security.HudsonPrivateSecurityRealm;
-import hudson.tasks.CommandInterpreter;
 import hudson.tasks.LogRotator;
-import hudson.tasks.Shell;
-import hudson.tasks.Builder;
 
 /**
  * @author mfriedenhagen
