@@ -141,6 +141,19 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         return Hudson.getInstance().getPlugin(JobConfigHistory.class).showBuildBadges(build.getProject());
     }
     
+    public boolean oldConfigsExist() {
+        final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
+        
+        for (String timestamp : configDates) {
+            final String path = plugin.getJobHistoryRootDir() + "/" + build.getProject().getName() + "/" + timestamp;
+            final File historyDir = new File(path);
+            if (!historyDir.exists() || !new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE).exists()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     /**
      * Creates the target for the link to the showDiffFiles page.
      * @return Link target as String.

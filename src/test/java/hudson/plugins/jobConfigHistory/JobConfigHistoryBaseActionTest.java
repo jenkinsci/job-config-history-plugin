@@ -4,6 +4,8 @@
 
 package hudson.plugins.jobConfigHistory;
 
+import hudson.model.Descriptor;
+import hudson.model.FreeStyleProject;
 import hudson.security.AccessControlled;
 import hudson.security.LegacyAuthorizationStrategy;
 
@@ -20,10 +22,16 @@ import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.TextPage;
+import com.gargoylesoftware.htmlunit.html.HtmlButton;
+import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import hudson.security.Permission;
 import hudson.security.HudsonPrivateSecurityRealm;
+import hudson.tasks.CommandInterpreter;
+import hudson.tasks.LogRotator;
+import hudson.tasks.Shell;
+import hudson.tasks.Builder;
 
 /**
  * @author mfriedenhagen
@@ -32,6 +40,9 @@ import hudson.security.HudsonPrivateSecurityRealm;
 public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private WebClient webClient;
+    // we need to sleep between saves so we don't overwrite the history directories
+    // (which are saved with a granularity of one second)
+    private static final int SLEEP_TIME = 1100;
 
     private final File file1 = new File("old/config.xml");
     private final File file2 = new File("new/config.xml");
@@ -153,5 +164,29 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
         } catch (ElementNotFoundException e) {
             System.err.println(e);
         }
+    }
+    
+    @Bug(17124)
+    public void testClearDuplicateLines() throws Exception {
+        final String jobName = "Test";
+        
+        final FreeStyleProject project = createFreeStyleProject(jobName);
+        project.setLogRotator(new LogRotator(42, 42, -1, -1));
+        project.save();
+        Thread.sleep(SLEEP_TIME);
+        assertEquals(project.getLogRotator().getDaysToKeep(), 42);
+        
+        project.setLogRotator(new LogRotator(47, 47, -1, -1));
+        project.save();
+        Thread.sleep(SLEEP_TIME);
+        assertEquals(project.getLogRotator().getDaysToKeep(), 47);
+
+        final HtmlPage historyPage = webClient.goTo("job/" + jobName + "/" + JobConfigHistoryConsts.URLNAME);
+        final HtmlForm diffFilesForm = historyPage.getFormByName("diffFiles");
+        final HtmlPage diffPage = (HtmlPage) diffFilesForm.submit((HtmlButton) last(diffFilesForm.getHtmlElementsByTagName("button")));
+        assertStringContains(diffPage.asText(), "<daysToKeep>42</daysToKeep>");
+        assertStringContains(diffPage.asText(), "<numToKeep>42</numToKeep>");
+        assertStringContains(diffPage.asText(), "<daysToKeep>47</daysToKeep>");
+        assertStringContains(diffPage.asText(), "<numToKeep>47</numToKeep>");
     }
 }
