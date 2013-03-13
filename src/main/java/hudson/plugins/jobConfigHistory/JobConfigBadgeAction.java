@@ -141,13 +141,18 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         return Hudson.getInstance().getPlugin(JobConfigHistory.class).showBuildBadges(build.getProject());
     }
     
+    /**
+     * Check if the config history files that are attached to the build still exist.
+     * 
+     * @return True if both files exist.
+     */
     public boolean oldConfigsExist() {
         final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
         
         for (String timestamp : configDates) {
             final String path = plugin.getJobHistoryRootDir() + "/" + build.getProject().getName() + "/" + timestamp;
             final File historyDir = new File(path);
-            if (!historyDir.exists() || !new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE).exists()) {
+            if (!historyDir.exists() || !new File(historyDir, "config.xml").exists()) {
                 return false;
             }
         }
