@@ -1,8 +1,8 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="Job Configuration History">
-    <st:include page="sidepanel.jelly" />
     <l:side-panel>
       <l:tasks>
+        <l:task icon="images/24x24/up.gif" href="${rootURL}/" title="${%Back to Dashboard}" />
       	<l:task icon="plugin/jobConfigHistory/img/confighistory.png" href="${rootURL}/jobConfigHistory" title="${%Back to Overview}" />
       </l:tasks>
  	</l:side-panel>
