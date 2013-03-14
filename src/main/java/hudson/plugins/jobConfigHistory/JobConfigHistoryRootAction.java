@@ -3,18 +3,24 @@ package hudson.plugins.jobConfigHistory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletException;
+
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.Extension;
 import hudson.XmlFile;
 import hudson.model.Item;
 import hudson.model.RootAction;
+import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
+import hudson.util.MultipartFormDataParser;
 
 /**
  *
@@ -195,6 +201,43 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     }
 
     /**
+     * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as
+     * String.
+     * 
+     * @return content of the {@code config.xml} found in directory given by the
+     *         request parameter {@code file}.
+     * @throws IOException
+     *             if the config file could not be read or converted to an xml
+     *             string.
+     */
+    public final String getFile() throws IOException {
+        checkConfigurePermission();
+        final String name = getRequestParameter("name");
+        final String timestamp = getRequestParameter("timestamp");
+        final XmlFile xmlFile = getOldConfigXml(name, timestamp);
+        return xmlFile.asString();
+    }
+
+    /**
+     * Creates links to the correct configOutput.jellys for job history vs. system history
+     * and for xml vs. plain text.
+     * 
+     * @param config ConfigInfo.
+     * @param type Output type ('xml' or 'plain').
+     * @return The link as String.
+     */
+    public final String createLinkToJobFiles(ConfigInfo config, String type) {
+        final String link;
+        if (config.getIsJob() && !config.getJob().contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+            link = getHudson().getRootUrl() + "job/" + config.getJob() + getUrlName() 
+                    + "/configOutput?type=" + type + "&timestamp=" + config.getDate();
+        } else {
+            link = "configOutput?type=" + type + "&name=" + config.getJob() + "&timestamp=" + config.getDate();
+        }
+        return link;
+    }
+    
+    /**
      * {@inheritDoc}
      *
      * Returns the hudson instance.
@@ -221,5 +264,84 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      */
     public boolean hasJobConfigurePermission() {
         return getAccessControlledObject().hasPermission(Item.CONFIGURE);
+    }
+    
+    /**
+     * Parses the incoming {@code POST} request and redirects as
+     * {@code GET showDiffFiles}.
+     * 
+     * @param req
+     *            incoming request
+     * @param rsp
+     *            outgoing response
+     * @throws ServletException
+     *             when parsing the request as {@link MultipartFormDataParser}
+     *             does not succeed.
+     * @throws IOException
+     *             when the redirection does not succeed.
+     */
+    public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
+        throws ServletException, IOException {
+        final MultipartFormDataParser parser = new MultipartFormDataParser(req);
+        rsp.sendRedirect("showDiffFiles?name=" + parser.get("name") + "&timestamp1=" + parser.get("timestamp1")
+                + "&timestamp2=" + parser.get("timestamp2"));
+    }
+    
+    /**
+     * Returns the diff between two config files as a list of single lines.
+     * Takes the two timestamps and the name of the system property 
+     * or the deleted job from the url parameters.
+     * 
+     * @return Differences between two config versions as list of lines.
+     * @throws IOException If diff doesn't work or xml files can't be read.
+     */
+    public final List<Line> getLines() throws IOException {
+        checkConfigurePermission();
+        final String name = getRequestParameter("name");
+        final String timestamp1 = getRequestParameter("timestamp1");
+        final String timestamp2 = getRequestParameter("timestamp2");
+
+        final XmlFile configXml1 = getOldConfigXml(name, timestamp1);
+        final String[] configXml1Lines = configXml1.asString().split("\\n");
+        final XmlFile configXml2 = getOldConfigXml(name, timestamp2);
+        final String[] configXml2Lines = configXml2.asString().split("\\n");
+        
+        final String diffAsString = getDiffAsString(configXml1.getFile(), configXml2.getFile(),
+                configXml1Lines, configXml2Lines);
+        
+        final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
+        return getDiffLines(diffLines);
+    }
+    
+    /**
+     * Gets the version of the config.xml that was saved at a certain time.
+     * 
+     * @param name The name of the system property or deleted job.
+     * @param timestamp The timestamp as String.
+     * @return The config file as XmlFile.
+     */
+    private XmlFile getOldConfigXml(String name, String timestamp) {
+        final JobConfigHistory plugin = getPlugin();
+        final String rootDir;
+        File configFile = null;
+        String path = null;
+
+        if (checkParameters(name, timestamp)) {
+            if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+                rootDir = plugin.getJobHistoryRootDir().getPath();
+            } else {
+                rootDir = plugin.getConfiguredHistoryRootDir().getPath();
+                checkConfigurePermission();
+            }
+            path = rootDir + "/" + name + "/" + timestamp;
+            configFile = plugin.getConfigFile(new File(path));
+        }
+
+        if (configFile == null) {
+            throw new IllegalArgumentException("Unable to get history from: "
+                    + path);
+        } else {
+            return new XmlFile(configFile);
+        }
     }
 }

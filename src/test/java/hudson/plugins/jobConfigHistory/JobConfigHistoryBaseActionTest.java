@@ -59,14 +59,14 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
     }
 
     /**
-     * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiff(File, File, String[], String[])}.
+     * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffAsString(File, File, String[], String[])}.
      */
     public void testGetDiffFileStringStringSameLineLength() {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
         final String s1 = "123\n346";
         final String s2 = "123\n3467";
         assertEquals("--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,2 @@\n 123\n-346\n+3467\n",
-                makeResultPlatformIndependent(action.getDiff(file1, file2, s1.split("\n"), s2.split("\n"))));
+                makeResultPlatformIndependent(action.getDiffAsString(file1, file2, s1.split("\n"), s2.split("\n"))));
     }
 
     /**
@@ -74,7 +74,7 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
      */
     public void testGetDiffFileStringStringEmpty() {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
-        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependent(action.getDiff(file1, file2, new String[0], new String[0])));
+        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependent(action.getDiffAsString(file1, file2, new String[0], new String[0])));
     }
 
     /**
@@ -103,12 +103,12 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
     }
 
     /**
-     * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiff(File, File, String[], String[])}.
+     * Test method for {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffAsString(File, File, String[], String[])}.
      */
     public void testGetDiffFileStringStringDifferentLineLength() {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();        
-        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependent(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n".split("\n"))));
-        assertEquals("--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,3 @@\n 123\n 346\n+123\n", makeResultPlatformIndependent(action.getDiff(file1, file2, "123\n346".split("\n"), "123\n346\n123".split("\n"))));
+        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependent(action.getDiffAsString(file1, file2, "123\n346".split("\n"), "123\n346\n".split("\n"))));
+        assertEquals("--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,3 @@\n 123\n 346\n+123\n", makeResultPlatformIndependent(action.getDiffAsString(file1, file2, "123\n346".split("\n"), "123\n346\n123".split("\n"))));
     }
 
     private String makeResultPlatformIndependent(final String result) {
@@ -117,14 +117,14 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
     
     public void testGetConfigXmlIllegalArgumentExceptionNonExistingJobName() throws IOException, SAXException {
         TextPage page = (TextPage) webClient.goTo(JobConfigHistoryConsts.URLNAME 
-                    + "/configOutput?type=raw&isJob=true&name=bogus&timestamp=2013-01-11_17-26-27", "text/plain");
+                    + "/configOutput?type=raw&name=bogus&timestamp=2013-01-11_17-26-27", "text/plain");
         assertTrue("Page should be empty.", page.getContent().trim().isEmpty());
     }
     
     public void testGetConfigXmlIllegalArgumentExceptionInvalidTimestamp() throws IOException, SAXException {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
         try {
-            action.getConfigXml("bla", "bogus", false);
+            action.checkParameters("bla", "bogus");
             fail("Expected " + IllegalArgumentException.class + " because of invalid timestamp.");
         } catch (IllegalArgumentException e) {
             System.err.println(e);
@@ -135,13 +135,12 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
         try {
             final String timestamp = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).format(new GregorianCalendar().getTime());
-            action.getConfigXml("bla..blubb", timestamp, false);
+            action.checkParameters("bla..blubb", timestamp);
             fail("Expected " + IllegalArgumentException.class + " because of '..' in parameter name.");
         } catch (IllegalArgumentException e) {
             System.err.println(e);
         }
     }
-
     
     @Bug(5534)
     public void testSecuredAccessToJobConfigHistoryPage() throws IOException, SAXException {

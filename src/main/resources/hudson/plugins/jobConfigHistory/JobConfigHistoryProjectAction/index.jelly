@@ -40,16 +40,16 @@
                       <td>${config.date}</td>
                       <td>${config.operation}</td>
                       <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                      <td><a href="configOutput?type=xml&amp;isJob=${config.getIsJob()}&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
+                      <td><a href="configOutput?type=xml&amp;timestamp=${config.getDate()}">
                             <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
                           </a>
                           <st:nbsp />
-                          <a href="configOutput?type=raw&amp;isJob=${config.getIsJob()}&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
+                          <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}">
                             (${%RAW})
                           </a>
                       </td>
                       <td><j:if test="${configNr > 1}">
-							<a id="restore${configNr}" href="restoreQuestion?name=${config.getJob()}&amp;timestamp=${config.getDate()}">
+							<a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
 								<img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
 							</a>
                           </j:if>
@@ -59,7 +59,6 @@
                     </tr>
                       <f:invisibleEntry>
               	        <f:textbox name="name" value="${config.getJob()}" />
-              	        <f:textbox name="isJob" value="${config.getIsJob()}" />
                       </f:invisibleEntry>
                   </j:forEach>
                 </table>

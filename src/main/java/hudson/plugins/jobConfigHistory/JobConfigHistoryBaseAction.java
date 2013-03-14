@@ -1,14 +1,9 @@
 package hudson.plugins.jobConfigHistory;
 
-import hudson.XmlFile;
-import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Hudson;
-import hudson.model.Item;
 import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
 import hudson.security.AccessControlled;
-import hudson.security.Permission;
-import hudson.util.MultipartFormDataParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,18 +11,13 @@ import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
-import javax.servlet.ServletException;
-
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -83,102 +73,15 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * Do we want 'raw' output?
+     * Returns how the config file should be formatted in configOutput.jelly: as plain text or xml.
      * 
-     * @return true if request parameter type is 'raw'.
+     * @return "plain" or "xml"
      */
-    public final boolean wantRawOutput() {
-        return isTypeParameter("raw");
-    }
-
-    /**
-     * Do we want 'xml' output?
-     * 
-     * @return true if request parameter type is 'xml'.
-     */
-    public final boolean wantXmlOutput() {
-        return isTypeParameter("xml");
-    }
-
-    /**
-     * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as
-     * String.
-     * 
-     * @return content of the {@code config.xml} found in directory given by the
-     *         request parameter {@code file}.
-     * @throws IOException
-     *             if the config file could not be read or converted to an xml
-     *             string.
-     */
-    public final String getFile() throws IOException {
-        checkConfigurePermission();
-        final boolean isJob = Boolean.parseBoolean(getRequestParameter("isJob"));
-        final String name = getRequestParameter("name");
-        final String timestamp = getRequestParameter("timestamp");
-
-        final XmlFile xmlFile = getConfigXml(name, timestamp, isJob);
-        return xmlFile.asString();
-    }
-
-    /**
-     * Checks whether the type parameter of the current request equals
-     * {@code toCompare}.
-     * 
-     * @param toCompare
-     *            the string we want to compare.
-     * @return true if {@code toCompare} equals request parameter type.
-     */
-    private boolean isTypeParameter(final String toCompare) {
-        return getRequestParameter("type").equalsIgnoreCase(toCompare);
-    }
-
-    /**
-     * Returns the configuration file (default is {@code config.xml}) located in
-     * {@code path}. The submitted parameters get checked so that they can
-     * not be abused to retrieve arbitrary xml configuration files located 
-     * anywhere on the system.
-     * 
-     * @param name The name of the project.
-     * @param timestamp The timestamp of the saved configuration as String.
-     * @param isJob True if the configuration file belongs to a job (as opposed to a system property).
-     * @return The configuration file as XmlFile.
-     */
-    protected XmlFile getConfigXml(final String name, final String timestamp, final boolean isJob) {
-        final JobConfigHistory plugin = hudson.getPlugin(JobConfigHistory.class);
-        final String rootDir;
-        File configFile = null;
-        String path = null;
-
-        if (checkParameters(name, timestamp)) {
-            if (isJob || name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
-                rootDir = plugin.getJobHistoryRootDir().getPath();
-            } else {
-                rootDir = plugin.getConfiguredHistoryRootDir().getPath();
-            }
-
-            if (isJob) {
-                final Item job = Hudson.getInstance().getItem(name);
-                if (job == null) {
-                    throw new IllegalArgumentException("A job with this name could not be found: " + name);
-                } else {
-                    job.checkPermission(AbstractProject.CONFIGURE);
-                }
-            } else {
-                if (!name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
-                    hudson.checkPermission(Permission.CONFIGURE);
-                }
-            }
-            
-            path = rootDir + "/" + name + "/" + timestamp;
-            configFile = plugin.getConfigFile(new File(path));
+    public final String getOutputType() {
+        if (("xml").equalsIgnoreCase(getRequestParameter("type"))) {
+            return "xml";
         }
-
-        if (configFile == null) {
-            throw new IllegalArgumentException("Unable to get history from: "
-                    + path);
-        } else {
-            return new XmlFile(configFile);
-        }
+        return "plain";
     }
 
     /**
@@ -188,7 +91,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @param timestamp Timestamp of config change.
      * @return True if parameters are okay.
      */
-    private boolean checkParameters(String name, String timestamp) {
+    public boolean checkParameters(String name, String timestamp) {
         if (name == null || timestamp == null || "null".equals(name) || "null".equals(timestamp)) {
             return false;
         }
@@ -257,63 +160,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     protected abstract AccessControlled getAccessControlledObject();
 
     /**
-     * Parses the incoming {@code POST} request and redirects as
-     * {@code GET showDiffFiles}.
-     * 
-     * @param req
-     *            incoming request
-     * @param rsp
-     *            outgoing response
-     * @throws ServletException
-     *             when parsing the request as {@link MultipartFormDataParser}
-     *             does not succeed.
-     * @throws IOException
-     *             when the redirection does not succeed.
-     */
-    public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
-        throws ServletException, IOException {
-        final MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        rsp.sendRedirect("showDiffFiles?timestamp1=" + parser.get("timestamp1")
-                + "&timestamp2=" + parser.get("timestamp2") + "&name=" + parser.get("name")
-                + "&isJob=" + parser.get("isJob"));
-    }
-
-    /**
-     * Returns a textual diff between two {@code config.xml} files which are identified 
-     * by their timestamps and the project they belong to, given as parameters of
-     * {@link Stapler#getCurrentRequest()}.
-     * 
-     * @return diff
-     * @throws IOException
-     *             if reading one of the config files does not succeed.
-     */
-    public final String getDiffFile() throws IOException {
-        checkConfigurePermission();
-        
-        final boolean isJob = Boolean.parseBoolean(getRequestParameter("isJob"));
-        final String name = getRequestParameter("name");
-
-        final String timestamp1 = getRequestParameter("timestamp1");
-        final String timestamp2 = getRequestParameter("timestamp2");
-
-        final XmlFile configXml1 = getConfigXml(name, timestamp1, isJob);
-        final String[] configXml1Lines = configXml1.asString().split("\\n");
-        final XmlFile configXml2 = getConfigXml(name, timestamp2, isJob);
-        final String[] configXml2Lines = configXml2.asString().split("\\n");
-        return getDiff(configXml1.getFile(), configXml2.getFile(),
-                configXml1Lines, configXml2Lines);
-    }
-
-    /**
      * Returns side-by-side (i.e. human-readable) diff view lines.
      * 
-     * @return diff lines
+     * @param diffLines Unified diff as list of Strings.
+     * @return Nice and clean diff as list of single Lines.
      * @throws IOException
      *             if reading one of the config files does not succeed.
      */
-    public final List<Line> getDiffLines() throws IOException {
-        final List<String> diffLines = Arrays.asList(getDiffFile().split("\n"));
-
+    public final List<Line> getDiffLines(List<String> diffLines) throws IOException {
         final Patch diff = DiffUtils.parseUnifiedDiff(diffLines);
         final SideBySideView view = new SideBySideView();
         final DiffRowGenerator.Builder builder = new DiffRowGenerator.Builder();
@@ -395,6 +249,32 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         view.clearDuplicateLines();
         return view.getLines();
     }
+    
+    /**
+     * Returns a unified diff between two string arrays.
+     * 
+     * @param file1
+     *            first config file.
+     * @param file2
+     *            second config file.
+     * @param file1Lines
+     *            the lines of the first file.
+     * @param file2Lines
+     *            the lines of the second file.
+     * @return unified diff
+     */
+    protected final String getDiffAsString(final File file1, final File file2,
+            final String[] file1Lines, final String[] file2Lines) {
+        final change change = new Diff(file1Lines, file2Lines).diff_2(false);
+        final DiffPrint.UnifiedPrint unifiedPrint = new DiffPrint.UnifiedPrint(
+                file1Lines, file2Lines);
+        final StringWriter output = new StringWriter();
+        unifiedPrint.setOutput(output);
+        unifiedPrint.print_header(file1.getPath(), file2.getPath());
+        unifiedPrint.print_script(change);
+        return output.toString();
+    }
+
     
     /**
      * Holds information for the SideBySideView.
@@ -532,30 +412,5 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 }
             }
         }
-    }
-    
-    /**
-     * Returns a unified diff between two string arrays.
-     * 
-     * @param file1
-     *            first config file.
-     * @param file2
-     *            second config file.
-     * @param file1Lines
-     *            the lines of the first file.
-     * @param file2Lines
-     *            the lines of the second file.
-     * @return unified diff
-     */
-    protected final String getDiff(final File file1, final File file2,
-            final String[] file1Lines, final String[] file2Lines) {
-        final change change = new Diff(file1Lines, file2Lines).diff_2(false);
-        final DiffPrint.UnifiedPrint unifiedPrint = new DiffPrint.UnifiedPrint(
-                file1Lines, file2Lines);
-        final StringWriter output = new StringWriter();
-        unifiedPrint.setOutput(output);
-        unifiedPrint.print_header(file1.getPath(), file2.getPath());
-        unifiedPrint.print_script(change);
-        return output.toString();
     }
 }

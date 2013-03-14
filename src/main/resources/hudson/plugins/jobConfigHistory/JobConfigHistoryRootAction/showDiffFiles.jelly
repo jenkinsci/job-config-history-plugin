@@ -11,12 +11,12 @@
           <j:otherwise>
             <div>
               <j:choose>
-                <j:when test="${it.diffLines.size() == 0}">
+                <j:when test="${it.getLines().size() == 0}">
                   <p>${%No lines changed}</p>
                 </j:when>
                 <j:otherwise>
                   <table class="pane" style="width:100%">
-                    <j:forEach items="${it.diffLines}" var="line">
+                    <j:forEach items="${it.getLines()}" var="line">
                       <tr>
                         <j:choose>
                           <j:when test="${line.skipping}">

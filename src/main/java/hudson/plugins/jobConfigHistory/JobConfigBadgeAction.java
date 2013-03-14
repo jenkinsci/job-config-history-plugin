@@ -52,7 +52,6 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
 
     @Override
     public void onStarted(AbstractBuild build, TaskListener listener) {
-        
         final AbstractProject<?, ?> project = (AbstractProject<?, ?>) build.getProject();
         if (project.getNextBuildNumber() <= 2) {
             super.onStarted(build, listener);
@@ -164,9 +163,9 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
      * @return Link target as String.
      */
     public String createLink() {
-        return Hudson.getInstance().getRootUrl() + "job/" + build.getProject().getName() + "/"
+        return Hudson.getInstance().getRootUrl() + build.getProject().getUrl() + "/"
                 + JobConfigHistoryConsts.URLNAME + "/showDiffFiles?timestamp1=" + configDates[1]
-                + "&timestamp2=" + configDates[0] + "&name=" + build.getProject().getName() + "&isJob=true";
+                + "&timestamp2=" + configDates[0];
     }
     
     /**
