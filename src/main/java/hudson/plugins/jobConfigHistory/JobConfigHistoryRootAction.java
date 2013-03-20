@@ -211,11 +211,15 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      *             string.
      */
     public final String getFile() throws IOException {
-        checkConfigurePermission();
         final String name = getRequestParameter("name");
-        final String timestamp = getRequestParameter("timestamp");
-        final XmlFile xmlFile = getOldConfigXml(name, timestamp);
-        return xmlFile.asString();
+        if ((name.contains(JobConfigHistoryConsts.DELETED_MARKER) && hasJobConfigurePermission())
+                || hasConfigurePermission()) {
+            final String timestamp = getRequestParameter("timestamp");
+            final XmlFile xmlFile = getOldConfigXml(name, timestamp);
+            return xmlFile.asString();
+        } else {
+            return "No permission to view config files";
+        }
     }
 
     /**
@@ -296,21 +300,25 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      * @throws IOException If diff doesn't work or xml files can't be read.
      */
     public final List<Line> getLines() throws IOException {
-        checkConfigurePermission();
         final String name = getRequestParameter("name");
-        final String timestamp1 = getRequestParameter("timestamp1");
-        final String timestamp2 = getRequestParameter("timestamp2");
+        if ((name.contains(JobConfigHistoryConsts.DELETED_MARKER) && hasJobConfigurePermission())
+                || hasConfigurePermission()) {
+            final String timestamp1 = getRequestParameter("timestamp1");
+            final String timestamp2 = getRequestParameter("timestamp2");
 
-        final XmlFile configXml1 = getOldConfigXml(name, timestamp1);
-        final String[] configXml1Lines = configXml1.asString().split("\\n");
-        final XmlFile configXml2 = getOldConfigXml(name, timestamp2);
-        final String[] configXml2Lines = configXml2.asString().split("\\n");
-        
-        final String diffAsString = getDiffAsString(configXml1.getFile(), configXml2.getFile(),
-                configXml1Lines, configXml2Lines);
-        
-        final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
-        return getDiffLines(diffLines);
+            final XmlFile configXml1 = getOldConfigXml(name, timestamp1);
+            final String[] configXml1Lines = configXml1.asString().split("\\n");
+            final XmlFile configXml2 = getOldConfigXml(name, timestamp2);
+            final String[] configXml2Lines = configXml2.asString().split("\\n");
+            
+            final String diffAsString = getDiffAsString(configXml1.getFile(), configXml2.getFile(),
+                    configXml1Lines, configXml2Lines);
+            
+            final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
+            return getDiffLines(diffLines);
+        } else {
+            return Collections.emptyList();
+        }
     }
     
     /**

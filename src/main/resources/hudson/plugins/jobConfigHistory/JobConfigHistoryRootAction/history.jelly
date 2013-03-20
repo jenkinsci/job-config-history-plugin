@@ -17,7 +17,7 @@
 		  <h1>${%System Configuration History}</h1>
         </j:otherwise>
       </j:choose>
-      <h2>${request.getParameter('name')}</h2>
+      <h2>${name}</h2>
       <j:set var="configs" value="${it.getSingleConfigs(request)}" />
       <div>
         <j:choose>
