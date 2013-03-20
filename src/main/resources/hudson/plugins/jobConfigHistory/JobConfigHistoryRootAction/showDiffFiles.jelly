@@ -1,10 +1,20 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="Job Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
-    <st:include it="${it.project}" page="sidepanel.jelly" />
+    <l:side-panel>
+      <l:tasks>
+        <l:task icon="images/24x24/up.gif" href="${rootURL}/" title="${%Back to Dashboard}" />
+      </l:tasks>
+ 	</l:side-panel>
     <l:main-panel>
       <h1>${%Configuration Difference}</h1>
       <div>
         <j:choose>
+          <j:when test="${!it.hasConfigurePermission() and !name.contains('_deleted_')}">
+            ${%No permission to view system changes}
+          </j:when>
+          <j:when test="${!it.hasJobConfigurePermission()}">
+            ${%No permission to view config history}
+          </j:when>
           <j:when test="${it.getConfigs().size() == 0}">
               ${%No configuration history available}
           </j:when>

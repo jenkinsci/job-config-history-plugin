@@ -5,6 +5,9 @@
       <h1>${%Job Configuration Difference}</h1>
       <div>
         <j:choose>
+          <j:when test="${!it.hasConfigurePermission()}">
+            ${%No permission to view config history}
+          </j:when>
           <j:when test="${it.getJobConfigs().size() == 0}">
               ${%No job configuration history available}
           </j:when>

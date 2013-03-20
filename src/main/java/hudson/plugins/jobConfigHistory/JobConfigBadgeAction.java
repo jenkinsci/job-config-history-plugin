@@ -163,7 +163,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
      * @return Link target as String.
      */
     public String createLink() {
-        return Hudson.getInstance().getRootUrl() + build.getProject().getUrl() + "/"
+        return Hudson.getInstance().getRootUrl() + build.getProject().getUrl()
                 + JobConfigHistoryConsts.URLNAME + "/showDiffFiles?timestamp1=" + configDates[1]
                 + "&timestamp2=" + configDates[0];
     }

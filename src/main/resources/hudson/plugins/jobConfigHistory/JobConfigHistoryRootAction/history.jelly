@@ -21,6 +21,12 @@
       <j:set var="configs" value="${it.getSingleConfigs(request)}" />
       <div>
         <j:choose>
+          <j:when test="${!it.hasConfigurePermission() and !name.contains('_deleted_')}">
+            ${%No permission to view system changes}
+          </j:when>
+          <j:when test="${!it.hasJobConfigurePermission()}">
+            ${%No permission to view config history}
+          </j:when>
           <j:when test="${configs.size() == 0}">
               ${%No configuration history available}
           </j:when>
