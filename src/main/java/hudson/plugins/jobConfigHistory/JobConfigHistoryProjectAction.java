@@ -1,10 +1,9 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
+import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
-import hudson.model.Hudson;
-import hudson.model.Item;
 import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.xml.transform.stream.StreamSource;
@@ -28,6 +28,9 @@ import org.kohsuke.stapler.StaplerResponse;
  * @author Stefan Brausch
  */
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
+
+    /** Our logger. */
+    private static final Logger LOG = Logger.getLogger(JobConfigHistoryProjectAction.class.getName());
 
     /** The project. */
     private final transient AbstractItem project;
@@ -173,26 +176,22 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @return The config file as XmlFile.
      */
     private XmlFile getOldConfigXml(String timestamp) {
-        final JobConfigHistory plugin = getPlugin();
-        final String name = project.getName();
-        final String rootDir;
+        checkConfigurePermission();
+
+        final String rootDir = getPlugin().getJobHistoryRootDir().getPath() + "/";
         File configFile = null;
         String path = null;
-
-        if (checkParameters(name, timestamp)) {
-            rootDir = plugin.getJobHistoryRootDir().getPath();
-
-            final Item job = Hudson.getInstance().getItem(name);
-            if (job == null) {
-                throw new IllegalArgumentException("A job with this name could not be found: " + name);
+        
+        if (checkTimestamp(timestamp)) {
+            if ("MavenModule".equals(project.getClass().getSimpleName())) {
+                path = rootDir + ((MavenModule) project).getParent().getName() + "/modules/" 
+                        + ((MavenModule) project).getModuleName().toFileSystemName() + "/" + timestamp;
             } else {
-                job.checkPermission(AbstractProject.CONFIGURE);
+                path = rootDir + project.getName() + "/" + timestamp;
             }
-            
-            path = rootDir + "/" + name + "/" + timestamp;
-            configFile = plugin.getConfigFile(new File(path));
+            configFile = getPlugin().getConfigFile(new File(path));
         }
-
+        
         if (configFile == null) {
             throw new IllegalArgumentException("Unable to get history from: " + path);
         } else {

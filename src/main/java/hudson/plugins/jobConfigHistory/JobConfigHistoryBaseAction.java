@@ -85,25 +85,19 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * Checks the parameters 'name' and 'timestamp' and returns true if they are neither null 
-     * nor suspicious.
-     * @param name Name of job or system property.
+     * Checks the url parameter 'timestamp' and returns true if it is parseable as a date.
      * @param timestamp Timestamp of config change.
-     * @return True if parameters are okay.
+     * @return True if timestamp is okay.
      */
-    public boolean checkParameters(String name, String timestamp) {
-        if (name == null || timestamp == null || "null".equals(name) || "null".equals(timestamp)) {
+    protected boolean checkTimestamp(String timestamp) {
+        if (timestamp == null || "null".equals(timestamp)) {
             return false;
-        }
-        if (name.contains("..")) {
-            throw new IllegalArgumentException("Invalid directory name because of '..': " + name);
         }
         try {
             new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timestamp);
         } catch (ParseException pe) {
             throw new IllegalArgumentException("Timestamp does not contain a valid date: " + timestamp);
         }
-
         return true;
     }
     

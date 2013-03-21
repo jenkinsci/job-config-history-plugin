@@ -32,6 +32,13 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistoryRootAction.class.getName());
+    
+    /**
+     * Constructor necessary for testing.
+     */
+    public JobConfigHistoryRootAction() {
+        super();
+    }
 
     /**
      * {@inheritDoc}
@@ -328,7 +335,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      * @param timestamp The timestamp as String.
      * @return The config file as XmlFile.
      */
-    private XmlFile getOldConfigXml(String name, String timestamp) {
+    protected XmlFile getOldConfigXml(String name, String timestamp) {
         final JobConfigHistory plugin = getPlugin();
         final String rootDir;
         File configFile = null;
@@ -351,5 +358,22 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         } else {
             return new XmlFile(configFile);
         }
+    }
+    
+    /**
+     * Checks the url parameters 'name' and 'timestamp' and returns true if they are neither null 
+     * nor suspicious.
+     * @param name Name of deleted job or system property.
+     * @param timestamp Timestamp of config change.
+     * @return True if parameters are okay.
+     */
+    private boolean checkParameters(String name, String timestamp) {
+        if (name == null || "null".equals(name) || !checkTimestamp(timestamp)) {
+            return false;
+        }
+        if (name.contains("..")) {
+            throw new IllegalArgumentException("Invalid directory name because of '..': " + name);
+        }
+        return true;
     }
 }

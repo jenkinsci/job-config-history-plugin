@@ -10,8 +10,6 @@ import hudson.security.LegacyAuthorizationStrategy;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
 
 import org.jvnet.hudson.test.Bug;
 import org.xml.sax.SAXException;
@@ -124,23 +122,13 @@ public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeleti
     public void testGetConfigXmlIllegalArgumentExceptionInvalidTimestamp() throws IOException, SAXException {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
         try {
-            action.checkParameters("bla", "bogus");
+            action.checkTimestamp("bla");
             fail("Expected " + IllegalArgumentException.class + " because of invalid timestamp.");
         } catch (IllegalArgumentException e) {
             System.err.println(e);
         }
     }
     
-    public void testGetConfigXmlIllegalArgumentExceptionDotsInName() throws IOException, SAXException {
-        final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
-        try {
-            final String timestamp = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).format(new GregorianCalendar().getTime());
-            action.checkParameters("bla..blubb", timestamp);
-            fail("Expected " + IllegalArgumentException.class + " because of '..' in parameter name.");
-        } catch (IllegalArgumentException e) {
-            System.err.println(e);
-        }
-    }
     
     @Bug(5534)
     public void testSecuredAccessToJobConfigHistoryPage() throws IOException, SAXException {
