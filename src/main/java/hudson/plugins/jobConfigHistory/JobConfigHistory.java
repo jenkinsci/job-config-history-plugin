@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Plugin;
 import hudson.XmlFile;
+import hudson.maven.MavenModule;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.model.ItemGroup;
@@ -37,6 +38,7 @@ import org.kohsuke.stapler.StaplerRequest;
  *
  */
 public class JobConfigHistory extends Plugin {
+    
     /** Root directory for storing histories. */
     private String historyRootDir;
     
@@ -52,7 +54,7 @@ public class JobConfigHistory extends Plugin {
      */
     private boolean saveSystemConfiguration;
 
-    /** Flag to indicated ItemGroups configuration is saved as well. */
+    /** Flag to indicate ItemGroups configuration is saved as well. */
     private boolean saveItemGroupConfiguration;
 
     /** Flag to indicate if we should save history when it 
@@ -67,6 +69,9 @@ public class JobConfigHistory extends Plugin {
 
     /** Compiled regular expression pattern. */
     private transient Pattern excludeRegexpPattern;
+    
+    /** Flag to indicate if we should save the config history of Maven modules */
+    private boolean saveModuleConfiguration;
     
     /**
      * Whether build badges should appear when the config of a job has changed since the last build.
@@ -115,6 +120,7 @@ public class JobConfigHistory extends Plugin {
         saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
         skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
         excludePattern = formData.getString("excludePattern");
+        saveModuleConfiguration = formData.getBoolean("saveModuleConfiguration");
         showBuildBadges = formData.getString("showBuildBadges");
         save();
         loadRegexpPatterns();
@@ -210,6 +216,13 @@ public class JobConfigHistory extends Plugin {
         return JobConfigHistoryConsts.DEFAULT_EXCLUDE;
     }
     
+    /**
+     * @return true if we should save 'system' configurations.
+     */
+    public boolean getSaveModuleConfiguration() {
+        return saveModuleConfiguration;
+    }
+
     /**
      * @return Whether build badges should appear always, never or only for users with config rights.
      */
@@ -414,6 +427,9 @@ public class JobConfigHistory extends Plugin {
             }
         } else if (saveItemGroupConfiguration && item instanceof ItemGroup) {
             saveable = true;
+        }
+        if (item instanceof MavenModule && !saveModuleConfiguration) {
+            saveable = false;
         }
         if (saveable && skipDuplicateHistory && hasDuplicateHistory(xmlFile)) {
             LOG.fine("found duplicate history, skipping save of " + xmlFile);

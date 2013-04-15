@@ -52,8 +52,14 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * jobs.
      */
     public final String getIconFileName() {
-        return hasConfigurePermission() ? JobConfigHistoryConsts.ICONFILENAME
-               : null;
+        if (!hasConfigurePermission()) {
+            return null;
+        }
+        if (!getPlugin().getSaveModuleConfiguration() && project instanceof MavenModule) {
+            return null;
+        }
+        
+        return JobConfigHistoryConsts.ICONFILENAME;
     }
     
     /**
@@ -183,7 +189,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         String path = null;
         
         if (checkTimestamp(timestamp)) {
-            if ("MavenModule".equals(project.getClass().getSimpleName())) {
+            if (project instanceof MavenModule) {
                 path = rootDir + ((MavenModule) project).getParent().getName() + "/modules/" 
                         + ((MavenModule) project).getModuleName().toFileSystemName() + "/" + timestamp;
             } else {

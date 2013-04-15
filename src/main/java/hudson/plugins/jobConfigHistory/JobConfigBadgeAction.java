@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 
 import hudson.Extension;
 import hudson.XmlFile;
+import hudson.maven.MavenModule;
+import hudson.maven.MavenModuleSet;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildBadgeAction;
@@ -52,7 +54,11 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
 
     @Override
     public void onStarted(AbstractBuild build, TaskListener listener) {
-        final AbstractProject<?, ?> project = (AbstractProject<?, ?>) build.getProject();
+        final AbstractProject<?, ?> project = build.getProject();
+        LOG.finest("Name: " + project.getName());
+        LOG.finest("MavenModuleSet? - " + (project instanceof MavenModuleSet));
+        LOG.finest("MavenModule? - " + (project instanceof MavenModule));
+        
         if (project.getNextBuildNumber() <= 2) {
             super.onStarted(build, listener);
             return;
