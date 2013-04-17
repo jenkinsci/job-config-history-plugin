@@ -29,10 +29,10 @@ public class JobConfigHistoryActionFactory extends TransientProjectActionFactory
     public Collection<? extends Action> createFor(@SuppressWarnings("unchecked") AbstractProject target) {
         final ArrayList<Action> actions = new ArrayList<Action>();
         final List<JobConfigHistoryProjectAction> historyJobActions = target.getActions(JobConfigHistoryProjectAction.class);
-//        LOG.fine(target + " already had " + historyJobActions);
+        LOG.fine(target + " already had " + historyJobActions);
         final JobConfigHistoryProjectAction newAction = new JobConfigHistoryProjectAction(target);
         actions.add(newAction);
-//        LOG.fine(this + " adds " + newAction + " for " + target);
+        LOG.fine(this + " adds " + newAction + " for " + target);
         return actions;
     }
 }

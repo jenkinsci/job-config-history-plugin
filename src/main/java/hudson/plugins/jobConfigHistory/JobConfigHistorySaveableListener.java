@@ -24,11 +24,11 @@ public final class JobConfigHistorySaveableListener extends SaveableListener {
     public void onChange(final Saveable o, final XmlFile file) {
         final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
 
-//        LOG.finest("In onChange for " + o);
+        LOG.finest("In onChange for " + o);
         if (plugin.isSaveable(o, file)) {
             ConfigHistoryListenerHelper.CHANGED.createNewHistoryEntry(file);
         }
-//        LOG.finest("onChange for " + o + " done.");
+        LOG.finest("onChange for " + o + " done.");
         //        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
 }

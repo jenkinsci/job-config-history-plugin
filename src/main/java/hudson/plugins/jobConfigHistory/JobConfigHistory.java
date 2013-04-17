@@ -70,8 +70,8 @@ public class JobConfigHistory extends Plugin {
     /** Compiled regular expression pattern. */
     private transient Pattern excludeRegexpPattern;
     
-    /** Flag to indicate if we should save the config history of Maven modules */
-    private boolean saveModuleConfiguration;
+    /** Flag to indicate if we should save the config history of Maven modules. */
+    private boolean saveModuleConfiguration = true;
     
     /**
      * Whether build badges should appear when the config of a job has changed since the last build.
@@ -431,11 +431,11 @@ public class JobConfigHistory extends Plugin {
         if (item instanceof MavenModule && !saveModuleConfiguration) {
             saveable = false;
         }
-        if (saveable && skipDuplicateHistory && hasDuplicateHistory(xmlFile)) {
+/*        if (saveable && skipDuplicateHistory && hasDuplicateHistory(xmlFile)) {
             LOG.fine("found duplicate history, skipping save of " + xmlFile);
             saveable = false;
         }
-        return saveable;
+*/        return saveable;
     }
 
     /**
