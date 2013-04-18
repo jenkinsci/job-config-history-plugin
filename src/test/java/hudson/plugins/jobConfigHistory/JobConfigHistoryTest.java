@@ -1,10 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.containsString;
 import hudson.XmlFile;
-import hudson.maven.MavenModule;
-import hudson.maven.MavenModuleSet;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.security.HudsonPrivateSecurityRealm;
@@ -16,13 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.jvnet.hudson.test.recipes.LocalData;
-
-import com.gargoylesoftware.htmlunit.TextPage;
-import com.gargoylesoftware.htmlunit.WebAssert;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
  * @author jborghi@cisco.com
@@ -380,50 +370,5 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
         } catch (Exception e) {
             fail("Unable to complete changed root dir test: " + e);
         }
-    }
-    
-    @LocalData
-    public void testMavenConfig() throws Exception {
-
-        final MavenModuleSet project = (MavenModuleSet) hudson.getItem("MultiTest");
-        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-        final MavenModule module1 = project.getItem("de.kathistutz$module1");
-
-        //Maven module configuration history is saved by default  
-        final String description = "Klaatu";
-        module1.setDescription(description);
-        Thread.sleep(SLEEP_TIME);
-
-        //JCH link should be present on module page
-        HtmlPage modulePage = webClient.getPage(module1);
-        WebAssert.assertLinkPresentWithText(modulePage, "Job Config History"); 
-
-        //test if config got saved
-        HtmlPage moduleHistoryPage = webClient.goTo(module1.getUrl() + JobConfigHistoryConsts.URLNAME);
-        final HtmlAnchor rawLink = moduleHistoryPage.getAnchorByText("(RAW)");
-        assertTrue("RAW should contain new description", ((TextPage)rawLink.click()).getContent().contains(description));
-            
-        final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(module1);
-        final int historyEntryCount = projectAction.getJobConfigs().size();
-        assertTrue("At least one job config should exist", historyEntryCount > 0);
-        
-        //switch off saving of Maven module configurations
-        final HtmlForm form = webClient.goTo("configure").getFormByName("config");
-        form.getInputByName("saveModuleConfiguration").setChecked(false);
-        submit(form);
-
-        //JCH should have disappeared from module page now
-        modulePage = (HtmlPage)modulePage.refresh();
-        WebAssert.assertLinkNotPresentWithText(modulePage, "Job Config History"); 
-
-        final String newDescription = "Barada nikto";
-        module1.setDescription(newDescription);
-        Thread.sleep(SLEEP_TIME);
-        
-        //config changes should not get saved any longer        
-        moduleHistoryPage = (HtmlPage)moduleHistoryPage.refresh();
-        final HtmlAnchor rawLink2 = moduleHistoryPage.getAnchorByText("(RAW)");
-        assertThat("RAW should still contain old description", ((TextPage)rawLink2.click()).getContent(), containsString(description));
-        assertTrue("Still same number of config history entries", projectAction.getJobConfigs().size() == historyEntryCount);
     }
 }

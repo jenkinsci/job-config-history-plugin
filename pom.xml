@@ -203,7 +203,7 @@
                 <configuration>
                     <argLine>-Xms256m -Xmx512m</argLine>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <testFailureIgnore>true</testFailureIgnore>
+                    <testFailureIgnore>false</testFailureIgnore>
                 </configuration>
             </plugin>
         </plugins>

@@ -419,25 +419,49 @@ public class JobConfigHistory extends Plugin {
         if (item instanceof AbstractProject<?, ?>) {
             saveable = true;
         } else if (saveSystemConfiguration && xmlFile.getFile().getParentFile().equals(Hudson.getInstance().root)) {
-            if (excludeRegexpPattern != null) {
-                final Matcher matcher = excludeRegexpPattern.matcher(xmlFile.getFile().getName());
-                saveable = !matcher.find();
-            } else {
-                saveable = true;
-            }
+            saveable = checkRegex(xmlFile);
         } else if (saveItemGroupConfiguration && item instanceof ItemGroup) {
             saveable = true;
         }
         if (item instanceof MavenModule && !saveModuleConfiguration) {
             saveable = false;
         }
-/*        if (saveable && skipDuplicateHistory && hasDuplicateHistory(xmlFile)) {
-            LOG.fine("found duplicate history, skipping save of " + xmlFile);
-            saveable = false;
+        if (saveable) {
+            saveable = checkDuplicate(xmlFile);
         }
-*/        return saveable;
+        
+        return saveable;
     }
 
+    /**
+     * Checks whether the configuration file should not be saved because it's a duplicate.
+     * @param xmlFile The config file
+     * @return True if it should be saved
+     */
+    private boolean checkDuplicate(final XmlFile xmlFile) {
+        if (skipDuplicateHistory && hasDuplicateHistory(xmlFile)) {
+            LOG.fine("found duplicate history, skipping save of " + xmlFile);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Check whether config file should not be saved because of regex pattern.
+     * @param xmlFile The config file
+     * @return True if it should be saved
+     */
+    private boolean checkRegex(final XmlFile xmlFile) {
+        if (excludeRegexpPattern != null) {
+            final Matcher matcher = excludeRegexpPattern.matcher(xmlFile.getFile().getName());
+            return !matcher.find();
+        } else {
+            return true;
+        }
+    }
+    
+    
     /**
      * Determines if the {@link XmlFile} contains a duplicate of
      * the last saved information, if there is previous history.
