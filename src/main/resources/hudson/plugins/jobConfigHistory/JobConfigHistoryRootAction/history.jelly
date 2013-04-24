@@ -1,8 +1,8 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="Job Configuration History">
-    <st:include page="sidepanel.jelly" />
     <l:side-panel>
       <l:tasks>
+        <l:task icon="images/24x24/up.gif" href="${rootURL}/" title="${%Back to Dashboard}" />
       	<l:task icon="plugin/jobConfigHistory/img/confighistory.png" href="${rootURL}/jobConfigHistory" title="${%Back to Overview}" />
       </l:tasks>
  	</l:side-panel>
@@ -17,10 +17,16 @@
 		  <h1>${%System Configuration History}</h1>
         </j:otherwise>
       </j:choose>
-      <h2>${request.getParameter('name')}</h2>
+      <h2>${name}</h2>
       <j:set var="configs" value="${it.getSingleConfigs(request)}" />
       <div>
         <j:choose>
+          <j:when test="${!it.hasConfigurePermission() and !name.contains('_deleted_')}">
+            ${%No permission to view system changes}
+          </j:when>
+          <j:when test="${!it.hasJobConfigurePermission()}">
+            ${%No permission to view config history}
+          </j:when>
           <j:when test="${configs.size() == 0}">
               ${%No configuration history available}
           </j:when>
@@ -35,16 +41,12 @@
       		    </j:if>
                 <table class="pane sortable" style="width:100%">
                   <tr>
-                    <td class="pane-header" initialSortDir="down" align="left">${%Date}</td>
+                    <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
                     <td class="pane-header" align="left">${%Operation}</td>
                     <td class="pane-header" align="left">${%User}</td>
                     <td class="pane-header" align="left">${%Show File}</td>
-                    <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">${%Diff}</td>
-                  </tr>
-                  <tr>
-                    <td colspan="4"></td>
-                    <td align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
-                    <td align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
+                    <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
+                    <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
                   </tr>
                   <j:set var="configNr" value="0"/>
                   <j:forEach var="config" items="${configs}">
@@ -53,11 +55,11 @@
                       <td>${config.date}</td>
                       <td>${config.operation}</td>
                       <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                      <td><a href="configOutput?type=xml&amp;isJob=${config.getIsJob()}&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
+                      <td><a href="configOutput?type=xml&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
                             <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
                           </a>
                           <st:nbsp />
-                          <a href="configOutput?type=raw&amp;isJob=${config.getIsJob()}&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
+                          <a href="configOutput?type=raw&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
                             (${%RAW})
                           </a>
                       </td>
@@ -66,7 +68,6 @@
                     </tr>
                     <f:invisibleEntry>
                       <f:textbox name="name" value="${config.getJob()}" />
-             	      <f:textbox name="isJob" value="${config.getIsJob()}" />
                     </f:invisibleEntry>
                   </j:forEach>
                 </table>

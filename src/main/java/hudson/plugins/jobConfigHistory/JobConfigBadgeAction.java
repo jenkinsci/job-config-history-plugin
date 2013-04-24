@@ -52,7 +52,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
 
     @Override
     public void onStarted(AbstractBuild build, TaskListener listener) {
-        final AbstractProject<?, ?> project = (AbstractProject<?, ?>) build.getProject();
+        final AbstractProject<?, ?> project = build.getProject();
         if (project.getNextBuildNumber() <= 2) {
             super.onStarted(build, listener);
             return;
@@ -78,21 +78,15 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
                 LOG.finest("Could not parse history files: " + ex);
             }
         }
-
+        
         if (configs.size() > 1) {
             Collections.sort(configs, ConfigInfoComparator.INSTANCE);
             final ConfigInfo lastChange = Collections.min(configs, ConfigInfoComparator.INSTANCE);
-            final ConfigInfo penultimateChange = configs.get(1);
-            
-            try {
-                final Date lastConfigChange = new SimpleDateFormat(
-                        JobConfigHistoryConsts.ID_FORMATTER).parse(lastChange.getDate());
-                if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
-                    final String[] dates = {lastChange.getDate(), penultimateChange.getDate()};
-                    build.addAction(new JobConfigBadgeAction(dates, build));
-                }
-            } catch (ParseException ex) {
-                LOG.finest("Could not parse Date: " + ex);
+            final Date lastConfigChange = parseDate(lastChange);
+
+            if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
+                final String[] dates = {lastChange.getDate(), findLastRelevantConfigChangeDate(configs, lastBuildDate)};
+                build.addAction(new JobConfigBadgeAction(dates, build));
             }
         }
 
@@ -100,13 +94,78 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     }
     
     /**
+     * Finds the date of the last config change that happened before the last build.
+     * This is needed for the link in the build history that shows the difference between the current
+     * configuration and the version that was in place when the last build happened. 
+     * 
+     * @param configs An ArrayList full of ConfigInfos.
+     * @param lastBuildDate The date of the lastBuild (as Date).
+     * @return The date of the last relevant config change (as String).
+     */
+    private String findLastRelevantConfigChangeDate(ArrayList<ConfigInfo> configs, Date lastBuildDate) {
+        for (int i = 1; i < configs.size(); i++) {
+            final ConfigInfo oldConfigChange = configs.get(i);
+            final Date changeDate = parseDate(oldConfigChange);
+            if (changeDate != null && changeDate.before(lastBuildDate)) {
+                return oldConfigChange.getDate();
+            }
+        }
+        return configs.get(1).getDate();
+    }
+    
+    /**
+     * Parses the date from a config info into a java.util.Date.
+     * 
+     * @param config A ConfigInfo.
+     * @return The parsed date as a java.util.Date.
+     */
+    private Date parseDate(ConfigInfo config) {
+        Date date = null;
+        try {
+            date = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(config.getDate());
+        } catch (ParseException ex) {
+            LOG.finest("Could not parse Date: " + ex);
+        }
+        return date;
+    }
+    
+    /**
+     * Returns true if the config change build badges should appear
+     * (depending on plugin settings and user permissions).
+     * Called from badge.jelly.
+     * 
+     * @return True if badges should appear.
+     */
+    public boolean showBadge() {
+        return Hudson.getInstance().getPlugin(JobConfigHistory.class).showBuildBadges(build.getProject());
+    }
+    
+    /**
+     * Check if the config history files that are attached to the build still exist.
+     * 
+     * @return True if both files exist.
+     */
+    public boolean oldConfigsExist() {
+        final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
+        
+        for (String timestamp : configDates) {
+            final String path = plugin.getJobHistoryRootDir() + "/" + build.getProject().getName() + "/" + timestamp;
+            final File historyDir = new File(path);
+            if (!historyDir.exists() || !new File(historyDir, "config.xml").exists()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
      * Creates the target for the link to the showDiffFiles page.
      * @return Link target as String.
      */
     public String createLink() {
-        return Hudson.getInstance().getRootUrl() + "job/" + build.getProject().getName() + "/"
+        return Hudson.getInstance().getRootUrl() + build.getProject().getUrl()
                 + JobConfigHistoryConsts.URLNAME + "/showDiffFiles?timestamp1=" + configDates[1]
-                + "&timestamp2=" + configDates[0] + "&name=" + build.getProject().getName() + "&isJob=true";
+                + "&timestamp2=" + configDates[0];
     }
     
     /**

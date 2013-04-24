@@ -5,18 +5,21 @@
       <h1>${%Job Configuration Difference}</h1>
       <div>
         <j:choose>
+          <j:when test="${!it.hasConfigurePermission()}">
+            ${%No permission to view config history}
+          </j:when>
           <j:when test="${it.getJobConfigs().size() == 0}">
               ${%No job configuration history available}
           </j:when>
           <j:otherwise>
             <div>
               <j:choose>
-                <j:when test="${it.diffLines.size() == 0}">
+                <j:when test="${it.getLines().size() == 0}">
                   <p>${%No lines changed}</p>
                 </j:when>
                 <j:otherwise>
                   <table class="pane" style="width:100%">
-                    <j:forEach items="${it.diffLines}" var="line">
+                    <j:forEach items="${it.getLines()}" var="line">
                       <tr>
                         <j:choose>
                           <j:when test="${line.skipping}">
@@ -35,7 +38,7 @@
                       </tr>
                     </j:forEach>
                   </table>
-                  <f:form method="post" action="forwardToRestoreQuestion?name=${request.getParameter('name')}&amp;timestamp=${request.getParameter('timestamp1')}" name="forward">
+                  <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
                     <div align="right">
                       <f:submit value="${%Restore old version}" />
                     </div>

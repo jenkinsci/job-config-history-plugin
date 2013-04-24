@@ -151,7 +151,9 @@
             <version>1.10</version>
             <scope>provided</scope>
         </dependency>
-    </dependencies>
+        <dependency>
+        	<groupId>org.jenkins-ci.main</groupId>
+        	<artifactId>maven-plugin</artifactId></dependency></dependencies>
     <build>
         <plugins>
             <plugin>
@@ -201,7 +203,7 @@
                 <configuration>
                     <argLine>-Xms256m -Xmx512m</argLine>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <testFailureIgnore>true</testFailureIgnore>
+                    <testFailureIgnore>false</testFailureIgnore>
                 </configuration>
             </plugin>
         </plugins>

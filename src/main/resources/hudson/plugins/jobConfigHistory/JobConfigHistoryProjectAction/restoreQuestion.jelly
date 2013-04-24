@@ -6,7 +6,7 @@
 		${%Replace the current configuration with the version from}	${request.getParameter("timestamp")}?
     	<br />
 		
-    	<f:form action="restore?timestamp=${request.getParameter('timestamp')}&amp;name=${request.getParameter('name')}" name="restore" method="post">
+    	<f:form action="restore?timestamp=${request.getParameter('timestamp')}" name="restore" method="post">
            	<f:entry>
                 <f:submit value="${%Yes}"/>
            	</f:entry>
