@@ -48,18 +48,22 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
             final HtmlForm form = webClient.goTo("configure").getFormByName("config");
             form.getInputByName("maxHistoryEntries").setValueAttribute("10");
             form.getInputByName("saveSystemConfiguration").setChecked(true);
+            form.getInputByName("saveModuleConfiguration").setChecked(false);
             form.getInputByName("skipDuplicateHistory").setChecked(false);
             form.getInputByName("excludePattern").setValueAttribute(JobConfigHistoryConsts.DEFAULT_EXCLUDE);
             form.getInputByName("historyRootDir").setValueAttribute("jobConfigHistory");
+            form.getInputByValue("never").setChecked(true);
             submit(form);
         } catch (Exception e) {
             fail("unable to configure Hudson instance " + e);
         }
         assertEquals("Verify history entries to keep setting.", "10", jch.getMaxHistoryEntries());
         assertTrue("Verify system level configurations setting.", jch.getSaveSystemConfiguration());
+        assertFalse("Verify Maven module configuration setting.", jch.getSaveModuleConfiguration());
         assertFalse("Verify skip duplicate history setting.", jch.getSkipDuplicateHistory());
         assertEquals("Verify configured history root directory.", new File(hudson.root + "/jobConfigHistory/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
         assertEquals("Verify exclude pattern setting.", JobConfigHistoryConsts.DEFAULT_EXCLUDE, jch.getExcludePattern());
+        assertEquals("Verify build badges setting.", "never", jch.getShowBuildBadges());
 
         final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertTrue("Verify a system level configuration is saveable.", jch.isSaveable(hudson, hudsonConfig));
@@ -76,8 +80,10 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
 
         assertNull("Verify number of history entries to keep default setting.", jch.getMaxHistoryEntries());
         assertFalse("Verify system level configurations default setting.", jch.getSaveSystemConfiguration());
+        assertTrue("Verify Maven module configuration default setting.", jch.getSaveModuleConfiguration());
         assertTrue("Verify skip duplicate history default setting.", jch.getSkipDuplicateHistory());
         assertNull("Verify unconfigured exclude pattern.", jch.getExcludePattern());
+        assertEquals("Verify build badges setting.", "always", jch.getShowBuildBadges());
 
         final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertFalse("Verify a system level configuration is not saveable.", jch.isSaveable(hudson, hudsonConfig));

@@ -1,10 +1,15 @@
 package hudson.plugins.jobConfigHistory;
 
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
+
 import hudson.model.FreeStyleProject;
 import hudson.security.LegacyAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlButton;
+import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeletingInstanceDir {
@@ -106,17 +111,20 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
     }
     
     /**
-     * Tests whether the config history of a single system feature is displayed correctly.
+     * Tests whether the config history of a single system feature is displayed correctly
+     * and showDiffs works.
      */
     public void testSingleSystemHistoryPage() {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
         jch.setSaveSystemConfiguration(true);
+        final String firstMessage = "First Testmessage";
+        final String secondMessage = "Second Testmessage";
 
         //create some config history data
         try {
-            hudson.setSystemMessage("First Testmessage");
+            hudson.setSystemMessage(firstMessage);
             Thread.sleep(SLEEP_TIME);
-            hudson.setSystemMessage("Second Testmessage");
+            hudson.setSystemMessage(secondMessage);
             Thread.sleep(SLEEP_TIME);
         } catch (Exception ex) {
             fail("Unable to prepare Hudson instance: " + ex);
@@ -127,6 +135,11 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
             final String page = htmlPage.asXml();
             assertFalse("Check whether configuration data is found.", page.contains("No configuration history"));
             assertTrue("Verify several entries for config changes exist.", page.split("Changed").length > 2);
+
+            final HtmlForm diffFilesForm = htmlPage.getFormByName("diffFiles");
+            final HtmlPage diffPage = (HtmlPage) diffFilesForm.submit((HtmlButton) last(diffFilesForm.getHtmlElementsByTagName("button")));
+            assertStringContains(diffPage.asText(), firstMessage);
+            assertStringContains(diffPage.asText(), secondMessage);
         } catch (Exception ex) {
             fail("Unable to complete testHistoryPage: " + ex);
         }
@@ -138,9 +151,9 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
     public void testSingleDeletedJobHistoryPage() {
         //create some config history data
         try {
-            final FreeStyleProject secondProject = createFreeStyleProject("Test");
+            final FreeStyleProject project = createFreeStyleProject("Test");
             Thread.sleep(SLEEP_TIME);
-            secondProject.delete();
+            project.delete();
         } catch (Exception ex) {
             fail("Unable to prepare Hudson instance: " + ex);
         }
@@ -153,6 +166,24 @@ public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeleti
             assertTrue("Verify entry for deletion exists.", historyPage.contains("Deleted"));
         } catch (Exception ex) {
             fail("Unable to complete testHistoryPage: " + ex);
+        }
+    }
+    
+    public void testGetOldConfigXmlWithWrongParameters() {
+        final JobConfigHistoryRootAction rootAction = new JobConfigHistoryRootAction(); 
+        try {
+            rootAction.getOldConfigXml("bla", "bogus");
+            fail("Expected " + IllegalArgumentException.class + " because of invalid timestamp.");
+        } catch (IllegalArgumentException e) {
+            System.err.println(e);
+        }
+        
+        try {
+            final String timestamp = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).format(new GregorianCalendar().getTime());
+            rootAction.getOldConfigXml("bla..blubb", timestamp);
+            fail("Expected " + IllegalArgumentException.class + " because of '..' in parameter name.");
+        } catch (IllegalArgumentException e) {
+            System.err.println(e);
         }
     }
 }

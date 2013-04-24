@@ -1,8 +1,8 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="${%All Configuration History}">
-    <st:include page="sidepanel.jelly"/>
     <l:side-panel>
       <l:tasks>
+        <l:task icon="images/24x24/up.gif" href="${rootURL}/" title="${%Back to Dashboard}" />
       	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=system" title="${%Show system configs only}" />
       	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=jobs" title="${%Show job configs only}" />
       	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=deleted" title="${%Show deleted jobs only}" />
@@ -48,7 +48,7 @@
             <div>
               <table class="pane sortable" style="width:100%">
                 <tr>
-                  <td class="pane-header" initialSortDir="down" align="left">${%Date}</td>
+                  <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
                   <j:choose>
                     <j:when test="${filter == 'jobs' || filter == 'deleted'}">
                       <td class="pane-header" align="left">${%Job configuration}</td>
@@ -86,11 +86,11 @@
                     </j:choose>
                     <td>${config.operation}</td>
                     <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                    <td><a href="configOutput?type=xml&amp;isJob=${config.getIsJob()}&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
+                    <td><a href="${it.createLinkToJobFiles(config,'xml')}">
                           <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
                         </a>
                         <st:nbsp />
-                        <a href="configOutput?type=raw&amp;isJob=${config.getIsJob()}&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
+                        <a href="${it.createLinkToJobFiles(config,'raw')}">
                           (${%RAW})
                         </a>
                     </td>

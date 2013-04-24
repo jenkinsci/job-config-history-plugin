@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Plugin;
 import hudson.XmlFile;
+import hudson.maven.MavenModule;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.model.ItemGroup;
@@ -21,6 +22,8 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletException;
 
+import jenkins.model.Jenkins;
+
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,6 +38,7 @@ import org.kohsuke.stapler.StaplerRequest;
  *
  */
 public class JobConfigHistory extends Plugin {
+    
     /** Root directory for storing histories. */
     private String historyRootDir;
     
@@ -50,7 +54,7 @@ public class JobConfigHistory extends Plugin {
      */
     private boolean saveSystemConfiguration;
 
-    /** Flag to indicated ItemGroups configuration is saved as well. */
+    /** Flag to indicate ItemGroups configuration is saved as well. */
     private boolean saveItemGroupConfiguration;
 
     /** Flag to indicate if we should save history when it 
@@ -65,6 +69,15 @@ public class JobConfigHistory extends Plugin {
 
     /** Compiled regular expression pattern. */
     private transient Pattern excludeRegexpPattern;
+    
+    /** Flag to indicate if we should save the config history of Maven modules. */
+    private boolean saveModuleConfiguration = true;
+    
+    /**
+     * Whether build badges should appear when the config of a job has changed since the last build.
+     * Three possible settings: Never, always, only for users with config permission. 
+     */
+    private String showBuildBadges = "always";
 
     /** our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistory.class.getName());
@@ -107,10 +120,12 @@ public class JobConfigHistory extends Plugin {
         saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
         skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
         excludePattern = formData.getString("excludePattern");
+        saveModuleConfiguration = formData.getBoolean("saveModuleConfiguration");
+        showBuildBadges = formData.getString("showBuildBadges");
         save();
         loadRegexpPatterns();
     }
-
+    
     /**
      * @return The configured history root directory.
      */
@@ -201,6 +216,45 @@ public class JobConfigHistory extends Plugin {
         return JobConfigHistoryConsts.DEFAULT_EXCLUDE;
     }
     
+    /**
+     * @return true if we should save 'system' configurations.
+     */
+    public boolean getSaveModuleConfiguration() {
+        return saveModuleConfiguration;
+    }
+
+    /**
+     * @return Whether build badges should appear always, never or only for users with config rights.
+     */
+    public String getShowBuildBadges() {
+        return showBuildBadges;
+    }
+    
+    /**
+     * Used for testing only.
+     * @param showBadges Never, always, userWithConfigPermission or adminUser.
+     */
+    public void setShowBuildBadges(String showBadges) {
+        showBuildBadges = showBadges;
+    }
+
+    /**
+     * Whether build badges should appear for the builds of this project for this user.
+     * 
+     * @param project The project to which the build history belongs.
+     * @return False if the option is set to 'never' or the user doesn't have the required permissions.
+     */
+    boolean showBuildBadges(AbstractProject<?, ?> project) {
+        if ("always".equals(showBuildBadges)) {
+            return true;
+        } else if ("userWithConfigPermission".equals(showBuildBadges) && project.hasPermission(AbstractProject.CONFIGURE)) {
+            return true;
+        } else if ("adminUser".equals(showBuildBadges) && Hudson.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Used for testing to verify invalid pattern not loaded.
      * @return The loaded regexp pattern, or null if pattern was invalid. 
@@ -365,22 +419,49 @@ public class JobConfigHistory extends Plugin {
         if (item instanceof AbstractProject<?, ?>) {
             saveable = true;
         } else if (saveSystemConfiguration && xmlFile.getFile().getParentFile().equals(Hudson.getInstance().root)) {
-            if (excludeRegexpPattern != null) {
-                final Matcher matcher = excludeRegexpPattern.matcher(xmlFile.getFile().getName());
-                saveable = !matcher.find();
-            } else {
-                saveable = true;
-            }
+            saveable = checkRegex(xmlFile);
         } else if (saveItemGroupConfiguration && item instanceof ItemGroup) {
             saveable = true;
         }
-        if (saveable && skipDuplicateHistory && hasDuplicateHistory(xmlFile)) {
-            LOG.fine("found duplicate history, skipping save of " + xmlFile);
+        if (item instanceof MavenModule && !saveModuleConfiguration) {
             saveable = false;
         }
+        if (saveable) {
+            saveable = checkDuplicate(xmlFile);
+        }
+        
         return saveable;
     }
 
+    /**
+     * Checks whether the configuration file should not be saved because it's a duplicate.
+     * @param xmlFile The config file
+     * @return True if it should be saved
+     */
+    private boolean checkDuplicate(final XmlFile xmlFile) {
+        if (skipDuplicateHistory && hasDuplicateHistory(xmlFile)) {
+            LOG.fine("found duplicate history, skipping save of " + xmlFile);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Check whether config file should not be saved because of regex pattern.
+     * @param xmlFile The config file
+     * @return True if it should be saved
+     */
+    private boolean checkRegex(final XmlFile xmlFile) {
+        if (excludeRegexpPattern != null) {
+            final Matcher matcher = excludeRegexpPattern.matcher(xmlFile.getFile().getName());
+            return !matcher.find();
+        } else {
+            return true;
+        }
+    }
+    
+    
     /**
      * Determines if the {@link XmlFile} contains a duplicate of
      * the last saved information, if there is previous history.

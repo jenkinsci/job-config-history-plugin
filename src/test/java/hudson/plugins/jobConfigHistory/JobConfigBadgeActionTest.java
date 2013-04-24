@@ -1,9 +1,13 @@
 package hudson.plugins.jobConfigHistory;
 
+import org.acegisecurity.context.SecurityContextHolder;
 import org.jvnet.hudson.test.recipes.LocalData;
+import org.jvnet.hudson.test.recipes.PresetData;
+import org.jvnet.hudson.test.recipes.PresetData.DataSet;
 
 import hudson.model.Result;
 import hudson.model.FreeStyleProject;
+import hudson.model.Hudson;
 
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -37,7 +41,6 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
         assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
         
         htmlPage = (HtmlPage)htmlPage.refresh();
-        System.out.println(htmlPage.asXml());
         assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
     }
     
@@ -112,5 +115,130 @@ public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInst
     public void testBuildWithoutHistoryEntries() throws Exception {
         final FreeStyleProject project = (FreeStyleProject) hudson.getItem("Test2");
         assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+    }
+
+    @PresetData(DataSet.ANONYMOUS_READONLY)
+    public void testBadgeConfigurationAnonymous() throws Exception {
+        final String jobName = "newjob";
+        final String description = "a description";
+        final FreeStyleProject project = createFreeStyleProject(jobName);
+
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
+        project.setDescription(description);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        
+        hudson.setSecurityRealm(createDummySecurityRealm());
+        SecurityContextHolder.getContext().setAuthentication(Hudson.ANONYMOUS);
+        shouldPageContainBadge("anonymous");
+    }
+
+    @LocalData
+    public void testBadgeConfigurationWithPermissions() throws Exception {
+        final String jobName = "newjob";
+        final String description = "a description";
+        final FreeStyleProject project = createFreeStyleProject(jobName);
+
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
+        project.setDescription(description);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        
+        hudson.setSecurityRealm(createDummySecurityRealm());
+        webClient.login("configUser");
+        shouldPageContainBadge("configUser");
+        
+        webClient.login("administrator");
+        shouldPageContainBadge("admin");
+    }
+
+    private void shouldPageContainBadge(String user) throws Exception{
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        HtmlPage htmlPage = webClient.goTo("job/newjob");
+        
+        //default = always
+        assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+
+        jch.setShowBuildBadges("never");
+        htmlPage = (HtmlPage) htmlPage.refresh();
+        assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        
+        jch.setShowBuildBadges("userWithConfigPermission");
+        htmlPage = (HtmlPage) htmlPage.refresh();
+        
+        if (("configUser").equals(user) || ("admin").equals(user)) {
+            assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        } else {
+            assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        }
+
+        jch.setShowBuildBadges("adminUser");
+        htmlPage = (HtmlPage) htmlPage.refresh();
+        
+        if (("admin").equals(user)) {
+            assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        } else {
+            assertFalse("Page should not contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+        }
+    }
+
+    public void testCorrectShowDiffLinkWithSingleChange() throws Exception {
+        final String jobName = "testjob";
+        final FreeStyleProject project = createFreeStyleProject(jobName);
+        project.setDescription("first description");
+        Thread.sleep(SLEEP_TIME);
+
+        final String secondDescription = "second description";
+        project.setDescription(secondDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
+        
+        final String lastDescription = "last description";
+        project.setDescription(lastDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+
+        HtmlPage htmlPage = webClient.goTo("job/" + jobName);
+        assertTrue("Page should contain build badge", htmlPage.asXml().contains("buildbadge.png"));
+
+        final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage.getElementById("showDiff");
+        final HtmlPage showDiffPage = showDiffLink.click();
+        final String page = showDiffPage.asText();
+        assertTrue("ShowDiffFiles page should be reached now", page.contains("Restore old version"));
+        assertTrue("ShowDiff page should contain second description", page.contains(secondDescription));
+        assertTrue("ShowDiff page should contain last description", page.contains(lastDescription));
+    }
+
+    public void testCorrectShowDiffLinkWithMultipleChanges() throws Exception {
+        final String jobName = "testjob";
+
+        final FreeStyleProject project = createFreeStyleProject(jobName);
+        project.setDescription("first description");
+        Thread.sleep(SLEEP_TIME);
+        final String secondDescription = "second description";
+        project.setDescription(secondDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
+
+        for (int i = 3; i < 6; i++) {
+            project.setDescription("decription no. " + i);
+            Thread.sleep(SLEEP_TIME);
+        }
+        final String lastDescription = "last description";
+        project.setDescription(lastDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+
+        HtmlPage htmlPage = webClient.goTo("job/" + jobName);
+        final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage.getElementById("showDiff");
+        final HtmlPage showDiffPage = showDiffLink.click();
+        final String page = showDiffPage.asText();
+        assertTrue("ShowDiffFiles page should be reached now", page.contains("Restore old version"));
+        assertTrue("ShowDiff page should contain second description", page.contains(secondDescription));
+        assertTrue("ShowDiff page should contain last description", page.contains(lastDescription));
     }
 }
