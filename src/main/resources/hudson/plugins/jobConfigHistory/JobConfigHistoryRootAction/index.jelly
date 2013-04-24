@@ -48,7 +48,7 @@
             <div>
               <table class="pane sortable" style="width:100%">
                 <tr>
-                  <td class="pane-header" initialSortDir="down" align="left">${%Date}</td>
+                  <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
                   <j:choose>
                     <j:when test="${filter == 'jobs' || filter == 'deleted'}">
                       <td class="pane-header" align="left">${%Job configuration}</td>

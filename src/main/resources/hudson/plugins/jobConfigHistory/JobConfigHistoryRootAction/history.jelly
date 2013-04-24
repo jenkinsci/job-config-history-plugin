@@ -41,16 +41,12 @@
       		    </j:if>
                 <table class="pane sortable" style="width:100%">
                   <tr>
-                    <td class="pane-header" initialSortDir="down" align="left">${%Date}</td>
+                    <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
                     <td class="pane-header" align="left">${%Operation}</td>
                     <td class="pane-header" align="left">${%User}</td>
                     <td class="pane-header" align="left">${%Show File}</td>
-                    <td class="pane-header" align="center" colspan="2" style="border-left: solid 1px #bbb;">${%Diff}</td>
-                  </tr>
-                  <tr>
-                    <td colspan="4"></td>
-                    <td align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
-                    <td align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
+                    <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
+                    <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
                   </tr>
                   <j:set var="configNr" value="0"/>
                   <j:forEach var="config" items="${configs}">
