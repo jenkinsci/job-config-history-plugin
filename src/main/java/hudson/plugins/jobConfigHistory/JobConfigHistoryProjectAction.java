@@ -186,10 +186,10 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         
         if (checkTimestamp(timestamp)) {
             if (project instanceof MavenModule) {
-                path = rootDir + ((MavenModule) project).getParent().getName() + "/modules/" 
+                path = rootDir + ((MavenModule) project).getParent().getFullName().replace("/", "/jobs/") + "/modules/"
                         + ((MavenModule) project).getModuleName().toFileSystemName() + "/" + timestamp;
             } else {
-                path = rootDir + project.getName() + "/" + timestamp;
+                path = rootDir + project.getFullName().replace("/", "/jobs/") + "/" + timestamp;
             }
             configFile = getPlugin().getConfigFile(new File(path));
         }

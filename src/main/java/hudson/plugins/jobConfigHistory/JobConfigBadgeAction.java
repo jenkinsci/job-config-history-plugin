@@ -149,7 +149,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
         
         for (String timestamp : configDates) {
-            final String path = plugin.getJobHistoryRootDir() + "/" + build.getProject().getName() + "/" + timestamp;
+            final String path = plugin.getJobHistoryRootDir() + "/" + build.getProject().getFullName().replace("/", "/jobs/") + "/" + timestamp;
             final File historyDir = new File(path);
             if (!historyDir.exists() || !new File(historyDir, "config.xml").exists()) {
                 return false;
