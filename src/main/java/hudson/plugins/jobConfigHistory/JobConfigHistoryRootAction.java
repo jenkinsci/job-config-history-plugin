@@ -240,7 +240,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     public final String createLinkToJobFiles(ConfigInfo config, String type) {
         final String link;
         if (config.getIsJob() && !config.getJob().contains(JobConfigHistoryConsts.DELETED_MARKER)) {
-            link = getHudson().getRootUrl() + "job/" + config.getJob() + getUrlName() 
+            link = getHudson().getRootUrl() + "job/" + config.getJob().replace("/", "/job/") + getUrlName()
                     + "/configOutput?type=" + type + "&timestamp=" + config.getDate();
         } else {
             link = "configOutput?type=" + type + "&name=" + config.getJob() + "&timestamp=" + config.getDate();
