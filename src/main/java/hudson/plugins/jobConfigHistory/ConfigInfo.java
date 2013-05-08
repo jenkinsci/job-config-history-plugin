@@ -57,7 +57,7 @@ public class ConfigInfo {
     public static ConfigInfo create(final AbstractItem item, final File file, final HistoryDescr histDescr)
         throws UnsupportedEncodingException {
         return new ConfigInfo(
-                item.getName(),
+                item.getFullName(),
                 URLEncoder.encode(file.getAbsolutePath(), "utf-8"),
                 histDescr.getTimestamp(),
                 histDescr.getUser(),
