@@ -15,12 +15,14 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.Extension;
 import hudson.XmlFile;
+import hudson.model.AbstractItem;
 import hudson.model.Item;
 import hudson.model.RootAction;
 import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
 import hudson.util.MultipartFormDataParser;
+import java.util.Collection;
 
 /**
  *
@@ -149,11 +151,17 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         if (!historyRootDir.isDirectory()) {
             LOG.fine(historyRootDir + " is not a directory, assuming that no history exists yet.");
         } else {
+            addConfigs(configs, type, historyRootDir, "");
+        }
+        return configs; 
+    }
+
+    private void addConfigs(Collection<ConfigInfo> configs, String type, File rootDir, String prefix) throws IOException {
             final File[] itemDirs;
             if ("deleted".equals(type)) {
-                itemDirs = historyRootDir.listFiles(JobConfigHistory.DELETED_FILTER);
+                itemDirs = rootDir.listFiles(JobConfigHistory.DELETED_FILTER);
             } else {
-                itemDirs = historyRootDir.listFiles();
+                itemDirs = rootDir.listFiles();
             }
             for (final File itemDir : itemDirs) {
                 for (final File historyDir : itemDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
@@ -161,19 +169,21 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
                     final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
                     final ConfigInfo config;
                     if ("jobs".equals(type) && !itemDir.getName().contains(JobConfigHistoryConsts.DELETED_MARKER)) {
-                        config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, true);
+                        config = ConfigInfo.create(prefix + itemDir.getName(), historyDir, histDescr, true);
                     } else {
-                        config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, false);
+                        config = ConfigInfo.create(prefix + itemDir.getName(), historyDir, histDescr, false);
                     }
                     if (!("deleted".equals(type) && !"Deleted".equals(config.getOperation()))) {
                         configs.add(config);
                     }
                 }
+            File jobs = new File(itemDir, JobConfigHistoryConsts.JOBS_HISTORY_DIR);
+            if (jobs.isDirectory()) {
+                // Recurse into folders.
+                addConfigs(configs, type, jobs, prefix + itemDir.getName() + "/");
             }
         }
-        return configs; 
     }
-
     
     /**
      * Returns the configuration history entries for one group of system files.
@@ -240,6 +250,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     public final String createLinkToJobFiles(ConfigInfo config, String type) {
         final String link;
         if (config.getIsJob() && !config.getJob().contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+            // XXX besides clumsiness with folders, this fails to URL-escape characters in job names
             link = getHudson().getRootUrl() + "job/" + config.getJob().replace("/", "/job/") + getUrlName()
                     + "/configOutput?type=" + type + "&timestamp=" + config.getDate();
         } else {
