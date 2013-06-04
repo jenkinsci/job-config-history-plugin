@@ -179,4 +179,9 @@ public class ConfigInfo {
     public boolean getIsJob() {
         return isJob;
     }
+
+    @Override public String toString() {
+        return operation + " on " + file + " @" + date;
+    }
+
 }
