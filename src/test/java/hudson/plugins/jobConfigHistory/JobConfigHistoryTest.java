@@ -208,20 +208,20 @@ public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstance
 
             // check with default value
             jch.checkForPurgeByQuantity(historyDir);
-            assertEquals("Verify 1 history entry exists, default purge quantity.", 1, projectAction.getJobConfigs().size());
+            assertEquals("Verify 2 history entries exist, default purge quantity: " + projectAction.getJobConfigs(), 2, projectAction.getJobConfigs().size());
 
             // set to negative value, ensure no purge happens
             jch.setMaxHistoryEntries("-1");
             jch.checkForPurgeByQuantity(historyDir);
-            assertEquals("Verify 1 history entry, invalid max quantity.", 1, projectAction.getJobConfigs().size());
+            assertEquals("Verify 2 history entries, invalid max quantity.", 2, projectAction.getJobConfigs().size());
 
-            // set to 2, ensure no purge happens
-            jch.setMaxHistoryEntries("2");
-            assertEquals("Verify 1 history entry, max entries > current.", 1, projectAction.getJobConfigs().size());
+            // set to 3, ensure no purge happens
+            jch.setMaxHistoryEntries("3");
+            assertEquals("Verify 2 history entries, max entries > current.", 2, projectAction.getJobConfigs().size());
 
             // purge attempt on invalid directory
             jch.checkForPurgeByQuantity(new File("/invaliddir"));
-            assertEquals("Verify history unaffected (still 1 entry) after attempt to purge invalid directory.", 1, projectAction.getJobConfigs().size());
+            assertEquals("Verify history unaffected (still 2 entries) after attempt to purge invalid directory.", 2, projectAction.getJobConfigs().size());
 
             // clear out all history - setting to 1 will clear out all with the expectation that we are creating a new entry
             jch.setMaxHistoryEntries("1");
