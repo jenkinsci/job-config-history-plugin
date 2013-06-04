@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,13 +75,30 @@ public enum ConfigHistoryListenerHelper {
      *            time of operation.
      * @return timestamped directory where to store one history entry.
      */
-    private File getRootDir(final XmlFile xmlFile, final Calendar timestamp) {
+    @SuppressWarnings("SleepWhileInLoop")
+    private File getRootDir(final XmlFile xmlFile, final AtomicReference<Calendar> timestampHolder) {
         final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
         final File itemHistoryDir = plugin.getHistoryDir(xmlFile);
         // perform check for purge here, when we are actually going to create
         // a new directory, rather than just when we scan it in above method.
         plugin.checkForPurgeByQuantity(itemHistoryDir);
-        final File f = new File(itemHistoryDir, getIdFormatter().format(timestamp.getTime()));
+        Calendar timestamp;
+        File f;
+        while (true) {
+            timestamp = new GregorianCalendar();
+            f = new File(itemHistoryDir, getIdFormatter().format(timestamp.getTime()));
+            if (f.isDirectory()) {
+                LOG.log(Level.FINE, "clash on {0}, will wait a moment", f);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException x) {
+                    throw new RuntimeException(x);
+                }
+            } else {
+                timestampHolder.set(timestamp);
+                break;
+            }
+        }
         // mkdirs sometimes fails although the directory exists afterwards,
         // so check for existence as well and just be happy if it does.
         if (!(f.mkdirs() || f.exists())) {
@@ -97,12 +115,14 @@ public enum ConfigHistoryListenerHelper {
      */
     public final void createNewHistoryEntry(final XmlFile xmlFile) {
         try {
-            final Calendar timestamp = new GregorianCalendar();
+            AtomicReference<Calendar> timestamp = new AtomicReference<Calendar>();
             final File timestampedDir = getRootDir(xmlFile, timestamp);
+            LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
             if (this != DELETED) {
                 copyConfigFile(xmlFile.getFile(), timestampedDir);
             }
-            createHistoryXmlFile(timestamp, timestampedDir);
+            assert timestamp.get() != null;
+            createHistoryXmlFile(timestamp.get(), timestampedDir);
         } catch (IOException e) {
             // If not able to create the history entry, log, but continue without it.
             // A known issue is where Hudson core fails to move the folders on rename,
