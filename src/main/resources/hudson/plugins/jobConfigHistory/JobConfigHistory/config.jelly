@@ -13,7 +13,7 @@
         <f:textbox name="maxDaysToKeepEntries" value="${it.maxDaysToKeepEntries}"
            checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxDaysToKeepEntries?value='+escape(this.value)"/>
       </f:entry>
-      <f:entry title="${%Save ItemGroups configuration changes}" help="/plugin/jobConfigHistory/help/help-saveItemGroupConfiguration.html">
+      <f:entry title="${%Save folder configuration changes}" help="/plugin/jobConfigHistory/help/help-saveItemGroupConfiguration.html">
         <f:checkbox name="saveItemGroupConfiguration" checked="${it.saveItemGroupConfiguration}"/>
       </f:entry>
       <f:entry title="${%Save system configuration changes}" help="/plugin/jobConfigHistory/help/help-saveSystemConfiguration.html">

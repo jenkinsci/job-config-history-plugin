@@ -49,7 +49,6 @@ public final class JobConfigHistoryJobListener extends ItemListener {
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         LOG.finest("In onRenamed for " + item + onRenameDesc);
         if (item instanceof AbstractItem) {
-            ConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
             final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
 
             // move history items from previous name, if the directory exists
@@ -74,6 +73,8 @@ public final class JobConfigHistoryJobListener extends ItemListener {
                     }
                 }
             }
+            // Must do this after moving old history, in case a CHANGED was fired during the same second under the old name.
+            ConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
         }
         LOG.finest("Completed onRename for" + item + " done.");
 //        new Exception("STACKTRACE for double invocation").printStackTrace();

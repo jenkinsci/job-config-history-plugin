@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="${%All Configuration History}">
     <l:side-panel>
@@ -71,7 +72,8 @@
                     <td>${config.date}</td>
                     <j:choose>
                       <j:when test="${config.getIsJob()}">
-                        <td><a href="${rootURL}/job/${config.job}/jobConfigHistory">${config.job}</a></td>
+                        <!-- XXX besides clumsiness with folders, this fails to URL-escape characters in job names -->
+                        <td><a href="${rootURL}/job/${config.job.replace('/', '/job/')}/jobConfigHistory">${config.job.replace('/', ' » ')}</a></td>
                       </j:when>
                       <j:otherwise>
                         <j:choose>
