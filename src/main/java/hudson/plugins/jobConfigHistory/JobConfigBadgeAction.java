@@ -24,8 +24,7 @@ import hudson.model.listeners.RunListener;
  * 
  * @author kstutz
  */
-@Extension
-public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements BuildBadgeAction {
+public class JobConfigBadgeAction implements BuildBadgeAction {
 
     /**The logger.*/
     private static final Logger LOG = Logger.getLogger(JobConfigBadgeAction.class.getName());
@@ -36,19 +35,18 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
     /**We need the build in order to get the project name.*/
     private AbstractBuild build;
 
-    /**No arguments about a no-argument constructor (necessary because of annotation).*/
-    public JobConfigBadgeAction() { }
-    
     /**
      * Creates a new JobConfigBadgeAction.
      * @param configDates The dates of the last two config changes
      * @param build The respective build
      */
     public JobConfigBadgeAction(String[] configDates, AbstractBuild build) {
-        super(AbstractBuild.class);
         this.configDates = configDates.clone();
         this.build = build;
     }
+
+    @Extension
+    public static final class Listener extends RunListener<AbstractBuild> {
 
     @Override
     public void onStarted(AbstractBuild build, TaskListener listener) {
@@ -92,7 +90,7 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
 
         super.onStarted(build, listener);
     }
-    
+
     /**
      * Finds the date of the last config change that happened before the last build.
      * This is needed for the link in the build history that shows the difference between the current
@@ -129,6 +127,8 @@ public class JobConfigBadgeAction extends RunListener<AbstractBuild> implements 
         return date;
     }
     
+    } // end Listener
+
     /**
      * Returns true if the config change build badges should appear
      * (depending on plugin settings and user permissions).
