@@ -1,5 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
+import static java.util.logging.Level.*;
+
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -7,6 +9,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
@@ -52,7 +55,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
             }
         }
         if (maxAge > 0) {
-            LOG.fine("checking for history files to purge (max age of " + maxAge + " days allowed)");
+            LOG.log(FINE, "checking for history files to purge (max age of {0} days allowed)", maxAge);
             this.maxAge = maxAge;
             purgeHistoryByAge();
         }
@@ -80,7 +83,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
                     for (File historyDir : historyDirs) {
                         //historyDir: e.g. 2013-01-18_17-33-51
                         if (isTooOld(historyDir)) {
-                            LOG.finest("Should delete: " + historyDir);
+                            LOG.log(FINEST, "Should delete: {0}", historyDir);
                             deleteDirectory(historyDir);
                         } else {
                             break;
