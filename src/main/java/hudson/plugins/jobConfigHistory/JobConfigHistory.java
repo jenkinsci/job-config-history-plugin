@@ -15,6 +15,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -440,7 +441,7 @@ public class JobConfigHistory extends Plugin {
      */
     private boolean checkDuplicate(final XmlFile xmlFile) {
         if (skipDuplicateHistory && hasDuplicateHistory(xmlFile)) {
-            LOG.fine("found duplicate history, skipping save of " + xmlFile);
+            LOG.log(Level.FINE, "found duplicate history, skipping save of {0}", xmlFile);
             return false;
         } else {
             return true;

@@ -1,5 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
+import static java.util.logging.Level.*;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Item;
@@ -28,13 +29,13 @@ public final class JobConfigHistoryJobListener extends ItemListener {
     /** {@inheritDoc} */
     @Override
     public void onCreated(Item item) {
-        LOG.finest("In onCreated for " + item);
+        LOG.log(FINEST, "In onCreated for {0}", item);
         if (item instanceof AbstractItem) {
             ConfigHistoryListenerHelper.CREATED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
         } else {
             LOG.finest("onCreated: not an AbstractItem, skipping history save");
         }
-        LOG.finest("onCreated for " + item + " done.");
+        LOG.log(FINEST, "onCreated for {0} done.", item);
         //        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
 
@@ -47,7 +48,7 @@ public final class JobConfigHistoryJobListener extends ItemListener {
     @Override
     public void onRenamed(Item item, String oldName, String newName) {
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
-        LOG.finest("In onRenamed for " + item + onRenameDesc);
+        LOG.log(FINEST, "In onRenamed for {0}{1}", new Object[] {item, onRenameDesc});
         if (item instanceof AbstractItem) {
             final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
 
@@ -63,7 +64,7 @@ public final class JobConfigHistoryJobListener extends ItemListener {
                     try {
                         fp.copyRecursiveTo(new FilePath(currentHistoryDir));
                         fp.deleteRecursive();
-                        LOG.finest("completed move of old history files on rename." + onRenameDesc);
+                        LOG.log(FINEST, "completed move of old history files on rename.{0}", onRenameDesc);
                     } catch (IOException e) {
                         final String ioExceptionStr = "unable to move old history on rename." + onRenameDesc;
                         LOG.log(Level.SEVERE, ioExceptionStr, e);
@@ -76,14 +77,14 @@ public final class JobConfigHistoryJobListener extends ItemListener {
             // Must do this after moving old history, in case a CHANGED was fired during the same second under the old name.
             ConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
         }
-        LOG.finest("Completed onRename for" + item + " done.");
+        LOG.log(FINEST, "Completed onRename for {0} done.", item);
 //        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
 
     /** {@inheritDoc} */
     @Override
     public void onDeleted(Item item) {
-        LOG.finest("In onDeleted for " + item);
+        LOG.log(FINEST, "In onDeleted for {0}", item);
         if (item instanceof AbstractItem) {
             final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
             
@@ -99,6 +100,6 @@ public final class JobConfigHistoryJobListener extends ItemListener {
                 LOG.warning("unable to rename deleted history dir to: " + deletedHistoryDir);
             }
         }
-        LOG.finest("onDeleted for " + item + " done.");
+        LOG.log(FINEST, "onDeleted for {0} done.", item);
     }
 }
