@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.427</version>
+        <version>1.519</version>
     </parent>
 
     <artifactId>jobConfigHistory</artifactId>
@@ -82,74 +82,9 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.4</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.4</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.hudson</groupId>
-            <artifactId>test-annotations</artifactId>
-            <version>1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci</groupId>
-            <artifactId>htmlunit</artifactId>
-            <version>2.6-jenkins-6</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>1.0.b2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.googlecode.java-diff-utils</groupId>
             <artifactId>diffutils</artifactId>
             <version>1.2.1</version>
-        </dependency>
-        <dependency>
-            <!--
-                stapler-1.172 depends on r06, which is missing symbol
-                com.google.common.collect.ImmutableList.copyOf(Ljava/util/Collection;)
-                new version 11.0.1 with this symbol is provided in jenkins-1.424.6
-            -->
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>11.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.kohsuke.stapler</groupId>
-            <artifactId>stapler</artifactId>
-            <version>1.172</version>
-            <scope>provided</scope>
-        </dependency>
-            <dependency>
-            <groupId>org.kohsuke.stapler</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.1-rev7</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.localizer</groupId>
-            <artifactId>localizer</artifactId>
-            <version>1.10</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
         	<groupId>org.jenkins-ci.main</groupId>
