@@ -15,8 +15,10 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildBadgeAction;
 import hudson.model.Hudson;
+import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
+import jenkins.model.RunAction2;
 
 /**
  * This class adds a badge to the build history marking builds 
@@ -24,7 +26,7 @@ import hudson.model.listeners.RunListener;
  * 
  * @author kstutz
  */
-public class JobConfigBadgeAction implements BuildBadgeAction {
+public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 
     /**The logger.*/
     private static final Logger LOG = Logger.getLogger(JobConfigBadgeAction.class.getName());
@@ -33,16 +35,24 @@ public class JobConfigBadgeAction implements BuildBadgeAction {
     private String[] configDates;
     
     /**We need the build in order to get the project name.*/
-    private AbstractBuild build;
+    private transient AbstractBuild build;
 
     /**
      * Creates a new JobConfigBadgeAction.
      * @param configDates The dates of the last two config changes
      * @param build The respective build
      */
-    public JobConfigBadgeAction(String[] configDates, AbstractBuild build) {
+    private JobConfigBadgeAction(String[] configDates) {
         this.configDates = configDates.clone();
-        this.build = build;
+    }
+
+    @Override public void onAttached(Run<?,?> r) {
+        build = (AbstractBuild) r;
+
+    }
+    
+    @Override public void onLoad(Run<?,?> r) {
+        build = (AbstractBuild) r;
     }
 
     @Extension
@@ -84,7 +94,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction {
 
             if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
                 final String[] dates = {lastChange.getDate(), findLastRelevantConfigChangeDate(configs, lastBuildDate)};
-                build.addAction(new JobConfigBadgeAction(dates, build));
+                build.addAction(new JobConfigBadgeAction(dates));
             }
         }
 
