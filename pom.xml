@@ -142,8 +142,25 @@
                 <configuration>
                     <argLine>${argLine} -Xms256m -Xmx512m</argLine>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <testFailureIgnore>false</testFailureIgnore>
+                    <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <argLine>${argLine} -Xms256m -Xmx512m</argLine>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <testFailureIgnore>true</testFailureIgnore>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -239,6 +256,7 @@
                     <reportSet>
                         <reports>
                             <report>report-only</report>
+                            <report>failsafe-report-only</report>
                         </reports>
                     </reportSet>
                 </reportSets>
