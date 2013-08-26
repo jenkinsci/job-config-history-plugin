@@ -31,7 +31,7 @@ import hudson.tasks.LogRotator;
  * @author mfriedenhagen
  *
  */
-public class JobConfigHistoryBaseActionTest extends AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigHistoryBaseActionIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private WebClient webClient;
     // we need to sleep between saves so we don't overwrite the history directories

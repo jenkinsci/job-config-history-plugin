@@ -12,7 +12,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class JobConfigHistoryRootActionTest extends AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigHistoryRootActionIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private WebClient webClient;
     // we need to sleep between saves so we don't overwrite the history directories

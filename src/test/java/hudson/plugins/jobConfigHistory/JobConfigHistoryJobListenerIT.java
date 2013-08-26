@@ -24,7 +24,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
  * @author mirko
  * 
  */
-public class JobConfigHistoryJobListenerTest extends AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigHistoryJobListenerIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private File jobHistoryDir;
     private WebClient webClient;

@@ -9,7 +9,7 @@ import org.jvnet.hudson.test.recipes.LocalData;
 
 import hudson.XmlFile;
 
-public class JobConfigHistoryPurgerTest extends AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInstanceDir {
     
     private static final int SLEEP_TIME = 1100;
 

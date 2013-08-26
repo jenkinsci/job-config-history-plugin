@@ -12,7 +12,7 @@ import hudson.model.Hudson;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
-public class JobConfigBadgeActionTest extends AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigBadgeActionIT extends AbstractHudsonTestCaseDeletingInstanceDir {
     
     private WebClient webClient;
     private static final int SLEEP_TIME = 1100;

@@ -18,7 +18,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
  * @author jborghi@cisco.com
  *
  */
-public class JobConfigHistoryTest extends AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private WebClient webClient;
     // we need to sleep between saves so we don't overwrite the history directories

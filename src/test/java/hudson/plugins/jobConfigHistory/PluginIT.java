@@ -25,7 +25,7 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
 /**
  * @author mfriedenhagen
  */
-public class PluginTest extends AbstractHudsonTestCaseDeletingInstanceDir {
+public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private class JobPage {
 
