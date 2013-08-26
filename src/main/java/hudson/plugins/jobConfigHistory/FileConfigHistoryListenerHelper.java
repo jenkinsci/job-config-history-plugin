@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  * 
  * @author mfriedenhagen
  */
-public enum ConfigHistoryListenerHelper {
+public enum FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelper {
 
     /**
      * Helper for job creation.
@@ -50,7 +50,7 @@ public enum ConfigHistoryListenerHelper {
     DELETED(Messages.ConfigHistoryListenerHelper_DELETED());
 
     /** Our logger. */
-    private static final Logger LOG = Logger.getLogger(ConfigHistoryListenerHelper.class.getName());
+    private static final Logger LOG = Logger.getLogger(FileConfigHistoryListenerHelper.class.getName());
 
     /**
      * Name of the operation.
@@ -62,7 +62,7 @@ public enum ConfigHistoryListenerHelper {
      * @param operation
      *            the operation we handle.
      */
-    ConfigHistoryListenerHelper(final String operation) {
+    FileConfigHistoryListenerHelper(final String operation) {
         this.operation = operation;
     }
 
@@ -113,6 +113,7 @@ public enum ConfigHistoryListenerHelper {
      * @param xmlFile
      *            configuration file for the item we want to backup
      */
+    @Override
     public final void createNewHistoryEntry(final XmlFile xmlFile) {
         try {
             AtomicReference<Calendar> timestamp = new AtomicReference<Calendar>();

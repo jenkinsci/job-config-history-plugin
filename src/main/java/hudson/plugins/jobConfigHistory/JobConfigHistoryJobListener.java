@@ -31,7 +31,7 @@ public final class JobConfigHistoryJobListener extends ItemListener {
     public void onCreated(Item item) {
         LOG.log(FINEST, "In onCreated for {0}", item);
         if (item instanceof AbstractItem) {
-            ConfigHistoryListenerHelper.CREATED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
+            FileConfigHistoryListenerHelper.CREATED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
         } else {
             LOG.finest("onCreated: not an AbstractItem, skipping history save");
         }
@@ -75,7 +75,7 @@ public final class JobConfigHistoryJobListener extends ItemListener {
                 }
             }
             // Must do this after moving old history, in case a CHANGED was fired during the same second under the old name.
-            ConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
+            FileConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
         }
         LOG.log(FINEST, "Completed onRename for {0} done.", item);
 //        new Exception("STACKTRACE for double invocation").printStackTrace();
@@ -88,7 +88,7 @@ public final class JobConfigHistoryJobListener extends ItemListener {
         if (item instanceof AbstractItem) {
             final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
             
-            ConfigHistoryListenerHelper.DELETED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
+            FileConfigHistoryListenerHelper.DELETED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
             final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
 
             final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
