@@ -16,7 +16,7 @@ public class HistoryDescr {
     /** Name of the operation. */
     private final String operation;
 
-    /** Timestamp of the operation, see {@link ConfigHistoryListenerHelper#ID_FORMATTER}. */
+    /** Timestamp of the operation, see {@link JobConfigHistoryConsts#ID_FORMATTER}. */
     private final String timestamp;
 
     /**

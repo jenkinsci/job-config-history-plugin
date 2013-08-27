@@ -134,7 +134,7 @@ public class ConfigInfo {
     /**
      * Returns the date of the change.
      *
-     * @return timestamp in the format of {@link ConfigHistoryListenerHelper#ID_FORMATTER}
+     * @return timestamp in the format of {@link JobConfigHistoryConsts#ID_FORMATTER}
      */
     @Exported
     public String getDate() {
