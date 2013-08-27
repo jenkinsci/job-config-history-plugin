@@ -36,7 +36,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistoryRootAction.class.getName());
-    
+
     /**
      * Constructor necessary for testing.
      */
@@ -57,7 +57,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * Make method final, as we always want the same icon file. Returns
      * {@code null} to hide the icon if the user is not allowed to configure
      * jobs.
@@ -71,8 +71,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     }
 
     /**
-     * Returns the configuration history entries 
-     * for either {@link AbstractItem}s or system changes or deleted jobs 
+     * Returns the configuration history entries
+     * for either {@link AbstractItem}s or system changes or deleted jobs
      * or all of the above.
      *
      * @return list of configuration histories (as ConfigInfo)
@@ -92,7 +92,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         } else {
             configs = getJobConfigs(filter);
         }
-        
+
         Collections.sort(configs, ConfigInfoComparator.INSTANCE);
         return configs;
     }
@@ -100,7 +100,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     /**
      * Returns the configuration history entries for all system files
      * in this Hudson instance.
-     * 
+     *
      * @return List of config infos.
      * @throws IOException
      *             if one of the history entries might not be read.
@@ -108,7 +108,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     protected List<ConfigInfo> getSystemConfigs() throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getConfiguredHistoryRootDir();
-        
+
         if (!hasConfigurePermission()) {
             return configs;
         }
@@ -130,13 +130,13 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
                 }
             }
         }
-        return configs; 
+        return configs;
     }
 
     /**
-     * Returns the configuration history entries for all jobs 
+     * Returns the configuration history entries for all jobs
      * or deleted jobs in this Hudson instance.
-     * 
+     *
      * @param type Whether we want to see all jobs or just the deleted jobs.
      * @return List of config infos.
      * @throws IOException
@@ -145,7 +145,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     protected List<ConfigInfo> getJobConfigs(String type) throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir = getPlugin().getJobHistoryRootDir();
-        
+
         if (!hasJobConfigurePermission()) {
             return configs;
         }
@@ -155,41 +155,41 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         } else {
             addConfigs(configs, type, historyRootDir, "");
         }
-        return configs; 
+        return configs;
     }
 
     private void addConfigs(Collection<ConfigInfo> configs, String type, File rootDir, String prefix) throws IOException {
-            final File[] itemDirs;
-            if ("deleted".equals(type)) {
-                itemDirs = rootDir.listFiles(JobConfigHistory.DELETED_FILTER);
-            } else {
-                itemDirs = rootDir.listFiles();
-            }
-            for (final File itemDir : itemDirs) {
-                for (final File historyDir : itemDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
-                    final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
-                    final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-                    final ConfigInfo config;
-                    if ("jobs".equals(type) && !itemDir.getName().contains(JobConfigHistoryConsts.DELETED_MARKER)) {
-                        config = ConfigInfo.create(prefix + itemDir.getName(), historyDir, histDescr, true);
-                    } else {
-                        config = ConfigInfo.create(prefix + itemDir.getName(), historyDir, histDescr, false);
-                    }
-                    if (!("deleted".equals(type) && !"Deleted".equals(config.getOperation()))) {
-                        configs.add(config);
-                    }
+        final File[] itemDirs;
+        if ("deleted".equals(type)) {
+            itemDirs = rootDir.listFiles(JobConfigHistory.DELETED_FILTER);
+        } else {
+            itemDirs = rootDir.listFiles();
+        }
+        for (final File itemDir : itemDirs) {
+            for (final File historyDir : itemDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+                final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
+                final ConfigInfo config;
+                if ("jobs".equals(type) && !itemDir.getName().contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+                    config = ConfigInfo.create(prefix + itemDir.getName(), historyDir, histDescr, true);
+                } else {
+                    config = ConfigInfo.create(prefix + itemDir.getName(), historyDir, histDescr, false);
                 }
-            File jobs = new File(itemDir, JobConfigHistoryConsts.JOBS_HISTORY_DIR);
+                if (!("deleted".equals(type) && !"Deleted".equals(config.getOperation()))) {
+                    configs.add(config);
+                }
+            }
+            final File jobs = new File(itemDir, JobConfigHistoryConsts.JOBS_HISTORY_DIR);
             if (jobs.isDirectory()) {
                 // Recurse into folders.
                 addConfigs(configs, type, jobs, prefix + itemDir.getName() + "/");
             }
         }
     }
-    
+
     /**
      * Returns the configuration history entries for one group of system files.
-     * 
+     *
      * @param req The incoming StaplerRequest
      * @return Configs list for one group of system configuration files.
      * @throws IOException
@@ -222,7 +222,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     /**
      * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as
      * String.
-     * 
+     *
      * @return content of the {@code config.xml} found in directory given by the
      *         request parameter {@code file}.
      * @throws IOException
@@ -244,7 +244,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     /**
      * Creates links to the correct configOutput.jellys for job history vs. system history
      * and for xml vs. plain text.
-     * 
+     *
      * @param config ConfigInfo.
      * @param type Output type ('xml' or 'plain').
      * @return The link as String.
@@ -260,7 +260,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         }
         return link;
     }
-    
+
     /**
      * {@inheritDoc}
      *
@@ -270,7 +270,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     protected AccessControlled getAccessControlledObject() {
         return getHudson();
     }
-    
+
     @Override
     protected void checkConfigurePermission() {
         getAccessControlledObject().checkPermission(Permission.CONFIGURE);
@@ -280,20 +280,20 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     public boolean hasConfigurePermission() {
         return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
     }
-    
+
     /**
      * Returns whether the current user may configure jobs.
-     * 
+     *
      * @return true if the current user may configure jobs.
      */
     public boolean hasJobConfigurePermission() {
         return getAccessControlledObject().hasPermission(Item.CONFIGURE);
     }
-    
+
     /**
      * Parses the incoming {@code POST} request and redirects as
      * {@code GET showDiffFiles}.
-     * 
+     *
      * @param req
      *            incoming request
      * @param rsp
@@ -310,12 +310,12 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         rsp.sendRedirect("showDiffFiles?name=" + parser.get("name") + "&timestamp1=" + parser.get("timestamp1")
                 + "&timestamp2=" + parser.get("timestamp2"));
     }
-    
+
     /**
      * Returns the diff between two config files as a list of single lines.
-     * Takes the two timestamps and the name of the system property 
+     * Takes the two timestamps and the name of the system property
      * or the deleted job from the url parameters.
-     * 
+     *
      * @return Differences between two config versions as list of lines.
      * @throws IOException If diff doesn't work or xml files can't be read.
      */
@@ -330,20 +330,20 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
             final String[] configXml1Lines = configXml1.asString().split("\\n");
             final XmlFile configXml2 = getOldConfigXml(name, timestamp2);
             final String[] configXml2Lines = configXml2.asString().split("\\n");
-            
+
             final String diffAsString = getDiffAsString(configXml1.getFile(), configXml2.getFile(),
                     configXml1Lines, configXml2Lines);
-            
+
             final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
             return getDiffLines(diffLines);
         } else {
             return Collections.emptyList();
         }
     }
-    
+
     /**
      * Gets the version of the config.xml that was saved at a certain time.
-     * 
+     *
      * @param name The name of the system property or deleted job.
      * @param timestamp The timestamp as String.
      * @return The config file as XmlFile.
@@ -372,9 +372,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
             return new XmlFile(configFile);
         }
     }
-    
+
     /**
-     * Checks the url parameters 'name' and 'timestamp' and returns true if they are neither null 
+     * Checks the url parameters 'name' and 'timestamp' and returns true if they are neither null
      * nor suspicious.
      * @param name Name of deleted job or system property.
      * @param timestamp Timestamp of config change.
