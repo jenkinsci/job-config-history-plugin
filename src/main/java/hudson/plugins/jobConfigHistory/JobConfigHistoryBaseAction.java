@@ -34,7 +34,7 @@ import bmsi.util.Diff.change;
 /**
  * Implements some basic methods needed by the
  * {@link JobConfigHistoryRootAction} and {@link JobConfigHistoryProjectAction}.
- * 
+ *
  * @author mfriedenhagen
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
@@ -52,8 +52,16 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
+     * For tests only.
+     * @param hudson
+     */
+    JobConfigHistoryBaseAction(Hudson hudson) {
+        this.hudson = hudson;
+    }
+
+    /**
      * {@inheritDoc}
-     * 
+     *
      * Make method final, as we always want the same display name.
      */
     // @Override
@@ -63,7 +71,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * Do not make this method final as {@link JobConfigHistoryRootAction}
      * overrides this method.
      */
@@ -74,7 +82,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Returns how the config file should be formatted in configOutput.jelly: as plain text or xml.
-     * 
+     *
      * @return "plain" or "xml"
      */
     public final String getOutputType() {
@@ -100,10 +108,10 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         }
         return true;
     }
-    
+
     /**
      * Returns the parameter named {@code parameterName} from current request.
-     * 
+     *
      * @param parameterName
      *            name of the parameter.
      * @return value of the request parameter or null if it does not exist.
@@ -123,14 +131,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * Returns whether the current user may read configurations in the object
      * returned by
      * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
-     * 
+     *
      * @return true if the current user may read configurations.
      */
     protected abstract boolean hasConfigurePermission();
-    
+
     /**
      * Returns the hudson instance.
-     * 
+     *
      * @return the hudson
      */
     protected final Hudson getHudson() {
@@ -139,7 +147,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Returns the JobConfigHistory plugin instance.
-     * 
+     *
      * @return the JobConfigHistory plugin
      */
     protected final JobConfigHistory getPlugin() {
@@ -148,14 +156,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * Returns the object for which we want to provide access control.
-     * 
+     *
      * @return the access controlled object.
      */
     protected abstract AccessControlled getAccessControlledObject();
 
     /**
      * Returns side-by-side (i.e. human-readable) diff view lines.
-     * 
+     *
      * @param diffLines Unified diff as list of Strings.
      * @return Nice and clean diff as list of single Lines.
      * @throws IOException
@@ -167,9 +175,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         final DiffRowGenerator.Builder builder = new DiffRowGenerator.Builder();
         builder.columnWidth(Integer.MAX_VALUE);
         final DiffRowGenerator dfg = builder.build();
-        
+
         int previousLeftPos = 0;
-        
+
         for (final Delta delta : diff.getDeltas()) {
             final Chunk original = delta.getOriginal();
             final Chunk revised = delta.getRevised();
@@ -194,7 +202,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
                 if (tag == Tag.INSERT) {
                     line.left.cssClass = "diff_original";
-                    
+
                     line.right.lineNumber = rightPos;
                     line.right.text = row.getNewLine();
                     line.right.cssClass = "diff_revised";
@@ -207,7 +215,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                         leftPos++;
                     }
                     line.left.cssClass = "diff_original";
-                    
+
                     if (StringUtils.isNotEmpty(row.getNewLine())) {
                         line.right.lineNumber = rightPos;
                         line.right.text = row.getNewLine();
@@ -220,7 +228,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                     line.left.text = row.getOldLine();
                     line.left.cssClass = "diff_original";
                     leftPos++;
-                    
+
                     line.right.cssClass = "diff_revised";
 
                 } else if (tag == Tag.EQUAL) {
@@ -243,10 +251,10 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         view.clearDuplicateLines();
         return view.getLines();
     }
-    
+
     /**
      * Returns a unified diff between two string arrays.
-     * 
+     *
      * @param file1
      *            first config file.
      * @param file2
@@ -269,7 +277,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return output.toString();
     }
 
-    
+
     /**
      * Holds information for the SideBySideView.
      */
@@ -297,7 +305,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         public void addLine(Line line) {
             lines.add(line);
         }
-        
+
         /**
          * Deletes all dupes in the given lines.
          */
@@ -323,7 +331,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             }
             lines.removeAll(dupes);
         }
-        
+
         /**
          * Holds information about a single line, which consists
          * of the left and right information of the diff.
@@ -337,7 +345,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             private boolean skipping;
             /**EQUAL, INSERT, CHANGE or DELETE.*/
             private Tag tag;
-            
+
 
             /**
              * Returns the left version of a modificated line.
@@ -358,7 +366,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             }
             /**
              * Should we skip this line.
-             * 
+             *
              * @return true when the line should be skipped.
              */
             public boolean isSkipping() {
