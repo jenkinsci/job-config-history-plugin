@@ -4,15 +4,18 @@ import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.User;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.concurrent.atomic.AtomicReference;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -112,5 +115,23 @@ public class FileConfigHistoryListenerHelperTest {
         assertThat(historyContent, endsWith("HistoryDescr>"));
         assertThat(historyContent, containsString("<user>Anonym"));
         assertThat(historyContent, containsString(Messages.ConfigHistoryListenerHelper_CHANGED()));
+    }
+
+    /**
+     * Test of createNewHistoryDir method, of class FileConfigHistoryListenerHelper.
+     */
+    @Test
+    public void testCreateNewHistoryDir() throws IOException {
+        final File itemHistoryDir = tempFolder.newFolder();
+        final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
+        final File result = FileConfigHistoryListenerHelper.createNewHistoryDir(itemHistoryDir, timestampHolder);
+        assertTrue(result.exists());
+        assertTrue(result.isDirectory());
+        // Should provoke clash
+        final File result2 = FileConfigHistoryListenerHelper.createNewHistoryDir(itemHistoryDir, timestampHolder);
+        assertTrue(result2.exists());
+        assertTrue(result2.isDirectory());
+        assertNotEquals(result, result2);
+
     }
 }

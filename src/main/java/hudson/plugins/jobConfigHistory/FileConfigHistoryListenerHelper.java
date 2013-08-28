@@ -82,29 +82,7 @@ public enum FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelp
         // perform check for purge here, when we are actually going to create
         // a new directory, rather than just when we scan it in above method.
         plugin.checkForPurgeByQuantity(itemHistoryDir);
-        Calendar timestamp;
-        File f;
-        while (true) {
-            timestamp = new GregorianCalendar();
-            f = new File(itemHistoryDir, getIdFormatter().format(timestamp.getTime()));
-            if (f.isDirectory()) {
-                LOG.log(Level.FINE, "clash on {0}, will wait a moment", f);
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException x) {
-                    throw new RuntimeException(x);
-                }
-            } else {
-                timestampHolder.set(timestamp);
-                break;
-            }
-        }
-        // mkdirs sometimes fails although the directory exists afterwards,
-        // so check for existence as well and just be happy if it does.
-        if (!(f.mkdirs() || f.exists())) {
-            throw new RuntimeException("Could not create rootDir " + f);
-        }
-        return f;
+        return createNewHistoryDir(itemHistoryDir, timestampHolder);
     }
 
     /**
@@ -212,6 +190,32 @@ public enum FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelp
      */
     static SimpleDateFormat getIdFormatter() {
         return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);
+    }
+
+    static File createNewHistoryDir(final File itemHistoryDir, final AtomicReference<Calendar> timestampHolder) throws RuntimeException {
+        Calendar timestamp;
+        File f;
+        while (true) {
+            timestamp = new GregorianCalendar();
+            f = new File(itemHistoryDir, getIdFormatter().format(timestamp.getTime()));
+            if (f.isDirectory()) {
+                LOG.log(Level.FINE, "clash on {0}, will wait a moment", f);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException x) {
+                    throw new RuntimeException(x);
+                }
+            } else {
+                timestampHolder.set(timestamp);
+                break;
+            }
+        }
+        // mkdirs sometimes fails although the directory exists afterwards,
+        // so check for existence as well and just be happy if it does.
+        if (!(f.mkdirs() || f.exists())) {
+            throw new RuntimeException("Could not create rootDir " + f);
+        }
+        return f;
     }
 
 }
