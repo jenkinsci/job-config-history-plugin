@@ -149,7 +149,7 @@ public enum FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelp
      * @throws IOException
      *             if writing the history fails.
      */
-    private void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir) throws IOException {
+    void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir) throws IOException {
         final User currentUser = getCurrentUser();
         final String user;
         final String userId;
@@ -188,7 +188,7 @@ public enum FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelp
      * @throws IOException
      *             if writing the file holding the copy fails.
      */
-    private void copyConfigFile(final File currentConfig, final File timestampedDir) throws FileNotFoundException,
+    void copyConfigFile(final File currentConfig, final File timestampedDir) throws FileNotFoundException,
             IOException {
 
         final FileOutputStream configCopy = new FileOutputStream(new File(timestampedDir, currentConfig.getName()));
