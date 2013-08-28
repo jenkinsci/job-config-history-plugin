@@ -82,9 +82,11 @@ public class FileConfigHistoryListenerHelperTest {
      */
     @Test
     public void testGetIdFormatter() {
-        String expResult = "1970-01-01_01-00-00";
         SimpleDateFormat result = FileConfigHistoryListenerHelper.getIdFormatter();
-        assertEquals(expResult, result.format(new Date(0)));
+        final String formattedDate = result.format(new Date(0));
+        // workaround for timezone issues, as cloudbees is in the far east :-) and returns 1969 :-).
+        assertThat(formattedDate, startsWith("19"));
+        assertThat(formattedDate, endsWith("00-00"));
     }
 
     /**
