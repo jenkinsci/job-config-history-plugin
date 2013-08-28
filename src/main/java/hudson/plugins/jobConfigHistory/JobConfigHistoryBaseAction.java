@@ -30,6 +30,7 @@ import difflib.Patch;
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
 import bmsi.util.Diff.change;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Implements some basic methods needed by the
@@ -117,7 +118,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return value of the request parameter or null if it does not exist.
      */
     protected String getRequestParameter(final String parameterName) {
-        return Stapler.getCurrentRequest().getParameter(parameterName);
+        return getCurrentRequest().getParameter(parameterName);
     }
 
     /**
@@ -275,6 +276,10 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         unifiedPrint.print_header(file1.getPath(), file2.getPath());
         unifiedPrint.print_script(change);
         return output.toString();
+    }
+
+    StaplerRequest getCurrentRequest() {
+        return Stapler.getCurrentRequest();
     }
 
 

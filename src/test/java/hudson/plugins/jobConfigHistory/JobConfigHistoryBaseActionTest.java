@@ -7,12 +7,16 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.model.Hudson;
 import hudson.security.AccessControlled;
+import hudson.util.IOUtils;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 import org.junit.Ignore;
+import org.kohsuke.stapler.StaplerRequest;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,13 +27,13 @@ import static org.mockito.Mockito.when;
 public class JobConfigHistoryBaseActionTest {
 
     private final Hudson hudsonMock = mock(Hudson.class);
-    
+    private final StaplerRequest staplerRequestMock = mock(StaplerRequest.class);
+
     /**
      * Test of getDisplayName method, of class JobConfigHistoryBaseAction.
      */
     @Test
     public void testGetDisplayName() {
-        System.out.println("getDisplayName");
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         String expResult = "Job Config History";
         String result = sut.getDisplayName();
@@ -51,17 +55,25 @@ public class JobConfigHistoryBaseActionTest {
      * Test of getOutputType method, of class JobConfigHistoryBaseAction.
      */
     @Test
-    @Ignore
-    public void testGetOutputType() {
-        System.out.println("getOutputType");
+    public void testGetOutputTypeXml() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
-        String expResult = "";
+        when(staplerRequestMock.getParameter("type")).thenReturn("xml");
+        String expResult = "xml";
         String result = sut.getOutputType();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
+    /**
+     * Test of getOutputType method, of class JobConfigHistoryBaseAction.
+     */
+    @Test
+    public void testGetOutputTypeOther() {
+        JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
+        when(staplerRequestMock.getParameter("type")).thenReturn("does not matter");
+        String expResult = "plain";
+        String result = sut.getOutputType();
+        assertEquals(expResult, result);
+    }
     /**
      * Test of checkTimestamp method, of class JobConfigHistoryBaseAction.
      */
@@ -77,16 +89,13 @@ public class JobConfigHistoryBaseActionTest {
      * Test of getRequestParameter method, of class JobConfigHistoryBaseAction.
      */
     @Test
-    @Ignore
     public void testGetRequestParameter() {
-        System.out.println("getRequestParameter");
-        String parameterName = "";
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
-        String expResult = "";
+        final String parameterName = "type";
+        when(staplerRequestMock.getParameter(parameterName)).thenReturn("xml");
+        String expResult = "xml";
         String result = sut.getRequestParameter(parameterName);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -114,7 +123,6 @@ public class JobConfigHistoryBaseActionTest {
      */
     @Test
     public void testGetHudson() {
-        System.out.println("getHudson");
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         Hudson expResult = hudsonMock;
         Hudson result = sut.getHudson();
@@ -136,35 +144,35 @@ public class JobConfigHistoryBaseActionTest {
      * Test of getDiffLines method, of class JobConfigHistoryBaseAction.
      */
     @Test
-    @Ignore
     public void testGetDiffLines() throws Exception {
-        System.out.println("getDiffLines");
-        List<String> diffLines = null;
+        final String resourceName = "diff.txt";
+        final List<String> lines = readResourceLines(resourceName);
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
-        List<JobConfigHistoryBaseAction.SideBySideView.Line> expResult = null;
-        List<JobConfigHistoryBaseAction.SideBySideView.Line> result = sut.getDiffLines(diffLines);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        List<JobConfigHistoryBaseAction.SideBySideView.Line> result = sut.getDiffLines(lines);
+        assertEquals(24, result.size());
     }
 
     /**
      * Test of getDiffAsString method, of class JobConfigHistoryBaseAction.
      */
     @Test
-    @Ignore
-    public void testGetDiffAsString() {
-        System.out.println("getDiffAsString");
-        File file1 = null;
-        File file2 = null;
-        String[] file1Lines = null;
-        String[] file2Lines = null;
+    public void testGetDiffAsString() throws IOException {
+        File file1 = new File(JobConfigHistoryBaseActionTest.class.getResource("file1.txt").getPath());
+        File file2 = new File(JobConfigHistoryBaseActionTest.class.getResource("file2.txt").getPath());
+        String[] file1Lines = readResourceLines("file1.txt").toArray(new String[]{});
+        String[] file2Lines = readResourceLines("file2.txt").toArray(new String[]{});;
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
-        String expResult = "";
         String result = sut.getDiffAsString(file1, file2, file1Lines, file2Lines);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertThat(result, endsWith("@@ -1 +1 @@\n-a\n+b\n"));
+    }
+
+    private List<String> readResourceLines(final String resourceName) throws IOException {
+        final InputStream stream = JobConfigHistoryBaseActionTest.class.getResourceAsStream(resourceName);
+        try {
+            return IOUtils.readLines(stream, "UTF-8");
+        } finally {
+            stream.close();
+        }
     }
 
     public class JobConfigHistoryBaseActionImpl extends JobConfigHistoryBaseAction {
@@ -172,7 +180,7 @@ public class JobConfigHistoryBaseActionTest {
         public JobConfigHistoryBaseActionImpl() {
             super(hudsonMock);
         }
-                
+
         public void checkConfigurePermission() {
         }
 
@@ -187,6 +195,11 @@ public class JobConfigHistoryBaseActionTest {
         public String getIconFileName() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
+
+        @Override
+        StaplerRequest getCurrentRequest() {
+            return staplerRequestMock;
+        }
     }
-    
+
 }
