@@ -12,10 +12,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import static org.hamcrest.Matchers.endsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
-import org.junit.Ignore;
 import org.kohsuke.stapler.StaplerRequest;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -150,6 +153,17 @@ public class JobConfigHistoryBaseActionTest {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         List<JobConfigHistoryBaseAction.SideBySideView.Line> result = sut.getDiffLines(lines);
         assertEquals(24, result.size());
+        JobConfigHistoryBaseAction.SideBySideView.Line firstLine = result.get(0);
+        assertEquals("import bmsi.util.Diff;", firstLine.getLeft().getText());
+        assertEquals("import bmsi.util.Diff;", firstLine.getRight().getText());
+        JobConfigHistoryBaseAction.SideBySideView.Line fourthLine = result.get(3);
+        final JobConfigHistoryBaseAction.SideBySideView.Line.Item left = fourthLine.getLeft();
+        final JobConfigHistoryBaseAction.SideBySideView.Line.Item right = fourthLine.getRight();
+        assertEquals("3", right.getLineNumber());
+        assertNull(left.getText());
+        assertEquals("import org.kohsuke.stapler.StaplerRequest;", right.getText());
+        assertEquals("diff_original", left.getCssClass());
+        assertEquals("diff_revised", right.getCssClass());
     }
 
     /**
