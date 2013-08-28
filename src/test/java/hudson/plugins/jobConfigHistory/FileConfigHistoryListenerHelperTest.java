@@ -9,11 +9,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import static org.hamcrest.Matchers.*;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Ignore;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 /**
@@ -73,9 +79,8 @@ public class FileConfigHistoryListenerHelperTest {
      */
     @Test
     public void testGetIdFormatter() {
-        FileConfigHistoryListenerHelper sut = FileConfigHistoryListenerHelper.CHANGED;
         String expResult = "1970-01-01_01-00-00";
-        SimpleDateFormat result = sut.getIdFormatter();
+        SimpleDateFormat result = FileConfigHistoryListenerHelper.getIdFormatter();
         assertEquals(expResult, result.format(new Date(0)));
     }
 
@@ -86,8 +91,7 @@ public class FileConfigHistoryListenerHelperTest {
     public void testCopyConfigFile() throws Exception {
         File currentConfig = new File(FileConfigHistoryListenerHelperTest.class.getResource("file1.txt").getPath());
         File timestampedDir = tempFolder.newFolder();
-        FileConfigHistoryListenerHelper sut = FileConfigHistoryListenerHelper.CHANGED;
-        sut.copyConfigFile(currentConfig, timestampedDir);
+        FileConfigHistoryListenerHelper.copyConfigFile(currentConfig, timestampedDir);
         final File copy = new File(timestampedDir, currentConfig.getName());
         assertTrue(copy.exists());
     }
@@ -107,5 +111,6 @@ public class FileConfigHistoryListenerHelperTest {
         assertThat(historyContent, startsWith("<?xml"));
         assertThat(historyContent, endsWith("HistoryDescr>"));
         assertThat(historyContent, containsString("<user>Anonym"));
+        assertThat(historyContent, containsString(Messages.ConfigHistoryListenerHelper_CHANGED()));
     }
 }

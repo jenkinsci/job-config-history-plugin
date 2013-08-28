@@ -188,7 +188,7 @@ public enum FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelp
      * @throws IOException
      *             if writing the file holding the copy fails.
      */
-    void copyConfigFile(final File currentConfig, final File timestampedDir) throws FileNotFoundException,
+    static void copyConfigFile(final File currentConfig, final File timestampedDir) throws FileNotFoundException,
             IOException {
 
         final FileOutputStream configCopy = new FileOutputStream(new File(timestampedDir, currentConfig.getName()));
@@ -210,7 +210,7 @@ public enum FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelp
      * 
      * @return the idFormatter
      */
-    SimpleDateFormat getIdFormatter() {
+    static SimpleDateFormat getIdFormatter() {
         return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);
     }
 
