@@ -14,7 +14,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -35,25 +34,6 @@ public class FileConfigHistoryListenerHelperTest {
     public TemporaryFolder tempFolder = new TemporaryFolder(new File("target"));
 
     /**
-     * Test of values method, of class FileConfigHistoryListenerHelper.
-     */
-    @Test
-    public void testValues() {
-        FileConfigHistoryListenerHelper[] result = FileConfigHistoryListenerHelper.values();
-        assertEquals(4, result.length);
-    }
-
-    /**
-     * Test of valueOf method, of class FileConfigHistoryListenerHelper.
-     */
-    @Test
-    public void testValueOf() {
-        FileConfigHistoryListenerHelper expResult = FileConfigHistoryListenerHelper.CHANGED;
-        FileConfigHistoryListenerHelper result = FileConfigHistoryListenerHelper.valueOf("CHANGED");
-        assertEquals(expResult, result);
-    }
-
-    /**
      * Test of createNewHistoryEntry method, of class FileConfigHistoryListenerHelper.
      */
     @Test
@@ -72,7 +52,12 @@ public class FileConfigHistoryListenerHelperTest {
      */
     @Test
     public void testGetCurrentUser() {
-        FileConfigHistoryListenerHelper sut = FileConfigHistoryListenerHelper.CHANGED;
+        FileConfigHistoryListenerHelper sut = new FileConfigHistoryListenerHelper("foo") {
+            @Override
+            User getCurrentUser() {
+                return null;
+            }
+        };
         User result = sut.getCurrentUser();
         assertNull(result);
     }
@@ -108,7 +93,12 @@ public class FileConfigHistoryListenerHelperTest {
     public void testCreateHistoryXmlFile() throws Exception {
         Calendar timestamp = new GregorianCalendar();
         File timestampedDir = tempFolder.newFolder();
-        FileConfigHistoryListenerHelper sut = FileConfigHistoryListenerHelper.CHANGED;
+        FileConfigHistoryListenerHelper sut = new FileConfigHistoryListenerHelper("foo") {
+            @Override
+            User getCurrentUser() {
+                return null;
+            }
+        };
         sut.createHistoryXmlFile(timestamp, timestampedDir);
         final File historyFile = new File(timestampedDir, JobConfigHistoryConsts.HISTORY_FILE);
         assertTrue(historyFile.exists());
@@ -116,7 +106,7 @@ public class FileConfigHistoryListenerHelperTest {
         assertThat(historyContent, startsWith("<?xml"));
         assertThat(historyContent, endsWith("HistoryDescr>"));
         assertThat(historyContent, containsString("<user>Anonym"));
-        assertThat(historyContent, containsString(Messages.ConfigHistoryListenerHelper_CHANGED()));
+        assertThat(historyContent, containsString("foo"));
     }
 
     /**

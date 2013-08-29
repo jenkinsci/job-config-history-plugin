@@ -27,27 +27,27 @@ import java.util.logging.Logger;
  * 
  * @author mfriedenhagen
  */
-public enum FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelper {
+public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelper {
 
     /**
      * Helper for job creation.
      */
-    CREATED(Messages.ConfigHistoryListenerHelper_CREATED()),
+    public static FileConfigHistoryListenerHelper CREATED = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CREATED());
 
     /**
      * Helper for job rename.
      */
-    RENAMED(Messages.ConfigHistoryListenerHelper_RENAMED()),
+    public static FileConfigHistoryListenerHelper RENAMED = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_RENAMED());
 
     /**
      * Helper for job change.
      */
-    CHANGED(Messages.ConfigHistoryListenerHelper_CHANGED()),
+    public static FileConfigHistoryListenerHelper CHANGED = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CHANGED());
 
     /**
      * Helper for job deleted.
      */
-    DELETED(Messages.ConfigHistoryListenerHelper_DELETED());
+    public static FileConfigHistoryListenerHelper DELETED = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_DELETED());
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(FileConfigHistoryListenerHelper.class.getName());
