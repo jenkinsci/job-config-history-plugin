@@ -66,7 +66,7 @@ public class JobConfigHistoryRootActionIT extends AbstractHudsonTestCaseDeleting
             assertFalse("Verify no history entry for job is listed.", page.contains("Test1"));
             assertFalse("Verify no history entry for system change is listed.", page.contains("(system)"));
             assertTrue("Check link to historypage exists.", page.contains("history?name"));
-            assertFalse("Verify that only \'Deleted\' entries are listed.", page.contains("Created") || page.contains("Changed"));
+            assertFalse("Verify that only \'Deleted\' entries are listed." + page, page.contains("Created") || page.contains("Changed"));
         } catch (Exception ex) {
             fail("Unable to complete testFilterWithData: " + ex);
         }
