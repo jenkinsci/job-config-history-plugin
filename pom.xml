@@ -168,6 +168,9 @@
                     <argLine>${argLine} -Xms256m -Xmx512m -XX:MaxPermSize=128m</argLine>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <testFailureIgnore>false</testFailureIgnore>
+                    <excludes>
+                        <exclude>**/InjectedTest.*</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -178,6 +181,10 @@
                     <argLine>${argLine} -Xms256m -Xmx512m -XX:MaxPermSize=128m</argLine>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <testFailureIgnore>true</testFailureIgnore>
+                    <includes>
+                        <include>**/InjectedTest.java</include>
+                        <include>**/*IT.java</include>
+                    </includes>
                 </configuration>
                 <executions>
                     <execution>
