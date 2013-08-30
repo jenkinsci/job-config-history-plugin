@@ -79,9 +79,8 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
      *            time of operation.
      * @return timestamped directory where to store one history entry.
      */
-    @SuppressWarnings("SleepWhileInLoop")
-    private File getRootDir(final XmlFile xmlFile, final AtomicReference<Calendar> timestampHolder) {
-        final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
+    File getRootDir(final XmlFile xmlFile, final AtomicReference<Calendar> timestampHolder) {
+        final JobConfigHistory plugin = getPlugin();
         final File itemHistoryDir = plugin.getHistoryDir(xmlFile);
         // perform check for purge here, when we are actually going to create
         // a new directory, rather than just when we scan it in above method.
@@ -98,14 +97,14 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
     @Override
     public final void createNewHistoryEntry(final XmlFile xmlFile) {
         try {
-            AtomicReference<Calendar> timestamp = new AtomicReference<Calendar>();
-            final File timestampedDir = getRootDir(xmlFile, timestamp);
+            AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
+            final File timestampedDir = getRootDir(xmlFile, timestampHolder);
             LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
             if (this != DELETED) {
                 copyConfigFile(xmlFile.getFile(), timestampedDir);
             }
-            assert timestamp.get() != null;
-            createHistoryXmlFile(timestamp.get(), timestampedDir);
+            assert timestampHolder.get() != null;
+            createHistoryXmlFile(timestampHolder.get(), timestampedDir);
         } catch (IOException e) {
             // If not able to create the history entry, log, but continue without it.
             // A known issue is where Hudson core fails to move the folders on rename,
@@ -172,7 +171,6 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
      */
     static void copyConfigFile(final File currentConfig, final File timestampedDir) throws FileNotFoundException,
             IOException {
-
         final FileOutputStream configCopy = new FileOutputStream(new File(timestampedDir, currentConfig.getName()));
         try {
             final FileInputStream configOriginal = new FileInputStream(currentConfig);
@@ -196,7 +194,15 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
         return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);
     }
 
-    static File createNewHistoryDir(final File itemHistoryDir, final AtomicReference<Calendar> timestampHolder) throws RuntimeException {
+    /**
+     * Creates the new history dir, loops until "enough" time has passed if two events are too near.
+     *
+     * @param itemHistoryDir the basedir for history items.
+     * @param timestampHolder of the event.
+     * @return new directory.
+     */
+    @SuppressWarnings("SleepWhileInLoop")
+    static File createNewHistoryDir(final File itemHistoryDir, final AtomicReference<Calendar> timestampHolder) {
         Calendar timestamp;
         File f;
         while (true) {
@@ -220,6 +226,10 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
             throw new RuntimeException("Could not create rootDir " + f);
         }
         return f;
+    }
+
+    JobConfigHistory getPlugin() {
+        return Hudson.getInstance().getPlugin(JobConfigHistory.class);
     }
 
 }
