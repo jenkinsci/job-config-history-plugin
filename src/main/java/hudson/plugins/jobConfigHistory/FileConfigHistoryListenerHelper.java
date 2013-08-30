@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 /**
  * Defines some helper functions needed by {@link JobConfigHistoryJobListener} and
  * {@link JobConfigHistorySaveableListener}.
- * 
+ *
  * @author mfriedenhagen
  */
 public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelper {
@@ -32,26 +32,26 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
     /**
      * Helper for job creation.
      */
-    public final static FileConfigHistoryListenerHelper CREATED
-            = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CREATED());
+    public static final FileConfigHistoryListenerHelper CREATED =
+        new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CREATED());
 
     /**
      * Helper for job rename.
      */
-    public final static FileConfigHistoryListenerHelper RENAMED
-            = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_RENAMED());
+    public static final FileConfigHistoryListenerHelper RENAMED =
+        new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_RENAMED());
 
     /**
      * Helper for job change.
      */
-    public final static FileConfigHistoryListenerHelper CHANGED
-            = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CHANGED());
+    public static final FileConfigHistoryListenerHelper CHANGED =
+        new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CHANGED());
 
     /**
      * Helper for job deleted.
      */
-    public final static FileConfigHistoryListenerHelper DELETED
-            = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_DELETED());
+    public static final FileConfigHistoryListenerHelper DELETED =
+        new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_DELETED());
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(FileConfigHistoryListenerHelper.class.getName());
@@ -62,7 +62,7 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
     private final String operation;
 
     /**
-     * 
+     *
      * @param operation
      *            the operation we handle.
      */
@@ -72,10 +72,10 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
 
     /**
      * Creates a timestamped directory to save the configuration beneath. Purges old data if configured
-     * 
+     *
      * @param xmlFile
      *            the current xmlFile configuration file to save
-     * @param timestamp
+     * @param timestampHolder
      *            time of operation.
      * @return timestamped directory where to store one history entry.
      */
@@ -91,7 +91,7 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
 
     /**
      * Creates a new backup of the job configuration.
-     * 
+     *
      * @param xmlFile
      *            configuration file for the item we want to backup
      */
@@ -123,7 +123,7 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
 
     /**
      * Creates the historical description for this action.
-     * 
+     *
      * @param timestamp
      *            when the action did happen.
      * @param timestampedDir
@@ -151,7 +151,7 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
 
     /**
      * Returns the user who invoked the action.
-     * 
+     *
      * @return current user.
      */
     User getCurrentUser() {
@@ -160,7 +160,7 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
 
     /**
      * Saves a copy of this project's {@code config.xml} into {@code timestampedDir}.
-     * 
+     *
      * @param currentConfig
      *            which we want to copy.
      * @param timestampedDir
@@ -189,7 +189,7 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
     /**
      * Returns a simple formatter used for creating timestamped directories. We create this every time as
      * {@link SimpleDateFormat} is <b>not</b> threadsafe.
-     * 
+     *
      * @return the idFormatter
      */
     static SimpleDateFormat getIdFormatter() {

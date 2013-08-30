@@ -13,16 +13,16 @@ public interface ConfigHistoryListenerHelper {
      */
     public enum Events {
 
-        /** Job created */
+        /** Job created. */
         CREATED(Messages.ConfigHistoryListenerHelper_CREATED()),
 
-        /** Job renamed */
+        /** Job renamed. */
         RENAMED(Messages.ConfigHistoryListenerHelper_RENAMED()),
 
-        /** Job modified */
+        /** Job modified. */
         CHANGED(Messages.ConfigHistoryListenerHelper_CHANGED()),
 
-        /** Job deleted */
+        /** Job deleted. */
         DELETED(Messages.ConfigHistoryListenerHelper_DELETED());
 
         /**
