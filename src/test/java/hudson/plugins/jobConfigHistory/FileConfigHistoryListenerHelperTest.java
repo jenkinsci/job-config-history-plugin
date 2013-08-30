@@ -23,6 +23,8 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -91,24 +93,33 @@ public class FileConfigHistoryListenerHelperTest {
      */
     @Test
     public void testCreateHistoryXmlFile() throws Exception {
-        Calendar timestamp = new GregorianCalendar();
-        File timestampedDir = tempFolder.newFolder();
+        final String fullName = "Full Name";
+        FileConfigHistoryListenerHelper sut = new FileConfigHistoryListenerHelper("foo") {
+            @Override
+            User getCurrentUser() {
+                final User mockedUser = mock(User.class);
+                when(mockedUser.getFullName()).thenReturn(fullName);
+                when(mockedUser.getId()).thenReturn("userId");
+                return mockedUser;
+            }
+        };
+        testCreateHistoryXmlFile(sut, fullName);
+    }
+
+    /**
+     * Test of createHistoryXmlFile method, of class FileConfigHistoryListenerHelper.
+     */
+    @Test
+    public void testCreateHistoryXmlFileAnonym() throws Exception {
+        final String fullName = "Anonym";
         FileConfigHistoryListenerHelper sut = new FileConfigHistoryListenerHelper("foo") {
             @Override
             User getCurrentUser() {
                 return null;
             }
         };
-        sut.createHistoryXmlFile(timestamp, timestampedDir);
-        final File historyFile = new File(timestampedDir, JobConfigHistoryConsts.HISTORY_FILE);
-        assertTrue(historyFile.exists());
-        final String historyContent = Util.loadFile(historyFile, Charset.forName("utf-8"));
-        assertThat(historyContent, startsWith("<?xml"));
-        assertThat(historyContent, endsWith("HistoryDescr>"));
-        assertThat(historyContent, containsString("<user>Anonym"));
-        assertThat(historyContent, containsString("foo"));
+        testCreateHistoryXmlFile(sut, fullName);
     }
-
     /**
      * Test of createNewHistoryDir method, of class FileConfigHistoryListenerHelper.
      */
@@ -124,6 +135,18 @@ public class FileConfigHistoryListenerHelperTest {
         assertTrue(result2.exists());
         assertTrue(result2.isDirectory());
         assertNotEquals(result, result2);
+    }
 
+    private void testCreateHistoryXmlFile(FileConfigHistoryListenerHelper sut, final String fullName) throws IOException {
+        Calendar timestamp = new GregorianCalendar();
+        File timestampedDir = tempFolder.newFolder();
+        sut.createHistoryXmlFile(timestamp, timestampedDir);
+        final File historyFile = new File(timestampedDir, JobConfigHistoryConsts.HISTORY_FILE);
+        assertTrue(historyFile.exists());
+        final String historyContent = Util.loadFile(historyFile, Charset.forName("utf-8"));
+        assertThat(historyContent, startsWith("<?xml"));
+        assertThat(historyContent, endsWith("HistoryDescr>"));
+        assertThat(historyContent, containsString("<user>"+fullName));
+        assertThat(historyContent, containsString("foo"));
     }
 }
