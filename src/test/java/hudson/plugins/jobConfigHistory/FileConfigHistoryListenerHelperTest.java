@@ -14,11 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -170,27 +166,5 @@ public class FileConfigHistoryListenerHelperTest {
         assertThat(historyContent, endsWith("HistoryDescr>"));
         assertThat(historyContent, containsString("<user>"+fullName));
         assertThat(historyContent, containsString("foo"));
-    }
-
-    private <T extends IOException> void testCreateNewHistoryEntryException(final XmlFile xmlFile, final T exception) {
-        FileConfigHistoryListenerHelper sut = new FileConfigHistoryListenerHelper("foo") {
-            @Override
-                    JobConfigHistory getPlugin() {
-                final JobConfigHistory mockPlugin = mock(JobConfigHistory.class);
-                try {
-                    when(mockPlugin.getHistoryDir(xmlFile)).thenReturn(tempFolder.newFolder());
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                return mockPlugin;
-            }
-
-            @Override
-            void createHistoryXmlFile(Calendar timestamp, File timestampedDir) throws IOException {
-                throw exception;
-            }
-        };
-        sut.createNewHistoryEntry(xmlFile);
-        assertFalse(xmlFile.getFile().exists());
     }
 }
