@@ -32,22 +32,26 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
     /**
      * Helper for job creation.
      */
-    public static FileConfigHistoryListenerHelper CREATED = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CREATED());
+    public final static FileConfigHistoryListenerHelper CREATED
+            = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CREATED());
 
     /**
      * Helper for job rename.
      */
-    public static FileConfigHistoryListenerHelper RENAMED = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_RENAMED());
+    public final static FileConfigHistoryListenerHelper RENAMED
+            = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_RENAMED());
 
     /**
      * Helper for job change.
      */
-    public static FileConfigHistoryListenerHelper CHANGED = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CHANGED());
+    public final static FileConfigHistoryListenerHelper CHANGED
+            = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CHANGED());
 
     /**
      * Helper for job deleted.
      */
-    public static FileConfigHistoryListenerHelper DELETED = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_DELETED());
+    public final static FileConfigHistoryListenerHelper DELETED
+            = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_DELETED());
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(FileConfigHistoryListenerHelper.class.getName());
