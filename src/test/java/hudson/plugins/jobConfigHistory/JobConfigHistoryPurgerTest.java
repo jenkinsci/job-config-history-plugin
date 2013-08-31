@@ -96,14 +96,55 @@ public class JobConfigHistoryPurgerTest {
      * Test of purgeSystemOrJobHistory method, of class JobConfigHistoryPurger.
      */
     @Test
-    @Ignore
-    public void testPurgeSystemOrJobHistory() {
-        System.out.println("purgeSystemOrJobHistory");
-        File[] itemDirs = null;
+    public void testPurgeSystemOrJobHistory() throws IOException {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
+        sut.maxAge = 1;
+        final File oldItemDir = tempFolder.newFolder(getFormattedDate(twoDaysAgo()));
+        new File(oldItemDir, JobConfigHistoryConsts.HISTORY_FILE).createNewFile();
+        final File newItemDir = tempFolder.newFolder(getFormattedDate(now()));
+        new File(newItemDir, JobConfigHistoryConsts.HISTORY_FILE).createNewFile();
+        File[] itemDirs = {tempFolder.getRoot()};
         sut.purgeSystemOrJobHistory(itemDirs);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertFalse(oldItemDir.exists());
+        assertTrue(newItemDir.exists());
+    }
+
+    /**
+     * Test of purgeSystemOrJobHistory method, of class JobConfigHistoryPurger.
+     */
+    @Test
+    public void testPurgeSystemOrJobHistoryNoItems() throws IOException {
+        JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
+        sut.maxAge = 1;
+        File[] itemDirs = {};
+        sut.purgeSystemOrJobHistory(itemDirs);
+        sut.purgeSystemOrJobHistory(null);
+    }
+
+    /**
+     * Test of purgeSystemOrJobHistory method, of class JobConfigHistoryPurger.
+     */
+    @Test
+    public void testPurgeSystemOrJobHistoryItemIsAFile() throws IOException {
+        JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
+        sut.maxAge = 1;
+        final File newFile = tempFolder.newFile(getFormattedDate(now()));
+        File[] itemDirs = {newFile};
+        sut.purgeSystemOrJobHistory(itemDirs);
+        assertTrue(newFile.exists());
+    }
+
+    /**
+     * Test of purgeSystemOrJobHistory method, of class JobConfigHistoryPurger.
+     */
+    @Test
+    public void testPurgeSystemOrJobHistoryItemHasNoHistory() throws IOException {
+        JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
+        sut.maxAge = 1;
+        final File newFolder = tempFolder.newFolder(getFormattedDate(twoDaysAgo()));
+        File[] itemDirs = {newFolder};
+        sut.purgeSystemOrJobHistory(itemDirs);
+        assertTrue(newFolder.exists());
     }
 
     /**
@@ -111,8 +152,7 @@ public class JobConfigHistoryPurgerTest {
      */
     @Test
     public void testIsNotTooOld() {
-        final Date date = new Date();
-        assertFalse(testIsOlderThanOneDay(date));
+        assertFalse(testIsOlderThanOneDay(now()));
     }
 
     /**
@@ -120,8 +160,7 @@ public class JobConfigHistoryPurgerTest {
      */
     @Test
     public void testIsTooOld() {
-        final Date date = new Date(System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS));
-        assertTrue(testIsOlderThanOneDay(date));
+        assertTrue(testIsOlderThanOneDay(twoDaysAgo()));
     }
 
     /**
@@ -162,10 +201,21 @@ public class JobConfigHistoryPurgerTest {
     private boolean testIsOlderThanOneDay(final Date date) {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
         sut.maxAge = 1;
-        final SimpleDateFormat dateParser = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);
-        final String format = dateParser.format(date);
-        File historyDir = new File(format);
+        File historyDir = new File(getFormattedDate(date));
         return sut.isTooOld(historyDir);
+    }
+
+    private Date twoDaysAgo() {
+        return new Date(System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS));
+    }
+
+    private String getFormattedDate(Date date) {
+        final SimpleDateFormat dateParser = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);
+        return dateParser.format(date);
+    }
+
+    private Date now() {
+        return new Date();
     }
 
     private static class JobConfigHistoryPurgerWithoutPurging extends JobConfigHistoryPurger {
