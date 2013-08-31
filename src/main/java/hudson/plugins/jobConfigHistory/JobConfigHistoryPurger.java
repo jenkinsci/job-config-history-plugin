@@ -19,7 +19,7 @@ import hudson.model.PeriodicWork;
 
 
 /**
- * 
+ *
  * @author kstutz
  *
  */
@@ -27,13 +27,21 @@ import hudson.model.PeriodicWork;
 public class JobConfigHistoryPurger extends PeriodicWork {
     /**The logger.*/
     private static final Logger LOG = Logger.getLogger(JobConfigHistoryPurger.class.getName());
-    
+
     /**Our plugin.*/
-    private final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
-    
+    private final JobConfigHistory plugin;
+
     /**The maximum allowed age of history entries in days.*/
-    private int maxAge;
-    
+    int maxAge;
+
+    public JobConfigHistoryPurger() {
+        this(Hudson.getInstance().getPlugin(JobConfigHistory.class));
+    }
+
+    JobConfigHistoryPurger(JobConfigHistory plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public long getRecurrencePeriod() {
         return DAY;
@@ -59,20 +67,20 @@ public class JobConfigHistoryPurger extends PeriodicWork {
             purgeHistoryByAge();
         }
     }
-    
+
     /**
      * Performs the actual purge of history entries.
      */
-    private void purgeHistoryByAge() {
+    void purgeHistoryByAge() {
         purgeSystemOrJobHistory(plugin.getConfiguredHistoryRootDir().listFiles());
         purgeSystemOrJobHistory(plugin.getJobHistoryRootDir().listFiles());
     }
-    
+
     /**
      * Traverse directories in order to find files which are too old.
      * @param itemDirs Config history directories as file arrays.
      */
-    private void purgeSystemOrJobHistory(File[] itemDirs) {
+    void purgeSystemOrJobHistory(File[] itemDirs) {
         if (itemDirs != null && itemDirs.length > 0) {
             for (File itemDir : itemDirs) {
                 //itemDir: z.B. Test2 or hudson.tasks.Ant
@@ -92,14 +100,14 @@ public class JobConfigHistoryPurger extends PeriodicWork {
             }
         }
     }
-    
+
     /**
      * Checks if the history directory is too old by parsing its name as a date
      * and comparing it to the current date minus the maximal allowed age in days.
      * @param historyDir The history directory, e.g. 2013-01-18_17-33-51
      * @return True if it is too old.
      */
-    private boolean isTooOld(File historyDir) {
+    boolean isTooOld(File historyDir) {
         Date parsedDate = null;
         final SimpleDateFormat dateParser = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER);
         try {
@@ -118,13 +126,13 @@ public class JobConfigHistoryPurger extends PeriodicWork {
         }
         return false;
     }
- 
+
     /**
      * Deletes a history directory (e.g. Test/2013-18-01_19-53-40),
      * first deleting the files it contains.
      * @param dir The directory which should be deleted.
      */
-    private void deleteDirectory(File dir) {
+    void deleteDirectory(File dir) {
         for (File file : dir.listFiles()) {
             if (!file.delete()) {
                 LOG.warning("problem deleting history file: " + file);
