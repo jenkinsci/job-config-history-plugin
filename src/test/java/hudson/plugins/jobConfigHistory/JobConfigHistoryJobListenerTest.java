@@ -5,7 +5,6 @@ import hudson.model.AbstractItem;
 import hudson.model.Item;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 
 import org.junit.Rule;
 import org.junit.Test;
