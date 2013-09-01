@@ -108,10 +108,19 @@ public class JobConfigHistoryJobListener extends ItemListener {
         LOG.log(FINEST, "onDeleted for {0} done.", item);
     }
 
+    /**
+     * Returns the plugin for tests.
+     * @return plugin
+     */
     JobConfigHistory getPlugin() {
         return Hudson.getInstance().getPlugin(JobConfigHistory.class);
     }
 
+    /**
+     * For tests.
+     * @param operationName name of the operation.
+     * @return listener
+     */
     ConfigHistoryListenerHelper getConfigHistoryListenerHelper(final String operationName) {
         return new FileConfigHistoryListenerHelper(operationName);
     }
