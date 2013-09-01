@@ -22,7 +22,7 @@ public class JobConfigHistoryJobListenerTest {
     final ConfigHistoryListenerHelper mockedConfigHistoryListenerHelper = mock(ConfigHistoryListenerHelper.class);
 
     @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder(new File("target"));
+    public TemporaryFolder tempFolder = new TemporaryFolder(new File(new File("target"), "jobConfigHistoryJobListenerTest"));
 
     /**
      * Test of onCreated method, of class JobConfigHistoryJobListener.
