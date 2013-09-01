@@ -80,19 +80,6 @@ public class JobConfigHistoryPurgerTest {
     }
 
     /**
-     * Test of purgeHistoryByAge method, of class JobConfigHistoryPurger.
-     */
-    @Test
-    @Ignore
-    public void testPurgeHistoryByAge() {
-        System.out.println("purgeHistoryByAge");
-        JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
-        sut.purgeHistoryByAge();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of purgeSystemOrJobHistory method, of class JobConfigHistoryPurger.
      */
     @Test
