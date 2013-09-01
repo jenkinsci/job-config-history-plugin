@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * @author Stefan Brausch
  */
 @Extension
-public final class JobConfigHistoryJobListener extends ItemListener {
+public class JobConfigHistoryJobListener extends ItemListener {
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistoryJobListener.class.getName());
@@ -31,7 +31,9 @@ public final class JobConfigHistoryJobListener extends ItemListener {
     public void onCreated(Item item) {
         LOG.log(FINEST, "In onCreated for {0}", item);
         if (item instanceof AbstractItem) {
-            FileConfigHistoryListenerHelper.CREATED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
+            final ConfigHistoryListenerHelper configHistoryListenerHelper = getConfigHistoryListenerHelper(
+                    Messages.ConfigHistoryListenerHelper_CREATED());
+            configHistoryListenerHelper.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
         } else {
             LOG.finest("onCreated: not an AbstractItem, skipping history save");
         }
@@ -40,7 +42,7 @@ public final class JobConfigHistoryJobListener extends ItemListener {
     }
 
     /** {@inheritDoc}
-     * 
+     *
      * <p>
      * Also checks if we have history stored under the old name.  If so, copies
      * all history to the folder for new name, and deletes the old history folder.
@@ -50,7 +52,7 @@ public final class JobConfigHistoryJobListener extends ItemListener {
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         LOG.log(FINEST, "In onRenamed for {0}{1}", new Object[] {item, onRenameDesc});
         if (item instanceof AbstractItem) {
-            final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
+            final JobConfigHistory plugin = getPlugin();
 
             // move history items from previous name, if the directory exists
             // only applies if using a custom root directory for saving history
@@ -75,7 +77,9 @@ public final class JobConfigHistoryJobListener extends ItemListener {
                 }
             }
             // Must do this after moving old history, in case a CHANGED was fired during the same second under the old name.
-            FileConfigHistoryListenerHelper.RENAMED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
+            final ConfigHistoryListenerHelper configHistoryListenerHelper = getConfigHistoryListenerHelper(
+                    Messages.ConfigHistoryListenerHelper_RENAMED());
+            configHistoryListenerHelper.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
         }
         LOG.log(FINEST, "Completed onRename for {0} done.", item);
 //        new Exception("STACKTRACE for double invocation").printStackTrace();
@@ -86,20 +90,29 @@ public final class JobConfigHistoryJobListener extends ItemListener {
     public void onDeleted(Item item) {
         LOG.log(FINEST, "In onDeleted for {0}", item);
         if (item instanceof AbstractItem) {
-            final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
-            
-            FileConfigHistoryListenerHelper.DELETED.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
+            final JobConfigHistory plugin = getPlugin();
+            final ConfigHistoryListenerHelper configHistoryListenerHelper = getConfigHistoryListenerHelper(
+                    Messages.ConfigHistoryListenerHelper_DELETED());
+            configHistoryListenerHelper.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
             final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
 
             final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
             final String timestamp = buildDateFormat.format(new Date());
             final String deletedHistoryName = item.getName() + JobConfigHistoryConsts.DELETED_MARKER + timestamp;
             final File deletedHistoryDir = new File(currentHistoryDir.getParentFile(), deletedHistoryName);
-            
+
             if (!currentHistoryDir.renameTo(deletedHistoryDir)) {
                 LOG.warning("unable to rename deleted history dir to: " + deletedHistoryDir);
             }
         }
         LOG.log(FINEST, "onDeleted for {0} done.", item);
+    }
+
+    JobConfigHistory getPlugin() {
+        return Hudson.getInstance().getPlugin(JobConfigHistory.class);
+    }
+
+    ConfigHistoryListenerHelper getConfigHistoryListenerHelper(final String operationName) {
+        return new FileConfigHistoryListenerHelper(operationName);
     }
 }
