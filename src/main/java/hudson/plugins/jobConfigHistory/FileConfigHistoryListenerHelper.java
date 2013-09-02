@@ -100,7 +100,7 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
             AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
             final File timestampedDir = getRootDir(xmlFile, timestampHolder);
             LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
-            if (this != DELETED) {
+            if (!Messages.ConfigHistoryListenerHelper_DELETED().equals(operation)) {
                 copyConfigFile(xmlFile.getFile(), timestampedDir);
             }
             assert timestampHolder.get() != null;
