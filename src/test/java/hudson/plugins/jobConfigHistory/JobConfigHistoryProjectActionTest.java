@@ -4,8 +4,6 @@ import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
-import hudson.security.AccessControlled;
-import hudson.security.Permission;
 import java.util.List;
 import org.acegisecurity.AccessDeniedException;
 import org.junit.Test;
@@ -27,8 +25,8 @@ public class JobConfigHistoryProjectActionTest {
     private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
     private final Hudson mockedHudson = mock(hudson.model.Hudson.class);
     private final AbstractItem mockedProject = mock(AbstractItem.class);
-    private final StaplerResponse mockedResponse = mock(StaplerResponse.class);
-    private final StaplerRequest mockedRequest = mock(StaplerRequest.class);
+    //private final StaplerResponse mockedResponse = mock(StaplerResponse.class);
+    //private final StaplerRequest mockedRequest = mock(StaplerRequest.class);
 
     /**
      * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
