@@ -29,30 +29,6 @@ import java.util.logging.Logger;
  */
 public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelper {
 
-    /**
-     * Helper for job creation.
-     */
-    public static final FileConfigHistoryListenerHelper CREATED =
-        new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CREATED());
-
-    /**
-     * Helper for job rename.
-     */
-    public static final FileConfigHistoryListenerHelper RENAMED =
-        new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_RENAMED());
-
-    /**
-     * Helper for job change.
-     */
-    public static final FileConfigHistoryListenerHelper CHANGED =
-        new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CHANGED());
-
-    /**
-     * Helper for job deleted.
-     */
-    public static final FileConfigHistoryListenerHelper DELETED =
-        new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_DELETED());
-
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(FileConfigHistoryListenerHelper.class.getName());
 
