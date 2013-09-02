@@ -4,6 +4,7 @@ import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
+import hudson.model.Hudson;
 import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
@@ -41,8 +42,19 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     }
 
     /**
+     * For testing only.
+     *
+     * @param hudson instance
+     * @param project
+     *            for which configurations should be returned.
+     */
+    JobConfigHistoryProjectAction(Hudson hudson, AbstractItem project) {
+        super(hudson);
+        this.project = project;
+    }
+    /**
      * {@inheritDoc}
-     * 
+     *
      * Make method final, as we always want the same icon file. Returns
      * {@code null} to hide the icon if the user is not allowed to configure
      * jobs.
@@ -54,10 +66,10 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         if (!getPlugin().getSaveModuleConfiguration() && project instanceof MavenModule) {
             return null;
         }
-        
+
         return JobConfigHistoryConsts.ICONFILENAME;
     }
-    
+
     /**
      * Returns the configuration history entries for one {@link AbstractItem}.
      *
@@ -84,7 +96,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     /**
      * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as
      * String.
-     * 
+     *
      * @return content of the {@code config.xml} found in directory given by the
      *         request parameter {@code file}.
      * @throws IOException
@@ -124,11 +136,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     public boolean hasConfigurePermission() {
         return getAccessControlledObject().hasPermission(AbstractProject.CONFIGURE);
     }
-    
+
     /**
      * Parses the incoming {@code POST} request and redirects as
      * {@code GET showDiffFiles}.
-     * 
+     *
      * @param req
      *            incoming request
      * @param rsp
@@ -145,12 +157,12 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         rsp.sendRedirect("showDiffFiles?timestamp1=" + parser.get("timestamp1")
                 + "&timestamp2=" + parser.get("timestamp2"));
     }
-    
-    
+
+
     /**
      * Takes the two timestamp request parameters and returns the diff between the corresponding
      * config files of this project as a list of single lines.
-     * 
+     *
      * @return Differences between two config versions as list of lines.
      * @throws IOException If diff doesn't work or xml files can't be read.
      */
@@ -163,17 +175,17 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         final String[] configXml1Lines = configXml1.asString().split("\\n");
         final XmlFile configXml2 = getOldConfigXml(timestamp2);
         final String[] configXml2Lines = configXml2.asString().split("\\n");
-        
+
         final String diffAsString = getDiffAsString(configXml1.getFile(), configXml2.getFile(),
                 configXml1Lines, configXml2Lines);
-        
+
         final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
         return getDiffLines(diffLines);
     }
-    
+
     /**
      * Gets the version of the config.xml that was saved at a certain time.
-     * 
+     *
      * @param timestamp The timestamp as String.
      * @return The config file as XmlFile.
      */
@@ -183,7 +195,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         final String rootDir = getPlugin().getJobHistoryRootDir().getPath() + "/";
         File configFile = null;
         String path = null;
-        
+
         if (checkTimestamp(timestamp)) {
             if (project instanceof MavenModule) {
                 path = rootDir + ((MavenModule) project).getParent().getFullName().replace("/", "/jobs/") + "/modules/"
@@ -193,18 +205,18 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             }
             configFile = getPlugin().getConfigFile(new File(path));
         }
-        
+
         if (configFile == null) {
             throw new IllegalArgumentException("Unable to get history from: " + path);
         } else {
             return new XmlFile(configFile);
         }
     }
-    
-    
+
+
     /**
      * Action when 'restore' button is pressed: Replace current config file by older version.
-     * 
+     *
      * @param req Incoming StaplerRequest
      * @param rsp Outgoing StaplerResponse
      * @throws IOException If something goes wrong
@@ -220,7 +232,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         project.save();
         rsp.sendRedirect(getHudson().getRootUrl() + project.getUrl());
     }
-    
+
     /**
      * Action when 'restore' button in showDiffFiles.jelly is pressed.
      * Gets required parameter and forwards to restoreQuestion.jelly.
