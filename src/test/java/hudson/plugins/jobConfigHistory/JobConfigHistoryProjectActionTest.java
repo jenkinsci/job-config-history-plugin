@@ -44,9 +44,9 @@ public class JobConfigHistoryProjectActionTest {
      * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    public void testGetIconFileNameSaveMavenModules() {
+    public void testGetIconFileNameSaveProjectNonMavenModules() {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
-        when(mockedPlugin.getSaveModuleConfiguration()).thenReturn(true);
+        when(mockedPlugin.getSaveModuleConfiguration()).thenReturn(false);
         JobConfigHistoryProjectAction sut = createAction();
         assertEquals(JobConfigHistoryConsts.ICONFILENAME, sut.getIconFileName());
     }
@@ -55,9 +55,20 @@ public class JobConfigHistoryProjectActionTest {
      * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    public void testGetIconFileNameDoNotSaveMavenModules() {
-        when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
+    public void testGetIconFileNameSaveMavenModules() {
+        when(mockedMavenModule.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
         when(mockedPlugin.getSaveModuleConfiguration()).thenReturn(true);
+        JobConfigHistoryProjectAction sut = createActionForMavenModule();
+        assertEquals(JobConfigHistoryConsts.ICONFILENAME, sut.getIconFileName());
+    }
+
+    /**
+     * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
+     */
+    @Test
+    public void testGetIconFileNameDoNotSaveMavenModules() {
+        when(mockedMavenModule.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
+        when(mockedPlugin.getSaveModuleConfiguration()).thenReturn(false);
         JobConfigHistoryProjectAction sut = createActionForMavenModule();
         assertNull(sut.getIconFileName());
     }
