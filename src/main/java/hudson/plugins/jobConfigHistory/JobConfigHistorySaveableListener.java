@@ -1,6 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
-import static java.util.logging.Level.*;
+import static java.util.logging.Level.FINEST;
 import hudson.Extension;
 import hudson.XmlFile;
 import hudson.model.Hudson;
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * @author Stefan Brausch
  */
 @Extension
-public final class JobConfigHistorySaveableListener extends SaveableListener {
+public class JobConfigHistorySaveableListener extends SaveableListener {
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistorySaveableListener.class.getName());
@@ -23,14 +23,30 @@ public final class JobConfigHistorySaveableListener extends SaveableListener {
     /** {@inheritDoc} */
     @Override
     public void onChange(final Saveable o, final XmlFile file) {
-        final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
-
+        final JobConfigHistory plugin = getPlugin();
         LOG.log(FINEST, "In onChange for {0}", o);
         if (plugin.isSaveable(o, file)) {
-            final ConfigHistoryListenerHelper configHistoryListenerHelper = new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CHANGED());
+            final ConfigHistoryListenerHelper configHistoryListenerHelper = getConfigHistoryListenerHelper();
             configHistoryListenerHelper.createNewHistoryEntry(file);
         }
         LOG.log(FINEST, "onChange for {0} done.", o);
-        //        new Exception("STACKTRACE for double invocation").printStackTrace();
+    }
+
+    /**
+     * For tests only.
+     *
+     * @return helper.
+     */
+    ConfigHistoryListenerHelper getConfigHistoryListenerHelper() {
+        return new FileConfigHistoryListenerHelper(Messages.ConfigHistoryListenerHelper_CHANGED());
+    }
+
+    /**
+     * For tests only.
+     *
+     * @return plugin
+     */
+    JobConfigHistory getPlugin() {
+        return Hudson.getInstance().getPlugin(JobConfigHistory.class);
     }
 }
