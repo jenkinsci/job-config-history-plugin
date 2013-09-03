@@ -338,11 +338,21 @@ public class FileHistoryDaoTest {
      * Test of purgeOldEntries method, of class FileHistoryDao.
      */
     @Test
-    public void testPurgeOldEntriesOnlyOneExisting() {        
-        final File itemHistoryRoot = unpackResourceZip.getResource("config-history/jobs/Test1/");
+    public void testPurgeOldEntriesOnlyOneExisting() {
+        final File itemHistoryRoot = getHistoryRootForTest1();
         int maxEntries = 2;
         FileHistoryDao.purgeOldEntries(itemHistoryRoot, maxEntries);
-        final int newLength = itemHistoryRoot.list().length;
+        final int newLength = getHistoryRootForTest1Length(itemHistoryRoot);
         assertEquals(1, newLength);
     }
+
+    private int getHistoryRootForTest1Length(final File itemHistoryRoot) {
+        return itemHistoryRoot.list().length;
+    }
+
+    private File getHistoryRootForTest1() {
+        return unpackResourceZip.getResource("config-history/jobs/Test1/");
+    }
+
+
 }
