@@ -5,6 +5,7 @@ import hudson.Extension;
 import hudson.XmlFile;
 import hudson.model.Hudson;
 import hudson.model.Saveable;
+import hudson.model.User;
 import hudson.model.listeners.SaveableListener;
 import java.io.File;
 
@@ -39,7 +40,8 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
      * @return helper.
      */
     HistoryDao getConfigHistoryListenerHelper() {
-        return new FileHistoryDao(getPlugin().getConfiguredHistoryRootDir(), new File(Hudson.getInstance().root.getPath()));
+        return new FileHistoryDao(
+                getPlugin().getConfiguredHistoryRootDir(), new File(Hudson.getInstance().root.getPath()), User.current());
     }
 
     /**

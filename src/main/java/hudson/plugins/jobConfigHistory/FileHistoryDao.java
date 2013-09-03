@@ -40,12 +40,15 @@ public class FileHistoryDao implements HistoryDao {
     /** JENKINS_HOME. */
     private final File jenkinsHome;
 
+    /** Currently logged in user. */
+    private final User currentUser;
+
     /**
      */
-    FileHistoryDao(final File historyRootDir, File jenkinsHome) {
+    FileHistoryDao(final File historyRootDir, File jenkinsHome, User currentUser) {
         this.historyRootDir = historyRootDir;
         this.jenkinsHome = jenkinsHome;
-        System.out.printf("hr=%s,jh=%s", this.historyRootDir, this.jenkinsHome);
+        this.currentUser = currentUser;
     }
 
     /**
@@ -77,7 +80,6 @@ public class FileHistoryDao implements HistoryDao {
      *             if writing the history fails.
      */
     void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir, final String operation) throws IOException {
-        final User currentUser = getCurrentUser();
         final String user;
         final String userId;
         if (currentUser != null) {
@@ -92,15 +94,6 @@ public class FileHistoryDao implements HistoryDao {
         final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, getIdFormatter().format(
                 timestamp.getTime()));
         historyDescription.write(myDescr);
-    }
-
-    /**
-     * Returns the user who invoked the action.
-     *
-     * @return current user.
-     */
-    User getCurrentUser() {
-        return User.current();
     }
 
     /**

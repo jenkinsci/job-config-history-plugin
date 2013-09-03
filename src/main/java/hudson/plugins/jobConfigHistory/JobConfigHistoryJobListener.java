@@ -6,6 +6,7 @@ import hudson.FilePath;
 import hudson.model.Item;
 import hudson.model.AbstractItem;
 import hudson.model.Hudson;
+import hudson.model.User;
 import hudson.model.listeners.ItemListener;
 
 import java.io.File;
@@ -122,6 +123,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
      * @return listener
      */
     HistoryDao getConfigHistoryListenerHelper() {
-        return new FileHistoryDao(getPlugin().getConfiguredHistoryRootDir(), new File(Hudson.getInstance().root.getPath()));
+        return new FileHistoryDao(
+                getPlugin().getConfiguredHistoryRootDir(), new File(Hudson.getInstance().root.getPath()), User.current());
     }
 }

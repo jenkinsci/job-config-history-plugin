@@ -29,14 +29,20 @@ public class FileHistoryDaoTest {
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder(new File("target"));
+    
+    private final User mockedUser = mock(User.class);
 
+    public FileHistoryDaoTest() {
+    }
+    
+    
     /**
      * Test of createNewHistoryEntry method, of class FileHistoryDao.
      */
     @Test
     public void testCreateNewHistoryEntry() throws IOException {
         final XmlFile xmlFile = new XmlFile(tempFolder.newFile());
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot()) {
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), null) {
             @Override
             JobConfigHistory getPlugin() {
                 final JobConfigHistory mockPlugin = mock(JobConfigHistory.class);
@@ -58,28 +64,13 @@ public class FileHistoryDaoTest {
     @Test
     public void testCreateNewHistoryEntryRTE() throws IOException {
         final XmlFile xmlFile = new XmlFile(tempFolder.newFile());
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot()) {
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), null) {
             @Override
             File getRootDir(XmlFile xmlFile, AtomicReference<Calendar> timestampHolder) {
                 throw new RuntimeException("oops");
             }
         };
         sut.createNewHistoryEntry(xmlFile, "foo");
-    }
-
-    /**
-     * Test of getCurrentUser method, of class FileHistoryDao.
-     */
-    @Test
-    public void testGetCurrentUser() {
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot()) {
-            @Override
-            User getCurrentUser() {
-                return null;
-            }
-        };
-        User result = sut.getCurrentUser();
-        assertNull(result);
     }
 
     /**
@@ -112,15 +103,9 @@ public class FileHistoryDaoTest {
     @Test
     public void testCreateHistoryXmlFile() throws Exception {
         final String fullName = "Full Name";
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot()) {
-            @Override
-            User getCurrentUser() {
-                final User mockedUser = mock(User.class);
-                when(mockedUser.getFullName()).thenReturn(fullName);
-                when(mockedUser.getId()).thenReturn("userId");
-                return mockedUser;
-            }
-        };
+        when(mockedUser.getFullName()).thenReturn(fullName);
+        when(mockedUser.getId()).thenReturn("userId");
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), mockedUser);
         testCreateHistoryXmlFile(sut, fullName);
     }
 
@@ -130,12 +115,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testCreateHistoryXmlFileAnonym() throws Exception {
         final String fullName = "Anonym";
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot()) {
-            @Override
-            User getCurrentUser() {
-                return null;
-            }
-        };
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), null);
         testCreateHistoryXmlFile(sut, fullName);
     }
     /**
