@@ -349,7 +349,7 @@ public class JobConfigHistory extends Plugin {
      */
     protected File getConfigFile(final File historyDir) {
         File configFile = null;
-        if (historyDir.exists() && (new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE)).exists()) {
+        if (historyDir.exists() && HistoryFileFilter.INSTANCE.accept(historyDir)) {
             // get the *.xml file that is not the JobConfigHistoryConsts.HISTORY_FILE
             // assumes random .xml files won't appear in the history directory
             final File[] listing = historyDir.listFiles();

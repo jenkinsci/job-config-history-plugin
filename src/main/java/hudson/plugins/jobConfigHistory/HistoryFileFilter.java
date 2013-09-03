@@ -15,7 +15,7 @@ class HistoryFileFilter implements FileFilter {
 
     @Override
     public boolean accept(File file) {
-        return (new File(file, JobConfigHistoryConsts.HISTORY_FILE)).exists();
+        return file.exists() && new File(file, JobConfigHistoryConsts.HISTORY_FILE).exists();
     }
 
 }
