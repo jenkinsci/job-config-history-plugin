@@ -36,7 +36,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testCreateNewHistoryEntry() throws IOException {
         final XmlFile xmlFile = new XmlFile(tempFolder.newFile());
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history")) {
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot()) {
             @Override
             JobConfigHistory getPlugin() {
                 final JobConfigHistory mockPlugin = mock(JobConfigHistory.class);
@@ -58,7 +58,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testCreateNewHistoryEntryRTE() throws IOException {
         final XmlFile xmlFile = new XmlFile(tempFolder.newFile());
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history")) {
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot()) {
             @Override
             File getRootDir(XmlFile xmlFile, AtomicReference<Calendar> timestampHolder) {
                 throw new RuntimeException("oops");
@@ -72,7 +72,7 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testGetCurrentUser() {
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history")) {
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot()) {
             @Override
             User getCurrentUser() {
                 return null;
@@ -112,7 +112,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testCreateHistoryXmlFile() throws Exception {
         final String fullName = "Full Name";
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history")) {
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot()) {
             @Override
             User getCurrentUser() {
                 final User mockedUser = mock(User.class);
@@ -130,7 +130,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testCreateHistoryXmlFileAnonym() throws Exception {
         final String fullName = "Anonym";
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history")) {
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot()) {
             @Override
             User getCurrentUser() {
                 return null;

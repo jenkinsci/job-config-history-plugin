@@ -39,7 +39,7 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
      * @return helper.
      */
     HistoryDao getConfigHistoryListenerHelper() {
-        return new FileHistoryDao(getPlugin().getConfiguredHistoryRootDir());
+        return new FileHistoryDao(getPlugin().getConfiguredHistoryRootDir(), new File(Hudson.getInstance().root.getPath()));
     }
 
     /**

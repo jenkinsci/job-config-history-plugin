@@ -37,10 +37,15 @@ public class FileHistoryDao implements HistoryDao {
     /** Base location for all files. */
     private final File historyRootDir;
 
+    /** JENKINS_HOME. */
+    private final File jenkinsHome;
+
     /**
      */
-    FileHistoryDao(final File historyRootDir) {
+    FileHistoryDao(final File historyRootDir, File jenkinsHome) {
         this.historyRootDir = historyRootDir;
+        this.jenkinsHome = jenkinsHome;
+        System.out.printf("hr=%s,jh=%s", this.historyRootDir, this.jenkinsHome);
     }
 
     /**
