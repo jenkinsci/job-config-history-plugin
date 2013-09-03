@@ -123,7 +123,17 @@ public class JobConfigHistoryJobListener extends ItemListener {
      * @return listener
      */
     HistoryDao getConfigHistoryListenerHelper() {
+        final String maxHistoryEntriesAsString = getPlugin().getMaxHistoryEntries();
+        int maxHistoryEntries = 0;
+        try {
+            maxHistoryEntries = Integer.valueOf(maxHistoryEntriesAsString);
+        } catch (IllegalArgumentException e) {
+            maxHistoryEntries = 0;
+        }
         return new FileHistoryDao(
-                getPlugin().getConfiguredHistoryRootDir(), new File(Hudson.getInstance().root.getPath()), User.current(), 0);
+                getPlugin().getConfiguredHistoryRootDir(),
+                new File(Hudson.getInstance().root.getPath()),
+                User.current(),
+                maxHistoryEntries);
     }
 }
