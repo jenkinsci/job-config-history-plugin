@@ -17,10 +17,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,14 +31,38 @@ import static org.mockito.Mockito.when;
 public class FileHistoryDaoTest {
 
     @Rule
-    public final TemporaryFolder tempFolder = new TemporaryFolder(new File("target"));
-
-    @Rule
     public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
 
     private final User mockedUser = mock(User.class);
 
+    private File jenkinsHome;
+
+    private XmlFile test1Config;
+
+    private File historyRoot;
+
+    private FileHistoryDao sutWithoutUser;
+
+    private FileHistoryDao sutWithUser;
+
+    private static final String FULL_NAME = "Full Name";
+
+    private static final String USER_ID = "userId";
+
     public FileHistoryDaoTest() {
+
+
+    }
+
+    @Before
+    public void setFieldsFromUnpackResource() {
+        jenkinsHome = unpackResourceZip.getRoot();
+        test1Config = new XmlFile(unpackResourceZip.getResource("jobs/Test1/config.xml"));
+        historyRoot = unpackResourceZip.getResource("config-history/jobs/Test1/");
+        sutWithoutUser = new FileHistoryDao(historyRoot, jenkinsHome, null, 0);
+        sutWithUser = new FileHistoryDao(historyRoot, jenkinsHome, mockedUser, 0);
+        when(mockedUser.getFullName()).thenReturn(FULL_NAME);
+        when(mockedUser.getId()).thenReturn(USER_ID);
     }
 
 
@@ -47,29 +71,26 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testCreateNewHistoryEntry() throws IOException {
-        final XmlFile xmlFile = new XmlFile(unpackResourceZip.getResource("jobs/Test1/config.xml"));
-        final File historyRoot = getHistoryRootForTest1();
-        FileHistoryDao sut = new FileHistoryDao(historyRoot, unpackResourceZip.getRoot(), null, 0);
-        sut.createNewHistoryEntry(xmlFile, "foo");
-        final int newLength = getHistoryRootForTest1Length(historyRoot);
+        sutWithoutUser.createNewHistoryEntry(test1Config, "foo");
+        final int newLength = getHistoryRootForTest1Length();
         assertEquals(6, newLength);
     }
+
 
     /**
      * Test of createNewHistoryEntry method, of class FileHistoryDao.
      */
     @Test
     public void testCreateNewHistoryEntryRTE() throws IOException {
-        final XmlFile xmlFile = new XmlFile(unpackResourceZip.getResource("jobs/Test1/config.xml"));
-        final File historyRoot = getHistoryRootForTest1();
-        FileHistoryDao sut = new FileHistoryDao(historyRoot, unpackResourceZip.getRoot(), null, 0) {
+        final XmlFile xmlFile = test1Config;
+        FileHistoryDao sut = new FileHistoryDao(historyRoot, jenkinsHome, null, 0) {
             @Override
             File getRootDir(XmlFile xmlFile, AtomicReference<Calendar> timestampHolder) {
                 throw new RuntimeException("oops");
             }
         };
         sut.createNewHistoryEntry(xmlFile, "foo");
-        final int newLength = getHistoryRootForTest1Length(historyRoot);
+        final int newLength = getHistoryRootForTest1Length();
         assertEquals(5, newLength);
     }
 
@@ -90,8 +111,9 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testCopyConfigFile() throws Exception {
-        File currentConfig = new File(FileHistoryDaoTest.class.getResource("file1.txt").getPath());
-        File timestampedDir = tempFolder.newFolder();
+        File currentConfig = test1Config.getFile();
+        File timestampedDir = new File(jenkinsHome, "timestamp");
+        timestampedDir.mkdir();
         FileHistoryDao.copyConfigFile(currentConfig, timestampedDir);
         final File copy = new File(timestampedDir, currentConfig.getName());
         assertTrue(copy.exists());
@@ -102,11 +124,7 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testCreateHistoryXmlFile() throws Exception {
-        final String fullName = "Full Name";
-        when(mockedUser.getFullName()).thenReturn(fullName);
-        when(mockedUser.getId()).thenReturn("userId");
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), mockedUser, 0);
-        testCreateHistoryXmlFile(sut, fullName);
+        testCreateHistoryXmlFile(sutWithUser, FULL_NAME);
     }
 
     /**
@@ -114,30 +132,12 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testCreateHistoryXmlFileAnonym() throws Exception {
-        final String fullName = "Anonym";
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), null, 0);
-        testCreateHistoryXmlFile(sut, fullName);
-    }
-    /**
-     * Test of createNewHistoryDir method, of class FileHistoryDao.
-     */
-    @Test
-    public void testCreateNewHistoryDir() throws IOException {
-        final File itemHistoryDir = tempFolder.newFolder();
-        final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
-        final File result = FileHistoryDao.createNewHistoryDir(itemHistoryDir, timestampHolder);
-        assertTrue(result.exists());
-        assertTrue(result.isDirectory());
-        // Should provoke clash
-        final File result2 = FileHistoryDao.createNewHistoryDir(itemHistoryDir, timestampHolder);
-        assertTrue(result2.exists());
-        assertTrue(result2.isDirectory());
-        assertNotEquals(result, result2);
+        testCreateHistoryXmlFile(sutWithoutUser, "Anonym");
     }
 
     private void testCreateHistoryXmlFile(FileHistoryDao sut, final String fullName) throws IOException {
         Calendar timestamp = new GregorianCalendar();
-        File timestampedDir = tempFolder.newFolder();
+        File timestampedDir = new File(historyRoot, "timestampedDir");
         sut.createHistoryXmlFile(timestamp, timestampedDir, "foo");
         final File historyFile = new File(timestampedDir, JobConfigHistoryConsts.HISTORY_FILE);
         assertTrue(historyFile.exists());
@@ -149,20 +149,30 @@ public class FileHistoryDaoTest {
     }
 
     /**
+     * Test of createNewHistoryDir method, of class FileHistoryDao.
+     */
+    @Test
+    public void testCreateNewHistoryDir() throws IOException {
+        final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
+        final File first = FileHistoryDao.createNewHistoryDir(historyRoot, timestampHolder);
+        assertTrue(first.exists());
+        assertTrue(first.isDirectory());
+        // Should provoke clash
+        final File second = FileHistoryDao.createNewHistoryDir(historyRoot, timestampHolder);
+        assertTrue(second.exists());
+        assertTrue(second.isDirectory());
+        assertNotEquals(first.getAbsolutePath(), second.getAbsolutePath());
+    }
+
+    /**
      * Test of getRootDir method, of class FileHistoryDao.
      */
     @Test
-    @Ignore
     public void testGetRootDir() {
-        System.out.println("getRootDir");
-        XmlFile xmlFile = null;
-        AtomicReference<Calendar> timestampHolder = null;
-        FileHistoryDao sut = null;
-        File expResult = null;
-        File result = sut.getRootDir(xmlFile, timestampHolder);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
+        File result = sutWithoutUser.getRootDir(test1Config, timestampHolder);
+        assertTrue(result.exists());
+        assertThat(result.getPath(), containsString("jobs" + File.separator + "Test1"));
     }
 
     /**
@@ -320,11 +330,10 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testPurgeOldEntriesNoEntriesToDelete() {
-        final File itemHistoryRoot = getHistoryRootForTest1();
-        final int oldLength = getHistoryRootForTest1Length(itemHistoryRoot);
+        final int oldLength = getHistoryRootForTest1Length();
         int maxEntries = 0;
-        FileHistoryDao.purgeOldEntries(itemHistoryRoot, maxEntries);
-        final int newLength = getHistoryRootForTest1Length(itemHistoryRoot);
+        FileHistoryDao.purgeOldEntries(historyRoot, maxEntries);
+        final int newLength = getHistoryRootForTest1Length();
         assertEquals(oldLength, newLength);
     }
 
@@ -333,20 +342,16 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testPurgeOldEntriesOnlyOneExisting() {
-        final File itemHistoryRoot = getHistoryRootForTest1();
         int maxEntries = 2;
-        FileHistoryDao.purgeOldEntries(itemHistoryRoot, maxEntries);
-        final int newLength = getHistoryRootForTest1Length(itemHistoryRoot);
+        FileHistoryDao.purgeOldEntries(historyRoot, maxEntries);
+        final int newLength = getHistoryRootForTest1Length();
         assertEquals(1, newLength);
     }
 
-    private int getHistoryRootForTest1Length(final File itemHistoryRoot) {
-        return itemHistoryRoot.list().length;
+    private int getHistoryRootForTest1Length() {
+        return historyRoot.list().length;
     }
 
-    private File getHistoryRootForTest1() {
-        return unpackResourceZip.getResource("config-history/jobs/Test1/");
-    }
 
 
 }
