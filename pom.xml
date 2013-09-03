@@ -165,7 +165,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <argLine>${argLine} -Xms256m -Xmx512m -XX:MaxPermSize=128m</argLine>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <testFailureIgnore>false</testFailureIgnore>
                     <excludes>
