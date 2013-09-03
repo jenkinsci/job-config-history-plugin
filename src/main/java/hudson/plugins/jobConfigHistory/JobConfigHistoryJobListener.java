@@ -31,7 +31,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
     public void onCreated(Item item) {
         LOG.log(FINEST, "In onCreated for {0}", item);
         if (item instanceof AbstractItem) {
-            final ConfigHistoryListenerHelper configHistoryListenerHelper = getConfigHistoryListenerHelper(
+            final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper(
                     Messages.ConfigHistoryListenerHelper_CREATED());
             configHistoryListenerHelper.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
         } else {
@@ -77,7 +77,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
                 }
             }
             // Must do this after moving old history, in case a CHANGED was fired during the same second under the old name.
-            final ConfigHistoryListenerHelper configHistoryListenerHelper = getConfigHistoryListenerHelper(
+            final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper(
                     Messages.ConfigHistoryListenerHelper_RENAMED());
             configHistoryListenerHelper.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
         }
@@ -91,7 +91,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
         LOG.log(FINEST, "In onDeleted for {0}", item);
         if (item instanceof AbstractItem) {
             final JobConfigHistory plugin = getPlugin();
-            final ConfigHistoryListenerHelper configHistoryListenerHelper = getConfigHistoryListenerHelper(
+            final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper(
                     Messages.ConfigHistoryListenerHelper_DELETED());
             configHistoryListenerHelper.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
             final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
@@ -121,7 +121,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
      * @param operationName name of the operation.
      * @return listener
      */
-    ConfigHistoryListenerHelper getConfigHistoryListenerHelper(final String operationName) {
-        return new FileConfigHistoryListenerHelper(operationName);
+    HistoryDao getConfigHistoryListenerHelper(final String operationName) {
+        return new FileHistoryDao(operationName);
     }
 }

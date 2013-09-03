@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
  */
 public class JobConfigHistorySaveableListenerTest {
 
-    private final ConfigHistoryListenerHelper mockedConfigHistoryListenerHelper = mock(ConfigHistoryListenerHelper.class);
+    private final HistoryDao mockedConfigHistoryListenerHelper = mock(HistoryDao.class);
 
     private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
 
@@ -49,7 +49,7 @@ public class JobConfigHistorySaveableListenerTest {
         }
 
         @Override
-        ConfigHistoryListenerHelper getConfigHistoryListenerHelper() {
+        HistoryDao getConfigHistoryListenerHelper() {
             return mockedConfigHistoryListenerHelper;
         }
     }

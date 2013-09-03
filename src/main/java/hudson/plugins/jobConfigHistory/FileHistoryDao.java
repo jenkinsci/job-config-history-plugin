@@ -27,10 +27,10 @@ import java.util.logging.Logger;
  *
  * @author mfriedenhagen
  */
-public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHelper {
+public class FileHistoryDao implements HistoryDao {
 
     /** Our logger. */
-    private static final Logger LOG = Logger.getLogger(FileConfigHistoryListenerHelper.class.getName());
+    private static final Logger LOG = Logger.getLogger(FileHistoryDao.class.getName());
 
     /**
      * Name of the operation.
@@ -42,7 +42,7 @@ public class FileConfigHistoryListenerHelper implements ConfigHistoryListenerHel
      * @param operation
      *            the operation we handle.
      */
-    FileConfigHistoryListenerHelper(final String operation) {
+    FileHistoryDao(final String operation) {
         this.operation = operation;
     }
 

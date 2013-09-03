@@ -6,7 +6,7 @@ import hudson.XmlFile;
  *
  * @author Mirko Friedenhagen
  */
-public interface ConfigHistoryListenerHelper {
+public interface HistoryDao {
 
     /**
      * Creates a new backup of the job configuration.

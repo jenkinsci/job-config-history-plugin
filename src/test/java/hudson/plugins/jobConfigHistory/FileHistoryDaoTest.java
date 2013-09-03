@@ -25,18 +25,18 @@ import static org.mockito.Mockito.when;
  *
  * @author Mirko Friedenhagen
  */
-public class FileConfigHistoryListenerHelperTest {
+public class FileHistoryDaoTest {
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder(new File("target"));
 
     /**
-     * Test of createNewHistoryEntry method, of class FileConfigHistoryListenerHelper.
+     * Test of createNewHistoryEntry method, of class FileHistoryDao.
      */
     @Test
     public void testCreateNewHistoryEntry() throws IOException {
         final XmlFile xmlFile = new XmlFile(tempFolder.newFile());
-        FileConfigHistoryListenerHelper sut = new FileConfigHistoryListenerHelper("foo") {
+        FileHistoryDao sut = new FileHistoryDao("foo") {
             @Override
             JobConfigHistory getPlugin() {
                 final JobConfigHistory mockPlugin = mock(JobConfigHistory.class);
@@ -53,12 +53,12 @@ public class FileConfigHistoryListenerHelperTest {
     }
 
     /**
-     * Test of createNewHistoryEntry method, of class FileConfigHistoryListenerHelper.
+     * Test of createNewHistoryEntry method, of class FileHistoryDao.
      */
     @Test
     public void testCreateNewHistoryEntryRTE() throws IOException {
         final XmlFile xmlFile = new XmlFile(tempFolder.newFile());
-        FileConfigHistoryListenerHelper sut = new FileConfigHistoryListenerHelper("foo") {
+        FileHistoryDao sut = new FileHistoryDao("foo") {
             @Override
             File getRootDir(XmlFile xmlFile, AtomicReference<Calendar> timestampHolder) {
                 throw new RuntimeException("oops");
@@ -68,11 +68,11 @@ public class FileConfigHistoryListenerHelperTest {
     }
 
     /**
-     * Test of getCurrentUser method, of class FileConfigHistoryListenerHelper.
+     * Test of getCurrentUser method, of class FileHistoryDao.
      */
     @Test
     public void testGetCurrentUser() {
-        FileConfigHistoryListenerHelper sut = new FileConfigHistoryListenerHelper("foo") {
+        FileHistoryDao sut = new FileHistoryDao("foo") {
             @Override
             User getCurrentUser() {
                 return null;
@@ -83,11 +83,11 @@ public class FileConfigHistoryListenerHelperTest {
     }
 
     /**
-     * Test of getIdFormatter method, of class FileConfigHistoryListenerHelper.
+     * Test of getIdFormatter method, of class FileHistoryDao.
      */
     @Test
     public void testGetIdFormatter() {
-        SimpleDateFormat result = FileConfigHistoryListenerHelper.getIdFormatter();
+        SimpleDateFormat result = FileHistoryDao.getIdFormatter();
         final String formattedDate = result.format(new Date(0));
         // workaround for timezone issues, as cloudbees is in the far east :-) and returns 1969 :-).
         assertThat(formattedDate, startsWith("19"));
@@ -95,24 +95,24 @@ public class FileConfigHistoryListenerHelperTest {
     }
 
     /**
-     * Test of copyConfigFile method, of class FileConfigHistoryListenerHelper.
+     * Test of copyConfigFile method, of class FileHistoryDao.
      */
     @Test
     public void testCopyConfigFile() throws Exception {
-        File currentConfig = new File(FileConfigHistoryListenerHelperTest.class.getResource("file1.txt").getPath());
+        File currentConfig = new File(FileHistoryDaoTest.class.getResource("file1.txt").getPath());
         File timestampedDir = tempFolder.newFolder();
-        FileConfigHistoryListenerHelper.copyConfigFile(currentConfig, timestampedDir);
+        FileHistoryDao.copyConfigFile(currentConfig, timestampedDir);
         final File copy = new File(timestampedDir, currentConfig.getName());
         assertTrue(copy.exists());
     }
 
     /**
-     * Test of createHistoryXmlFile method, of class FileConfigHistoryListenerHelper.
+     * Test of createHistoryXmlFile method, of class FileHistoryDao.
      */
     @Test
     public void testCreateHistoryXmlFile() throws Exception {
         final String fullName = "Full Name";
-        FileConfigHistoryListenerHelper sut = new FileConfigHistoryListenerHelper("foo") {
+        FileHistoryDao sut = new FileHistoryDao("foo") {
             @Override
             User getCurrentUser() {
                 final User mockedUser = mock(User.class);
@@ -125,12 +125,12 @@ public class FileConfigHistoryListenerHelperTest {
     }
 
     /**
-     * Test of createHistoryXmlFile method, of class FileConfigHistoryListenerHelper.
+     * Test of createHistoryXmlFile method, of class FileHistoryDao.
      */
     @Test
     public void testCreateHistoryXmlFileAnonym() throws Exception {
         final String fullName = "Anonym";
-        FileConfigHistoryListenerHelper sut = new FileConfigHistoryListenerHelper("foo") {
+        FileHistoryDao sut = new FileHistoryDao("foo") {
             @Override
             User getCurrentUser() {
                 return null;
@@ -139,23 +139,23 @@ public class FileConfigHistoryListenerHelperTest {
         testCreateHistoryXmlFile(sut, fullName);
     }
     /**
-     * Test of createNewHistoryDir method, of class FileConfigHistoryListenerHelper.
+     * Test of createNewHistoryDir method, of class FileHistoryDao.
      */
     @Test
     public void testCreateNewHistoryDir() throws IOException {
         final File itemHistoryDir = tempFolder.newFolder();
         final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
-        final File result = FileConfigHistoryListenerHelper.createNewHistoryDir(itemHistoryDir, timestampHolder);
+        final File result = FileHistoryDao.createNewHistoryDir(itemHistoryDir, timestampHolder);
         assertTrue(result.exists());
         assertTrue(result.isDirectory());
         // Should provoke clash
-        final File result2 = FileConfigHistoryListenerHelper.createNewHistoryDir(itemHistoryDir, timestampHolder);
+        final File result2 = FileHistoryDao.createNewHistoryDir(itemHistoryDir, timestampHolder);
         assertTrue(result2.exists());
         assertTrue(result2.isDirectory());
         assertNotEquals(result, result2);
     }
 
-    private void testCreateHistoryXmlFile(FileConfigHistoryListenerHelper sut, final String fullName) throws IOException {
+    private void testCreateHistoryXmlFile(FileHistoryDao sut, final String fullName) throws IOException {
         Calendar timestamp = new GregorianCalendar();
         File timestampedDir = tempFolder.newFolder();
         sut.createHistoryXmlFile(timestamp, timestampedDir);
