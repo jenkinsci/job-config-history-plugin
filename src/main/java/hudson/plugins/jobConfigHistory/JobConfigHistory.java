@@ -35,21 +35,21 @@ import org.kohsuke.stapler.StaplerRequest;
 /**
  * Class supporting global configuration settings, along with methods
  * associated with the plugin itself.
- * 
+ *
  * @author jborghi
  *
  */
 public class JobConfigHistory extends Plugin {
-    
+
     /** Root directory for storing histories. */
     private String historyRootDir;
-    
+
     /** Maximum number of configuration history entries to keep. */
     private String maxHistoryEntries;
-    
+
     /** Maximum number of days to keep entries. */
     private String maxDaysToKeepEntries;
-    
+
     /** Flag to indicate we should save 'system' level configurations
      *  A 'system' level configuration is defined as one stored directly
      *  under the HUDSON_ROOT directory.
@@ -59,7 +59,7 @@ public class JobConfigHistory extends Plugin {
     /** Flag to indicate ItemGroups configuration is saved as well. */
     private boolean saveItemGroupConfiguration;
 
-    /** Flag to indicate if we should save history when it 
+    /** Flag to indicate if we should save history when it
      *  is a duplication of the previous saved configuration.
      */
     private boolean skipDuplicateHistory = true;
@@ -71,13 +71,13 @@ public class JobConfigHistory extends Plugin {
 
     /** Compiled regular expression pattern. */
     private transient Pattern excludeRegexpPattern;
-    
+
     /** Flag to indicate if we should save the config history of Maven modules. */
     private boolean saveModuleConfiguration = true;
-    
+
     /**
      * Whether build badges should appear when the config of a job has changed since the last build.
-     * Three possible settings: Never, always, only for users with config permission. 
+     * Three possible settings: Never, always, only for users with config permission.
      */
     private String showBuildBadges = "always";
 
@@ -100,8 +100,8 @@ public class JobConfigHistory extends Plugin {
         }
     };
 
-   
-    @Override 
+
+    @Override
     public void start() throws Exception {
         load();
         loadRegexpPatterns();
@@ -123,21 +123,21 @@ public class JobConfigHistory extends Plugin {
         save();
         loadRegexpPatterns();
     }
-    
+
     /**
      * @return The configured history root directory.
      */
     public String getHistoryRootDir() {
         return historyRootDir;
     }
-    
+
     /**
      * @return The default history root directory.
      */
     public String getDefaultRootDir() {
         return JobConfigHistoryConsts.DEFAULT_HISTORY_DIR;
     }
-    
+
     /**
      * @return The maximum number of history entries to keep.
      */
@@ -153,7 +153,7 @@ public class JobConfigHistory extends Plugin {
     protected void setMaxHistoryEntries(final String maxHistoryEntries) {
         this.maxHistoryEntries = maxHistoryEntries;
     }
-    
+
     /**
      * @return The maximum number of days to keep history entries.
      */
@@ -169,7 +169,7 @@ public class JobConfigHistory extends Plugin {
     protected void setMaxDaysToKeepEntries(final String maxDays) {
         this.maxDaysToKeepEntries = maxDays;
     }
-    
+
     /**
      * @return true if we should save 'system' configurations.
      */
@@ -213,7 +213,7 @@ public class JobConfigHistory extends Plugin {
     public String getDefaultExcludePattern() {
         return JobConfigHistoryConsts.DEFAULT_EXCLUDE;
     }
-    
+
     /**
      * @return true if we should save 'system' configurations.
      */
@@ -227,7 +227,7 @@ public class JobConfigHistory extends Plugin {
     public String getShowBuildBadges() {
         return showBuildBadges;
     }
-    
+
     /**
      * Used for testing only.
      * @param showBadges Never, always, userWithConfigPermission or adminUser.
@@ -238,7 +238,7 @@ public class JobConfigHistory extends Plugin {
 
     /**
      * Whether build badges should appear for the builds of this project for this user.
-     * 
+     *
      * @param project The project to which the build history belongs.
      * @return False if the option is set to 'never' or the user doesn't have the required permissions.
      */
@@ -255,7 +255,7 @@ public class JobConfigHistory extends Plugin {
 
     /**
      * Used for testing to verify invalid pattern not loaded.
-     * @return The loaded regexp pattern, or null if pattern was invalid. 
+     * @return The loaded regexp pattern, or null if pattern was invalid.
      */
     protected Pattern getExcludeRegexpPattern() {
         return excludeRegexpPattern;
@@ -272,7 +272,7 @@ public class JobConfigHistory extends Plugin {
      * Loads a regular expression pattern for the given string.
      * @param patternString
      *            The string representing the regular expression.
-     * @return The {@link Pattern} for the given expression, or null if 
+     * @return The {@link Pattern} for the given expression, or null if
      *         the pattern cannot be loaded.
      */
     private Pattern loadRegex(final String patternString) {
@@ -292,13 +292,19 @@ public class JobConfigHistory extends Plugin {
      * of the configured history root dir.
      *
      * @return The job history File object.
+     *
+     * @deprecated replace this with FileHistoryDao invocation.
      */
     @Deprecated
     protected File getJobHistoryRootDir() {
-        return new FileHistoryDao(getConfiguredHistoryRootDir(), Hudson.getInstance().getRootDir(), User.current().current(), 0).getJobHistoryRootDir();
+        return new FileHistoryDao(
+                getConfiguredHistoryRootDir(),
+                Hudson.getInstance().getRootDir(),
+                User.current().current(),
+                0).getJobHistoryRootDir();
     }
 
-    
+
     /**
      * Returns the File object representing the configured root history directory.
      *
@@ -306,14 +312,14 @@ public class JobConfigHistory extends Plugin {
      */
     protected File getConfiguredHistoryRootDir() {
         File rootDir;
- 
+
         if (historyRootDir == null || historyRootDir.isEmpty()) {
             rootDir = new File(Hudson.getInstance().root.getPath() + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
         } else {
             if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*")) {
                 rootDir = new File(historyRootDir + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
             } else {
-                rootDir = new File(Hudson.getInstance().root.getPath() + "/" + historyRootDir + "/" 
+                rootDir = new File(Hudson.getInstance().root.getPath() + "/" + historyRootDir + "/"
                             + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
             }
         }
@@ -325,17 +331,23 @@ public class JobConfigHistory extends Plugin {
      *
      * @param xmlFile
      *            The configuration file whose content we are saving.
-     * @return The base directory where to store the history, 
+     * @return The base directory where to store the history,
      *         or null if the file is not a valid Hudson configuration file.
+     *
+     * @deprecated replace this with FileHistoryDao invocation.
      */
     @Deprecated
     protected File getHistoryDir(final XmlFile xmlFile) {
-        return new FileHistoryDao(getConfiguredHistoryRootDir(), Hudson.getInstance().getRootDir(), User.current(), 0).getHistoryDir(xmlFile);
+        return new FileHistoryDao(
+                getConfiguredHistoryRootDir(),
+                Hudson.getInstance().getRootDir(),
+                User.current(),
+                0).getHistoryDir(xmlFile);
     }
 
     /**
      * Returns the configuration data file stored in the specified history directory.
-     * It looks for a file with an 'xml' extension that is not named 
+     * It looks for a file with an 'xml' extension that is not named
      * {@link JobConfigHistoryConsts#HISTORY_FILE}.
      * <p>
      * Relies on the assumption that random '.xml' files
@@ -366,11 +378,11 @@ public class JobConfigHistory extends Plugin {
     /**
      * Returns true if configuration for this item should be saved, based on the
      * plugin settings, the type of item and the configuration file specified.
-     * 
+     *
      * <p>
      * If the item is an instance of {@link AbstractProject} or the configuration
      * file is stored directly in HUDSON_ROOT, it is considered for saving.
-     * 
+     *
      * If the plugin is configured to skip saving duplicated history, we also evaluate
      * if this configuration duplicates the previous saved history (if such history exists).
      *
@@ -395,7 +407,7 @@ public class JobConfigHistory extends Plugin {
         if (saveable) {
             saveable = checkDuplicate(xmlFile);
         }
-        
+
         return saveable;
     }
 
@@ -426,8 +438,8 @@ public class JobConfigHistory extends Plugin {
             return true;
         }
     }
-    
-    
+
+
     /**
      * Determines if the {@link XmlFile} contains a duplicate of
      * the last saved information, if there is previous history.
@@ -468,7 +480,7 @@ public class JobConfigHistory extends Plugin {
     protected void checkForPurgeByQuantity(final File itemHistoryRoot) {
         int maxEntries = 0;
         if (StringUtils.isNotEmpty(maxHistoryEntries)) {
-            try {                
+            try {
                 maxEntries = Integer.parseInt(maxHistoryEntries);
                 if (maxEntries < 0) {
                     throw new NumberFormatException();
@@ -497,7 +509,7 @@ public class JobConfigHistory extends Plugin {
             return FormValidation.error("Enter a valid positive integer");
         }
     }
-    
+
     /**
      * Validates the user entry for the maximum number of days to keep history items.
      * Must be blank or a non-negative integer.

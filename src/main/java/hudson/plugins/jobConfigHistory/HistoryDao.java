@@ -42,8 +42,8 @@ public interface HistoryDao {
     /**
      * Save and renames the item.
      *
-     * @param item
-     * @param newName
+     * @param item project
+     * @param newName new name
      */
     void renameItem(AbstractItem item, String newName);
 
@@ -62,7 +62,7 @@ public interface HistoryDao {
      * Returns one old configuration of item.
      *
      *
-     * @param item
+     * @param item project
      * @param identifier timestamp or hash
      * @return old configuration.
      */

@@ -11,7 +11,7 @@ import java.io.FileFilter;
 class HistoryFileFilter implements FileFilter {
 
     /** Singleton. */
-    static HistoryFileFilter INSTANCE = new HistoryFileFilter();
+    static final HistoryFileFilter INSTANCE = new HistoryFileFilter();
 
     @Override
     public boolean accept(File file) {

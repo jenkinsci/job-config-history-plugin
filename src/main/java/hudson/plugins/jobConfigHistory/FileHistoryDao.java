@@ -7,7 +7,6 @@ package hudson.plugins.jobConfigHistory;
 import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
-import hudson.model.Hudson;
 import hudson.model.User;
 
 import java.io.File;
@@ -36,6 +35,9 @@ public class FileHistoryDao implements HistoryDao {
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(FileHistoryDao.class.getName());
 
+    /** milliseconds between attempts to save a new entry. */
+    private static final int CLASH_SLEEP_TIME = 500;
+
     /** Base location for all files. */
     private final File historyRootDir;
 
@@ -49,6 +51,10 @@ public class FileHistoryDao implements HistoryDao {
     private final int maxHistoryEntries;
 
     /**
+     * @param historyRootDir where to store history
+     * @param jenkinsHome JENKKINS_HOME
+     * @param currentUser of operation
+     * @param maxHistoryEntries max number of history entries
      */
     FileHistoryDao(final File historyRootDir, File jenkinsHome, User currentUser, int maxHistoryEntries) {
         this.historyRootDir = historyRootDir;
@@ -81,6 +87,8 @@ public class FileHistoryDao implements HistoryDao {
      *            when the action did happen.
      * @param timestampedDir
      *            the directory where to save the history.
+     * @param operation
+     *            description of operation.
      * @throws IOException
      *             if writing the history fails.
      */
@@ -155,7 +163,7 @@ public class FileHistoryDao implements HistoryDao {
             if (f.isDirectory()) {
                 LOG.log(Level.FINE, "clash on {0}, will wait a moment", f);
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(CLASH_SLEEP_TIME);
                 } catch (InterruptedException x) {
                     throw new RuntimeException(x);
                 }
@@ -171,6 +179,7 @@ public class FileHistoryDao implements HistoryDao {
         }
         return f;
     }
+
 
     @Override
     public void createNewItem(AbstractItem item) {
@@ -207,9 +216,15 @@ public class FileHistoryDao implements HistoryDao {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /**
+     * Creates a new history entry.
+     *
+     * @param xmlFile to save.
+     * @param operation description
+     */
     void createNewHistoryEntry(final XmlFile xmlFile, final String operation) {
         try {
-            AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
+            final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
             final File timestampedDir = getRootDir(xmlFile, timestampHolder);
             LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
             if (!Messages.ConfigHistoryListenerHelper_DELETED().equals(operation)) {
@@ -256,7 +271,8 @@ public class FileHistoryDao implements HistoryDao {
         }
         final File historyDir;
         if (underRootDir == null) {
-            final String remainingPath = configRootDir.substring(hudsonRootDir.length() + JobConfigHistoryConsts.JOBS_HISTORY_DIR.length() + 1);
+            final String remainingPath = configRootDir.substring(
+                    hudsonRootDir.length() + JobConfigHistoryConsts.JOBS_HISTORY_DIR.length() + 1);
             historyDir = new File(getJobHistoryRootDir(), remainingPath);
         } else {
             historyDir = new File(historyRootDir, underRootDir);
