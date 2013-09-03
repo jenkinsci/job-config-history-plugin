@@ -210,14 +210,13 @@ public class FileHistoryDaoTest {
      * Test of saveItem method, of class FileHistoryDao.
      */
     @Test
-    @Ignore
     public void testSaveItem_XmlFile() {
-        System.out.println("saveItem");
-        XmlFile file = null;
-        FileHistoryDao sut = null;
-        sut.saveItem(file);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        sutWithUser.saveItem(test1Config);
+        assertEquals(6, getHistoryLength());
+    }
+
+    private int getHistoryLength() {
+        return test1History.list().length;
     }
 
     /**
@@ -340,7 +339,7 @@ public class FileHistoryDaoTest {
     }
 
     private int getHistoryRootForTest1Length() {
-        return test1History.list().length;
+        return getHistoryLength();
     }
 
 
