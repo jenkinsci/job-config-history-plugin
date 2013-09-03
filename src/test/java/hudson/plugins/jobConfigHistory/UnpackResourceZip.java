@@ -40,10 +40,18 @@ public class UnpackResourceZip extends ExternalResource {
     }
 
     /**
-     * @return the location of the unpacked resources.
+     * @return the root location of the unpacked resources.
      */
     public File getRoot() {
         return temporaryFolder.getRoot();
+    }
+
+    /**
+     * @param resourceName name
+     * @return an unpacked resource.
+     */
+    public File getResource(final String resourceName) {
+        return new File(getRoot(), resourceName);
     }
 
     private void unpackZip() throws IOException {

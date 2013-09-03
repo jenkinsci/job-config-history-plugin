@@ -90,7 +90,7 @@ public class JobConfigHistoryProjectActionTest {
     public void testGetJobConfigs() throws Exception {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
         when(mockedPlugin.getHistoryDir(any(XmlFile.class))).thenReturn(
-                new File(testConfigs.getRoot(), "config-history/jobs/Test1"));
+                testConfigs.getResource("config-history/jobs/Test1"));
         final JobConfigHistoryProjectAction sut = createAction();
         final List<ConfigInfo> result = sut.getJobConfigs();
         assertEquals(5, result.size());
@@ -103,7 +103,7 @@ public class JobConfigHistoryProjectActionTest {
     public void testGetJobConfigsEmpty() throws Exception {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
         when(mockedPlugin.getHistoryDir(any(XmlFile.class))).thenReturn(
-                new File(testConfigs.getRoot(), "config-history/jobs/I_DO_NOT_EXIST"));
+                testConfigs.getResource("config-history/jobs/I_DO_NOT_EXIST"));
         final JobConfigHistoryProjectAction sut = createAction();
         final List<ConfigInfo> result = sut.getJobConfigs();
         assertEquals(0, result.size());
