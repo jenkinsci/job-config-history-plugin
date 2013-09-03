@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Util;
 import hudson.XmlFile;
+import hudson.model.AbstractItem;
 import hudson.model.User;
 import java.io.File;
 import java.io.IOException;
@@ -10,11 +11,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicReference;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -28,7 +31,10 @@ import static org.mockito.Mockito.when;
 public class FileHistoryDaoTest {
 
     @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder(new File("target"));
+    public final TemporaryFolder tempFolder = new TemporaryFolder(new File("target"));
+    
+    @Rule
+    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
     
     private final User mockedUser = mock(User.class);
 
@@ -146,5 +152,197 @@ public class FileHistoryDaoTest {
         assertThat(historyContent, endsWith("HistoryDescr>"));
         assertThat(historyContent, containsString("<user>"+fullName));
         assertThat(historyContent, containsString("foo"));
+    }
+
+    /**
+     * Test of getRootDir method, of class FileHistoryDao.
+     */
+    @Test
+    @Ignore
+    public void testGetRootDir() {
+        System.out.println("getRootDir");
+        XmlFile xmlFile = null;
+        AtomicReference<Calendar> timestampHolder = null;
+        FileHistoryDao instance = null;
+        File expResult = null;
+        File result = instance.getRootDir(xmlFile, timestampHolder);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of getPlugin method, of class FileHistoryDao.
+     */
+    @Test
+    @Ignore
+    public void testGetPlugin() {
+        System.out.println("getPlugin");
+        FileHistoryDao instance = null;
+        JobConfigHistory expResult = null;
+        JobConfigHistory result = instance.getPlugin();
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of createNewItem method, of class FileHistoryDao.
+     */
+    @Test
+    @Ignore
+    public void testCreateNewItem() {
+        System.out.println("createNewItem");
+        AbstractItem item = null;
+        FileHistoryDao instance = null;
+        instance.createNewItem(item);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of saveItem method, of class FileHistoryDao.
+     */
+    @Test
+    @Ignore
+    public void testSaveItem_AbstractItem() {
+        System.out.println("saveItem");
+        AbstractItem item = null;
+        FileHistoryDao instance = null;
+        instance.saveItem(item);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of saveItem method, of class FileHistoryDao.
+     */
+    @Test
+    @Ignore
+    public void testSaveItem_XmlFile() {
+        System.out.println("saveItem");
+        XmlFile file = null;
+        FileHistoryDao instance = null;
+        instance.saveItem(file);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of deleteItem method, of class FileHistoryDao.
+     */
+    @Test
+    @Ignore
+    public void testDeleteItem() {
+        System.out.println("deleteItem");
+        AbstractItem item = null;
+        FileHistoryDao instance = null;
+        instance.deleteItem(item);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of renameItem method, of class FileHistoryDao.
+     */
+    @Test
+    @Ignore
+    public void testRenameItem() {
+        System.out.println("renameItem");
+        AbstractItem item = null;
+        String newName = "";
+        FileHistoryDao instance = null;
+        instance.renameItem(item, newName);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of getRevisions method, of class FileHistoryDao.
+     */
+    @Test
+    @Ignore
+    public void testGetRevisions() {
+        System.out.println("getRevisions");
+        AbstractItem item = null;
+        FileHistoryDao instance = null;
+        SortedMap<String, XmlFile> expResult = null;
+        SortedMap<String, XmlFile> result = instance.getRevisions(item);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of getOldRevision method, of class FileHistoryDao.
+     */
+    @Test
+    @Ignore
+    public void testGetOldRevision() {
+        System.out.println("getOldRevision");
+        AbstractItem item = null;
+        String identifier = "";
+        FileHistoryDao instance = null;
+        XmlFile expResult = null;
+        XmlFile result = instance.getOldRevision(item, identifier);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of getHistoryDir method, of class FileHistoryDao.
+     */
+    @Test
+    @Ignore
+    public void testGetHistoryDir() {
+        System.out.println("getHistoryDir");
+        XmlFile xmlFile = null;
+        FileHistoryDao instance = null;
+        File expResult = null;
+        File result = instance.getHistoryDir(xmlFile);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of getJobHistoryRootDir method, of class FileHistoryDao.
+     */
+    @Test
+    @Ignore
+    public void testGetJobHistoryRootDir() {
+        System.out.println("getJobHistoryRootDir");
+        FileHistoryDao instance = null;
+        File expResult = null;
+        File result = instance.getJobHistoryRootDir();
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of purgeOldEntries method, of class FileHistoryDao.
+     */
+    @Test
+    public void testPurgeOldEntriesNoEntriesToDelete() {        
+        final File itemHistoryRoot = unpackResourceZip.getResource("config-history/jobs/Test1/");
+        final int oldLength = itemHistoryRoot.list().length;
+        int maxEntries = 0;
+        FileHistoryDao.purgeOldEntries(itemHistoryRoot, maxEntries);
+        final int newLength = itemHistoryRoot.list().length;
+        assertEquals(oldLength, newLength);
+    }
+
+    /**
+     * Test of purgeOldEntries method, of class FileHistoryDao.
+     */
+    @Test
+    public void testPurgeOldEntriesOnlyOneExisting() {        
+        final File itemHistoryRoot = unpackResourceZip.getResource("config-history/jobs/Test1/");
+        int maxEntries = 2;
+        FileHistoryDao.purgeOldEntries(itemHistoryRoot, maxEntries);
+        final int newLength = itemHistoryRoot.list().length;
+        assertEquals(1, newLength);
     }
 }
