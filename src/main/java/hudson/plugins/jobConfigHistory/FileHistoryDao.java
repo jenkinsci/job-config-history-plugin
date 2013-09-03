@@ -172,10 +172,6 @@ public class FileHistoryDao implements HistoryDao {
         return f;
     }
 
-    JobConfigHistory getPlugin() {
-        return Hudson.getInstance().getPlugin(JobConfigHistory.class);
-    }
-
     @Override
     public void createNewItem(AbstractItem item) {
         createNewHistoryEntry(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED());

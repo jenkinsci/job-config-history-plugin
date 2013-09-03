@@ -179,21 +179,6 @@ public class FileHistoryDaoTest {
     }
 
     /**
-     * Test of getPlugin method, of class FileHistoryDao.
-     */
-    @Test
-    @Ignore
-    public void testGetPlugin() {
-        System.out.println("getPlugin");
-        FileHistoryDao sut = null;
-        JobConfigHistory expResult = null;
-        JobConfigHistory result = sut.getPlugin();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of createNewItem method, of class FileHistoryDao.
      */
     @Test
