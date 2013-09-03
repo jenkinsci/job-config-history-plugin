@@ -67,8 +67,7 @@ public class FileHistoryDao implements HistoryDao {
      * @return timestamped directory where to store one history entry.
      */
     File getRootDir(final XmlFile xmlFile, final AtomicReference<Calendar> timestampHolder) {
-        final JobConfigHistory plugin = getPlugin();
-        final File itemHistoryDir = plugin.getHistoryDir(xmlFile);
+        final File itemHistoryDir = getHistoryDir(xmlFile);
         // perform check for purge here, when we are actually going to create
         // a new directory, rather than just when we scan it in above method.
         purgeOldEntries(itemHistoryDir, maxHistoryEntries);
