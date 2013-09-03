@@ -41,6 +41,8 @@ public class FileHistoryDaoTest {
 
     private File historyRoot;
 
+    private File test1History;
+
     private FileHistoryDao sutWithoutUser;
 
     private FileHistoryDao sutWithUser;
@@ -58,7 +60,8 @@ public class FileHistoryDaoTest {
     public void setFieldsFromUnpackResource() {
         jenkinsHome = unpackResourceZip.getRoot();
         test1Config = new XmlFile(unpackResourceZip.getResource("jobs/Test1/config.xml"));
-        historyRoot = unpackResourceZip.getResource("config-history/jobs/Test1/");
+        historyRoot = unpackResourceZip.getResource("config-history");
+        test1History = new File(historyRoot, "jobs/Test1");
         sutWithoutUser = new FileHistoryDao(historyRoot, jenkinsHome, null, 0);
         sutWithUser = new FileHistoryDao(historyRoot, jenkinsHome, mockedUser, 0);
         when(mockedUser.getFullName()).thenReturn(FULL_NAME);
@@ -172,7 +175,7 @@ public class FileHistoryDaoTest {
         AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
         File result = sutWithoutUser.getRootDir(test1Config, timestampHolder);
         assertTrue(result.exists());
-        assertThat(result.getPath(), containsString("jobs" + File.separator + "Test1"));
+        assertThat(result.getPath(), containsString("config-history"  + File.separator + "jobs" + File.separator + "Test1"));
     }
 
     /**
@@ -330,11 +333,9 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testPurgeOldEntriesNoEntriesToDelete() {
-        final int oldLength = getHistoryRootForTest1Length();
-        int maxEntries = 0;
-        FileHistoryDao.purgeOldEntries(historyRoot, maxEntries);
-        final int newLength = getHistoryRootForTest1Length();
-        assertEquals(oldLength, newLength);
+        final int maxEntries = 0;
+        final int expectedLength = 5;
+        testPurgeOldEntries(maxEntries, expectedLength);
     }
 
     /**
@@ -342,14 +343,19 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testPurgeOldEntriesOnlyOneExisting() {
-        int maxEntries = 2;
-        FileHistoryDao.purgeOldEntries(historyRoot, maxEntries);
+        final int maxEntries = 2;
+        final int expectedLength = 1;
+        testPurgeOldEntries(maxEntries, expectedLength);
+    }
+
+    private void testPurgeOldEntries(int maxEntries, final int expectedLength) {
+        FileHistoryDao.purgeOldEntries(test1History, maxEntries);
         final int newLength = getHistoryRootForTest1Length();
-        assertEquals(1, newLength);
+        assertEquals(expectedLength, newLength);
     }
 
     private int getHistoryRootForTest1Length() {
-        return historyRoot.list().length;
+        return test1History.list().length;
     }
 
 
