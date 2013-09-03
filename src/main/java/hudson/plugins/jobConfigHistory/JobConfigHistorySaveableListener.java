@@ -23,11 +23,11 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
     /** {@inheritDoc} */
     @Override
     public void onChange(final Saveable o, final XmlFile file) {
-        final JobConfigHistory plugin = getPlugin();
+        final JobConfigHistory plugin = getPlugin();        
         LOG.log(FINEST, "In onChange for {0}", o);
         if (plugin.isSaveable(o, file)) {
             final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper();
-            configHistoryListenerHelper.createNewHistoryEntry(file);
+            configHistoryListenerHelper.saveItem(file);
         }
         LOG.log(FINEST, "onChange for {0} done.", o);
     }
@@ -38,7 +38,7 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
      * @return helper.
      */
     HistoryDao getConfigHistoryListenerHelper() {
-        return new FileHistoryDao(Messages.ConfigHistoryListenerHelper_CHANGED());
+        return new FileHistoryDao("DOES_NOT_MATTER");
     }
 
     /**

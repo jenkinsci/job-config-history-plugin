@@ -1,6 +1,8 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
+import hudson.model.AbstractItem;
+import java.util.List;
 
 /**
  *
@@ -14,5 +16,21 @@ public interface HistoryDao {
      * @param xmlFile
      *            configuration file for the item we want to backup
      */
-    void createNewHistoryEntry(final XmlFile xmlFile);
+    //void createNewHistoryEntry(final XmlFile xmlFile);
+    
+    void createNewItem(AbstractItem item);
+    
+    void saveItem(AbstractItem item);
+    
+    void saveItem(XmlFile file);
+    
+    void deleteItem(AbstractItem item);
+    
+    void moveItem(AbstractItem item, String newName);
+    
+    List<XmlFile> getRevisions(AbstractItem item);
+    
+    XmlFile getOldRevision(AbstractItem item, String identifier);
+    
 }
+

@@ -46,7 +46,7 @@ public class JobConfigHistoryJobListenerTest {
         when(item.getConfigFile()).thenReturn(null);
         JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
         sut.onCreated(item);
-        verify(mockedConfigHistoryListenerHelper).createNewHistoryEntry(any(XmlFile.class));
+        verify(mockedConfigHistoryListenerHelper).createNewItem(item);
     }
 
     /**
@@ -68,8 +68,8 @@ public class JobConfigHistoryJobListenerTest {
         AbstractItem item = mock(AbstractItem.class);
         when(item.getConfigFile()).thenReturn(null);
         JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
-        sut.onRenamed(item, "", "");
-        verify(mockedConfigHistoryListenerHelper).createNewHistoryEntry(any(XmlFile.class));
+        sut.onRenamed(item, "", "newName");
+        verify(mockedConfigHistoryListenerHelper).moveItem(item, "newName");
     }
 
     /**
@@ -83,7 +83,7 @@ public class JobConfigHistoryJobListenerTest {
         when(mockedPlugin.getHistoryDir(any(XmlFile.class))).thenReturn(tempFolder.newFolder("oldName"));
         JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
         sut.onRenamed(item, "oldName", "newName");
-        verify(mockedConfigHistoryListenerHelper).createNewHistoryEntry(any(XmlFile.class));
+        verify(mockedConfigHistoryListenerHelper).moveItem(item, "newName");
     }
 
     /**
@@ -107,7 +107,7 @@ public class JobConfigHistoryJobListenerTest {
         when(mockedPlugin.getHistoryDir(any(XmlFile.class))).thenReturn(tempFolder.newFile());
         JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
         sut.onDeleted(item);
-        verify(mockedConfigHistoryListenerHelper).createNewHistoryEntry(any(XmlFile.class));
+        verify(mockedConfigHistoryListenerHelper).deleteItem(item);
     }
 
     private class JobConfigHistoryJobListenerWithMocks extends JobConfigHistoryJobListener {

@@ -38,7 +38,7 @@ public class JobConfigHistorySaveableListenerTest {
         when(mockedPlugin.isSaveable(any(Saveable.class), any(XmlFile.class))).thenReturn(true);
         JobConfigHistorySaveableListener sut = new JobConfigHistorySaveableListenerImpl();
         sut.onChange(null, null);
-        verify(mockedConfigHistoryListenerHelper).createNewHistoryEntry(any(XmlFile.class));
+        verify(mockedConfigHistoryListenerHelper).saveItem(any(XmlFile.class));
     }
 
     private class JobConfigHistorySaveableListenerImpl extends JobConfigHistorySaveableListener {

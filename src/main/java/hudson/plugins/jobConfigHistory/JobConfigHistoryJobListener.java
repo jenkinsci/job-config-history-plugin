@@ -32,8 +32,8 @@ public class JobConfigHistoryJobListener extends ItemListener {
         LOG.log(FINEST, "In onCreated for {0}", item);
         if (item instanceof AbstractItem) {
             final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper(
-                    Messages.ConfigHistoryListenerHelper_CREATED());
-            configHistoryListenerHelper.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
+                    "does not matter");
+            configHistoryListenerHelper.createNewItem(((AbstractItem) item));
         } else {
             LOG.finest("onCreated: not an AbstractItem, skipping history save");
         }
@@ -79,7 +79,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
             // Must do this after moving old history, in case a CHANGED was fired during the same second under the old name.
             final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper(
                     Messages.ConfigHistoryListenerHelper_RENAMED());
-            configHistoryListenerHelper.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
+            configHistoryListenerHelper.moveItem((AbstractItem) item, newName);
         }
         LOG.log(FINEST, "Completed onRename for {0} done.", item);
 //        new Exception("STACKTRACE for double invocation").printStackTrace();
@@ -92,8 +92,8 @@ public class JobConfigHistoryJobListener extends ItemListener {
         if (item instanceof AbstractItem) {
             final JobConfigHistory plugin = getPlugin();
             final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper(
-                    Messages.ConfigHistoryListenerHelper_DELETED());
-            configHistoryListenerHelper.createNewHistoryEntry(((AbstractItem) item).getConfigFile());
+                    "does not matter really");
+            configHistoryListenerHelper.deleteItem((AbstractItem) item);
             final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
 
             final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");

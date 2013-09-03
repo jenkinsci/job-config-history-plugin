@@ -6,6 +6,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Util;
 import hudson.XmlFile;
+import hudson.model.AbstractItem;
 import hudson.model.Hudson;
 import hudson.model.User;
 
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,7 +72,7 @@ public class FileHistoryDao implements HistoryDao {
      * @param xmlFile
      *            configuration file for the item we want to backup
      */
-    @Override
+    //@Override
     public final void createNewHistoryEntry(final XmlFile xmlFile) {
         try {
             AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
@@ -208,4 +210,38 @@ public class FileHistoryDao implements HistoryDao {
         return Hudson.getInstance().getPlugin(JobConfigHistory.class);
     }
 
+    @Override
+    public void createNewItem(AbstractItem item) {
+        new FileHistoryDao(Messages.ConfigHistoryListenerHelper_CREATED()).createNewHistoryEntry(item.getConfigFile());
+    }
+    
+    @Override
+    public void saveItem(AbstractItem item) {
+        new FileHistoryDao(Messages.ConfigHistoryListenerHelper_CHANGED()).createNewHistoryEntry(item.getConfigFile());
+    }
+
+    @Override
+    public void saveItem(XmlFile file) {
+        new FileHistoryDao(Messages.ConfigHistoryListenerHelper_CHANGED()).createNewHistoryEntry(file);
+    }
+    
+    @Override
+    public void deleteItem(AbstractItem item) {
+        new FileHistoryDao(Messages.ConfigHistoryListenerHelper_DELETED()).createNewHistoryEntry(item.getConfigFile());
+    }
+
+    @Override
+    public List<XmlFile> getRevisions(AbstractItem item) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public XmlFile getOldRevision(AbstractItem item, String identifier) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void moveItem(AbstractItem item, String newName) {
+        new FileHistoryDao(Messages.ConfigHistoryListenerHelper_RENAMED()).createNewHistoryEntry(item.getConfigFile());
+    }
 }
