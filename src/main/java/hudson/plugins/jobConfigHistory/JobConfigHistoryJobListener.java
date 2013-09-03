@@ -32,7 +32,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
         LOG.log(FINEST, "In onCreated for {0}", item);
         if (item instanceof AbstractItem) {
             final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper(
-                    "does not matter");
+                    );
             configHistoryListenerHelper.createNewItem(((AbstractItem) item));
         } else {
             LOG.finest("onCreated: not an AbstractItem, skipping history save");
@@ -78,7 +78,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
             }
             // Must do this after moving old history, in case a CHANGED was fired during the same second under the old name.
             final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper(
-                    Messages.ConfigHistoryListenerHelper_RENAMED());
+                    );
             configHistoryListenerHelper.renameItem((AbstractItem) item, newName);
         }
         LOG.log(FINEST, "Completed onRename for {0} done.", item);
@@ -92,7 +92,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
         if (item instanceof AbstractItem) {
             final JobConfigHistory plugin = getPlugin();
             final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper(
-                    "does not matter really");
+                    );
             configHistoryListenerHelper.deleteItem((AbstractItem) item);
             final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
 
@@ -121,7 +121,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
      * @param operationName name of the operation.
      * @return listener
      */
-    HistoryDao getConfigHistoryListenerHelper(final String operationName) {
-        return new FileHistoryDao(operationName);
+    HistoryDao getConfigHistoryListenerHelper() {
+        return new FileHistoryDao(getPlugin().getConfiguredHistoryRootDir());
     }
 }

@@ -34,18 +34,13 @@ public class FileHistoryDao implements HistoryDao {
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(FileHistoryDao.class.getName());
 
-    /**
-     * Name of the operation.
-     */
-    private final String operation;
+    /** Base location for all files. */
+    private final File historyRootDir;
 
     /**
-     *
-     * @param operation
-     *            the operation we handle.
      */
-    FileHistoryDao(final String operation) {
-        this.operation = operation;
+    FileHistoryDao(final File historyRootDir) {
+        this.historyRootDir = historyRootDir;
     }
 
     /**
@@ -67,38 +62,6 @@ public class FileHistoryDao implements HistoryDao {
     }
 
     /**
-     * Creates a new backup of the job configuration.
-     *
-     * @param xmlFile
-     *            configuration file for the item we want to backup
-     */
-    //@Override
-    public final void createNewHistoryEntry(final XmlFile xmlFile) {
-        try {
-            AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
-            final File timestampedDir = getRootDir(xmlFile, timestampHolder);
-            LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
-            if (!Messages.ConfigHistoryListenerHelper_DELETED().equals(operation)) {
-                copyConfigFile(xmlFile.getFile(), timestampedDir);
-            }
-            assert timestampHolder.get() != null;
-            createHistoryXmlFile(timestampHolder.get(), timestampedDir);
-        } catch (IOException e) {
-            // If not able to create the history entry, log, but continue without it.
-            // A known issue is where Hudson core fails to move the folders on rename,
-            // but continues as if it did.
-            // Reference http://issues.hudson-ci.org/browse/HUDSON-8318
-            LOG.log(Level.SEVERE, "Unable to create history entry for configuration file: " + xmlFile, e);
-        } catch (RuntimeException e) {
-            // If not able to create the history entry, log, but continue without it.
-            // A known issue is where Hudson core fails to move the folders on rename,
-            // but continues as if it did.
-            // Reference http://issues.hudson-ci.org/browse/HUDSON-8318
-            LOG.log(Level.SEVERE, "Unable to create history entry for configuration file: " + xmlFile, e);
-        }
-    }
-
-    /**
      * Creates the historical description for this action.
      *
      * @param timestamp
@@ -108,7 +71,7 @@ public class FileHistoryDao implements HistoryDao {
      * @throws IOException
      *             if writing the history fails.
      */
-    void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir) throws IOException {
+    void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir, final String operation) throws IOException {
         final User currentUser = getCurrentUser();
         final String user;
         final String userId;
@@ -212,22 +175,27 @@ public class FileHistoryDao implements HistoryDao {
 
     @Override
     public void createNewItem(AbstractItem item) {
-        new FileHistoryDao(Messages.ConfigHistoryListenerHelper_CREATED()).createNewHistoryEntry(item.getConfigFile());
+        createNewHistoryEntry(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED());
     }
 
     @Override
     public void saveItem(AbstractItem item) {
-        new FileHistoryDao(Messages.ConfigHistoryListenerHelper_CHANGED()).createNewHistoryEntry(item.getConfigFile());
+        createNewHistoryEntry(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_CHANGED());
     }
 
     @Override
     public void saveItem(XmlFile file) {
-        new FileHistoryDao(Messages.ConfigHistoryListenerHelper_CHANGED()).createNewHistoryEntry(file);
+        createNewHistoryEntry(file, Messages.ConfigHistoryListenerHelper_CHANGED());
     }
 
     @Override
     public void deleteItem(AbstractItem item) {
-        new FileHistoryDao(Messages.ConfigHistoryListenerHelper_DELETED()).createNewHistoryEntry(item.getConfigFile());
+        createNewHistoryEntry(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_DELETED());
+    }
+
+    @Override
+    public void renameItem(AbstractItem item, String newName) {
+        createNewHistoryEntry(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_RENAMED());
     }
 
     @Override
@@ -240,8 +208,28 @@ public class FileHistoryDao implements HistoryDao {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    public void renameItem(AbstractItem item, String newName) {
-        new FileHistoryDao(Messages.ConfigHistoryListenerHelper_RENAMED()).createNewHistoryEntry(item.getConfigFile());
+    void createNewHistoryEntry(final XmlFile xmlFile, final String operation) {
+        try {
+            AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
+            final File timestampedDir = getRootDir(xmlFile, timestampHolder);
+            LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
+            if (!Messages.ConfigHistoryListenerHelper_DELETED().equals(operation)) {
+                copyConfigFile(xmlFile.getFile(), timestampedDir);
+            }
+            assert timestampHolder.get() != null;
+            createHistoryXmlFile(timestampHolder.get(), timestampedDir, operation);
+        } catch (IOException e) {
+            // If not able to create the history entry, log, but continue without it.
+            // A known issue is where Hudson core fails to move the folders on rename,
+            // but continues as if it did.
+            // Reference http://issues.hudson-ci.org/browse/HUDSON-8318
+            LOG.log(Level.SEVERE, "Unable to create history entry for configuration file: " + xmlFile, e);
+        } catch (RuntimeException e) {
+            // If not able to create the history entry, log, but continue without it.
+            // A known issue is where Hudson core fails to move the folders on rename,
+            // but continues as if it did.
+            // Reference http://issues.hudson-ci.org/browse/HUDSON-8318
+            LOG.log(Level.SEVERE, "Unable to create history entry for configuration file: " + xmlFile, e);
+        }
     }
 }

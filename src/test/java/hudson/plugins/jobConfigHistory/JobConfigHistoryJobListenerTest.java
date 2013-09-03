@@ -118,7 +118,7 @@ public class JobConfigHistoryJobListenerTest {
         }
 
         @Override
-        HistoryDao getConfigHistoryListenerHelper(String operationName) {
+        HistoryDao getConfigHistoryListenerHelper() {
             return mockedConfigHistoryListenerHelper;
         }
     }
