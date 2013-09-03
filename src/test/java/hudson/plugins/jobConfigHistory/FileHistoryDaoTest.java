@@ -4,7 +4,9 @@ import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
 import hudson.model.User;
+import hudson.util.IOUtils;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
@@ -34,6 +36,8 @@ public class FileHistoryDaoTest {
     public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
 
     private final User mockedUser = mock(User.class);
+
+    private final AbstractItem mockedItem = mock(AbstractItem.class);
 
     private File jenkinsHome;
 
@@ -182,28 +186,27 @@ public class FileHistoryDaoTest {
      * Test of createNewItem method, of class FileHistoryDao.
      */
     @Test
-    @Ignore
-    public void testCreateNewItem() {
-        System.out.println("createNewItem");
-        AbstractItem item = null;
-        FileHistoryDao sut = null;
-        sut.createNewItem(item);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testCreateNewItem() throws IOException {
+        final File jobDir = new File(jenkinsHome, "jobs/MyTest");
+        jobDir.mkdirs();
+        IOUtils.copy(test1Config.getFile(), new FileOutputStream(new File(jobDir, "config.xml")));
+        when(mockedItem.getRootDir()).thenReturn(jobDir);
+        sutWithUser.createNewItem(mockedItem);
+        assertTrue(new File(jobDir, "config.xml").exists());
+        final File historyDir = new File(jenkinsHome, "config-history/jobs/MyTest");
+        assertTrue(historyDir.exists());
+        assertEquals(1, historyDir.list().length);
     }
 
     /**
      * Test of saveItem method, of class FileHistoryDao.
      */
     @Test
-    @Ignore
-    public void testSaveItem_AbstractItem() {
-        System.out.println("saveItem");
-        AbstractItem item = null;
-        FileHistoryDao sut = null;
-        sut.saveItem(item);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testSaveItem_AbstractItem() throws IOException {
+        final AbstractItem item = mock(AbstractItem.class);
+        when(mockedItem.getRootDir()).thenReturn(test1Config.getFile().getParentFile());
+        sutWithUser.saveItem(mockedItem);
+        assertEquals(6, getHistoryLength());
     }
 
     /**
