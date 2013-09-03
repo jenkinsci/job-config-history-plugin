@@ -124,6 +124,6 @@ public class JobConfigHistoryJobListener extends ItemListener {
      */
     HistoryDao getConfigHistoryListenerHelper() {
         return new FileHistoryDao(
-                getPlugin().getConfiguredHistoryRootDir(), new File(Hudson.getInstance().root.getPath()), User.current());
+                getPlugin().getConfiguredHistoryRootDir(), new File(Hudson.getInstance().root.getPath()), User.current(), 0);
     }
 }

@@ -45,12 +45,16 @@ public class FileHistoryDao implements HistoryDao {
     /** Currently logged in user. */
     private final User currentUser;
 
+    /** Maximum numbers which should exist. */
+    private final int maxHistoryEntries;
+
     /**
      */
-    FileHistoryDao(final File historyRootDir, File jenkinsHome, User currentUser) {
+    FileHistoryDao(final File historyRootDir, File jenkinsHome, User currentUser, int maxHistoryEntries) {
         this.historyRootDir = historyRootDir;
         this.jenkinsHome = jenkinsHome;
         this.currentUser = currentUser;
+        this.maxHistoryEntries = maxHistoryEntries;
     }
 
     /**
@@ -67,7 +71,7 @@ public class FileHistoryDao implements HistoryDao {
         final File itemHistoryDir = plugin.getHistoryDir(xmlFile);
         // perform check for purge here, when we are actually going to create
         // a new directory, rather than just when we scan it in above method.
-        plugin.checkForPurgeByQuantity(itemHistoryDir);
+        purgeOldEntries(itemHistoryDir, maxHistoryEntries);
         return createNewHistoryDir(itemHistoryDir, timestampHolder);
     }
 
@@ -276,7 +280,7 @@ public class FileHistoryDao implements HistoryDao {
         //ROOT/config-history/jobs
         return new File(historyRootDir, "/" + JobConfigHistoryConsts.JOBS_HISTORY_DIR);
     }
-    
+
     /**
      * Purges old entries for the given history root to maxEntries.
      *

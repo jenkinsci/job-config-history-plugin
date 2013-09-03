@@ -48,7 +48,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testCreateNewHistoryEntry() throws IOException {
         final XmlFile xmlFile = new XmlFile(tempFolder.newFile());
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), null) {
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), null, 0) {
             @Override
             JobConfigHistory getPlugin() {
                 final JobConfigHistory mockPlugin = mock(JobConfigHistory.class);
@@ -70,7 +70,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testCreateNewHistoryEntryRTE() throws IOException {
         final XmlFile xmlFile = new XmlFile(tempFolder.newFile());
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), null) {
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), null, 0) {
             @Override
             File getRootDir(XmlFile xmlFile, AtomicReference<Calendar> timestampHolder) {
                 throw new RuntimeException("oops");
@@ -111,7 +111,7 @@ public class FileHistoryDaoTest {
         final String fullName = "Full Name";
         when(mockedUser.getFullName()).thenReturn(fullName);
         when(mockedUser.getId()).thenReturn("userId");
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), mockedUser);
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), mockedUser, 0);
         testCreateHistoryXmlFile(sut, fullName);
     }
 
@@ -121,7 +121,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testCreateHistoryXmlFileAnonym() throws Exception {
         final String fullName = "Anonym";
-        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), null);
+        FileHistoryDao sut = new FileHistoryDao(new File("config-history"), tempFolder.getRoot(), null, 0);
         testCreateHistoryXmlFile(sut, fullName);
     }
     /**

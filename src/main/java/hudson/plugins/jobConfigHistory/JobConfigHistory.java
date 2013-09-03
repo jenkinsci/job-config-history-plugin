@@ -295,7 +295,7 @@ public class JobConfigHistory extends Plugin {
      */
     @Deprecated
     protected File getJobHistoryRootDir() {
-        return new FileHistoryDao(getConfiguredHistoryRootDir(), Hudson.getInstance().getRootDir(), User.current().current()).getJobHistoryRootDir();
+        return new FileHistoryDao(getConfiguredHistoryRootDir(), Hudson.getInstance().getRootDir(), User.current().current(), 0).getJobHistoryRootDir();
     }
 
     
@@ -330,7 +330,7 @@ public class JobConfigHistory extends Plugin {
      */
     @Deprecated
     protected File getHistoryDir(final XmlFile xmlFile) {
-        return new FileHistoryDao(getConfiguredHistoryRootDir(), Hudson.getInstance().getRootDir(), User.current()).getHistoryDir(xmlFile);
+        return new FileHistoryDao(getConfiguredHistoryRootDir(), Hudson.getInstance().getRootDir(), User.current(), 0).getHistoryDir(xmlFile);
     }
 
     /**
