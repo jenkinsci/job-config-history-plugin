@@ -8,6 +8,7 @@ import hudson.model.Hudson;
 import hudson.model.ItemGroup;
 import hudson.model.Saveable;
 import hudson.model.Descriptor.FormException;
+import hudson.model.User;
 import hudson.util.FormValidation;
 
 import java.io.File;
@@ -87,11 +88,7 @@ public class JobConfigHistory extends Plugin {
      * A filter to return only those directories of a file listing
      * that represent configuration history directories.
      */
-    public static final FileFilter HISTORY_FILTER = new FileFilter() {
-        public boolean accept(File file) {
-            return isHistoryDir(file);
-        }
-    };
+    public static final FileFilter HISTORY_FILTER = new HistoryFileFilter();
 
     /**
      * A filter to return only those directories of a file listing
@@ -296,17 +293,9 @@ public class JobConfigHistory extends Plugin {
      *
      * @return The job history File object.
      */
+    @Deprecated
     protected File getJobHistoryRootDir() {
-        File rootDir;
- 
-        if (historyRootDir == null || historyRootDir.isEmpty()) {
-            //ROOT/config-history/jobs
-            rootDir = new File(getConfiguredHistoryRootDir() + "/" + JobConfigHistoryConsts.JOBS_HISTORY_DIR);
-        } else {
-            //ROOT/MYNAME/jobs -> backwards compatibility
-            rootDir = new File(getConfiguredHistoryRootDir().getParent() + "/" + JobConfigHistoryConsts.JOBS_HISTORY_DIR);
-        }
-        return rootDir;
+        return new FileHistoryDao(getConfiguredHistoryRootDir(), Hudson.getInstance().getRootDir(), User.current().current()).getJobHistoryRootDir();
     }
 
     
@@ -339,33 +328,9 @@ public class JobConfigHistory extends Plugin {
      * @return The base directory where to store the history, 
      *         or null if the file is not a valid Hudson configuration file.
      */
+    @Deprecated
     protected File getHistoryDir(final XmlFile xmlFile) {
-        final String configRootDir = xmlFile.getFile().getParent();
-        final String hudsonRootDir = Hudson.getInstance().root.getPath();
-
-        if (!configRootDir.startsWith(hudsonRootDir)) {
-            LOG.warning("Trying to get history dir for object outside of HUDSON: " + xmlFile);
-            return null;
-        }
-
-        //if the file is stored directly under HUDSON_ROOT, it's a system config 
-        //so create a distinct directory
-        String underRootDir = null;
-        if (configRootDir.equals(hudsonRootDir)) {
-            final String xmlFileName = xmlFile.getFile().getName();
-            underRootDir = xmlFileName.substring(0, xmlFileName.lastIndexOf('.'));
-        }
-         
-        File historyDir;
-        if (underRootDir == null) {
-            final String remainingPath = configRootDir.substring(hudsonRootDir.length() 
-                                        + JobConfigHistoryConsts.JOBS_HISTORY_DIR.length() + 1);
-            historyDir = new File(getJobHistoryRootDir(), remainingPath);
-        } else {
-            historyDir = new File(getConfiguredHistoryRootDir(), underRootDir);
-        }
-
-        return historyDir;
+        return new FileHistoryDao(getConfiguredHistoryRootDir(), Hudson.getInstance().getRootDir(), User.current()).getHistoryDir(xmlFile);
     }
 
     /**
@@ -384,7 +349,7 @@ public class JobConfigHistory extends Plugin {
      */
     protected File getConfigFile(final File historyDir) {
         File configFile = null;
-        if (historyDir.exists() && isHistoryDir(historyDir)) {
+        if (historyDir.exists() && (new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE)).exists()) {
             // get the *.xml file that is not the JobConfigHistoryConsts.HISTORY_FILE
             // assumes random .xml files won't appear in the history directory
             final File[] listing = historyDir.listFiles();
@@ -503,9 +468,8 @@ public class JobConfigHistory extends Plugin {
     protected void checkForPurgeByQuantity(final File itemHistoryRoot) {
         int maxEntries = 0;
         if (StringUtils.isNotEmpty(maxHistoryEntries)) {
-            try {
-                maxEntries = new Integer(getMaxHistoryEntries());
-                maxEntries = Integer.parseInt(getMaxHistoryEntries());
+            try {                
+                maxEntries = Integer.parseInt(maxHistoryEntries);
                 if (maxEntries < 0) {
                     throw new NumberFormatException();
                 }
@@ -513,49 +477,7 @@ public class JobConfigHistory extends Plugin {
                 LOG.warning("maximum number of history entries not formatted properly, unable to purge: " + maxHistoryEntries);
             }
         }
-        if (maxEntries > 0) {
-            LOG.fine("checking for history files to purge (" + maxHistoryEntries + " max allowed)");
-            purgeHistoryByQuantity(itemHistoryRoot, maxEntries);
-        }
-    }
-
-    /**
-     * Performs the actual purge of history entries.
-     * @param historyRoot
-     *            The directory to purge entries from.
-     * @param maxEntries
-     *            The maximum number of history entries to keep.
-     */
-    private void purgeHistoryByQuantity(final File historyRoot, final int maxEntries) {
-        // we are about to create a new history entry, so 
-        // subtract 1 from the maximum configured to save.
-        final int entriesToLeave = maxEntries - 1;
-        final File[] historyDirs = historyRoot.listFiles(HISTORY_FILTER);
-        if (historyDirs != null && historyDirs.length >= entriesToLeave) {
-            Arrays.sort(historyDirs, Collections.reverseOrder());
-            for (int i = entriesToLeave; i < historyDirs.length; i++) {
-                LOG.fine("purging old directory from history logs: " + historyDirs[i]);
-                for (File file : historyDirs[i].listFiles()) {
-                    if (!file.delete()) {
-                        LOG.warning("problem deleting history file: " + file);
-                    }
-                }
-                if (!historyDirs[i].delete()) {
-                    LOG.warning("problem deleting history directory: " + historyDirs[i]);
-                }
-            }
-        }
-    }
-
-    /**
-     * Determines if the specified {@code dir} stores history information.
-     *
-     * @param dir
-     *            The directory under consideration.
-     * @return true if this directory contains a {@link JobConfigHistoryConsts#HISTORY_FILE} file.
-     */
-    private static boolean  isHistoryDir(File dir) {
-        return (new File(dir, JobConfigHistoryConsts.HISTORY_FILE)).exists();
+        FileHistoryDao.purgeOldEntries(itemHistoryRoot, maxEntries);
     }
 
     /**

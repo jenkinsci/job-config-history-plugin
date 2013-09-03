@@ -16,7 +16,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -198,12 +200,12 @@ public class FileHistoryDao implements HistoryDao {
 
     @Override
     public SortedMap<String, XmlFile> getRevisions(AbstractItem item) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public XmlFile getOldRevision(AbstractItem item, String identifier) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     void createNewHistoryEntry(final XmlFile xmlFile, final String operation) {
@@ -230,4 +232,78 @@ public class FileHistoryDao implements HistoryDao {
             LOG.log(Level.SEVERE, "Unable to create history entry for configuration file: " + xmlFile, e);
         }
     }
+
+    /**
+     * Returns the configuration history directory for the given configuration file.
+     *
+     * @param xmlFile
+     *            The configuration file whose content we are saving.
+     * @return The base directory where to store the history,
+     *         or null if the file is not a valid Hudson configuration file.
+     */
+    File getHistoryDir(final XmlFile xmlFile) {
+        final String configRootDir = xmlFile.getFile().getParent();
+        final String hudsonRootDir = jenkinsHome.getPath();
+        if (!configRootDir.startsWith(hudsonRootDir)) {
+            LOG.warning("Trying to get history dir for object outside of HUDSON: " + xmlFile);
+            return null;
+        }
+        //if the file is stored directly under HUDSON_ROOT, it's a system config
+        //so create a distinct directory
+        String underRootDir = null;
+        if (configRootDir.equals(hudsonRootDir)) {
+            final String xmlFileName = xmlFile.getFile().getName();
+            underRootDir = xmlFileName.substring(0, xmlFileName.lastIndexOf('.'));
+        }
+        final File historyDir;
+        if (underRootDir == null) {
+            final String remainingPath = configRootDir.substring(hudsonRootDir.length() + JobConfigHistoryConsts.JOBS_HISTORY_DIR.length() + 1);
+            historyDir = new File(getJobHistoryRootDir(), remainingPath);
+        } else {
+            historyDir = new File(historyRootDir, underRootDir);
+        }
+        return historyDir;
+    }
+
+    /**
+     * Returns the File object representing the job history directory,
+     * which is for reasons of backwards compatibility either a sibling or child
+     * of the configured history root dir.
+     *
+     * @return The job history File object.
+     */
+    File getJobHistoryRootDir() {
+        //ROOT/config-history/jobs
+        return new File(historyRootDir, "/" + JobConfigHistoryConsts.JOBS_HISTORY_DIR);
+    }
+    
+    /**
+     * Purges old entries for the given history root to maxEntries.
+     *
+     * @param itemHistoryRoot directory to inspect.
+     * @param maxEntries maximum number of entries.
+     */
+    static void purgeOldEntries(final File itemHistoryRoot, final int maxEntries) {
+        if (maxEntries > 0) {
+            LOG.fine("checking for history files to purge (" + maxEntries + " max allowed)");
+            final int entriesToLeave = maxEntries - 1;
+            final File[] historyDirs = itemHistoryRoot.listFiles(HistoryFileFilter.INSTANCE);
+            if (historyDirs != null && historyDirs.length >= entriesToLeave) {
+                Arrays.sort(historyDirs, Collections.reverseOrder());
+                for (int i = entriesToLeave; i < historyDirs.length; i++) {
+                    LOG.fine("purging old directory from history logs: " + historyDirs[i]);
+                    for (File file : historyDirs[i].listFiles()) {
+                        if (!file.delete()) {
+                            LOG.warning("problem deleting history file: " + file);
+                        }
+                    }
+                    if (!historyDirs[i].delete()) {
+                        LOG.warning("problem deleting history directory: " + historyDirs[i]);
+                    }
+                }
+            }
+        }
+    }
+
+
 }
