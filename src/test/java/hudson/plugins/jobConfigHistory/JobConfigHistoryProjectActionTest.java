@@ -9,6 +9,7 @@ import hudson.model.ItemGroup;
 import java.io.File;
 import java.util.List;
 import org.acegisecurity.AccessDeniedException;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Ignore;
@@ -31,13 +32,14 @@ public class JobConfigHistoryProjectActionTest {
     private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
     private final Hudson mockedHudson = mock(hudson.model.Hudson.class);
     private final AbstractItem mockedProject = mock(AbstractItem.class);
+    private final StaplerRequest mockedRequest = mock(StaplerRequest.class);
     //private final StaplerResponse mockedResponse = mock(StaplerResponse.class);
-    //private final StaplerRequest mockedRequest = mock(StaplerRequest.class);
+
 
     public JobConfigHistoryProjectActionTest() {
-        when(mockedItemGroup.getFullName()).thenReturn("mockedItemGroup");
+        when(mockedItemGroup.getFullName()).thenReturn("");
         when(mockedProject.getParent()).thenReturn(mockedItemGroup);
-        when(mockedProject.getFullName()).thenReturn("mockedProject");
+        when(mockedProject.getFullName()).thenReturn("Test1");
     }
 
     /**
@@ -113,13 +115,17 @@ public class JobConfigHistoryProjectActionTest {
      * Test of getFile method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    @Ignore
     public void testGetFile() throws Exception {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
-        JobConfigHistoryProjectAction sut = createAction();
-        String expResult = "";
+        when(mockedPlugin.getJobHistoryRootDir()).thenReturn(
+                testConfigs.getResource("config-history/jobs"));
+        when(mockedPlugin.getConfigFile(any(File.class))).thenReturn(
+                testConfigs.getResource("config-history/jobs/Test1/2012-11-21_11-40-28/config.xml"));
+        when(mockedRequest.getParameter("timestamp")).thenReturn("2012-11-21_11-40-28");
+        final JobConfigHistoryProjectAction sut = createAction();
         String result = sut.getFile();
-        assertEquals(expResult, result);
+        assertThat(result, CoreMatchers.startsWith("<?xml version="));
+        assertThat(result, CoreMatchers.endsWith("</project>"));
     }
 
     /**
@@ -232,11 +238,23 @@ public class JobConfigHistoryProjectActionTest {
 
     private JobConfigHistoryProjectAction createAction() {
         when(mockedHudson.getPlugin(JobConfigHistory.class)).thenReturn(mockedPlugin);
-        return new JobConfigHistoryProjectAction(mockedHudson, mockedProject);
+        return new JobConfigHistoryProjectActionImpl(mockedHudson, mockedProject);
     }
 
     private JobConfigHistoryProjectAction createActionForMavenModule() {
         when(mockedHudson.getPlugin(JobConfigHistory.class)).thenReturn(mockedPlugin);
-        return new JobConfigHistoryProjectAction(mockedHudson, mockedMavenModule);
+        return new JobConfigHistoryProjectActionImpl(mockedHudson, mockedMavenModule);
+    }
+
+    private class JobConfigHistoryProjectActionImpl extends JobConfigHistoryProjectAction {
+
+        public JobConfigHistoryProjectActionImpl(Hudson hudson, AbstractItem project) {
+            super(hudson, project);
+        }
+
+        @Override
+        StaplerRequest getCurrentRequest() {
+            return mockedRequest;
+        }
     }
 }
