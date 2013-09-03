@@ -1,14 +1,18 @@
 package hudson.plugins.jobConfigHistory;
 
+import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
+import hudson.model.ItemGroup;
+import java.io.File;
 import java.util.List;
 import org.acegisecurity.AccessDeniedException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Ignore;
+import org.junit.Rule;
 import static org.mockito.Mockito.*;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -19,14 +23,22 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class JobConfigHistoryProjectActionTest {
 
-    public JobConfigHistoryProjectActionTest() {
-    }
+    @Rule
+    public UnpackResourceZip testConfigs = new UnpackResourceZip(JobConfigHistoryProjectActionTest.class.getResource("JobConfigHistoryPurgerIT.zip"));
+
+    private final ItemGroup mockedItemGroup = mock(ItemGroup.class);
     private final MavenModule mockedMavenModule = mock(MavenModule.class);
     private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
     private final Hudson mockedHudson = mock(hudson.model.Hudson.class);
     private final AbstractItem mockedProject = mock(AbstractItem.class);
     //private final StaplerResponse mockedResponse = mock(StaplerResponse.class);
     //private final StaplerRequest mockedRequest = mock(StaplerRequest.class);
+
+    public JobConfigHistoryProjectActionTest() {
+        when(mockedItemGroup.getFullName()).thenReturn("mockedItemGroup");
+        when(mockedProject.getParent()).thenReturn(mockedItemGroup);
+        when(mockedProject.getFullName()).thenReturn("mockedProject");
+    }
 
     /**
      * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
@@ -70,19 +82,31 @@ public class JobConfigHistoryProjectActionTest {
         JobConfigHistoryProjectAction sut = createActionForMavenModule();
         assertNull(sut.getIconFileName());
     }
+
     /**
      * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    @Ignore
     public void testGetJobConfigs() throws Exception {
-        System.out.println("getJobConfigs");
-        JobConfigHistoryProjectAction sut = null;
-        List<ConfigInfo> expResult = null;
-        List<ConfigInfo> result = sut.getJobConfigs();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
+        when(mockedPlugin.getHistoryDir(any(XmlFile.class))).thenReturn(
+                new File(testConfigs.getRoot(), "config-history/jobs/Test1"));
+        final JobConfigHistoryProjectAction sut = createAction();
+        final List<ConfigInfo> result = sut.getJobConfigs();
+        assertEquals(5, result.size());
+    }
+
+    /**
+     * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
+     */
+    @Test
+    public void testGetJobConfigsEmpty() throws Exception {
+        when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
+        when(mockedPlugin.getHistoryDir(any(XmlFile.class))).thenReturn(
+                new File(testConfigs.getRoot(), "config-history/jobs/I_DO_NOT_EXIST"));
+        final JobConfigHistoryProjectAction sut = createAction();
+        final List<ConfigInfo> result = sut.getJobConfigs();
+        assertEquals(0, result.size());
     }
 
     /**
