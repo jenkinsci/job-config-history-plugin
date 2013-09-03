@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -214,7 +214,7 @@ public class FileHistoryDao implements HistoryDao {
     public void createNewItem(AbstractItem item) {
         new FileHistoryDao(Messages.ConfigHistoryListenerHelper_CREATED()).createNewHistoryEntry(item.getConfigFile());
     }
-    
+
     @Override
     public void saveItem(AbstractItem item) {
         new FileHistoryDao(Messages.ConfigHistoryListenerHelper_CHANGED()).createNewHistoryEntry(item.getConfigFile());
@@ -224,14 +224,14 @@ public class FileHistoryDao implements HistoryDao {
     public void saveItem(XmlFile file) {
         new FileHistoryDao(Messages.ConfigHistoryListenerHelper_CHANGED()).createNewHistoryEntry(file);
     }
-    
+
     @Override
     public void deleteItem(AbstractItem item) {
         new FileHistoryDao(Messages.ConfigHistoryListenerHelper_DELETED()).createNewHistoryEntry(item.getConfigFile());
     }
 
     @Override
-    public List<XmlFile> getRevisions(AbstractItem item) {
+    public SortedMap<String, XmlFile> getRevisions(AbstractItem item) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -241,7 +241,7 @@ public class FileHistoryDao implements HistoryDao {
     }
 
     @Override
-    public void moveItem(AbstractItem item, String newName) {
+    public void renameItem(AbstractItem item, String newName) {
         new FileHistoryDao(Messages.ConfigHistoryListenerHelper_RENAMED()).createNewHistoryEntry(item.getConfigFile());
     }
 }

@@ -79,7 +79,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
             // Must do this after moving old history, in case a CHANGED was fired during the same second under the old name.
             final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper(
                     Messages.ConfigHistoryListenerHelper_RENAMED());
-            configHistoryListenerHelper.moveItem((AbstractItem) item, newName);
+            configHistoryListenerHelper.renameItem((AbstractItem) item, newName);
         }
         LOG.log(FINEST, "Completed onRename for {0} done.", item);
 //        new Exception("STACKTRACE for double invocation").printStackTrace();
