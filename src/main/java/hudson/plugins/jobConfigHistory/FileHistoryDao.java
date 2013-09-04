@@ -241,7 +241,8 @@ public class FileHistoryDao implements HistoryDao {
 
     @Override
     public XmlFile getOldRevision(AbstractItem item, String identifier) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        final File historyDir = new File(getHistoryDir(item.getConfigFile()), identifier);
+        return new XmlFile(new File(historyDir, "config.xml"));
     }
 
     /**

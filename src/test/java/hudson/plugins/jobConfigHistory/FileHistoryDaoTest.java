@@ -271,17 +271,14 @@ public class FileHistoryDaoTest {
      * Test of getOldRevision method, of class FileHistoryDao.
      */
     @Test
-    @Ignore
-    public void testGetOldRevision() {
+    public void testGetOldRevision() throws IOException {
         System.out.println("getOldRevision");
-        AbstractItem item = null;
-        String identifier = "";
-        FileHistoryDao sut = null;
-        XmlFile expResult = null;
-        XmlFile result = sut.getOldRevision(item, identifier);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        when(mockedItem.getRootDir()).thenReturn(test1Config.getFile().getParentFile());
+        String identifier = "2012-11-21_11-42-05";
+        final XmlFile result = sutWithUser.getOldRevision(mockedItem, identifier);
+        final String xml = result.asString();
+        assertThat(xml, startsWith("<?xml version='1.0' encoding='UTF-8'?>"));
+        assertThat(xml, endsWith("</project>"));
     }
 
     /**
