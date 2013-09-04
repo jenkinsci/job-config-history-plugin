@@ -53,15 +53,16 @@ public class FileHistoryDaoTest {
 
     private static final String USER_ID = "userId";
 
+    private File test1JobDirectory;
+
     public FileHistoryDaoTest() {
-
-
     }
 
     @Before
     public void setFieldsFromUnpackResource() {
         jenkinsHome = unpackResourceZip.getRoot();
         test1Config = new XmlFile(unpackResourceZip.getResource("jobs/Test1/config.xml"));
+        test1JobDirectory = test1Config.getFile().getParentFile();
         historyRoot = unpackResourceZip.getResource("config-history");
         test1History = new File(historyRoot, "jobs/Test1");
         sutWithoutUser = new FileHistoryDao(historyRoot, jenkinsHome, null, 0);
@@ -205,7 +206,7 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testSaveItem_AbstractItem() throws IOException {
-        when(mockedItem.getRootDir()).thenReturn(test1Config.getFile().getParentFile());
+        when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         sutWithUser.saveItem(mockedItem);
         assertEquals(6, getHistoryLength());
     }
@@ -257,7 +258,7 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testGetRevisions() throws IOException {
-        when(mockedItem.getRootDir()).thenReturn(test1Config.getFile().getParentFile());
+        when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         SortedMap<String, HistoryDescr> result = sutWithUser.getRevisions(mockedItem);
         assertEquals(5, result.size());
         assertEquals("2012-11-21_11-29-12", result.firstKey());
@@ -273,7 +274,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testGetOldRevision() throws IOException {
         System.out.println("getOldRevision");
-        when(mockedItem.getRootDir()).thenReturn(test1Config.getFile().getParentFile());
+        when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         String identifier = "2012-11-21_11-42-05";
         final XmlFile result = sutWithUser.getOldRevision(mockedItem, identifier);
         final String xml = result.asString();
