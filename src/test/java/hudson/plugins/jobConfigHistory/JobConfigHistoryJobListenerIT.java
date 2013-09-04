@@ -22,7 +22,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlForm;
 
 /**
  * @author mirko
- * 
+ *
  */
 public class JobConfigHistoryJobListenerIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 
@@ -58,7 +58,7 @@ public class JobConfigHistoryJobListenerIT extends AbstractHudsonTestCaseDeletin
         final List<File> historyFilesNew = Arrays.asList(new File(jobHistoryDir, jobName2).listFiles());
         assertTrue("Expected " + historyFilesNew.toString() + " to have at least two entries", historyFilesNew.size() >= 1);
     }
-    
+
     //TODO: ???
     public void testNonAbstractProjects() {
         final JobConfigHistoryJobListener listener = new JobConfigHistoryJobListener();
@@ -89,21 +89,25 @@ public class JobConfigHistoryJobListenerIT extends AbstractHudsonTestCaseDeletin
         } else {
             historyDir = jch.getHistoryDir(project.getConfigFile());
             historyDir.getParentFile().setWritable(false);
-            project.renameTo("newproject2");
-            assertTrue("Verify history dir not able to be renamed.", historyDir.exists());
-            historyDir.getParentFile().setWritable(true);
+            try {
+                project.renameTo("newproject2");
+                fail("Expected RTE on rename");
+            } catch (RuntimeException e) {
+                assertTrue("Verify history dir not able to be renamed.", historyDir.exists());
+                historyDir.getParentFile().setWritable(true);
 
-            // test delete rename failure
-            project = createFreeStyleProject("newproject_deleteme");
-            historyDir = jch.getHistoryDir(project.getConfigFile());
-            historyDir.getParentFile().setWritable(false);
+                // test delete rename failure
+                project = createFreeStyleProject("newproject_deleteme");
+                historyDir = jch.getHistoryDir(project.getConfigFile());
+                historyDir.getParentFile().setWritable(false);
 
-            project.delete();
-            assertTrue("Verify history dir not able to be renamed on delete.", historyDir.exists());
-            historyDir.getParentFile().setWritable(true);
+                project.delete();
+                assertTrue("Verify history dir not able to be renamed on delete.", historyDir.exists());
+                historyDir.getParentFile().setWritable(true);
+            }
         }
     }
-    
+
     @Bug(16499)
     public void testCopyJob() throws Exception {
         final String text = "This is a description.";
