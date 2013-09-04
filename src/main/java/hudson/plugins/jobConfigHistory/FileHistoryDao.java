@@ -208,12 +208,19 @@ public class FileHistoryDao implements HistoryDao {
     }
 
     @Override
-    public SortedMap<String, XmlFile> getRevisions(AbstractItem item) {
-        final File historyDir = getHistoryDir(item.getConfigFile());
-        final File[] files = historyDir.listFiles(HistoryFileFilter.INSTANCE);
-        final TreeMap<String, XmlFile> map = new TreeMap<String, XmlFile>();
-        for (File file : files) {
-            map.put(file.getName(), new XmlFile(new File(file, "config.xml")));
+    public SortedMap<String, HistoryDescr> getRevisions(AbstractItem item) {
+        final File historiesDir = getHistoryDir(item.getConfigFile());
+        final File[] historyDirs = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
+        final TreeMap<String, HistoryDescr> map = new TreeMap<String, HistoryDescr>();
+        for (File historyDir : historyDirs) {
+            final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+            final HistoryDescr historyDescription;
+            try {
+                historyDescription = (HistoryDescr)historyXml.read();
+            } catch (IOException ex) {
+                throw new RuntimeException("Unable to read history for " + item.getName(), ex);
+            }
+            map.put(historyDir.getName(), historyDescription);
         }
         return map;
     }

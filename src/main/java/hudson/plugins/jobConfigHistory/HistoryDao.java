@@ -48,7 +48,7 @@ public interface HistoryDao {
     void renameItem(AbstractItem item, String newName);
 
     /**
-     * Returns a sorted list of all configurations for this item.
+     * Returns a sorted list of all revisions for this item.
      *
      * The key is an identifier which may be used in
      * {@link HistoryDao#getOldRevision(hudson.model.AbstractItem, java.lang.String)}
@@ -56,7 +56,7 @@ public interface HistoryDao {
      * @param item project
      * @return old configurations
      */
-    SortedMap<String, XmlFile> getRevisions(AbstractItem item);
+    SortedMap<String, HistoryDescr> getRevisions(AbstractItem item);
 
     /**
      * Returns one old configuration of item.

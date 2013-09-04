@@ -254,11 +254,13 @@ public class FileHistoryDaoTest {
     @Test
     public void testGetRevisions() throws IOException {
         when(mockedItem.getRootDir()).thenReturn(test1Config.getFile().getParentFile());
-        SortedMap<String, XmlFile> result = sutWithUser.getRevisions(mockedItem);
+        SortedMap<String, HistoryDescr> result = sutWithUser.getRevisions(mockedItem);
         assertEquals(5, result.size());
         assertEquals("2012-11-21_11-29-12", result.firstKey());
         assertEquals("2012-11-21_11-42-05", result.lastKey());
-        assertThat(result.get(result.firstKey()).asString(), startsWith("<?xml version='1.0' encoding='UTF-8'?>"));
+        final HistoryDescr firstValue = result.get(result.firstKey());
+        assertEquals("Changed", firstValue.getOperation());
+        assertEquals("anonymous", firstValue.getUserID());
     }
 
     /**
