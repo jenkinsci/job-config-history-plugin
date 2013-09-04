@@ -184,17 +184,26 @@ public class FileHistoryDao implements HistoryDao {
 
     @Override
     public void createNewItem(AbstractItem item) {
-        createNewHistoryEntry(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED());
+        createNewHistoryEntryAndCopyConfig(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED());
+    }
+
+    void createNewHistoryEntryAndCopyConfig(final XmlFile configFile, final String message) throws RuntimeException {
+        final File timestampedDir = createNewHistoryEntry(configFile, message);
+        try {
+            copyConfigFile(configFile.getFile(), timestampedDir);
+        } catch (IOException ex) {
+            throw new RuntimeException("Uanble to copy " + configFile, ex);
+        }
     }
 
     @Override
     public void saveItem(AbstractItem item) {
-        createNewHistoryEntry(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_CHANGED());
+        createNewHistoryEntryAndCopyConfig(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_CHANGED());
     }
 
     @Override
     public void saveItem(XmlFile file) {
-        createNewHistoryEntry(file, Messages.ConfigHistoryListenerHelper_CHANGED());
+        createNewHistoryEntryAndCopyConfig(file, Messages.ConfigHistoryListenerHelper_CHANGED());
     }
 
     @Override
@@ -204,7 +213,7 @@ public class FileHistoryDao implements HistoryDao {
 
     @Override
     public void renameItem(AbstractItem item, String newName) {
-        createNewHistoryEntry(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_RENAMED());
+        createNewHistoryEntryAndCopyConfig(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_RENAMED());
     }
 
     @Override
@@ -236,16 +245,14 @@ public class FileHistoryDao implements HistoryDao {
      * @param xmlFile to save.
      * @param operation description
      */
-    void createNewHistoryEntry(final XmlFile xmlFile, final String operation) {
+    File createNewHistoryEntry(final XmlFile xmlFile, final String operation) {
         try {
             final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
             final File timestampedDir = getRootDir(xmlFile, timestampHolder);
             LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
-            if (!Messages.ConfigHistoryListenerHelper_DELETED().equals(operation)) {
-                copyConfigFile(xmlFile.getFile(), timestampedDir);
-            }
-            assert timestampHolder.get() != null;
             createHistoryXmlFile(timestampHolder.get(), timestampedDir, operation);
+            assert timestampHolder.get() != null;
+            return timestampedDir;
         } catch (IOException e) {
             // If not able to create the history entry, log, but continue without it.
             // A known issue is where Hudson core fails to move the folders on rename,
@@ -253,6 +260,7 @@ public class FileHistoryDao implements HistoryDao {
             // Reference http://issues.hudson-ci.org/browse/HUDSON-8318
             LOG.log(Level.SEVERE,
                     "Unable to create history entry for configuration file: " + xmlFile.getFile().getAbsolutePath(), e);
+            return null;
         } catch (RuntimeException e) {
             // If not able to create the history entry, log, but continue without it.
             // A known issue is where Hudson core fails to move the folders on rename,
@@ -260,6 +268,7 @@ public class FileHistoryDao implements HistoryDao {
             // Reference http://issues.hudson-ci.org/browse/HUDSON-8318
             LOG.log(Level.SEVERE,
                     "Unable to create history entry for configuration file: " + xmlFile.getFile().getAbsolutePath(), e);
+            return null;
         }
     }
 
