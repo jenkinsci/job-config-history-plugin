@@ -7,6 +7,7 @@ import hudson.model.FreeStyleProject;
 import hudson.security.LegacyAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 
+import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
@@ -185,5 +186,20 @@ public class JobConfigHistoryRootActionIT extends AbstractHudsonTestCaseDeleting
         } catch (IllegalArgumentException e) {
             System.err.println(e);
         }
+    }
+    
+    public void testDeletedAfterDisabled() throws Exception {
+        final String description = "All your base";
+        final FreeStyleProject project = createFreeStyleProject("Test");
+        project.setDescription(description);
+        Thread.sleep(SLEEP_TIME);
+        project.delete();
+        
+        final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
+        final HtmlAnchor rawLink = (HtmlAnchor) htmlPage.getAnchorByText("(RAW)");
+//        final String rawPage = ((HtmlPage) rawLink.click()).asText();
+//        System.out.println(rawPage);
+        final String rawPage = ((TextPage) rawLink.click()).getContent();
+        assertTrue("Verify config file is shown", rawPage.contains(description));
     }
 }

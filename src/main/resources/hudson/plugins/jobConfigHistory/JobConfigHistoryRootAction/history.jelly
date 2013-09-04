@@ -1,16 +1,25 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="Job Configuration History">
+    <j:set var="name" value="${request.getParameter('name')}"/>
+    <j:set var="isDeleted" value="${name.contains('_deleted_')}"/>
     <l:side-panel>
       <l:tasks>
         <l:task icon="images/24x24/up.gif" href="${rootURL}/" title="${%Back to Dashboard}" />
-      	<l:task icon="plugin/jobConfigHistory/img/confighistory.png" href="${rootURL}/jobConfigHistory" title="${%Back to Overview}" />
+       <l:task icon="plugin/jobConfigHistory/img/confighistory.png" href="${rootURL}/jobConfigHistory" title="${%Back to Overview}" />
+        <j:choose>
+          <j:when test="${isDeleted}">
+            <l:task icon="plugin/jobConfigHistory/img/filter.png" href="${rootURL}/jobConfigHistory/?filter=deleted" title="${%Back to Deleted Jobs}" />
+          </j:when>
+          <j:otherwise>
+            <l:task icon="plugin/jobConfigHistory/img/filter.png" href="${rootURL}/jobConfigHistory/?filter=system" title="${%Back to System History}" />
+          </j:otherwise>
+        </j:choose>
       </l:tasks>
- 	</l:side-panel>
+    </l:side-panel>
     
     <l:main-panel>
-      <j:set var="name" value="${request.getParameter('name')}"/>
       <j:choose>
-        <j:when test="${name.contains('_deleted_')}">
+        <j:when test="${isDeleted}">
           <h1>${%Job Deletion History}</h1>
         </j:when>
         <j:otherwise>
@@ -21,7 +30,7 @@
       <j:set var="configs" value="${it.getSingleConfigs(name)}" />
       <div>
         <j:choose>
-          <j:when test="${!it.hasConfigurePermission() and !name.contains('_deleted_')}">
+          <j:when test="${!it.hasConfigurePermission() and !isDeleted}">
             ${%No permission to view system changes}
           </j:when>
           <j:when test="${!it.hasJobConfigurePermission()}">
@@ -38,7 +47,7 @@
                   <div align="right">
                     <f:submit value="${%Show Diffs}" />
                   </div>
-      		    </j:if>
+       			</j:if>
                 <table class="pane sortable" style="width:100%">
                   <tr>
                     <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
@@ -55,29 +64,50 @@
                       <td>${config.date}</td>
                       <td>${config.operation}</td>
                       <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                      <td><a href="configOutput?type=xml&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
+                      <td>
+                        <j:if test="${config.operation != 'Deleted'}">
+                          <a href="configOutput?type=xml&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
                             <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
                           </a>
                           <st:nbsp />
                           <a href="configOutput?type=raw&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
                             (${%RAW})
                           </a>
+                        </j:if>
                       </td>
-                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == 2 ? true:false}" /></td>
-                      <td align="center" style="border-left: solid 1px #bbb;"><f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" /></td>
+                      <j:if test="${isDeleted}">
+                        <j:set var="offsetIfDeleted" value="1"/>
+                      </j:if>
+                      <td align="center" style="border-left: solid 1px #bbb;">
+                        <j:if test="${config.operation != 'Deleted'}">
+                          <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfDeleted) ? true:false}" />
+                        </j:if>
+                      </td>
+                      <td align="center" style="border-left: solid 1px #bbb;">
+                        <j:if test="${config.operation != 'Deleted'}">
+                          <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == (1 + offsetIfDeleted) ? true:false}" />
+                        </j:if>
+                      </td>
                     </tr>
                     <f:invisibleEntry>
                       <f:textbox name="name" value="${config.getJob()}" />
                     </f:invisibleEntry>
                   </j:forEach>
                 </table>
-	            <j:if test="${configs.size() > 1}">
+				<j:if test="${configs.size() > 1}">
                   <div align="right">
                     <f:submit value="${%Show Diffs}" />
                   </div>
-      		    </j:if>
+		       	</j:if>
               </f:form>
             </div>
+            <j:if test="${isDeleted}">
+              <f:form method="post" action="forwardToRestoreQuestion?name=${name}" name="forward">
+                <div align="right">
+                  <f:submit value="${%Restore project}" />
+                </div>
+              </f:form>
+            </j:if>
           </j:otherwise>
         </j:choose>
       </div>

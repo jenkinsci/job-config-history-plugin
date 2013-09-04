@@ -88,11 +88,11 @@
                     </j:choose>
                     <td>${config.operation}</td>
                     <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                    <td><a href="${it.createLinkToJobFiles(config,'xml')}">
+                    <td><a href="${it.createLinkToFiles(config,'xml')}">
                           <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
                         </a>
                         <st:nbsp />
-                        <a href="${it.createLinkToJobFiles(config,'raw')}">
+                        <a href="${it.createLinkToFiles(config,'raw')}">
                           (${%RAW})
                         </a>
                     </td>

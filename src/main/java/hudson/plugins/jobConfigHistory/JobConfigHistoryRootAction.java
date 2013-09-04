@@ -188,7 +188,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     }
 
     /**
-     * Returns the configuration history entries for one group of system files.
+     * Returns the configuration history entries for one group of system files
+     * or deleted jobs.
      *
      * @param req The incoming StaplerRequest
      * @return Configs list for one group of system configuration files.
@@ -248,18 +249,30 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      * @param type Output type ('xml' or 'plain').
      * @return The link as String.
      */
-    public final String createLinkToJobFiles(ConfigInfo config, String type) {
-        final String link;
-        if (config.getIsJob() && !config.getJob().contains(JobConfigHistoryConsts.DELETED_MARKER)) {
-            // XXX besides clumsiness with folders, this fails to URL-escape characters in job names
-            link = getHudson().getRootUrl() + "job/" + config.getJob().replace("/", "/job/") + getUrlName()
-                    + "/configOutput?type=" + type + "&timestamp=" + config.getDate();
+    public final String createLinkToFiles(ConfigInfo config, String type) {
+        String link = null;
+        final String name = config.getJob();
+        String timestamp = config.getDate();
+        
+        if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+            //last config.xml for deleted job usually doesn't exist
+            try {
+                if (getSingleConfigs(name).size() > 1) {
+                    timestamp = getSingleConfigs(name).get(1).getDate();
+                    link = "configOutput?type=" + type + "&name=" + name + "&timestamp=" + timestamp;
+                }
+            } catch (IOException ex) {
+                LOG.finest("Unable to get config for " + name);
+            }
+        } else if (config.getIsJob()) {
+            link = getHudson().getRootUrl() + "job/" + name + getUrlName()
+                    + "/configOutput?type=" + type + "&timestamp=" + timestamp;
         } else {
-            link = "configOutput?type=" + type + "&name=" + config.getJob() + "&timestamp=" + config.getDate();
+            link = "configOutput?type=" + type + "&name=" + name + "&timestamp=" + timestamp;
         }
+
         return link;
     }
-
     /**
      * {@inheritDoc}
      *
