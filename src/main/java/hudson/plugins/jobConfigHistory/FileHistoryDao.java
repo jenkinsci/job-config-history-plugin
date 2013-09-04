@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -208,7 +209,13 @@ public class FileHistoryDao implements HistoryDao {
 
     @Override
     public SortedMap<String, XmlFile> getRevisions(AbstractItem item) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        final File historyDir = getHistoryDir(item.getConfigFile());
+        final File[] files = historyDir.listFiles(HistoryFileFilter.INSTANCE);
+        final TreeMap<String, XmlFile> map = new TreeMap<String, XmlFile>();
+        for (File file : files) {
+            map.put(file.getName(), new XmlFile(new File(file, "config.xml")));
+        }
+        return map;
     }
 
     @Override

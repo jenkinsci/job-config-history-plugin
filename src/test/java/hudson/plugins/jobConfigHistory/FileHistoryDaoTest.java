@@ -203,7 +203,6 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testSaveItem_AbstractItem() throws IOException {
-        final AbstractItem item = mock(AbstractItem.class);
         when(mockedItem.getRootDir()).thenReturn(test1Config.getFile().getParentFile());
         sutWithUser.saveItem(mockedItem);
         assertEquals(6, getHistoryLength());
@@ -255,16 +254,13 @@ public class FileHistoryDaoTest {
      * Test of getRevisions method, of class FileHistoryDao.
      */
     @Test
-    @Ignore
-    public void testGetRevisions() {
-        System.out.println("getRevisions");
-        AbstractItem item = null;
-        FileHistoryDao sut = null;
-        SortedMap<String, XmlFile> expResult = null;
-        SortedMap<String, XmlFile> result = sut.getRevisions(item);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetRevisions() throws IOException {
+        when(mockedItem.getRootDir()).thenReturn(test1Config.getFile().getParentFile());
+        SortedMap<String, XmlFile> result = sutWithUser.getRevisions(mockedItem);
+        assertEquals(5, result.size());
+        assertEquals("2012-11-21_11-29-12", result.firstKey());
+        assertEquals("2012-11-21_11-42-05", result.lastKey());
+        assertThat(result.get(result.firstKey()).asString(), startsWith("<?xml version='1.0' encoding='UTF-8'?>"));
     }
 
     /**
