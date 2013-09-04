@@ -6,6 +6,7 @@ import hudson.model.AbstractItem;
 import hudson.model.User;
 import hudson.util.IOUtils;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -127,6 +128,17 @@ public class FileHistoryDaoTest {
         FileHistoryDao.copyConfigFile(currentConfig, timestampedDir);
         final File copy = new File(timestampedDir, currentConfig.getName());
         assertTrue(copy.exists());
+    }
+
+    /**
+     * Test of copyConfigFile method, of class FileHistoryDao.
+     */
+    @Test(expected = FileNotFoundException.class)
+    public void testCopyConfigFileIOE() throws Exception {
+        File currentConfig = test1Config.getFile();
+        File timestampedDir = new File(jenkinsHome, "timestamp");
+        // do *not* create the directory
+        FileHistoryDao.copyConfigFile(currentConfig, timestampedDir);
     }
 
     /**
