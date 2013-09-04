@@ -187,8 +187,13 @@ public class FileHistoryDao implements HistoryDao {
         createNewHistoryEntryAndCopyConfig(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED());
     }
 
-    void createNewHistoryEntryAndCopyConfig(final XmlFile configFile, final String message) throws RuntimeException {
-        final File timestampedDir = createNewHistoryEntry(configFile, message);
+    /**
+     * Creates a new history entry and copies the old config.xml to the
+     * @param configFile to copy.
+     * @param operation operation
+     */
+    void createNewHistoryEntryAndCopyConfig(final XmlFile configFile, final String operation) {
+        final File timestampedDir = createNewHistoryEntry(configFile, operation);
         try {
             copyConfigFile(configFile.getFile(), timestampedDir);
         } catch (IOException ex) {
@@ -225,7 +230,7 @@ public class FileHistoryDao implements HistoryDao {
             final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
             final HistoryDescr historyDescription;
             try {
-                historyDescription = (HistoryDescr)historyXml.read();
+                historyDescription = (HistoryDescr) historyXml.read();
             } catch (IOException ex) {
                 throw new RuntimeException("Unable to read history for " + item.getName(), ex);
             }
@@ -244,6 +249,8 @@ public class FileHistoryDao implements HistoryDao {
      *
      * @param xmlFile to save.
      * @param operation description
+     *
+     * @return timestampedDir
      */
     File createNewHistoryEntry(final XmlFile xmlFile, final String operation) {
         try {

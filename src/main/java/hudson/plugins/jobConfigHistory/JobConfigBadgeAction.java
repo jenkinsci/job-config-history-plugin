@@ -25,7 +25,7 @@ import jenkins.model.RunAction2;
  *
  * @author kstutz
  */
-public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
+public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 
     /**
      * The logger.
@@ -62,6 +62,9 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
         build = (AbstractBuild) r;
     }
 
+    /**
+     * Listener.
+     */
     @Extension
     public static final class Listener extends RunListener<AbstractBuild> {
 
@@ -80,7 +83,8 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 
             //get timestamp of config-change
             final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-            final File historyRootDir = Hudson.getInstance().getPlugin(JobConfigHistory.class).getHistoryDir(project.getConfigFile());
+            final File historyRootDir = Hudson.getInstance()
+                    .getPlugin(JobConfigHistory.class).getHistoryDir(project.getConfigFile());
             if (historyRootDir.exists()) {
                 try {
                     for (final File historyDir : historyRootDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
@@ -165,7 +169,8 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
         final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
 
         for (String timestamp : configDates) {
-            final String path = plugin.getJobHistoryRootDir() + "/" + build.getProject().getFullName().replace("/", "/jobs/") + "/" + timestamp;
+            final String path = plugin.getJobHistoryRootDir() + "/"
+                    + build.getProject().getFullName().replace("/", "/jobs/") + "/" + timestamp;
             final File historyDir = new File(path);
             if (!historyDir.exists() || !new File(historyDir, "config.xml").exists()) {
                 return false;
