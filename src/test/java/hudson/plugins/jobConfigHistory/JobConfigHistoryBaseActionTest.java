@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package hudson.plugins.jobConfigHistory;
 
 import hudson.model.Hudson;
@@ -13,11 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import static org.hamcrest.Matchers.endsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.kohsuke.stapler.StaplerRequest;
 import static org.mockito.Mockito.mock;
