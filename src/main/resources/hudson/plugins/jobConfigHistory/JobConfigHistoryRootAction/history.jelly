@@ -18,7 +18,7 @@
         </j:otherwise>
       </j:choose>
       <h2>${name}</h2>
-      <j:set var="configs" value="${it.getSingleConfigs(request)}" />
+      <j:set var="configs" value="${it.getSingleConfigs(name)}" />
       <div>
         <j:choose>
           <j:when test="${!it.hasConfigurePermission() and !name.contains('_deleted_')}">

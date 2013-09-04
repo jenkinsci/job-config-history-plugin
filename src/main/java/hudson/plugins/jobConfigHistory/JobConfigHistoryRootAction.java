@@ -195,8 +195,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      * @throws IOException
      *             if one of the history entries might not be read.
      */
-    public final List<ConfigInfo> getSingleConfigs(StaplerRequest req) throws IOException {
-        final String name = req.getParameter("name");
+    public final List<ConfigInfo> getSingleConfigs(String name) throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final File historyRootDir;
         if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
