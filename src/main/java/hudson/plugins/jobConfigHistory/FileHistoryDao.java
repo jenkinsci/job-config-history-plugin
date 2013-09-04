@@ -258,17 +258,8 @@ public class FileHistoryDao implements HistoryDao {
             // A known issue is where Hudson core fails to move the folders on rename,
             // but continues as if it did.
             // Reference https://issues.jenkins-ci.org/browse/JENKINS-8318
-            LOG.log(Level.SEVERE,
+            throw new RuntimeException(
                     "Unable to create history entry for configuration file: " + xmlFile.getFile().getAbsolutePath(), e);
-            return null;
-        } catch (RuntimeException e) {
-            // If not able to create the history entry, log, but continue without it.
-            // A known issue is where Hudson core fails to move the folders on rename,
-            // but continues as if it did.
-            // Reference https://issues.jenkins-ci.org/browse/JENKINS-8318
-            LOG.log(Level.SEVERE,
-                    "Unable to create history entry for configuration file: " + xmlFile.getFile().getAbsolutePath(), e);
-            return null;
         }
     }
 

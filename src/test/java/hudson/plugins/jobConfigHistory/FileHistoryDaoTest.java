@@ -94,9 +94,13 @@ public class FileHistoryDaoTest {
                 throw new RuntimeException("oops");
             }
         };
-        sut.createNewHistoryEntry(xmlFile, "foo");
-        final int newLength = getHistoryRootForTest1Length();
-        assertEquals(5, newLength);
+        try {
+            sut.createNewHistoryEntry(xmlFile, "foo");
+            fail("Should throw RTE");
+        } catch (RuntimeException e) {
+            final int newLength = getHistoryRootForTest1Length();
+            assertEquals(5, newLength);
+        }
     }
 
     /**
