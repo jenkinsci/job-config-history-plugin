@@ -32,7 +32,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
     public void onCreated(Item item) {
         LOG.log(FINEST, "In onCreated for {0}", item);
         if (item instanceof AbstractItem) {
-            final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper();
+            final HistoryDao configHistoryListenerHelper = getHistoryDao();
             configHistoryListenerHelper.createNewItem(((AbstractItem) item));
         } else {
             LOG.finest("onCreated: not an AbstractItem, skipping history save");
@@ -77,7 +77,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
                 }
             }
             // Must do this after moving old history, in case a CHANGED was fired during the same second under the old name.
-            final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper();
+            final HistoryDao configHistoryListenerHelper = getHistoryDao();
             configHistoryListenerHelper.renameItem((AbstractItem) item, newName);
         }
         LOG.log(FINEST, "Completed onRename for {0} done.", item);
@@ -90,7 +90,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
         LOG.log(FINEST, "In onDeleted for {0}", item);
         if (item instanceof AbstractItem) {
             final JobConfigHistory plugin = getPlugin();
-            final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper();
+            final HistoryDao configHistoryListenerHelper = getHistoryDao();
             configHistoryListenerHelper.deleteItem((AbstractItem) item);
             final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
 
@@ -108,28 +108,20 @@ public class JobConfigHistoryJobListener extends ItemListener {
 
     /**
      * Returns the plugin for tests.
+     *
      * @return plugin
      */
     JobConfigHistory getPlugin() {
-        return Hudson.getInstance().getPlugin(JobConfigHistory.class);
+        return PluginUtils.getPlugin();
     }
 
     /**
      * For tests.
+     *
      * @return listener
      */
-    HistoryDao getConfigHistoryListenerHelper() {
-        final String maxHistoryEntriesAsString = getPlugin().getMaxHistoryEntries();
-        int maxHistoryEntries = 0;
-        try {
-            maxHistoryEntries = Integer.valueOf(maxHistoryEntriesAsString);
-        } catch (IllegalArgumentException e) {
-            maxHistoryEntries = 0;
-        }
-        return new FileHistoryDao(
-                getPlugin().getConfiguredHistoryRootDir(),
-                new File(Hudson.getInstance().root.getPath()),
-                User.current(),
-                maxHistoryEntries);
+
+    HistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
     }
 }

@@ -28,7 +28,7 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
         final JobConfigHistory plugin = getPlugin();
         LOG.log(FINEST, "In onChange for {0}", o);
         if (plugin.isSaveable(o, file)) {
-            final HistoryDao configHistoryListenerHelper = getConfigHistoryListenerHelper();
+            final HistoryDao configHistoryListenerHelper = getHistoryDao();
             configHistoryListenerHelper.saveItem(file);
         }
         LOG.log(FINEST, "onChange for {0} done.", o);
@@ -37,29 +37,19 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
     /**
      * For tests only.
      *
-     * @return helper.
+     * @return plugin
      */
-    HistoryDao getConfigHistoryListenerHelper() {
-        final String maxHistoryEntriesAsString = getPlugin().getMaxHistoryEntries();
-        int maxHistoryEntries = 0;
-        try {
-            maxHistoryEntries = Integer.valueOf(maxHistoryEntriesAsString);
-        } catch (IllegalArgumentException e) {
-            maxHistoryEntries = 0;
-        }
-        return new FileHistoryDao(
-                getPlugin().getConfiguredHistoryRootDir(),
-                new File(Hudson.getInstance().root.getPath()),
-                User.current(),
-                maxHistoryEntries);
+    JobConfigHistory getPlugin() {
+        return PluginUtils.getPlugin();
     }
 
     /**
      * For tests only.
      *
-     * @return plugin
+     * @return helper.
      */
-    JobConfigHistory getPlugin() {
-        return Hudson.getInstance().getPlugin(JobConfigHistory.class);
+    HistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
     }
+
 }

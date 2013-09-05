@@ -49,7 +49,7 @@ public class JobConfigHistorySaveableListenerTest {
         }
 
         @Override
-        HistoryDao getConfigHistoryListenerHelper() {
+        HistoryDao getHistoryDao() {
             return mockedConfigHistoryListenerHelper;
         }
     }
