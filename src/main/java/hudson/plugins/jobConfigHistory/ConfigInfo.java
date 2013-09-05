@@ -5,6 +5,9 @@ import hudson.model.AbstractItem;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
@@ -35,7 +38,7 @@ public class ConfigInfo {
     /** One of created, changed, renamed or deleted. */
     private final String operation;
 
-    /** true if this information is for a Hudson job, 
+    /** true if this information is for a Hudson job,
      *  as opposed to information for a system configuration file.
      */
     private boolean isJob;
@@ -50,21 +53,19 @@ public class ConfigInfo {
      * @param histDescr
      *            metadata of the change
      * @return a new ConfigInfo object.
-     *
-     * @throws UnsupportedEncodingException
-     *             if UTF-8 is not available (probably a serious error).
      */
-    public static ConfigInfo create(final AbstractItem item, final File file, final HistoryDescr histDescr)
-        throws UnsupportedEncodingException {
+    public static ConfigInfo create(final AbstractItem item, final File file, final HistoryDescr histDescr) {
+        final String encodedURL = getEncodedUrl(file);
         return new ConfigInfo(
                 item.getFullName(),
-                URLEncoder.encode(file.getAbsolutePath(), "utf-8"),
+                encodedURL,
                 histDescr.getTimestamp(),
                 histDescr.getUser(),
                 histDescr.getOperation(),
                 histDescr.getUserID(),
                 true);
     }
+
     /**
      * Returns a new ConfigInfo object for a system configuration file.
      * @param name
@@ -74,16 +75,14 @@ public class ConfigInfo {
      * @param histDescr
      *            metadata of the change.
      * @param isJob
-     *            whether it is a job's config info or not. 
+     *            whether it is a job's config info or not.
      * @return a new ConfigInfo object.
-     * @throws UnsupportedEncodingException
-     *             if UTF-8 is not available
      */
-    public static ConfigInfo create(final String name, final File file, final HistoryDescr histDescr, final boolean isJob)
-        throws UnsupportedEncodingException {
+    public static ConfigInfo create(final String name, final File file, final HistoryDescr histDescr, final boolean isJob) {
+        final String encodedURL = getEncodedUrl(file);
         return new ConfigInfo(
                 name,
-                URLEncoder.encode(file.getAbsolutePath(), "utf-8"),
+                encodedURL,
                 histDescr.getTimestamp(),
                 histDescr.getUser(),
                 histDescr.getOperation(),
@@ -180,8 +179,31 @@ public class ConfigInfo {
         return isJob;
     }
 
-    @Override public String toString() {
+    @Override 
+    public String toString() {
         return operation + " on " + file + " @" + date;
     }
 
+    private static String getEncodedUrl(final File file) throws RuntimeException {
+        final String encodedURL;
+        try {
+            encodedURL = URLEncoder.encode(file.getAbsolutePath(), "utf-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException("Could not encode " + file.getAbsolutePath(), ex);
+        }
+        return encodedURL;
+    }
+
+    /**
+     * Returns a {@link Date}.
+     *
+     * @return The parsed date as a java.util.Date.
+     */
+    public Date parsedDate() {
+        try {
+            return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(getDate());
+        } catch (ParseException ex) {
+            throw new RuntimeException("Could not parse Date" + getDate(), ex);
+        }
+    }
 }

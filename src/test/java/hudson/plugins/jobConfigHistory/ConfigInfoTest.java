@@ -4,6 +4,7 @@ import hudson.model.AbstractItem;
 import hudson.model.ItemGroup;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -21,8 +22,12 @@ public class ConfigInfoTest {
     private final AbstractItem itemMock = mock(AbstractItem.class);
 
     private final File file = new File("");
-    
-    private final HistoryDescr historyDescr = new HistoryDescr("Firstname Lastname", "userId", "operation", "123");
+
+    private static final String DATE = "2012-11-21_11-29-12";
+
+    private final HistoryDescr historyDescr = new HistoryDescr(
+            "Firstname Lastname", "userId", "operation", DATE);
+
 
     public ConfigInfoTest() {
         when(itemGroupMock.getFullName()).thenReturn("does not matter parent");
@@ -34,13 +39,13 @@ public class ConfigInfoTest {
      * Test of create method, of class ConfigInfo.
      */
     @Test
-    public void testCreate_3args() throws UnsupportedEncodingException {
+    public void testCreate_3args() {
         ConfigInfo sut = ConfigInfo.create(itemMock, file, historyDescr);
         assertNotNull(sut);
         assertEquals("Firstname Lastname", sut.getUser());
         assertEquals("userId", sut.getUserID());
         assertEquals("operation", sut.getOperation());
-        assertEquals("123", sut.getDate());
+        assertEquals(DATE, sut.getDate());
         assertEquals(true, sut.getIsJob());
     }
 
@@ -48,7 +53,7 @@ public class ConfigInfoTest {
      * Test of create method, of class ConfigInfo.
      */
     @Test
-    public void testCreate_4args() throws UnsupportedEncodingException {
+    public void testCreate_4args() {
         ConfigInfo sut = ConfigInfo.create("jobName", file, historyDescr, false);
         assertNotNull(sut);
         assertEquals(false, sut.getIsJob());
@@ -58,10 +63,22 @@ public class ConfigInfoTest {
      * Test of toString method, of class ConfigInfo.
      */
     @Test
-    public void testToString() throws UnsupportedEncodingException {        
+    public void testToString() {
         ConfigInfo sut = ConfigInfo.create("jobName", file, historyDescr, false);
         String result = sut.toString();
         assertThat(result, startsWith("operation on "));
+    }
+
+    /**
+     * Test of parsedDate method, of class ConfigInfo.
+     */
+    @Test
+    public void testParsedDate() {
+        //"2012-11-21_11-29-12"
+        ConfigInfo sut = ConfigInfo.create("jobName", file, historyDescr, false);
+        Date expResult = new Date(112, 10, 21, 11, 29, 12);
+        Date result = sut.parsedDate();
+        assertEquals(expResult, result);
     }
 
 }

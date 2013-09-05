@@ -18,6 +18,8 @@ import hudson.model.Hudson;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
+import java.util.Map;
+import java.util.SortedMap;
 import jenkins.model.RunAction2;
 
 /**
@@ -83,25 +85,18 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
 
             //get timestamp of config-change
             final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-            final File historyRootDir = Hudson.getInstance()
-                    .getPlugin(JobConfigHistory.class).getHistoryDir(project.getConfigFile());
-            if (historyRootDir.exists()) {
-                try {
-                    for (final File historyDir : historyRootDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
-                        final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
-                        final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-                        final ConfigInfo config = ConfigInfo.create(project, historyDir, histDescr);
-                        configs.add(config);
-                    }
-                } catch (IOException ex) {
-                    LOG.finest("Could not parse history files: " + ex);
-                }
+            final HistoryDao historyDao = PluginUtils.getHistoryDao();
+            final SortedMap<String, HistoryDescr> revisions = historyDao.getRevisions(project);
+            for (Map.Entry<String, HistoryDescr> revision : revisions.entrySet()) {
+                final XmlFile historyXml = historyDao.getOldRevision(project, revision.getKey());
+                final File historyDir = historyXml.getFile();
+                final ConfigInfo config = ConfigInfo.create(project, historyDir, revision.getValue());
+                configs.add(config);
             }
-
             if (configs.size() > 1) {
                 Collections.sort(configs, ConfigInfoComparator.INSTANCE);
                 final ConfigInfo lastChange = Collections.min(configs, ConfigInfoComparator.INSTANCE);
-                final Date lastConfigChange = parseDate(lastChange);
+                final Date lastConfigChange = lastChange.parsedDate();
 
                 if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
                     final String[] dates = {lastChange.getDate(), findLastRelevantConfigChangeDate(configs, lastBuildDate)};
@@ -124,28 +119,12 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
         private String findLastRelevantConfigChangeDate(ArrayList<ConfigInfo> configs, Date lastBuildDate) {
             for (int i = 1; i < configs.size(); i++) {
                 final ConfigInfo oldConfigChange = configs.get(i);
-                final Date changeDate = parseDate(oldConfigChange);
+                final Date changeDate = oldConfigChange.parsedDate();
                 if (changeDate != null && changeDate.before(lastBuildDate)) {
                     return oldConfigChange.getDate();
                 }
             }
             return configs.get(1).getDate();
-        }
-
-        /**
-         * Parses the date from a config info into a java.util.Date.
-         *
-         * @param config A ConfigInfo.
-         * @return The parsed date as a java.util.Date.
-         */
-        private Date parseDate(ConfigInfo config) {
-            Date date = null;
-            try {
-                date = new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(config.getDate());
-            } catch (ParseException ex) {
-                LOG.finest("Could not parse Date: " + ex);
-            }
-            return date;
         }
 
     } // end Listener
