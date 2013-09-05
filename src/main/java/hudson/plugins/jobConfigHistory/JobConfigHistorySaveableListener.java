@@ -3,11 +3,8 @@ package hudson.plugins.jobConfigHistory;
 import static java.util.logging.Level.FINEST;
 import hudson.Extension;
 import hudson.XmlFile;
-import hudson.model.Hudson;
 import hudson.model.Saveable;
-import hudson.model.User;
 import hudson.model.listeners.SaveableListener;
-import java.io.File;
 
 import java.util.logging.Logger;
 

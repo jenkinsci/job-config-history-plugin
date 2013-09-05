@@ -5,8 +5,6 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Item;
 import hudson.model.AbstractItem;
-import hudson.model.Hudson;
-import hudson.model.User;
 import hudson.model.listeners.ItemListener;
 
 import java.io.File;
