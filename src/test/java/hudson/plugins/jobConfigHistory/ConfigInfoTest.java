@@ -3,7 +3,6 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.AbstractItem;
 import hudson.model.ItemGroup;
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;

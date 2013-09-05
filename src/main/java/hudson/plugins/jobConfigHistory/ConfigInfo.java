@@ -184,7 +184,13 @@ public class ConfigInfo {
         return operation + " on " + file + " @" + date;
     }
 
-    private static String getEncodedUrl(final File file) throws RuntimeException {
+    /**
+     * Converts give file to encode URL string.
+     *
+     * @param file to convert
+     * @return encoded url
+     */
+    private static String getEncodedUrl(final File file) {
         final String encodedURL;
         try {
             encodedURL = URLEncoder.encode(file.getAbsolutePath(), "utf-8");

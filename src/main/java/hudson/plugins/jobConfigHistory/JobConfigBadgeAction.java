@@ -1,9 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,11 +25,6 @@ import jenkins.model.RunAction2;
  * @author kstutz
  */
 public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
-
-    /**
-     * The logger.
-     */
-    private static final Logger LOG = Logger.getLogger(JobConfigBadgeAction.class.getName());
 
     /**
      * The dates of the last two config changes as Strings.
