@@ -68,8 +68,8 @@ public class JobConfigHistoryJobListenerTest {
         AbstractItem item = mock(AbstractItem.class);
         when(item.getConfigFile()).thenReturn(null);
         JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
-        sut.onRenamed(item, "", "newName");
-        verify(mockedConfigHistoryListenerHelper).renameItem(item, "newName");
+        sut.onRenamed(item, "oldName", "newName");
+        verify(mockedConfigHistoryListenerHelper).renameItem(item, "oldName", "newName");
     }
 
     /**
@@ -83,7 +83,7 @@ public class JobConfigHistoryJobListenerTest {
         when(mockedPlugin.getHistoryDir(any(XmlFile.class))).thenReturn(tempFolder.newFolder("oldName"));
         JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
         sut.onRenamed(item, "oldName", "newName");
-        verify(mockedConfigHistoryListenerHelper).renameItem(item, "newName");
+        verify(mockedConfigHistoryListenerHelper).renameItem(item, "oldName", "newName");
     }
 
     /**

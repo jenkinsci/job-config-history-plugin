@@ -2,16 +2,13 @@ package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.*;
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.model.Item;
 import hudson.model.AbstractItem;
 import hudson.model.listeners.ItemListener;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -50,33 +47,9 @@ public class JobConfigHistoryJobListener extends ItemListener {
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         LOG.log(FINEST, "In onRenamed for {0}{1}", new Object[] {item, onRenameDesc});
         if (item instanceof AbstractItem) {
-            final JobConfigHistory plugin = getPlugin();
-
-            // move history items from previous name, if the directory exists
-            // only applies if using a custom root directory for saving history
-            if (plugin.getConfiguredHistoryRootDir() != null) {
-                final File currentHistoryDir = plugin.getHistoryDir(((AbstractItem) item).getConfigFile());
-                final File historyParentDir = currentHistoryDir.getParentFile();
-                final File oldHistoryDir = new File(historyParentDir, oldName);
-                if (oldHistoryDir.exists()) {
-                    final FilePath fp = new FilePath(oldHistoryDir);
-                    // catch all exceptions so Hudson can continue with other rename tasks.
-                    try {
-                        fp.copyRecursiveTo(new FilePath(currentHistoryDir));
-                        fp.deleteRecursive();
-                        LOG.log(FINEST, "completed move of old history files on rename.{0}", onRenameDesc);
-                    } catch (IOException e) {
-                        final String ioExceptionStr = "unable to move old history on rename." + onRenameDesc;
-                        LOG.log(Level.SEVERE, ioExceptionStr, e);
-                    } catch (InterruptedException e) {
-                        final String irExceptionStr = "interrupted while moving old history on rename." + onRenameDesc;
-                        LOG.log(Level.WARNING, irExceptionStr, e);
-                    }
-                }
-            }
-            // Must do this after moving old history, in case a CHANGED was fired during the same second under the old name.
             final HistoryDao configHistoryListenerHelper = getHistoryDao();
-            configHistoryListenerHelper.renameItem((AbstractItem) item, newName);
+            // Must do this after moving old history, in case a CHANGED was fired during the same second under the old name.            
+            configHistoryListenerHelper.renameItem((AbstractItem) item, oldName, newName);
         }
         LOG.log(FINEST, "Completed onRename for {0} done.", item);
 //        new Exception("STACKTRACE for double invocation").printStackTrace();

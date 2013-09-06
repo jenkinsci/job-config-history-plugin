@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.io.FileUtils;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -254,15 +255,16 @@ public class FileHistoryDaoTest {
      * Test of renameItem method, of class FileHistoryDao.
      */
     @Test
-    @Ignore
-    public void testRenameItem() {
-        System.out.println("renameItem");
-        AbstractItem item = null;
-        String newName = "";
-        FileHistoryDao sut = null;
-        sut.renameItem(item, newName);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testRenameItem() throws IOException {
+        String newName = "NewName";
+        File newJobDir = unpackResourceZip.getResource("jobs/" + newName);
+        // Rename of Job is already done in Listener.
+        FileUtils.touch(new File(newJobDir, "config.xml"));
+        when(mockedItem.getRootDir()).thenReturn(newJobDir);
+        sutWithUser.renameItem(mockedItem, "Test1", "NewName");
+        final File newHistoryDir = new File(historyRoot, "jobs/" + newName);
+        assertTrue(newHistoryDir.exists());
+        assertEquals(6, newHistoryDir.list().length);
     }
 
     /**

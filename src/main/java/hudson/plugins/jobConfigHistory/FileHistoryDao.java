@@ -4,6 +4,7 @@
 
 package hudson.plugins.jobConfigHistory;
 
+import hudson.FilePath;
 import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
@@ -23,6 +24,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
+import static java.util.logging.Level.FINEST;
 import java.util.logging.Logger;
 
 /**
@@ -217,7 +219,29 @@ public class FileHistoryDao implements HistoryDao {
     }
 
     @Override
-    public void renameItem(AbstractItem item, String newName) {
+    public void renameItem(AbstractItem item, String oldName, String newName) {
+        final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
+        if (historyRootDir != null) {
+            final File currentHistoryDir = getHistoryDir(item.getConfigFile());
+            final File historyParentDir = currentHistoryDir.getParentFile();
+            final File oldHistoryDir = new File(historyParentDir, oldName);
+            if (oldHistoryDir.exists()) {
+                final FilePath fp = new FilePath(oldHistoryDir);
+                // catch all exceptions so Hudson can continue with other rename tasks.
+                try {
+                    fp.copyRecursiveTo(new FilePath(currentHistoryDir));
+                    fp.deleteRecursive();
+                    LOG.log(FINEST, "completed move of old history files on rename.{0}", onRenameDesc);
+                } catch (IOException e) {
+                    final String ioExceptionStr = "unable to move old history on rename." + onRenameDesc;
+                    LOG.log(Level.SEVERE, ioExceptionStr, e);
+                } catch (InterruptedException e) {
+                    final String irExceptionStr = "interrupted while moving old history on rename." + onRenameDesc;
+                    LOG.log(Level.WARNING, irExceptionStr, e);
+                }
+            }
+
+        }
         createNewHistoryEntryAndCopyConfig(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_RENAMED());
     }
 

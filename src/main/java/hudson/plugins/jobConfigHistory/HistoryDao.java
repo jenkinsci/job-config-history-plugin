@@ -43,9 +43,10 @@ public interface HistoryDao {
      * Save and renames the item.
      *
      * @param item project
+     * @param oldName old project name
      * @param newName new name
      */
-    void renameItem(AbstractItem item, String newName);
+    void renameItem(AbstractItem item, String oldName, String newName);
 
     /**
      * Returns a sorted list of all revisions for this item.
