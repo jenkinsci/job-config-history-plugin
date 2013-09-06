@@ -93,7 +93,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
             configs = getJobConfigs(filter);
         }
 
-        Collections.sort(configs, ConfigInfoComparator.INSTANCE);
+        Collections.sort(configs);
         return configs;
     }
 
@@ -215,7 +215,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
                 }
             }
         }
-        Collections.sort(configs, ConfigInfoComparator.INSTANCE);
+        Collections.sort(configs);
         return configs;
     }
 

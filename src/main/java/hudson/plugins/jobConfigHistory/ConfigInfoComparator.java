@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * Comparator for {@link ConfigInfo}, sort order depends on {@link ConfigInfo#getDate()}.
+ * Comparator for {@link ConfigInfo}, sort order depends on {@link ConfigInfo#parsedDate()}.
+ *
+ * Sort in descending order.
  *
  * @author mfriedenhagen
  */
@@ -18,6 +20,6 @@ final class ConfigInfoComparator implements Comparator<ConfigInfo>, Serializable
 
     /** {@inheritDoc} */
     public int compare(final ConfigInfo ci1, final ConfigInfo ci2) {
-        return ci2.getDate().compareTo(ci1.getDate());
+        return ci2.parsedDate().compareTo(ci1.parsedDate());
     }
 }

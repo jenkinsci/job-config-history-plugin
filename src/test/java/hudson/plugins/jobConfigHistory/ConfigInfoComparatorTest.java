@@ -26,7 +26,7 @@ public class ConfigInfoComparatorTest {
         when(itemMock.getParent()).thenReturn(itemGroupMock);
         when(itemMock.getFullName()).thenReturn("does not matter");
         HistoryDescr descrMock = mock(HistoryDescr.class);
-        when(descrMock.getTimestamp()).thenReturn("123");
+        when(descrMock.getTimestamp()).thenReturn("2012-11-21_11-29-12");
         ConfigInfo ci1 = ConfigInfo.create(itemMock, new File(""), descrMock);
         ConfigInfo ci2 = ConfigInfo.create(itemMock, new File(""), descrMock);
         int expResult = 0;

@@ -86,8 +86,8 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
                 configs.add(config);
             }
             if (configs.size() > 1) {
-                Collections.sort(configs, ConfigInfoComparator.INSTANCE);
-                final ConfigInfo lastChange = Collections.min(configs, ConfigInfoComparator.INSTANCE);
+                Collections.sort(configs);
+                final ConfigInfo lastChange = Collections.min(configs);
                 final Date lastConfigChange = lastChange.parsedDate();
 
                 if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {

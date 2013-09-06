@@ -15,10 +15,11 @@ import org.kohsuke.stapler.export.ExportedBean;
 /**
  * Holder object for displaying information.
  *
+ *
  * @author Stefan Brausch
  */
 @ExportedBean(defaultVisibility = 999)
-public class ConfigInfo {
+public class ConfigInfo implements Comparable<ConfigInfo>{
 
     /** The display name of the user. */
     private final String user;
@@ -179,7 +180,7 @@ public class ConfigInfo {
         return isJob;
     }
 
-    @Override 
+    @Override
     public String toString() {
         return operation + " on " + file + " @" + date;
     }
@@ -211,5 +212,10 @@ public class ConfigInfo {
         } catch (ParseException ex) {
             throw new RuntimeException("Could not parse Date" + getDate(), ex);
         }
+    }
+
+    @Override
+    public int compareTo(ConfigInfo o) {
+        return ConfigInfoComparator.INSTANCE.compare(this, o);
     }
 }
