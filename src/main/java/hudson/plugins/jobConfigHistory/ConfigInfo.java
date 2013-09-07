@@ -19,7 +19,7 @@ import org.kohsuke.stapler.export.ExportedBean;
  * @author Stefan Brausch
  */
 @ExportedBean(defaultVisibility = 999)
-public class ConfigInfo implements Comparable<ConfigInfo>, ParsedDate {
+public class ConfigInfo implements ParsedDate {
 
     /** The display name of the user. */
     private final String user;
@@ -213,10 +213,5 @@ public class ConfigInfo implements Comparable<ConfigInfo>, ParsedDate {
         } catch (ParseException ex) {
             throw new RuntimeException("Could not parse Date" + getDate(), ex);
         }
-    }
-
-    @Override
-    public int compareTo(ConfigInfo o) {
-        return ParsedDateComparator.INSTANCE.compare(this, o);
     }
 }

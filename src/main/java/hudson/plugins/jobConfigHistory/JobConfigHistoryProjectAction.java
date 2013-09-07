@@ -89,7 +89,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
                 configs.add(config);
             }
         }
-        Collections.sort(configs);
+        Collections.sort(configs, ParsedDateComparator.INSTANCE);
         return configs;
     }
 

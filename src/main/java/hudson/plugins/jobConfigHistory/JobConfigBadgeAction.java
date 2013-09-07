@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.logging.Logger;
 
 import hudson.Extension;
 import hudson.XmlFile;
@@ -86,8 +85,8 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
                 configs.add(config);
             }
             if (configs.size() > 1) {
-                Collections.sort(configs);
-                final ConfigInfo lastChange = Collections.min(configs);
+                Collections.sort(configs, ParsedDateComparator.INSTANCE);
+                final ConfigInfo lastChange = Collections.min(configs, ParsedDateComparator.INSTANCE);
                 final Date lastConfigChange = lastChange.parsedDate();
 
                 if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {

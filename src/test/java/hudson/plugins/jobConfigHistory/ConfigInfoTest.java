@@ -3,10 +3,7 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.AbstractItem;
 import hudson.model.ItemGroup;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -86,19 +83,4 @@ public class ConfigInfoTest {
         Date result = sut.parsedDate();
         assertEquals(expResult, result);
     }
-
-    /**
-     * Test of compareTo method, of class ConfigInfo.
-     */
-    @Test
-    public void testCompareTo() {
-        ConfigInfo o = ConfigInfo.create("jobName", file, historyDescrNewer, false);
-        ConfigInfo sut = ConfigInfo.create("jobName", file, historyDescr, false);
-        final List<ConfigInfo> list = Arrays.asList(sut, o);
-        Collections.sort(list);
-        assertEquals(sut, list.get(1));
-        assertEquals(o, list.get(0));
-        assertEquals(o, Collections.min(list));
-    }
-
 }
