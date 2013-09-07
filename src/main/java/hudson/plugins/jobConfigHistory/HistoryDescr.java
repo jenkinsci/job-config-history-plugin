@@ -1,7 +1,5 @@
 package hudson.plugins.jobConfigHistory;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -84,10 +82,6 @@ public class HistoryDescr implements ParsedDate {
      */
     @Override
     public Date parsedDate() {
-        try {
-            return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(getTimestamp());
-        } catch (ParseException ex) {
-            throw new RuntimeException("Could not parse Date" + getTimestamp(), ex);
-        }
+        return PluginUtils.parsedDate(getTimestamp());
     }
 }

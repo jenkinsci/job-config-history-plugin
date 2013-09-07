@@ -24,18 +24,13 @@ public class ConfigInfoTest {
 
     private static final String DATE = "2012-11-21_11-29-12";
 
-    private static final String DATE_NEWER = "2012-11-21_11-29-14";
-
     private final HistoryDescr historyDescr = new HistoryDescr(
             "Firstname Lastname", "userId", "operation", DATE);
-
-    private final HistoryDescr historyDescrNewer = new HistoryDescr(
-            "Firstname Lastname", "userId", "operation", DATE_NEWER);
 
     public ConfigInfoTest() {
         when(itemGroupMock.getFullName()).thenReturn("does not matter parent");
         when(itemMock.getParent()).thenReturn(itemGroupMock);
-        when(itemMock.getFullName()).thenReturn("does not matter item");
+        when(itemMock.getFullName()).thenReturn("Job1");
     }
 
     /**

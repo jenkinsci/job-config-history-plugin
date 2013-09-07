@@ -27,6 +27,9 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.Hudson;
 import hudson.model.User;
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Helper class.
@@ -68,5 +71,17 @@ final class PluginUtils {
                 User.current(),
                 maxHistoryEntries);
     }
-
+    /**
+     * Returns a {@link Date}.
+     *
+     * @param timeStamp date as string.
+     * @return The parsed date as a java.util.Date.
+     */
+    public static Date parsedDate(final String timeStamp) {
+        try {
+            return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timeStamp);
+        } catch (ParseException ex) {
+            throw new RuntimeException("Could not parse Date" + timeStamp, ex);
+        }        
+    }
 }

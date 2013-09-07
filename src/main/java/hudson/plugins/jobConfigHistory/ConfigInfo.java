@@ -5,8 +5,6 @@ import hudson.model.AbstractItem;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.kohsuke.stapler.export.Exported;
@@ -56,7 +54,7 @@ public class ConfigInfo implements ParsedDate {
      * @return a new ConfigInfo object.
      */
     public static ConfigInfo create(final AbstractItem item, final File file, final HistoryDescr histDescr) {
-        final String fileUrl = getEncodedUrl(file);
+        final String fileUrl = createEncodedUrl(file);
         return new ConfigInfo(
                 item.getFullName(),
                 fileUrl,
@@ -80,7 +78,7 @@ public class ConfigInfo implements ParsedDate {
      * @return a new ConfigInfo object.
      */
     public static ConfigInfo create(final String name, final File file, final HistoryDescr histDescr, final boolean isJob) {
-        final String encodedURL = getEncodedUrl(file);
+        final String encodedURL = createEncodedUrl(file);
         return new ConfigInfo(
                 name,
                 encodedURL,
@@ -191,7 +189,7 @@ public class ConfigInfo implements ParsedDate {
      * @param file to convert
      * @return encoded url
      */
-    private static String getEncodedUrl(final File file) {
+    private static String createEncodedUrl(final File file) {
         final String encodedURL;
         try {
             encodedURL = URLEncoder.encode(file.getAbsolutePath(), "utf-8");
@@ -208,10 +206,6 @@ public class ConfigInfo implements ParsedDate {
      */
     @Override
     public Date parsedDate() {
-        try {
-            return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(getDate());
-        } catch (ParseException ex) {
-            throw new RuntimeException("Could not parse Date" + getDate(), ex);
-        }
+        return PluginUtils.parsedDate(getDate());
     }
 }
