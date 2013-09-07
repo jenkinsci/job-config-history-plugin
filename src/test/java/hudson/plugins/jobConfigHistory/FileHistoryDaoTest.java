@@ -282,13 +282,22 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testGetOldRevision() throws IOException {
-        System.out.println("getOldRevision");
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         String identifier = "2012-11-21_11-42-05";
         final XmlFile result = sutWithUser.getOldRevision(mockedItem, identifier);
         final String xml = result.asString();
         assertThat(xml, startsWith("<?xml version='1.0' encoding='UTF-8'?>"));
         assertThat(xml, endsWith("</project>"));
+    }
+
+    /**
+     * Test of getOldRevision method, of class FileHistoryDao.
+     */
+    @Test
+    public void testHasOldRevision() throws IOException {
+        when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
+        assertTrue(sutWithUser.hasOldRevision(mockedItem, "2012-11-21_11-42-05"));
+        assertFalse(sutWithUser.hasOldRevision(mockedItem, "1914-11-21_11-42-05"));
     }
 
     /**

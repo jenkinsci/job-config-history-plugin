@@ -1,12 +1,10 @@
 package hudson.plugins.jobConfigHistory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 
 import hudson.Extension;
-import hudson.XmlFile;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildBadgeAction;
@@ -14,7 +12,6 @@ import hudson.model.Hudson;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
-import java.util.SortedMap;
 import jenkins.model.RunAction2;
 
 /**
@@ -140,9 +137,9 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
      */
     public boolean oldConfigsExist() {
         final HistoryDao historyDao = getHistoryDao();
+        final AbstractProject project = build.getProject();
         for (String timestamp : configDates) {
-            final XmlFile oldRevision = historyDao.getOldRevision(build.getProject(), timestamp);
-            if (!oldRevision.getFile().exists()) {
+            if (!historyDao.hasOldRevision(project, timestamp)) {
                 return false;
             }
         }

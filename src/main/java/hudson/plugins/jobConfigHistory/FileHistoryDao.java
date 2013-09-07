@@ -279,6 +279,12 @@ public class FileHistoryDao implements HistoryDao {
         return new XmlFile(new File(historyDir, "config.xml"));
     }
 
+    @Override
+    public boolean hasOldRevision(AbstractItem item, String identifier) {
+        final XmlFile oldRevision = getOldRevision(item, identifier);
+        return oldRevision.getFile().exists();
+    }    
+            
     /**
      * Creates a new history entry.
      *
