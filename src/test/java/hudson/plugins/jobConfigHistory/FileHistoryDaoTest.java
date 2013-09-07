@@ -241,14 +241,9 @@ public class FileHistoryDaoTest {
      * Test of deleteItem method, of class FileHistoryDao.
      */
     @Test
-    @Ignore
     public void testDeleteItem() {
-        System.out.println("deleteItem");
-        AbstractItem item = null;
-        FileHistoryDao sut = null;
-        sut.deleteItem(item);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
+        sutWithUser.deleteItem(mockedItem);
     }
 
     /**

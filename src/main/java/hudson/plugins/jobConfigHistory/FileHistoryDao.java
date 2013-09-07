@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -216,6 +217,14 @@ public class FileHistoryDao implements HistoryDao {
     @Override
     public void deleteItem(AbstractItem item) {
         createNewHistoryEntry(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_DELETED());
+        final File currentHistoryDir = getHistoryDir(item.getConfigFile());
+        final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
+        final String timestamp = buildDateFormat.format(new Date());
+        final String deletedHistoryName = item.getName() + JobConfigHistoryConsts.DELETED_MARKER + timestamp;
+        final File deletedHistoryDir = new File(currentHistoryDir.getParentFile(), deletedHistoryName);
+        if (!currentHistoryDir.renameTo(deletedHistoryDir)) {
+            LOG.warning("unable to rename deleted history dir to: " + deletedHistoryDir);
+        }
     }
 
     @Override
