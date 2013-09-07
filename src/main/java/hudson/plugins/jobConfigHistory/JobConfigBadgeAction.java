@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import hudson.Extension;
+import hudson.XmlFile;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildBadgeAction;
@@ -73,9 +74,9 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
             }
 
             //get timestamp of config-change
-            final HistoryDao historyDao = PluginUtils.getHistoryDao();
-            final SortedMap<String, HistoryDescr> revisions = historyDao.getRevisions(project);
-            final ArrayList<HistoryDescr> historyDescriptions = new ArrayList<HistoryDescr>(revisions.values());
+            final HistoryDao historyDao = getHistoryDao();
+            final ArrayList<HistoryDescr> historyDescriptions = new ArrayList<HistoryDescr>(
+                    historyDao.getRevisions(project).values());
             if (historyDescriptions.size() > 1) {
                 Collections.sort(historyDescriptions, ParsedDateComparator.INSTANCE);
                 final HistoryDescr lastChange = Collections.min(historyDescriptions, ParsedDateComparator.INSTANCE);
@@ -111,6 +112,15 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
             return historyDescriptions.get(1).getTimestamp();
         }
 
+        /**
+         * For tests.
+         *
+         * @return listener
+         */
+
+        HistoryDao getHistoryDao() {
+            return PluginUtils.getHistoryDao();
+        }
     } // end Listener
 
     /**
@@ -120,7 +130,7 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
      * @return True if badges should appear.
      */
     public boolean showBadge() {
-        return Hudson.getInstance().getPlugin(JobConfigHistory.class).showBuildBadges(build.getProject());
+        return getPlugin().showBuildBadges(build.getProject());
     }
 
     /**
@@ -129,13 +139,10 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
      * @return True if both files exist.
      */
     public boolean oldConfigsExist() {
-        final JobConfigHistory plugin = Hudson.getInstance().getPlugin(JobConfigHistory.class);
-
+        final HistoryDao historyDao = getHistoryDao();
         for (String timestamp : configDates) {
-            final String path = plugin.getJobHistoryRootDir() + "/"
-                    + build.getProject().getFullName().replace("/", "/jobs/") + "/" + timestamp;
-            final File historyDir = new File(path);
-            if (!historyDir.exists() || !new File(historyDir, "config.xml").exists()) {
+            final XmlFile oldRevision = historyDao.getOldRevision(build.getProject(), timestamp);
+            if (!oldRevision.getFile().exists()) {
                 return false;
             }
         }
@@ -190,5 +197,23 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
      */
     public String getUrlName() {
         return "";
+    }
+    /**
+     * Returns the plugin for tests.
+     *
+     * @return plugin
+     */
+    JobConfigHistory getPlugin() {
+        return PluginUtils.getPlugin();
+    }
+
+    /**
+     * For tests.
+     *
+     * @return listener
+     */
+
+    HistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
     }
 }
