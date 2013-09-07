@@ -19,7 +19,7 @@ import org.kohsuke.stapler.export.ExportedBean;
  * @author Stefan Brausch
  */
 @ExportedBean(defaultVisibility = 999)
-public class ConfigInfo implements Comparable<ConfigInfo>{
+public class ConfigInfo implements Comparable<ConfigInfo>, ParsedDate {
 
     /** The display name of the user. */
     private final String user;
@@ -50,16 +50,16 @@ public class ConfigInfo implements Comparable<ConfigInfo>{
      * @param item
      *            a project
      * @param file
-     *            pointing to {@code config.xml}
+     *            pointing to {@literal config.xml}
      * @param histDescr
      *            metadata of the change
      * @return a new ConfigInfo object.
      */
     public static ConfigInfo create(final AbstractItem item, final File file, final HistoryDescr histDescr) {
-        final String encodedURL = getEncodedUrl(file);
+        final String fileUrl = getEncodedUrl(file);
         return new ConfigInfo(
                 item.getFullName(),
-                encodedURL,
+                fileUrl,
                 histDescr.getTimestamp(),
                 histDescr.getUser(),
                 histDescr.getOperation(),
@@ -206,6 +206,7 @@ public class ConfigInfo implements Comparable<ConfigInfo>{
      *
      * @return The parsed date as a java.util.Date.
      */
+    @Override
     public Date parsedDate() {
         try {
             return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(getDate());
@@ -216,6 +217,6 @@ public class ConfigInfo implements Comparable<ConfigInfo>{
 
     @Override
     public int compareTo(ConfigInfo o) {
-        return ConfigInfoComparator.INSTANCE.compare(this, o);
+        return ParsedDateComparator.INSTANCE.compare(this, o);
     }
 }

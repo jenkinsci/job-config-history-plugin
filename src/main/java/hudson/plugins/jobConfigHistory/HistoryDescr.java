@@ -1,11 +1,15 @@
 package hudson.plugins.jobConfigHistory;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Holder for information about an altering operation saved to {@link JobConfigHistoryConsts#HISTORY_FILE}.
  *
  * @author Stefan Brausch
  */
-public class HistoryDescr {
+public class HistoryDescr implements ParsedDate {
 
     /** Display name of the user doing the operation. */
     private final String user;
@@ -73,4 +77,17 @@ public class HistoryDescr {
         return timestamp;
     }
 
+    /**
+     * Returns a {@link Date}.
+     *
+     * @return The parsed date as a java.util.Date.
+     */
+    @Override
+    public Date parsedDate() {
+        try {
+            return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(getTimestamp());
+        } catch (ParseException ex) {
+            throw new RuntimeException("Could not parse Date" + getTimestamp(), ex);
+        }
+    }
 }

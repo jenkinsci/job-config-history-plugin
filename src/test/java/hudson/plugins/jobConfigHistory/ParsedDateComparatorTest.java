@@ -13,10 +13,10 @@ import static org.mockito.Mockito.when;
  *
  * @author Mirko Friedenhagen
  */
-public class ConfigInfoComparatorTest {
+public class ParsedDateComparatorTest {
 
     /**
-     * Test of compare method, of class ConfigInfoComparator.
+     * Test of compare method, of class ParsedDateComparator.
      */
     @Test
     public void testCompare() throws UnsupportedEncodingException {
@@ -30,7 +30,7 @@ public class ConfigInfoComparatorTest {
         ConfigInfo ci1 = ConfigInfo.create(itemMock, new File(""), descrMock);
         ConfigInfo ci2 = ConfigInfo.create(itemMock, new File(""), descrMock);
         int expResult = 0;
-        int result = ConfigInfoComparator.INSTANCE.compare(ci1, ci2);
+        int result = ParsedDateComparator.INSTANCE.compare(ci1, ci2);
         assertEquals(expResult, result);
     }
 

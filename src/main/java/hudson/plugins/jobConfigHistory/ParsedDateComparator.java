@@ -4,22 +4,22 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * Comparator for {@link ConfigInfo}, sort order depends on {@link ConfigInfo#parsedDate()}.
+ * Comparator for {@link ParsedDate}, sort order depends on {@link ParsedDate#parsedDate()}.
  *
  * Sort in descending order.
  *
  * @author mfriedenhagen
  */
 @SuppressWarnings("serial")
-final class ConfigInfoComparator implements Comparator<ConfigInfo>, Serializable {
+final class ParsedDateComparator implements Comparator<ParsedDate>, Serializable {
 
     /**
      * No need to create more than one instance.
      */
-    public static final ConfigInfoComparator INSTANCE = new ConfigInfoComparator();
+    public static final ParsedDateComparator INSTANCE = new ParsedDateComparator();
 
     /** {@inheritDoc} */
-    public int compare(final ConfigInfo ci1, final ConfigInfo ci2) {
+    public int compare(final ParsedDate ci1, final ParsedDate ci2) {
         return ci2.parsedDate().compareTo(ci1.parsedDate());
     }
 }
