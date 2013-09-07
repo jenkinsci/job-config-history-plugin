@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Date;
 
 import hudson.Extension;
-import hudson.XmlFile;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildBadgeAction;
@@ -14,7 +13,6 @@ import hudson.model.Hudson;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
-import java.util.Map;
 import java.util.SortedMap;
 import jenkins.model.RunAction2;
 
@@ -75,22 +73,17 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
             }
 
             //get timestamp of config-change
-            final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
             final HistoryDao historyDao = PluginUtils.getHistoryDao();
             final SortedMap<String, HistoryDescr> revisions = historyDao.getRevisions(project);
-            for (Map.Entry<String, HistoryDescr> revision : revisions.entrySet()) {
-                final XmlFile historyXml = historyDao.getOldRevision(project, revision.getKey());
-                final File historyDir = historyXml.getFile();
-                final ConfigInfo config = ConfigInfo.create(project, historyDir, revision.getValue());
-                configs.add(config);
-            }
-            if (configs.size() > 1) {
-                Collections.sort(configs, ParsedDateComparator.INSTANCE);
-                final ConfigInfo lastChange = Collections.min(configs, ParsedDateComparator.INSTANCE);
+            final ArrayList<HistoryDescr> historyDescriptions = new ArrayList<HistoryDescr>(revisions.values());
+            if (historyDescriptions.size() > 1) {
+                Collections.sort(historyDescriptions, ParsedDateComparator.INSTANCE);
+                final HistoryDescr lastChange = Collections.min(historyDescriptions, ParsedDateComparator.INSTANCE);
                 final Date lastConfigChange = lastChange.parsedDate();
 
                 if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
-                    final String[] dates = {lastChange.getDate(), findLastRelevantConfigChangeDate(configs, lastBuildDate)};
+                    final String[] dates = {lastChange.getTimestamp(),
+                        findLastRelevantConfigChangeDate(historyDescriptions, lastBuildDate)};
                     build.addAction(new JobConfigBadgeAction(dates));
                 }
             }
@@ -103,19 +96,19 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
          * history that shows the difference between the current configuration and the version that was in place when the last
          * build happened.
          *
-         * @param configs An ArrayList full of ConfigInfos.
+         * @param historyDescriptions An ArrayList full of HistoryDescr.
          * @param lastBuildDate The date of the lastBuild (as Date).
          * @return The date of the last relevant config change (as String).
          */
-        private String findLastRelevantConfigChangeDate(ArrayList<ConfigInfo> configs, Date lastBuildDate) {
-            for (int i = 1; i < configs.size(); i++) {
-                final ConfigInfo oldConfigChange = configs.get(i);
+        private String findLastRelevantConfigChangeDate(ArrayList<HistoryDescr> historyDescriptions, Date lastBuildDate) {
+            for (int i = 1; i < historyDescriptions.size(); i++) {
+                final HistoryDescr oldConfigChange = historyDescriptions.get(i);
                 final Date changeDate = oldConfigChange.parsedDate();
                 if (changeDate != null && changeDate.before(lastBuildDate)) {
-                    return oldConfigChange.getDate();
+                    return oldConfigChange.getTimestamp();
                 }
             }
-            return configs.get(1).getDate();
+            return historyDescriptions.get(1).getTimestamp();
         }
 
     } // end Listener
