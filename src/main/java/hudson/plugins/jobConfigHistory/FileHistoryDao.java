@@ -191,7 +191,8 @@ public class FileHistoryDao implements HistoryDao {
     }
 
     /**
-     * Creates a new history entry and copies the old config.xml to the
+     * Creates a new history entry and copies the old config.xml to a timestamped dir.
+     *
      * @param configFile to copy.
      * @param operation operation
      */

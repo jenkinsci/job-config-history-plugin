@@ -17,7 +17,6 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.Extension;
 import hudson.XmlFile;
-import hudson.model.AbstractItem;
 import hudson.model.Item;
 import hudson.model.RootAction;
 import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
@@ -153,12 +152,21 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
         if (!historyRootDir.isDirectory()) {
             LOG.log(FINE, "{0} is not a directory, assuming that no history exists yet.", historyRootDir);
         } else {
-            addConfigs(configs, type, historyRootDir, "");
+            collectConfigs(configs, type, historyRootDir, "");
         }
         return configs;
     }
 
-    private void addConfigs(Collection<ConfigInfo> configs, String type, File rootDir, String prefix) throws IOException {
+    /**
+     * Collects configs.
+     *
+     * @param configs outparameter.
+     * @param type of configs to collect
+     * @param rootDir of config-history.
+     * @param prefix prefix.
+     * @throws IOException 
+     */
+    private void collectConfigs(Collection<ConfigInfo> configs, String type, File rootDir, String prefix) throws IOException {
         final File[] itemDirs;
         if ("deleted".equals(type)) {
             itemDirs = rootDir.listFiles(JobConfigHistory.DELETED_FILTER);
@@ -182,7 +190,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
             final File jobs = new File(itemDir, JobConfigHistoryConsts.JOBS_HISTORY_DIR);
             if (jobs.isDirectory()) {
                 // Recurse into folders.
-                addConfigs(configs, type, jobs, prefix + itemDir.getName() + "/");
+                collectConfigs(configs, type, jobs, prefix + itemDir.getName() + "/");
             }
         }
     }
@@ -191,7 +199,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      * Returns the configuration history entries for one group of system files
      * or deleted jobs.
      *
-     * @param req The incoming StaplerRequest
+     * @param name of the item.
      * @return Configs list for one group of system configuration files.
      * @throws IOException
      *             if one of the history entries might not be read.
