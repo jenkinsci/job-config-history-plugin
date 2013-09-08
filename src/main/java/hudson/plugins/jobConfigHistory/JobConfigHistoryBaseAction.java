@@ -8,13 +8,7 @@ import hudson.security.AccessControlled;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.Stapler;
