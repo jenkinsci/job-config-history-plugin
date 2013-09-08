@@ -1,17 +1,17 @@
 package hudson.plugins.jobConfigHistory;
 
-import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.model.ItemGroup;
-import java.io.File;
 import java.util.List;
 import org.acegisecurity.AccessDeniedException;
+import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import static org.mockito.Mockito.*;
@@ -22,7 +22,7 @@ import org.kohsuke.stapler.StaplerResponse;
  *
  * @author Mirko Friedenhagen
  */
-public class JobConfigHistoryProjectActionTest {
+    public class JobConfigHistoryProjectActionTest {
 
     @Rule
     public UnpackResourceZip testConfigs = UnpackResourceZip.INSTANCE;
@@ -34,6 +34,7 @@ public class JobConfigHistoryProjectActionTest {
     private final AbstractItem mockedProject = mock(AbstractItem.class);
     private final StaplerRequest mockedRequest = mock(StaplerRequest.class);
     //private final StaplerResponse mockedResponse = mock(StaplerResponse.class);
+    private HistoryDao historyDao;
 
 
     public JobConfigHistoryProjectActionTest() {
@@ -42,6 +43,10 @@ public class JobConfigHistoryProjectActionTest {
         when(mockedProject.getFullName()).thenReturn("Test1");
     }
 
+    @Before
+    public void createHistoryDao() {
+        historyDao = new FileHistoryDao(testConfigs.getResource("config-history"), testConfigs.getRoot(), null, 0);
+    }
     /**
      * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
      */
@@ -91,8 +96,7 @@ public class JobConfigHistoryProjectActionTest {
     @Test
     public void testGetJobConfigs() throws Exception {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
-        when(mockedPlugin.getHistoryDir(any(XmlFile.class))).thenReturn(
-                testConfigs.getResource("config-history/jobs/Test1"));
+        when(mockedProject.getRootDir()).thenReturn(testConfigs.getResource("jobs/Test1"));
         final JobConfigHistoryProjectAction sut = createAction();
         final List<ConfigInfo> result = sut.getJobConfigs();
         assertEquals(5, result.size());
@@ -104,8 +108,8 @@ public class JobConfigHistoryProjectActionTest {
     @Test
     public void testGetJobConfigsEmpty() throws Exception {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
-        when(mockedPlugin.getHistoryDir(any(XmlFile.class))).thenReturn(
-                testConfigs.getResource("config-history/jobs/I_DO_NOT_EXIST"));
+        when(mockedProject.getRootDir()).thenReturn(testConfigs.getResource("jobs/Test1"));
+        FileUtils.cleanDirectory(testConfigs.getResource("config-history/jobs/Test1"));
         final JobConfigHistoryProjectAction sut = createAction();
         final List<ConfigInfo> result = sut.getJobConfigs();
         assertEquals(0, result.size());
@@ -117,10 +121,7 @@ public class JobConfigHistoryProjectActionTest {
     @Test
     public void testGetFile() throws Exception {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
-        when(mockedPlugin.getJobHistoryRootDir()).thenReturn(
-                testConfigs.getResource("config-history/jobs"));
-        when(mockedPlugin.getConfigFile(any(File.class))).thenReturn(
-                testConfigs.getResource("config-history/jobs/Test1/2012-11-21_11-40-28/config.xml"));
+        when(mockedProject.getRootDir()).thenReturn(testConfigs.getResource("jobs/Test1"));
         when(mockedRequest.getParameter("timestamp")).thenReturn("2012-11-21_11-40-28");
         final JobConfigHistoryProjectAction sut = createAction();
         String result = sut.getFile();
@@ -255,6 +256,11 @@ public class JobConfigHistoryProjectActionTest {
         @Override
         StaplerRequest getCurrentRequest() {
             return mockedRequest;
+        }
+
+        @Override
+        HistoryDao getHistoryDao() {
+            return historyDao;
         }
     }
 }

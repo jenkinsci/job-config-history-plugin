@@ -10,7 +10,6 @@ import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.kohsuke.stapler.StaplerRequest;
@@ -80,14 +80,13 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     public final List<ConfigInfo> getJobConfigs() throws IOException {
         checkConfigurePermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final File historyRootDir = getPlugin().getHistoryDir(project.getConfigFile());
-        if (historyRootDir.exists()) {
-            for (final File historyDir : historyRootDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
-                final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
-                final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-                final ConfigInfo config = ConfigInfo.create(project, historyDir, histDescr);
-                configs.add(config);
-            }
+        final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(getHistoryDao().getRevisions(project).values());
+        for (final HistoryDescr historyDescr : values) {
+            final String timestamp = historyDescr.getTimestamp();
+            configs.add(ConfigInfo.create(
+                    project,
+                    getHistoryDao().getOldRevision(project, timestamp).getFile().getParentFile(),
+                    historyDescr));
         }
         Collections.sort(configs, ParsedDateComparator.INSTANCE);
         return configs;
@@ -191,25 +190,14 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      */
     private XmlFile getOldConfigXml(String timestamp) {
         checkConfigurePermission();
-
-        final String rootDir = getPlugin().getJobHistoryRootDir().getPath() + "/";
-        File configFile = null;
-        String path = null;
-
+        XmlFile configFile = null;
         if (checkTimestamp(timestamp)) {
-            if (project instanceof MavenModule) {
-                path = rootDir + ((MavenModule) project).getParent().getFullName().replace("/", "/jobs/") + "/modules/"
-                        + ((MavenModule) project).getModuleName().toFileSystemName() + "/" + timestamp;
-            } else {
-                path = rootDir + project.getFullName().replace("/", "/jobs/") + "/" + timestamp;
-            }
-            configFile = getPlugin().getConfigFile(new File(path));
+            configFile = getHistoryDao().getOldRevision(project, timestamp);
         }
-
         if (configFile == null) {
-            throw new IllegalArgumentException("Unable to get history from: " + path);
+            throw new IllegalArgumentException("Unable to get history from for " + timestamp);
         } else {
-            return new XmlFile(configFile);
+            return configFile;
         }
     }
 
@@ -225,10 +213,10 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         checkConfigurePermission();
         final String timestamp = req.getParameter("timestamp");
 
-        final XmlFile xmlFile = getOldConfigXml(timestamp);
+        final XmlFile xmlFile = getHistoryDao().getOldRevision(project, timestamp);
         final InputStream is = new ByteArrayInputStream(xmlFile.asString().getBytes("UTF-8"));
 
-        project.updateByXml(new StreamSource(is));
+        project.updateByXml((Source)new StreamSource(is));
         project.save();
         rsp.sendRedirect(getHudson().getRootUrl() + project.getUrl());
     }
@@ -246,4 +234,14 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         final String timestamp = req.getParameter("timestamp");
         rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
     }
+
+    /**
+     * For tests.
+     *
+     * @return historyDao
+     */
+    HistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
+    }
+
 }

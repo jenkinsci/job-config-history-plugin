@@ -7,6 +7,7 @@ package hudson.plugins.jobConfigHistory;
 import hudson.FilePath;
 import hudson.Util;
 import hudson.XmlFile;
+import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.User;
 
@@ -276,15 +277,21 @@ public class FileHistoryDao implements HistoryDao {
     @Override
     public XmlFile getOldRevision(AbstractItem item, String identifier) {
         final File historyDir = new File(getHistoryDir(item.getConfigFile()), identifier);
-        return new XmlFile(new File(historyDir, "config.xml"));
+        if (item instanceof MavenModule) {
+            final String path = historyDir + ((MavenModule) item).getParent().getFullName().replace("/", "/jobs/") + "/modules/"
+                    + ((MavenModule) item).getModuleName().toFileSystemName() + "/" + identifier;
+            return new XmlFile(getConfigFile(new File(path)));
+        } else {
+            return new XmlFile(getConfigFile(historyDir));
+        }
     }
 
     @Override
     public boolean hasOldRevision(AbstractItem item, String identifier) {
         final XmlFile oldRevision = getOldRevision(item, identifier);
-        return oldRevision.getFile().exists();
-    }    
-            
+        return oldRevision.getFile() != null && oldRevision.getFile().exists();
+    }
+
     /**
      * Creates a new history entry.
      *
@@ -384,5 +391,34 @@ public class FileHistoryDao implements HistoryDao {
         }
     }
 
+    /**
+     * Returns the configuration data file stored in the specified history directory.
+     * It looks for a file with an 'xml' extension that is not named
+     * {@link JobConfigHistoryConsts#HISTORY_FILE}.
+     * <p>
+     * Relies on the assumption that random '.xml' files
+     * will not appear in the history directories.
+     * <p>
+     * Checks that we are in an actual 'history directory' to prevent use for
+     * getting random xml files.
+     * @param historyDir
+     *            The history directory to look under.
+     * @return The configuration file or null if no file is found.
+     */
+    static File getConfigFile(final File historyDir) {
+        File configFile = null;
+        if (HistoryFileFilter.INSTANCE.accept(historyDir)) {
+            // get the *.xml file that is not the JobConfigHistoryConsts.HISTORY_FILE
+            // assumes random .xml files won't appear in the history directory
+            final File[] listing = historyDir.listFiles();
+            for (final File file : listing) {
+                if (!file.getName().equals(JobConfigHistoryConsts.HISTORY_FILE) && file.getName().matches(".*\\.xml$")) {
+                    configFile = file;
+                    break;
+                }
+            }
+        }
+        return configFile;
+    }
 
 }

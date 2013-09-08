@@ -20,7 +20,6 @@ import org.apache.commons.io.FileUtils;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
@@ -304,31 +303,17 @@ public class FileHistoryDaoTest {
      * Test of getHistoryDir method, of class FileHistoryDao.
      */
     @Test
-    @Ignore
     public void testGetHistoryDir() {
-        System.out.println("getHistoryDir");
-        XmlFile xmlFile = null;
-        FileHistoryDao sut = null;
-        File expResult = null;
-        File result = sut.getHistoryDir(xmlFile);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        File result = sutWithUser.getHistoryDir(test1Config);
+        assertEquals(test1History, result);
     }
 
     /**
      * Test of getJobHistoryRootDir method, of class FileHistoryDao.
      */
     @Test
-    @Ignore
     public void testGetJobHistoryRootDir() {
-        System.out.println("getJobHistoryRootDir");
-        FileHistoryDao sut = null;
-        File expResult = null;
-        File result = sut.getJobHistoryRootDir();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(unpackResourceZip.getResource("config-history/jobs"), sutWithUser.getJobHistoryRootDir());
     }
 
     /**
