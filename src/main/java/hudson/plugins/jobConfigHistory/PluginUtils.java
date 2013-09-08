@@ -81,7 +81,7 @@ final class PluginUtils {
         try {
             return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timeStamp);
         } catch (ParseException ex) {
-            throw new RuntimeException("Could not parse Date" + timeStamp, ex);
+            throw new IllegalArgumentException("Could not parse Date" + timeStamp, ex);
         }        
     }
 }

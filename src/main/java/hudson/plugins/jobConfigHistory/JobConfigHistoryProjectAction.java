@@ -5,7 +5,7 @@ import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
-import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
+import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
 

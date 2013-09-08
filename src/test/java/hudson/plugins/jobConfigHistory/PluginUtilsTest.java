@@ -48,7 +48,7 @@ public class PluginUtilsTest {
     /**
      * Test of parsedDate method, of class PluginUtils.
      */
-    @Test(expected = RuntimeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testParsedDateError() {
         String timeStamp = "abc";
         PluginUtils.parsedDate(timeStamp);

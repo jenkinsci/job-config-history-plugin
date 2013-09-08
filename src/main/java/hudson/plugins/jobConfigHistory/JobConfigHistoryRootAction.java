@@ -19,7 +19,7 @@ import hudson.Extension;
 import hudson.XmlFile;
 import hudson.model.Item;
 import hudson.model.RootAction;
-import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
+import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
 import hudson.util.MultipartFormDataParser;

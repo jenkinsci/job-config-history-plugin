@@ -2,7 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.model.Action;
 import hudson.model.Hudson;
-import hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction.SideBySideView.Line;
+import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 
 import java.io.File;
@@ -102,11 +102,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         if (timestamp == null || "null".equals(timestamp)) {
             return false;
         }
-        try {
-            new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timestamp);
-        } catch (ParseException pe) {
-            throw new IllegalArgumentException("Timestamp does not contain a valid date: " + timestamp);
-        }
+        PluginUtils.parsedDate(timestamp);
         return true;
     }
 
@@ -193,58 +189,59 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
             if (previousLeftPos > 0 && leftPos - previousLeftPos > 1) {
                 final Line skippingLine = new Line();
-                skippingLine.skipping = true;
+                skippingLine.setSkipping(true);
                 view.addLine(skippingLine);
             }
 
             for (final DiffRow row : diffRows) {
                 final Tag tag = row.getTag();
                 final Line line = new Line();
-
+                final Line.Item left = line.getLeft();
+                final Line.Item right = line.getRight();
                 if (tag == Tag.INSERT) {
-                    line.left.cssClass = "diff_original";
+                    left.setCssClass("diff_original");
 
-                    line.right.lineNumber = rightPos;
-                    line.right.text = row.getNewLine();
-                    line.right.cssClass = "diff_revised";
+                    right.setLineNumber(rightPos);
+                    right.setText(row.getNewLine());
+                    right.setCssClass("diff_revised");
                     rightPos++;
 
                 } else if (tag == Tag.CHANGE) {
                     if (StringUtils.isNotEmpty(row.getOldLine())) {
-                        line.left.lineNumber = leftPos;
-                        line.left.text = row.getOldLine();
+                        left.setLineNumber(leftPos);
+                        left.setText(row.getOldLine());
                         leftPos++;
                     }
-                    line.left.cssClass = "diff_original";
+                    left.setCssClass("diff_original");
 
                     if (StringUtils.isNotEmpty(row.getNewLine())) {
-                        line.right.lineNumber = rightPos;
-                        line.right.text = row.getNewLine();
+                        right.setLineNumber(rightPos);
+                        right.setText(row.getNewLine());
                         rightPos++;
                     }
-                    line.right.cssClass = "diff_revised";
+                    right.setCssClass("diff_revised");
 
                 } else if (tag == Tag.DELETE) {
-                    line.left.lineNumber = leftPos;
-                    line.left.text = row.getOldLine();
-                    line.left.cssClass = "diff_original";
+                    left.setLineNumber(leftPos);
+                    left.setText(row.getOldLine());
+                    left.setCssClass("diff_original");
                     leftPos++;
 
-                    line.right.cssClass = "diff_revised";
+                    right.setCssClass("diff_revised");
 
                 } else if (tag == Tag.EQUAL) {
-                    line.left.lineNumber = leftPos;
-                    line.left.text = row.getOldLine();
+                    left.setLineNumber(leftPos);
+                    left.setText(row.getOldLine());
                     leftPos++;
 
-                    line.right.lineNumber = rightPos;
-                    line.right.text = row.getNewLine();
+                    right.setLineNumber(rightPos);
+                    right.setText(row.getNewLine());
                     rightPos++;
 
                 } else {
                     throw new IllegalStateException("Unknown tag pattern: " + tag);
                 }
-                line.tag = tag;
+                line.setTag(tag);
                 view.addLine(line);
                 previousLeftPos = leftPos;
             }
@@ -280,144 +277,5 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     StaplerRequest getCurrentRequest() {
         return Stapler.getCurrentRequest();
-    }
-
-
-    /**
-     * Holds information for the SideBySideView.
-     */
-    public static class SideBySideView {
-
-        /**
-         * All lines of the view.
-         */
-        private final List<Line> lines = new ArrayList<Line>();
-
-        /**
-         * Returns the lines of the {@link SideBySideView}.
-         *
-         * @return an unmodifiable view of the lines.
-         */
-        public List<Line> getLines() {
-            return Collections.unmodifiableList(lines);
-        }
-
-        /**
-         * Adds a line.
-         *
-         * @param line A single line.
-         */
-        public void addLine(Line line) {
-            lines.add(line);
-        }
-
-        /**
-         * Deletes all dupes in the given lines.
-         */
-        public void clearDuplicateLines() {
-            final TreeMap<Integer, Line> linesByNumbers = new TreeMap<Integer, Line>();
-            final ArrayList<Line> dupes = new ArrayList<Line>();
-            final Iterator<Line> iter = lines.iterator();
-            while (iter.hasNext()) {
-                final Line line = iter.next();
-                final String lineNum = line.left.getLineNumber();
-                if (lineNum.length() != 0) {
-                    final int lineNumInt = Integer.parseInt(lineNum);
-                    if (linesByNumbers.containsKey(lineNumInt)) {
-                        if (line.tag == Tag.EQUAL) {
-                            iter.remove();
-                        } else {
-                            dupes.add(linesByNumbers.get(lineNumInt));
-                        }
-                    } else {
-                        linesByNumbers.put(lineNumInt, line);
-                    }
-                }
-            }
-            lines.removeAll(dupes);
-        }
-
-        /**
-         * Holds information about a single line, which consists
-         * of the left and right information of the diff.
-         */
-        public static class Line {
-            /**The left version of a modificated line.*/
-            private final Item left = new Item();
-            /**The right version of a modificated line.*/
-            private final Item right = new Item();
-            /**True when line should be skipped.*/
-            private boolean skipping;
-            /**EQUAL, INSERT, CHANGE or DELETE.*/
-            private Tag tag;
-
-
-            /**
-             * Returns the left version of a modificated line.
-             *
-             * @return left item.
-             */
-            public Item getLeft() {
-                return left;
-            }
-
-            /**
-             * Returns the right version of a modificated line.
-             *
-             * @return right item.
-             */
-            public Item getRight() {
-                return right;
-            }
-            /**
-             * Should we skip this line.
-             *
-             * @return true when the line should be skipped.
-             */
-            public boolean isSkipping() {
-                return skipping;
-            }
-
-            /**
-             * Simple representation of a diff element.
-             *
-             * Additional to the the text this includes the linenumber
-             * as well as the corresponding cssClass which signals wether
-             * the item was modified, added or deleted.
-             */
-            public static class Item {
-                /**Line number of Item.*/
-                private Integer lineNumber;
-                /**Text of Item.*/
-                private String text;
-                /**CSS Class of Item.*/
-                private String cssClass;
-
-                /**
-                 * Returns the line number of the Item.
-                 * @return lineNumber.
-                 */
-                public String getLineNumber() {
-                    return lineNumber == null ? "" : String.valueOf(lineNumber);
-                }
-
-                /**
-                 * Returns the text of the Item.
-                 * @return text.
-                 */
-                public String getText() {
-                    return text;
-                }
-
-                /**
-                 * Returns the cssClass of the Item.
-                 *
-                 * @return cssClass.
-                 */
-                public String getCssClass() {
-                    return cssClass;
-                }
-            }
-        }
     }
 }

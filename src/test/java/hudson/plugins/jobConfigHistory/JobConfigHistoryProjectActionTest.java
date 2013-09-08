@@ -199,8 +199,8 @@ public class JobConfigHistoryProjectActionTest {
     public void testGetLines() throws Exception {
         System.out.println("getLines");
         JobConfigHistoryProjectAction sut = null;
-        List<JobConfigHistoryBaseAction.SideBySideView.Line> expResult = null;
-        List<JobConfigHistoryBaseAction.SideBySideView.Line> result = sut.getLines();
+        List<SideBySideView.Line> expResult = null;
+        List<SideBySideView.Line> result = sut.getLines();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
