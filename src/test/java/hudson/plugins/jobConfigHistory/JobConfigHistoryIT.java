@@ -70,8 +70,12 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
 
         assertTrue("Verify system configuration history location", jch.getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
         testCreateRenameDeleteProject(jch);
-
-        assertNull("Verify null when attempting to get history dir for a file outside of HUDSON_ROOT.", jch.getHistoryDir(new XmlFile(new File("/tmp"))));
+        try {
+            jch.getHistoryDir(new XmlFile(new File("/tmp")));
+            fail("Verify IAE when attempting to get history dir for a file outside of HUDSON_ROOT.");
+        } catch (IllegalArgumentException e) {
+            // We are OK here, no access allowed outside of JENKINS_ROOT.
+        }
         assertFalse("Verify false when testing if a file outside of HUDSON_ROOT is saveable.", jch.isSaveable(null, new XmlFile(new File("/tmp/config.xml"))));
     }
 
@@ -293,7 +297,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             final File expectedConfigDir = new File(jobHistoryRootFile, "testproject");
             assertEquals("Verify history dir configured as expected.", expectedConfigDir, jch.getHistoryDir(project.getConfigFile()));
             assertTrue("Verify project config history directory created: " + expectedConfigDir, expectedConfigDir.exists());
-            
+
             //since sometimes two history entries are created, we just check
             //if one of them contains "Created"
             boolean createdEntryFound = false;
@@ -319,7 +323,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             // delete project and verify the history directory is gone
             project.delete();
             assertFalse("Verify on delete project config history directory removed(renamed): " + newExpectedConfigDir, newExpectedConfigDir.exists());
-            
+
             String deletedDir = null;
             for (File file : expectedConfigDir.getParentFile().listFiles()) {
                 if (file.getName().contains("renamed_testproject" + JobConfigHistoryConsts.DELETED_MARKER)) {
@@ -338,14 +342,14 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
                 }
             }
             assertTrue("Verify one \'deleted\' history entry exists.", deletedEntryFound);
-            
+
         } catch (IOException e) {
             fail("Unable to complete project creation/rename test: " + e);
         } catch (InterruptedException e) {
             fail("Interrupted, unable to test project deletion: " + e);
         }
     }
-    
+
     /**
      * Tests if project can still be built after the config history root dir has been changed.
      * (I.e. the project exists but has no configs.)
@@ -355,7 +359,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             final FreeStyleProject project = createFreeStyleProject("bla");
             final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
             assertTrue("Verify project history entry is not empty.", projectAction.getJobConfigs().size() > 0);
-            
+
             final HtmlForm form = webClient.goTo("configure").getFormByName("config");
             form.getInputByName("historyRootDir").setValueAttribute("newDir");
             submit(form);
