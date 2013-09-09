@@ -320,6 +320,16 @@ public class FileHistoryDaoTest {
     }
 
     /**
+     * Test of getHistoryDir method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetHistoryDirOfSystemXml() throws IOException {
+        final XmlFile systemXmlFile = new XmlFile(new File(jenkinsHome, "jenkins.xml"));
+        File result = sutWithUser.getHistoryDir(systemXmlFile);
+        assertThat(result.getPath(), endsWith(File.separatorChar + "jenkins"));
+    }
+
+    /**
      * Test of getJobHistoryRootDir method, of class FileHistoryDao.
      */
     @Test
