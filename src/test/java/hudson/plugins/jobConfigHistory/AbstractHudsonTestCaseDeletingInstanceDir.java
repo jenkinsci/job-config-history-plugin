@@ -21,6 +21,11 @@ public abstract class AbstractHudsonTestCaseDeletingInstanceDir extends HudsonTe
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(AbstractHudsonTestCaseDeletingInstanceDir.class.getName());
 
+    static {
+        new File("target/tmp").mkdir();
+        System.setProperty("java.io.tmpdir", "target/tmp");
+    }
+
     /** {@inheritDoc} */
     @Override
     protected void tearDown() throws Exception {
