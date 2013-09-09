@@ -48,7 +48,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     /**
      * For tests only.
-     * @param hudson
+     *
+     * @param hudson injected jenkins
      */
     JobConfigHistoryBaseAction(Hudson hudson) {
         this.hudson = hudson;
@@ -269,6 +270,11 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return output.toString();
     }
 
+    /**
+     * Overridable for tests.
+     *
+     * @return current request
+     */
     StaplerRequest getCurrentRequest() {
         return Stapler.getCurrentRequest();
     }

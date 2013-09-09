@@ -32,12 +32,20 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     private final JobConfigHistory plugin;
 
     /**The maximum allowed age of history entries in days.*/
-    int maxAge;
+    private int maxAge;
 
+    /**
+     * Standard constructor using instance.
+     */
     public JobConfigHistoryPurger() {
         this(Hudson.getInstance().getPlugin(JobConfigHistory.class));
     }
 
+    /**
+     * For tests with injected plugin.
+     *
+     * @param plugin injected plugin
+     */
     JobConfigHistoryPurger(JobConfigHistory plugin) {
         this.plugin = plugin;
     }
@@ -63,7 +71,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
         }
         if (maxAge > 0) {
             LOG.log(FINE, "checking for history files to purge (max age of {0} days allowed)", maxAge);
-            this.maxAge = maxAge;
+            this.setMaxAge(maxAge);
             purgeHistoryByAge();
         }
     }
@@ -119,7 +127,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
         if (parsedDate != null) {
             historyDate.setTime(parsedDate);
             final Calendar oldestAllowedDate = new GregorianCalendar();
-            oldestAllowedDate.add(Calendar.DAY_OF_YEAR, -maxAge);
+            oldestAllowedDate.add(Calendar.DAY_OF_YEAR, -getMaxAge());
             if (historyDate.before(oldestAllowedDate)) {
                 return true;
             }
@@ -141,5 +149,20 @@ public class JobConfigHistoryPurger extends PeriodicWork {
         if (!dir.delete()) {
             LOG.warning("problem deleting history directory: " + dir);
         }
+    }
+
+    /**
+     * @return the maxAge
+     */
+    int getMaxAge() {
+        return maxAge;
+    }
+
+    /**
+     * For tests.
+     * @param maxAge the maxAge to set
+     */
+    void setMaxAge(int maxAge) {
+        this.maxAge = maxAge;
     }
 }

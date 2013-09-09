@@ -75,7 +75,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             jch.getHistoryDir(new XmlFile(new File("/tmp")));
             fail("Verify IAE when attempting to get history dir for a file outside of HUDSON_ROOT.");
         } catch (IllegalArgumentException e) {
-            // We are OK here, no access allowed outside of JENKINS_ROOT.
+            assertNotNull("Expected IAE", e);
         }
         assertFalse("Verify false when testing if a file outside of HUDSON_ROOT is saveable.", jch.isSaveable(null, new XmlFile(new File("/tmp/config.xml"))));
     }

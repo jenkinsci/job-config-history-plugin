@@ -84,7 +84,7 @@ public class JobConfigHistoryPurgerTest {
     @Test
     public void testPurgeSystemOrJobHistory() throws IOException {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
-        sut.maxAge = 1;
+        sut.setMaxAge(1);
         final File oldItemDir = tempFolder.newFolder(getFormattedDate(twoDaysAgo()));
         new File(oldItemDir, JobConfigHistoryConsts.HISTORY_FILE).createNewFile();
         final File newItemDir = tempFolder.newFolder(getFormattedDate(now()));
@@ -101,7 +101,7 @@ public class JobConfigHistoryPurgerTest {
     @Test
     public void testPurgeSystemOrJobHistoryNoItems() throws IOException {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
-        sut.maxAge = 1;
+        sut.setMaxAge(1);
         File[] itemDirs = {};
         sut.purgeSystemOrJobHistory(itemDirs);
         sut.purgeSystemOrJobHistory(null);
@@ -113,7 +113,7 @@ public class JobConfigHistoryPurgerTest {
     @Test
     public void testPurgeSystemOrJobHistoryItemIsAFile() throws IOException {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
-        sut.maxAge = 1;
+        sut.setMaxAge(1);
         final File newFile = tempFolder.newFile(getFormattedDate(now()));
         File[] itemDirs = {newFile};
         sut.purgeSystemOrJobHistory(itemDirs);
@@ -126,7 +126,7 @@ public class JobConfigHistoryPurgerTest {
     @Test
     public void testPurgeSystemOrJobHistoryItemHasNoHistory() throws IOException {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
-        sut.maxAge = 1;
+        sut.setMaxAge(1);
         final File newFolder = tempFolder.newFolder(getFormattedDate(twoDaysAgo()));
         File[] itemDirs = {newFolder};
         sut.purgeSystemOrJobHistory(itemDirs);
@@ -155,7 +155,7 @@ public class JobConfigHistoryPurgerTest {
     @Test
     public void testIsTooOldInvalidFormat() {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
-        sut.maxAge = 1;
+        sut.setMaxAge(1);
         assertFalse(sut.isTooOld(new File("invalid format")));
     }
 
@@ -186,7 +186,7 @@ public class JobConfigHistoryPurgerTest {
 
     private boolean testIsOlderThanOneDay(final Date date) {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin);
-        sut.maxAge = 1;
+        sut.setMaxAge(1);
         File historyDir = new File(getFormattedDate(date));
         return sut.isTooOld(historyDir);
     }
