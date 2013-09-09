@@ -148,7 +148,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         Thread.sleep(SLEEP_TIME);
         hudson.save();
         project.save();
-        assertTrue("Verify duplicate project history entries.", projectAction.getJobConfigs().size() > 2);
+        assertTrue("Verify duplicate project history entries.", projectAction.getJobConfigs().size() >= 2);
         assertTrue("Verify duplicate system history entries.", hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length > 1);
     }
 
