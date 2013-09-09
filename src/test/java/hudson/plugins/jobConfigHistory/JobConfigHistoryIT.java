@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import org.xml.sax.SAXException;
 
 /**
  * @author jborghi@cisco.com
@@ -96,64 +97,59 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         testCreateRenameDeleteProject(jch);
     }
 
-    public void testSkipDuplicateHistory() {
+    public void testSkipDuplicateHistory() throws IOException, SAXException, Exception {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        try {
-            HtmlForm form = webClient.goTo("configure").getFormByName("config");
-            form.getInputByName("saveSystemConfiguration").setChecked(true);
-            submit(form);
+        HtmlForm form = webClient.goTo("configure").getFormByName("config");
+        form.getInputByName("saveSystemConfiguration").setChecked(true);
+        submit(form);
 
-            final FreeStyleProject project = createFreeStyleProject("testproject");
-            final File projectHistoryDir = jch.getHistoryDir(project.getConfigFile());
-            final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
+        final FreeStyleProject project = createFreeStyleProject("testproject");
+        final File projectHistoryDir = jch.getHistoryDir(project.getConfigFile());
+        final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
 
-            // clear out all history - setting to 1 will clear out all with the expectation that we are creating a new entry
-            jch.setMaxHistoryEntries("1");
-            jch.checkForPurgeByQuantity(projectHistoryDir);
+        // clear out all history - setting to 1 will clear out all with the expectation that we are creating a new entry
+        jch.setMaxHistoryEntries("1");
+        jch.checkForPurgeByQuantity(projectHistoryDir);
 
-            // reset to empty value
-            jch.setMaxHistoryEntries("");
-            for (int i = 0; i < 3; i++) {
-                Thread.sleep(SLEEP_TIME);
-                project.save();
-            }
-            assertEquals("Verify 1 project history entry after 3 duplicate saves.", 1, projectAction.getJobConfigs().size());
-
-            // system history test - skip duplicate history -hardcode path to Hudson config
-            final File hudsonConfigDir = new File(hudson.root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR + "/config");
-            for (int i = 0; i < 3; i++) {
-                Thread.sleep(SLEEP_TIME);
-                hudson.save();
-            }
-            assertEquals("Verify 1 system history entry after 3 duplicate saves.", 1, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
-
-            // verify non-duplicate history is saved
-            project.setDescription("new description");
+        // reset to empty value
+        jch.setMaxHistoryEntries("");
+        for (int i = 0; i < 3; i++) {
+            Thread.sleep(SLEEP_TIME);
             project.save();
-            assertEquals("Verify non duplicate project history saved.", 2, projectAction.getJobConfigs().size());
+        }
+        assertEquals("Verify 1 project history entry after 3 duplicate saves.", 1, projectAction.getJobConfigs().size());
 
-            // corrupt history record and verify new entry will be saved
-            final File[] historyDirs = jch.getHistoryDir(project.getConfigFile()).listFiles(JobConfigHistory.HISTORY_FILTER);
-            Arrays.sort(historyDirs, Collections.reverseOrder());
-            (new File(historyDirs[0], "config.xml")).renameTo(new File(historyDirs[0], "config"));
-            assertNull("Verify history dir is corrupted.", jch.getConfigFile(historyDirs[0]));
-            assertTrue("Verify configuration is saveable when history is corrupted.", jch.isSaveable(project, project.getConfigFile()));
-
-            // reconfigure to allow saving duplicate history
-            form = webClient.goTo("configure").getFormByName("config");
-            form.getInputByName("skipDuplicateHistory").setChecked(false);
-            submit(form);
-
-            // perform additional save and verify more than one history entries exist
+        // system history test - skip duplicate history -hardcode path to Hudson config
+        final File hudsonConfigDir = new File(hudson.root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR + "/config");
+        for (int i = 0; i < 3; i++) {
             Thread.sleep(SLEEP_TIME);
             hudson.save();
-            project.save();
-            assertTrue("Verify duplicate project history entries.", projectAction.getJobConfigs().size() > 2);
-            assertTrue("Verify duplicate system history entries.", hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length > 1);
-
-        } catch (Exception e) {
-            fail("Unable to complete duplicate history test: " + e);
         }
+        assertEquals("Verify 1 system history entry after 3 duplicate saves.", 1, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+
+        // verify non-duplicate history is saved
+        project.setDescription("new description");
+        project.save();
+        assertEquals("Verify non duplicate project history saved.", 2, projectAction.getJobConfigs().size());
+
+        // corrupt history record and verify new entry will be saved
+        final File[] historyDirs = jch.getHistoryDir(project.getConfigFile()).listFiles(JobConfigHistory.HISTORY_FILTER);
+        Arrays.sort(historyDirs, Collections.reverseOrder());
+        (new File(historyDirs[0], "config.xml")).renameTo(new File(historyDirs[0], "config"));
+        assertNull("Verify history dir is corrupted.", jch.getConfigFile(historyDirs[0]));
+        assertTrue("Verify configuration is saveable when history is corrupted.", jch.isSaveable(project, project.getConfigFile()));
+
+        // reconfigure to allow saving duplicate history
+        form = webClient.goTo("configure").getFormByName("config");
+        form.getInputByName("skipDuplicateHistory").setChecked(false);
+        submit(form);
+
+        // perform additional save and verify more than one history entries exist
+        Thread.sleep(SLEEP_TIME);
+        hudson.save();
+        project.save();
+        assertTrue("Verify duplicate project history entries.", projectAction.getJobConfigs().size() > 2);
+        assertTrue("Verify duplicate system history entries.", hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length > 1);
     }
 
     public void testFormValidation() {

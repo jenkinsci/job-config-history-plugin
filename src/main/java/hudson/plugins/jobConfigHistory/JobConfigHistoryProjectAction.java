@@ -83,9 +83,10 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(getHistoryDao().getRevisions(project).values());
         for (final HistoryDescr historyDescr : values) {
             final String timestamp = historyDescr.getTimestamp();
+            final XmlFile oldRevision = getHistoryDao().getOldRevision(project, timestamp);
             configs.add(ConfigInfo.create(
                     project,
-                    getHistoryDao().getOldRevision(project, timestamp).getFile().getParentFile(),
+                    oldRevision.getFile().getParentFile(),
                     historyDescr));
         }
         Collections.sort(configs, ParsedDateComparator.INSTANCE);
