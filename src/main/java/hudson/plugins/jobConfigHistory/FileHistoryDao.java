@@ -259,19 +259,23 @@ public class FileHistoryDao implements HistoryDao {
     @Override
     public SortedMap<String, HistoryDescr> getRevisions(AbstractItem item) {
         final File historiesDir = getHistoryDir(item.getConfigFile());
-        final File[] historyDirs = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
+        final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
         final TreeMap<String, HistoryDescr> map = new TreeMap<String, HistoryDescr>();
-        for (File historyDir : historyDirs) {
-            final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
-            final HistoryDescr historyDescription;
-            try {
-                historyDescription = (HistoryDescr) historyXml.read();
-            } catch (IOException ex) {
-                throw new RuntimeException("Unable to read history for " + item.getName(), ex);
+        if (historyDirsOfItem == null) {
+            return map;
+        } else {
+            for (File historyDir : historyDirsOfItem) {
+                final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+                final HistoryDescr historyDescription;
+                try {
+                    historyDescription = (HistoryDescr) historyXml.read();
+                } catch (IOException ex) {
+                    throw new RuntimeException("Unable to read history for " + item.getName(), ex);
+                }
+                map.put(historyDir.getName(), historyDescription);
             }
-            map.put(historyDir.getName(), historyDescription);
+            return map;
         }
-        return map;
     }
 
     @Override
@@ -330,8 +334,7 @@ public class FileHistoryDao implements HistoryDao {
         final String configRootDir = xmlFile.getFile().getParent();
         final String hudsonRootDir = jenkinsHome.getPath();
         if (!configRootDir.startsWith(hudsonRootDir)) {
-            LOG.warning("Trying to get history dir for object outside of HUDSON: " + xmlFile);
-            return null;
+            throw new IllegalArgumentException("Trying to get history dir for object outside of HUDSON: " + xmlFile);
         }
         //if the file is stored directly under HUDSON_ROOT, it's a system config
         //so create a distinct directory
@@ -371,20 +374,20 @@ public class FileHistoryDao implements HistoryDao {
      */
     static void purgeOldEntries(final File itemHistoryRoot, final int maxEntries) {
         if (maxEntries > 0) {
-            LOG.fine("checking for history files to purge (" + maxEntries + " max allowed)");
+            LOG.log(Level.FINE, "checking for history files to purge ({0} max allowed)", maxEntries);
             final int entriesToLeave = maxEntries - 1;
             final File[] historyDirs = itemHistoryRoot.listFiles(HistoryFileFilter.INSTANCE);
             if (historyDirs != null && historyDirs.length >= entriesToLeave) {
                 Arrays.sort(historyDirs, Collections.reverseOrder());
                 for (int i = entriesToLeave; i < historyDirs.length; i++) {
-                    LOG.fine("purging old directory from history logs: " + historyDirs[i]);
+                    LOG.log(Level.FINE, "purging old directory from history logs: {0}", historyDirs[i]);
                     for (File file : historyDirs[i].listFiles()) {
                         if (!file.delete()) {
-                            LOG.warning("problem deleting history file: " + file);
+                            LOG.log(Level.WARNING, "problem deleting history file: {0}", file);
                         }
                     }
                     if (!historyDirs[i].delete()) {
-                        LOG.warning("problem deleting history directory: " + historyDirs[i]);
+                        LOG.log(Level.WARNING, "problem deleting history directory: {0}", historyDirs[i]);
                     }
                 }
             }

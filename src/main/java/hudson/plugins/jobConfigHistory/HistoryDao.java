@@ -49,13 +49,13 @@ public interface HistoryDao {
     void renameItem(AbstractItem item, String oldName, String newName);
 
     /**
-     * Returns a sorted list of all revisions for this item.
+     * Returns a sorted map of all revisions for this item.
      *
      * The key is an identifier which may be used in
      * {@link HistoryDao#getOldRevision(hudson.model.AbstractItem, java.lang.String)}
      *
      * @param item project
-     * @return old configurations
+     * @return old revisions mapped to the identifier.
      */
     SortedMap<String, HistoryDescr> getRevisions(AbstractItem item);
 

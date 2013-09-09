@@ -277,6 +277,17 @@ public class FileHistoryDaoTest {
     }
 
     /**
+     * Test of getRevisions method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetRevisionsForItemWithoutHistory() throws IOException {
+        String jobWithoutHistory = "NewJobWithoutHistory";
+        File newJobDir = unpackResourceZip.getResource("jobs/" + jobWithoutHistory);
+        when(mockedItem.getRootDir()).thenReturn(newJobDir);
+        assertEquals(0, sutWithUser.getRevisions(mockedItem).size());
+    }
+
+    /**
      * Test of getOldRevision method, of class FileHistoryDao.
      */
     @Test
