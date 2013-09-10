@@ -29,8 +29,8 @@ public class ParsedDateComparatorTest {
      */
     @Test
     public void testCompare() {
-        assertEquals(0, ParsedDateComparator.INSTANCE.compare(historyDescr, historyDescrClone));
-        assertEquals(0, ParsedDateComparator.INSTANCE.compare(historyDescrClone, historyDescr));
+        assertEquals(0, ParsedDateComparator.DESCENDING.compare(historyDescr, historyDescrClone));
+        assertEquals(0, ParsedDateComparator.DESCENDING.compare(historyDescrClone, historyDescr));
     }
 
     /**
@@ -39,10 +39,9 @@ public class ParsedDateComparatorTest {
     @Test
     public void testSortAndMin() {
         final List<HistoryDescr> list = Arrays.asList(historyDescr, historyDescrNewer);
-        Collections.sort(list, ParsedDateComparator.INSTANCE);
+        Collections.sort(list, ParsedDateComparator.DESCENDING);
         assertEquals(historyDescr, list.get(1));
         assertEquals(historyDescrNewer, list.get(0));
-        assertEquals(historyDescrNewer, Collections.min(list, ParsedDateComparator.INSTANCE));
+        assertEquals(historyDescrNewer, Collections.min(list, ParsedDateComparator.DESCENDING));
     }
-
 }

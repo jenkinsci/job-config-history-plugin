@@ -75,8 +75,8 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
             final ArrayList<HistoryDescr> historyDescriptions = new ArrayList<HistoryDescr>(
                     historyDao.getRevisions(project).values());
             if (historyDescriptions.size() > 1) {
-                Collections.sort(historyDescriptions, ParsedDateComparator.INSTANCE);
-                final HistoryDescr lastChange = Collections.min(historyDescriptions, ParsedDateComparator.INSTANCE);
+                Collections.sort(historyDescriptions, ParsedDateComparator.DESCENDING);
+                final HistoryDescr lastChange = Collections.min(historyDescriptions, ParsedDateComparator.DESCENDING);
                 final Date lastConfigChange = lastChange.parsedDate();
 
                 if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {

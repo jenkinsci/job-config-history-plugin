@@ -14,9 +14,9 @@ import java.util.Comparator;
 final class ParsedDateComparator implements Comparator<ParsedDate>, Serializable {
 
     /**
-     * No need to create more than one instance.
+     * No need to create more than one instance for descending.
      */
-    public static final ParsedDateComparator INSTANCE = new ParsedDateComparator();
+    public static final ParsedDateComparator DESCENDING = new ParsedDateComparator();
 
     /** {@inheritDoc} */
     public int compare(final ParsedDate ci1, final ParsedDate ci2) {

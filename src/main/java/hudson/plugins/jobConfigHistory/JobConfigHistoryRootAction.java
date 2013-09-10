@@ -58,7 +58,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      * {@inheritDoc}
      *
      * Make method final, as we always want the same icon file. Returns
-     * {@code null} to hide the icon if the user is not allowed to configure
+     * {@literal null} to hide the icon if the user is not allowed to configure
      * jobs.
      */
     public final String getIconFileName() {
@@ -92,7 +92,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
             configs = getJobConfigs(filter);
         }
 
-        Collections.sort(configs, ParsedDateComparator.INSTANCE);
+        Collections.sort(configs, ParsedDateComparator.DESCENDING);
         return configs;
     }
 
@@ -223,7 +223,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
                 }
             }
         }
-        Collections.sort(configs, ParsedDateComparator.INSTANCE);
+        Collections.sort(configs, ParsedDateComparator.DESCENDING);
         return configs;
     }
 
@@ -231,8 +231,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
      * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as
      * String.
      *
-     * @return content of the {@code config.xml} found in directory given by the
-     *         request parameter {@code file}.
+     * @return content of the {@literal config.xml} found in directory given by the
+     *         request parameter {@literal file}.
      * @throws IOException
      *             if the config file could not be read or converted to an xml
      *             string.
@@ -307,8 +307,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
     }
 
     /**
-     * Parses the incoming {@code POST} request and redirects as
-     * {@code GET showDiffFiles}.
+     * Parses the incoming {@literal POST} request and redirects as
+     * {@literal GET showDiffFiles}.
      *
      * @param req
      *            incoming request
