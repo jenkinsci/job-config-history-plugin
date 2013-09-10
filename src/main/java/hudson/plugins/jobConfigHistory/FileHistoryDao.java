@@ -371,13 +371,8 @@ public class FileHistoryDao implements HistoryDao {
         return new File(historyRootDir, "/" + JobConfigHistoryConsts.JOBS_HISTORY_DIR);
     }
 
-    /**
-     * Purges old entries for the given history root to maxEntries.
-     *
-     * @param itemHistoryRoot directory to inspect.
-     * @param maxEntries maximum number of entries.
-     */
-    static void purgeOldEntries(final File itemHistoryRoot, final int maxEntries) {
+    @Override
+    public void purgeOldEntries(final File itemHistoryRoot, final int maxEntries) {
         if (maxEntries > 0) {
             LOG.log(Level.FINE, "checking for history files to purge ({0} max allowed)", maxEntries);
             final int entriesToLeave = maxEntries - 1;

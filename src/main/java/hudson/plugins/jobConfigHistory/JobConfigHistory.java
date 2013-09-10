@@ -296,7 +296,7 @@ public class JobConfigHistory extends Plugin {
      */
     @Deprecated
     protected File getJobHistoryRootDir() {
-        return ((FileHistoryDao) PluginUtils.getHistoryDao()).getJobHistoryRootDir();
+        return ((FileHistoryDao) getHistoryDao()).getJobHistoryRootDir();
     }
 
 
@@ -333,7 +333,7 @@ public class JobConfigHistory extends Plugin {
      */
     @Deprecated
     protected File getHistoryDir(final XmlFile xmlFile) {
-        return ((FileHistoryDao) PluginUtils.getHistoryDao()).getHistoryDir(xmlFile);
+        return ((FileHistoryDao) getHistoryDao()).getHistoryDir(xmlFile);
     }
 
     /**
@@ -407,7 +407,7 @@ public class JobConfigHistory extends Plugin {
      * @param xmlFile The config file
      * @return True if it should be saved
      */
-    private boolean checkDuplicate(final XmlFile xmlFile) {
+    boolean checkDuplicate(final XmlFile xmlFile) {
         if (skipDuplicateHistory && hasDuplicateHistory(xmlFile)) {
             LOG.log(Level.FINE, "found duplicate history, skipping save of {0}", xmlFile);
             return false;
@@ -439,7 +439,7 @@ public class JobConfigHistory extends Plugin {
      *           The {@link XmlFile} configuration file under consideration.
      * @return true if previous history is accessible, and the file duplicates the previously saved information.
      */
-    private boolean hasDuplicateHistory(XmlFile xmlFile) {
+    boolean hasDuplicateHistory(XmlFile xmlFile) {
         boolean isDuplicated = false;
 
         final File[] historyDirs = getHistoryDir(xmlFile).listFiles(HISTORY_FILTER);
@@ -480,7 +480,7 @@ public class JobConfigHistory extends Plugin {
                 LOG.warning("maximum number of history entries not formatted properly, unable to purge: " + maxHistoryEntries);
             }
         }
-        FileHistoryDao.purgeOldEntries(itemHistoryRoot, maxEntries);
+        getHistoryDao().purgeOldEntries(itemHistoryRoot, maxEntries);
     }
 
     /**
@@ -533,5 +533,13 @@ public class JobConfigHistory extends Plugin {
         } catch (PatternSyntaxException e) {
             return FormValidation.error("Invalid regexp:\n" + e);
         }
+    }
+
+    /**
+     *
+     * @return the historyDao
+     */
+    HistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
     }
 }

@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
+import java.io.File;
 import java.util.SortedMap;
 
 /**
@@ -76,5 +77,13 @@ public interface HistoryDao {
      * @return old configuration.
      */
     boolean hasOldRevision(AbstractItem item, String identifier);
+
+   /**
+     * Purges old entries for the given history root to maxEntries.
+     *
+     * @param itemHistoryRoot directory to inspect.
+     * @param maxEntries maximum number of entries.
+     */
+    void purgeOldEntries(final File itemHistoryRoot, final int maxEntries);
 }
 

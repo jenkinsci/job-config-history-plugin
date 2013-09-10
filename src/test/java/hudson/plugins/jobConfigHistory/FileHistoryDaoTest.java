@@ -358,7 +358,7 @@ public class FileHistoryDaoTest {
     }
 
     private void testPurgeOldEntries(int maxEntries, final int expectedLength) {
-        FileHistoryDao.purgeOldEntries(test1History, maxEntries);
+        sutWithUserAndNoDuplicateHistory.purgeOldEntries(test1History, maxEntries);
         final int newLength = getHistoryRootForTest1Length();
         assertEquals(expectedLength, newLength);
     }
