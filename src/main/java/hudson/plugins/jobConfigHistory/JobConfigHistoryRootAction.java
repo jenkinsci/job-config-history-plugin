@@ -281,11 +281,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction imple
 
         return link;
     }
-    /**
-     * {@inheritDoc}
-     *
-     * Returns the hudson instance.
-     */
+
     @Override
     protected AccessControlled getAccessControlledObject() {
         return getHudson();
