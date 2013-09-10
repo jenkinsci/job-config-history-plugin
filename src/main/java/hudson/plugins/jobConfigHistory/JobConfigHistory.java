@@ -8,7 +8,6 @@ import hudson.model.Hudson;
 import hudson.model.ItemGroup;
 import hudson.model.Saveable;
 import hudson.model.Descriptor.FormException;
-import hudson.model.User;
 import hudson.util.FormValidation;
 
 import java.io.File;
@@ -297,7 +296,7 @@ public class JobConfigHistory extends Plugin {
      */
     @Deprecated
     protected File getJobHistoryRootDir() {
-        return ((FileHistoryDao)PluginUtils.getHistoryDao()).getJobHistoryRootDir();
+        return ((FileHistoryDao) PluginUtils.getHistoryDao()).getJobHistoryRootDir();
     }
 
 
@@ -334,7 +333,7 @@ public class JobConfigHistory extends Plugin {
      */
     @Deprecated
     protected File getHistoryDir(final XmlFile xmlFile) {
-        return ((FileHistoryDao)PluginUtils.getHistoryDao()).getHistoryDir(xmlFile);
+        return ((FileHistoryDao) PluginUtils.getHistoryDao()).getHistoryDir(xmlFile);
     }
 
     /**
