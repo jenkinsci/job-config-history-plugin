@@ -263,7 +263,12 @@ public class FileHistoryDao implements HistoryDao {
 
     @Override
     public SortedMap<String, HistoryDescr> getRevisions(AbstractItem item) {
-        final File historiesDir = getHistoryDir(item.getConfigFile());
+        return getRevisions(item.getConfigFile());
+    }
+
+    @Override
+    public SortedMap<String, HistoryDescr> getRevisions(XmlFile xmlFile) {
+        final File historiesDir = getHistoryDir(xmlFile);
         final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
         final TreeMap<String, HistoryDescr> map = new TreeMap<String, HistoryDescr>();
         if (historyDirsOfItem == null) {
@@ -275,7 +280,7 @@ public class FileHistoryDao implements HistoryDao {
                 try {
                     historyDescription = (HistoryDescr) historyXml.read();
                 } catch (IOException ex) {
-                    throw new RuntimeException("Unable to read history for " + item.getName(), ex);
+                    throw new RuntimeException("Unable to read history for " + xmlFile, ex);
                 }
                 map.put(historyDir.getName(), historyDescription);
             }
@@ -296,8 +301,19 @@ public class FileHistoryDao implements HistoryDao {
     }
 
     @Override
+    public XmlFile getOldRevision(XmlFile xmlFile, String identifier) {
+        final File historyDir = new File(getHistoryDir(xmlFile), identifier);
+        return new XmlFile(getConfigFile(historyDir));
+    }
+
+    @Override
     public boolean hasOldRevision(AbstractItem item, String identifier) {
-        final XmlFile oldRevision = getOldRevision(item, identifier);
+        return hasOldRevision(item.getConfigFile(), identifier);
+    }
+
+    @Override
+    public boolean hasOldRevision(XmlFile xmlFile, String identifier) {
+        final XmlFile oldRevision = getOldRevision(xmlFile, identifier);
         return oldRevision.getFile() != null && oldRevision.getFile().exists();
     }
 

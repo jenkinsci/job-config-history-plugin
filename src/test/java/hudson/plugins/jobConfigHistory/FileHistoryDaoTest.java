@@ -265,9 +265,22 @@ public class FileHistoryDaoTest {
      * Test of getRevisions method, of class FileHistoryDao.
      */
     @Test
-    public void testGetRevisions() throws IOException {
+    public void testGetRevisions_Item() throws IOException {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getRevisions(mockedItem);
+        testGetRevisions(result);
+    }
+
+    /**
+     * Test of getRevisions method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetRevisions_XmlFile() throws IOException {
+        SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getRevisions(test1Config);
+        testGetRevisions(result);
+    }
+
+    private void testGetRevisions(SortedMap<String, HistoryDescr> result) {
         assertEquals(5, result.size());
         assertEquals("2012-11-21_11-29-12", result.firstKey());
         assertEquals("2012-11-21_11-42-05", result.lastKey());
@@ -291,10 +304,24 @@ public class FileHistoryDaoTest {
      * Test of getOldRevision method, of class FileHistoryDao.
      */
     @Test
-    public void testGetOldRevision() throws IOException {
+    public void testGetOldRevision_Item() throws IOException {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         String identifier = "2012-11-21_11-42-05";
         final XmlFile result = sutWithUserAndNoDuplicateHistory.getOldRevision(mockedItem, identifier);
+        testGetOldRevision(result);
+    }
+
+    /**
+     * Test of getOldRevision method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetOldRevision_XmlFile() throws IOException {
+        String identifier = "2012-11-21_11-42-05";
+        final XmlFile result = sutWithUserAndNoDuplicateHistory.getOldRevision(test1Config, identifier);
+        testGetOldRevision(result);
+    }
+
+    private void testGetOldRevision(final XmlFile result) throws IOException {
         final String xml = result.asString();
         assertThat(xml, startsWith("<?xml version='1.0' encoding='UTF-8'?>"));
         assertThat(xml, endsWith("</project>"));
@@ -304,10 +331,19 @@ public class FileHistoryDaoTest {
      * Test of getOldRevision method, of class FileHistoryDao.
      */
     @Test
-    public void testHasOldRevision() throws IOException {
+    public void testHasOldRevision_Item() throws IOException {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         assertTrue(sutWithUserAndNoDuplicateHistory.hasOldRevision(mockedItem, "2012-11-21_11-42-05"));
         assertFalse(sutWithUserAndNoDuplicateHistory.hasOldRevision(mockedItem, "1914-11-21_11-42-05"));
+    }
+
+    /**
+     * Test of getOldRevision method, of class FileHistoryDao.
+     */
+    @Test
+    public void testHasOldRevision_XmlFile() throws IOException {
+        assertTrue(sutWithUserAndNoDuplicateHistory.hasOldRevision(test1Config, "2012-11-21_11-42-05"));
+        assertFalse(sutWithUserAndNoDuplicateHistory.hasOldRevision(test1Config, "1914-11-21_11-42-05"));
     }
 
     /**
