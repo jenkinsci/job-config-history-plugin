@@ -55,17 +55,22 @@ public class FileHistoryDao implements HistoryDao {
     /** Maximum numbers which should exist. */
     private final int maxHistoryEntries;
 
+    /** Should we save duplicate entries? */
+    private final boolean saveDuplicates;
+
     /**
      * @param historyRootDir where to store history
      * @param jenkinsHome JENKKINS_HOME
      * @param currentUser of operation
      * @param maxHistoryEntries max number of history entries
+     * @param saveDuplicates should we save duplicate entries?
      */
-    FileHistoryDao(final File historyRootDir, File jenkinsHome, User currentUser, int maxHistoryEntries) {
+    FileHistoryDao(final File historyRootDir, File jenkinsHome, User currentUser, int maxHistoryEntries, boolean saveDuplicates) {
         this.historyRootDir = historyRootDir;
         this.jenkinsHome = jenkinsHome;
         this.currentUser = currentUser;
         this.maxHistoryEntries = maxHistoryEntries;
+        this.saveDuplicates = saveDuplicates;
     }
 
     /**

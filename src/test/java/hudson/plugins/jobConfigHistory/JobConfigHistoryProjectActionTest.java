@@ -45,7 +45,7 @@ import org.kohsuke.stapler.StaplerResponse;
 
     @Before
     public void createHistoryDao() {
-        historyDao = new FileHistoryDao(testConfigs.getResource("config-history"), testConfigs.getRoot(), null, 0);
+        historyDao = new FileHistoryDao(testConfigs.getResource("config-history"), testConfigs.getRoot(), null, 0, false);
     }
     /**
      * Test of getIconFileName method, of class JobConfigHistoryProjectAction.

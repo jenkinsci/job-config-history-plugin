@@ -69,7 +69,8 @@ final class PluginUtils {
                 getPlugin().getConfiguredHistoryRootDir(),
                 new File(Hudson.getInstance().root.getPath()),
                 User.current(),
-                maxHistoryEntries);
+                maxHistoryEntries,
+                getPlugin().getSkipDuplicateHistory());
     }
     /**
      * Returns a {@link Date}.
