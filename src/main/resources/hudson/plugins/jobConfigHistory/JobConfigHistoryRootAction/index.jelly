@@ -6,6 +6,7 @@
         <l:task icon="images/24x24/up.gif" href="${rootURL}/" title="${%Back to Dashboard}" />
       	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=system" title="${%Show system configs only}" />
       	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=jobs" title="${%Show job configs only}" />
+		<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=created" title="${%Show created jobs only}" />
       	<l:task icon="plugin/jobConfigHistory/img/edit-find.png" href="?filter=deleted" title="${%Show deleted jobs only}" />
       	<l:task icon="plugin/jobConfigHistory/img/text-x-generic.png" href="?filter=all" title="${%Show all configs}" />
       </l:tasks>
@@ -20,6 +21,9 @@
         <j:when test="${filter == 'jobs'}">
           <h1>${%Job Configuration History}</h1>
         </j:when>
+        <j:when test="${filter == 'created'}">
+          <h1>${%Job Creation History}</h1>
+        </j:when>
         <j:when test="${filter == 'deleted'}">
           <h1>${%Job Deletion History}</h1>
         </j:when>
@@ -30,6 +34,7 @@
       
       <a href="?filter=system">${%Show system configs only}</a> <br />
       <a href="?filter=jobs">${%Show job configs only}</a> <br />
+      <a href="?filter=created">${%Show created jobs only}</a> <br />
       <a href="?filter=deleted">${%Show deleted jobs only}</a> <br />
       <a href="?filter=all">${%Show all configs}</a> <br />
       
@@ -51,7 +56,7 @@
                 <tr>
                   <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
                   <j:choose>
-                    <j:when test="${filter == 'jobs' || filter == 'deleted'}">
+                    <j:when test="${filter == 'jobs' || filter == 'deleted' || filter == 'created'}">
                       <td class="pane-header" align="left">${%Job configuration}</td>
                     </j:when>
                     <j:when test="${filter == 'all'}">
