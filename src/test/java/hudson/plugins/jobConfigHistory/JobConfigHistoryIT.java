@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import org.xml.sax.SAXException;
 
@@ -257,32 +258,27 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         }
     }
 
-    public void testAbsPathHistoryRootDir() {
+    public void testAbsPathHistoryRootDir() throws Exception {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        try {
-            // create a unique name, then delete the empty file - will be recreated later
-            final File root = File.createTempFile("jobConfigHistory.test_abs_path", null);
-            final String absolutePath = root.getPath();
-            root.delete();
+        // create a unique name, then delete the empty file - will be recreated later
+        final File root = File.createTempFile("jobConfigHistory.test_abs_path", null).getCanonicalFile();
+        final String absolutePath = root.getPath();
+        root.delete();
 
-            final HtmlForm form = webClient.goTo("configure").getFormByName("config");
-            form.getInputByName("historyRootDir").setValueAttribute(absolutePath);
-            submit(form);
-            assertEquals("Verify history root configured at absolute path.", new File(root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
+        final HtmlForm form = webClient.goTo("configure").getFormByName("config");
+        form.getInputByName("historyRootDir").setValueAttribute(absolutePath);
+        submit(form);
+        assertEquals("Verify history root configured at absolute path.", new File(root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
 
-            // save something
-            createFreeStyleProject();
-            assertTrue("Verify history root exists.", root.exists());
+        // save something
+        createFreeStyleProject();
+        assertTrue("Verify history root exists.", root.exists());
 
-            // cleanup - Hudson doesn't know about these files we created
-            root.listFiles(DELETE_FILTER);
-            root.delete();
-            // not really needed, but helpful so we don't clutter the test host with unnecessary files
-            assertFalse("Verify cleanup of history files: " + root, root.exists());
-
-        } catch (Exception e) {
-            fail("Unable to complete history root absolute path test: " + e);
-        }
+        // cleanup - Hudson doesn't know about these files we created
+        root.listFiles(DELETE_FILTER);
+        root.delete();
+        // not really needed, but helpful so we don't clutter the test host with unnecessary files
+        assertFalse("Verify cleanup of history files: " + root, root.exists());
     }
 
     private void testCreateRenameDeleteProject(final JobConfigHistory jch) {
