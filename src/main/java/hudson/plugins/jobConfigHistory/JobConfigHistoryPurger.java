@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,12 +34,15 @@ public class JobConfigHistoryPurger extends PeriodicWork {
 
     /**The maximum allowed age of history entries in days.*/
     private int maxAge;
+    
+    /**The dao.*/
+    private HistoryDao historyDao;
 
     /**
      * Standard constructor using instance.
      */
     public JobConfigHistoryPurger() {
-        this(Hudson.getInstance().getPlugin(JobConfigHistory.class));
+        this(Hudson.getInstance().getPlugin(JobConfigHistory.class), PluginUtils.getHistoryDao());
     }
 
     /**
@@ -46,8 +50,9 @@ public class JobConfigHistoryPurger extends PeriodicWork {
      *
      * @param plugin injected plugin
      */
-    JobConfigHistoryPurger(JobConfigHistory plugin) {
+    JobConfigHistoryPurger(JobConfigHistory plugin, HistoryDao historyDao) {
         this.plugin = plugin;
+        this.historyDao = historyDao;
     }
 
     @Override
@@ -98,8 +103,10 @@ public class JobConfigHistoryPurger extends PeriodicWork {
                     for (File historyDir : historyDirs) {
                         //historyDir: e.g. 2013-01-18_17-33-51
                         if (isTooOld(historyDir)) {
-                            LOG.log(FINEST, "Should delete: {0}", historyDir);
-                            deleteDirectory(historyDir);
+                            if (!historyDao.isCreatedEntry(historyDir)) {
+                                LOG.log(FINEST, "Should delete: {0}", historyDir);
+                                deleteDirectory(historyDir);
+                            }
                         } else {
                             break;
                         }
@@ -143,11 +150,11 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     void deleteDirectory(File dir) {
         for (File file : dir.listFiles()) {
             if (!file.delete()) {
-                LOG.warning("problem deleting history file: " + file);
+                LOG.log(Level.WARNING, "problem deleting history file: {0}", file);
             }
         }
         if (!dir.delete()) {
-            LOG.warning("problem deleting history directory: " + dir);
+            LOG.log(Level.WARNING, "problem deleting history directory: {0}", dir);
         }
     }
 
@@ -164,5 +171,13 @@ public class JobConfigHistoryPurger extends PeriodicWork {
      */
     void setMaxAge(int maxAge) {
         this.maxAge = maxAge;
+    }
+    
+    /**
+     *
+     * @return the historyDao
+     */
+    HistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
     }
 }

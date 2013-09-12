@@ -396,19 +396,48 @@ public class FileHistoryDao implements HistoryDao {
             if (historyDirs != null && historyDirs.length >= entriesToLeave) {
                 Arrays.sort(historyDirs, Collections.reverseOrder());
                 for (int i = entriesToLeave; i < historyDirs.length; i++) {
+                    if (isCreatedEntry(historyDirs[i])) {
+                        continue;
+                    }
                     LOG.log(Level.FINE, "purging old directory from history logs: {0}", historyDirs[i]);
-                    for (File file : historyDirs[i].listFiles()) {
-                        if (!file.delete()) {
-                            LOG.log(Level.WARNING, "problem deleting history file: {0}", file);
-                        }
-                    }
-                    if (!historyDirs[i].delete()) {
-                        LOG.log(Level.WARNING, "problem deleting history directory: {0}", historyDirs[i]);
-                    }
+                    deleteDirectory(historyDirs[i]);
                 }
             }
         }
     }
+
+    @Override
+    public boolean isCreatedEntry(File historyDir) {
+        final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+        try {
+            final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
+            LOG.log(Level.FINEST, "historyDir: {0}", historyDir);
+            LOG.log(Level.FINEST, "histDescr.getOperation(): {0}", histDescr.getOperation());
+            if ("Created".equals(histDescr.getOperation())) {
+                return true;
+            }
+        } catch (IOException ex) {
+            LOG.log(Level.FINEST, "Unable to retrieve history file for {0}", historyDir);
+        }
+        return false;
+    }
+    
+    /**
+     * Deletes a history directory (e.g. Test/2013-18-01_19-53-40),
+     * first deleting the files it contains.
+     * @param dir The directory which should be deleted.
+     */
+    private void deleteDirectory(File dir) {
+        for (File file : dir.listFiles()) {
+            if (!file.delete()) {
+                LOG.log(Level.WARNING, "problem deleting history file: {0}", file);
+            }
+        }
+        if (!dir.delete()) {
+            LOG.log(Level.WARNING, "problem deleting history directory: {0}", dir);
+        }
+    }
+
 
     /**
      * Returns the configuration data file stored in the specified history directory.

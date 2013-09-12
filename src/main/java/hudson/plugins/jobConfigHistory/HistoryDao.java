@@ -114,5 +114,13 @@ public interface HistoryDao {
      * @param maxEntries maximum number of entries.
      */
     void purgeOldEntries(final File itemHistoryRoot, final int maxEntries);
+    
+    /**
+     * Checks whether the respective history entry is a 'Created' entry.
+     *
+     * @param historyDir The directory, e.g. 2013-01-18_17-33-51
+     * @return True if the directory contains a 'Created' entry.
+     */
+    boolean isCreatedEntry(File historyDir);
 }
 
