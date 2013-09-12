@@ -4,6 +4,7 @@ import static java.util.logging.Level.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -526,7 +527,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     /**
      * Utility class for comparing file names alphanumerically.
      */
-    private static class FileNameComparator implements Comparator<File> {
+    private static class FileNameComparator implements Comparator<File>, Serializable {
         /** {@inheritDoc} */
         public int compare(File f1, File f2) {
             return f1.getName().compareTo(f2.getName());
