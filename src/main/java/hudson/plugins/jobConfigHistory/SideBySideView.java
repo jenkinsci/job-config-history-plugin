@@ -127,7 +127,7 @@ public class SideBySideView {
         }
 
         /**
-         * Sets skipping
+         * Sets skipping.
          * @param skipping skip?
          */
         public void setSkipping(boolean skipping) {

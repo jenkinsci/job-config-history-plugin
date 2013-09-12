@@ -219,7 +219,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         final XmlFile xmlFile = getHistoryDao().getOldRevision(project, timestamp);
         final InputStream is = new ByteArrayInputStream(xmlFile.asString().getBytes("UTF-8"));
 
-        project.updateByXml((Source)new StreamSource(is));
+        project.updateByXml((Source) new StreamSource(is));
         project.save();
         rsp.sendRedirect(getHudson().getRootUrl() + project.getUrl());
     }
