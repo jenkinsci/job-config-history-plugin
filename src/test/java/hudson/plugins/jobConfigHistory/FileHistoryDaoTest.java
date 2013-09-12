@@ -285,8 +285,10 @@ public class FileHistoryDaoTest {
         assertEquals("2012-11-21_11-29-12", result.firstKey());
         assertEquals("2012-11-21_11-42-05", result.lastKey());
         final HistoryDescr firstValue = result.get(result.firstKey());
-        assertEquals("Changed", firstValue.getOperation());
+        final HistoryDescr lastValue = result.get(result.lastKey());
+        assertEquals("Created", firstValue.getOperation());
         assertEquals("anonymous", firstValue.getUserID());
+        assertEquals("Changed", lastValue.getOperation());
     }
 
     /**
@@ -387,9 +389,9 @@ public class FileHistoryDaoTest {
      * Test of purgeOldEntries method, of class FileHistoryDao.
      */
     @Test
-    public void testPurgeOldEntriesOnlyOneExisting() {
+    public void testPurgeOldEntriesOnlyTwoExistingOneBecauseOfCreatedStatus() {
         final int maxEntries = 2;
-        final int expectedLength = 1;
+        final int expectedLength = 2;
         testPurgeOldEntries(maxEntries, expectedLength);
     }
 
