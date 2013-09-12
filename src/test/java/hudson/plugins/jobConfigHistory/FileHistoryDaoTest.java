@@ -79,7 +79,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testCreateNewHistoryEntry() throws IOException {
         sutWithoutUserAndDuplicateHistory.createNewHistoryEntry(test1Config, "foo");
-        final int newLength = getHistoryRootForTest1Length();
+        final int newLength = getHistoryLength();
         assertEquals(6, newLength);
     }
 
@@ -100,7 +100,7 @@ public class FileHistoryDaoTest {
             sut.createNewHistoryEntry(xmlFile, "foo");
             fail("Should throw RTE");
         } catch (RuntimeException e) {
-            final int newLength = getHistoryRootForTest1Length();
+            final int newLength = getHistoryLength();
             assertEquals(5, newLength);
         }
     }
@@ -397,14 +397,7 @@ public class FileHistoryDaoTest {
 
     private void testPurgeOldEntries(int maxEntries, final int expectedLength) {
         sutWithUserAndNoDuplicateHistory.purgeOldEntries(test1History, maxEntries);
-        final int newLength = getHistoryRootForTest1Length();
+        final int newLength = getHistoryLength();
         assertEquals(expectedLength, newLength);
     }
-
-    private int getHistoryRootForTest1Length() {
-        return getHistoryLength();
-    }
-
-
-
 }
