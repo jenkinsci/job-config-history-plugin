@@ -14,6 +14,8 @@ import java.util.Collections;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+
+import org.jvnet.hudson.test.recipes.LocalData;
 import org.xml.sax.SAXException;
 
 /**
@@ -193,8 +195,8 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
                 Thread.sleep(SLEEP_TIME);
                 project.save();
             }
-            assertEquals("Verify no more than 5 history entries created.", 5, projectAction.getJobConfigs().size());
-
+            assertEquals("Verify no more than 5 history entries created + 1 'Created' entry that won't be deleted.",
+                            5+1, projectAction.getJobConfigs().size()); 
         } catch (Exception e) {
             fail("Unable to complete max history entries test: " + e);
         }
@@ -227,7 +229,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             // clear out all history - setting to 1 will clear out all with the expectation that we are creating a new entry
             jch.setMaxHistoryEntries("1");
             jch.checkForPurgeByQuantity(historyDir);
-            assertEquals("Verify no history entries remain.", 0, projectAction.getJobConfigs().size());
+            assertEquals("Verify only one entry remains (the 'created' entry of the project).", 1, projectAction.getJobConfigs().size()); 
 
             // recreate a history entry, set to read-only status, verify it is not deleted
             // NOTE: Windows host seem to ignore the setWritable flag, so the following test will fail on Windows.
@@ -256,6 +258,45 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         } catch (IOException e) {
             fail("Unable to complete purge test: " + e);
         }
+    }
+    
+    @LocalData
+    public void testPurgeByQuantityWithoutCreatedEntries() throws Exception {
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        final String name = "JobWithoutCreatedEntries";
+        final File historyDir = new File(jch.getJobHistoryRootDir(), name);
+        assertEquals("Verify 5 original project history entries.", 5, historyDir.listFiles().length);
+
+        jch.setMaxHistoryEntries("1");
+        jch.checkForPurgeByQuantity(historyDir);
+        
+        assertEquals("Verify no project history entries left.", 0, historyDir.listFiles().length);
+    }
+    
+    @LocalData
+    public void testPurgeByQuantityWithCreatedEntries() throws Exception {
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        final String name = "JobWithCreatedEntries";
+        final File historyDir = new File(jch.getJobHistoryRootDir(), name);
+        assertEquals("Verify 5 original project history entries.", 5, historyDir.listFiles().length);
+
+        jch.setMaxHistoryEntries("1");
+        jch.checkForPurgeByQuantity(historyDir);
+        
+        assertEquals("Verify 2 project history entries left.", 2, historyDir.listFiles().length);
+    }
+    
+    @LocalData
+    public void testPurgeByQuantityWithNoEntries() throws Exception {
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        final String name = "JobWithoutAnyEntries";
+        final File historyDir = new File(jch.getJobHistoryRootDir(), name);
+        assertEquals("Verify no original project history entries.", 0, historyDir.listFiles().length);
+
+        jch.setMaxHistoryEntries("1");
+        jch.checkForPurgeByQuantity(historyDir);
+        
+        assertEquals("Verify still no project history entries.", 0, historyDir.listFiles().length);
     }
 
     public void testAbsPathHistoryRootDir() throws Exception {
