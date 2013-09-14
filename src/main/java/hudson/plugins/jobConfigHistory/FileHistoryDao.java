@@ -113,10 +113,21 @@ public class FileHistoryDao implements HistoryDao {
             userId = Messages.ConfigHistoryListenerHelper_anonymous();
         }
 
-        final XmlFile historyDescription = new XmlFile(new File(timestampedDir, JobConfigHistoryConsts.HISTORY_FILE));
+        final XmlFile historyDescription = getHistoryXmlFile(timestampedDir);
         final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, getIdFormatter().format(
                 timestamp.getTime()));
         historyDescription.write(myDescr);
+    }
+
+    /**
+     * Returns the history.xml file in the directory.
+     *
+     * @param directory to search.
+     *
+     * @return history.xml
+     */
+    private XmlFile getHistoryXmlFile(final File directory) {
+        return new XmlFile(new File(directory, JobConfigHistoryConsts.HISTORY_FILE));
     }
 
     /**
@@ -275,7 +286,7 @@ public class FileHistoryDao implements HistoryDao {
             return map;
         } else {
             for (File historyDir : historyDirsOfItem) {
-                final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+                final XmlFile historyXml = getHistoryXmlFile(historyDir);
                 final HistoryDescr historyDescription;
                 try {
                     historyDescription = (HistoryDescr) historyXml.read();
@@ -408,7 +419,7 @@ public class FileHistoryDao implements HistoryDao {
 
     @Override
     public boolean isCreatedEntry(File historyDir) {
-        final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
+        final XmlFile historyXml = getHistoryXmlFile(historyDir);
         try {
             final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
             LOG.log(Level.FINEST, "historyDir: {0}", historyDir);
@@ -421,7 +432,7 @@ public class FileHistoryDao implements HistoryDao {
         }
         return false;
     }
-    
+
     /**
      * Deletes a history directory (e.g. Test/2013-18-01_19-53-40),
      * first deleting the files it contains.
