@@ -238,12 +238,10 @@ import org.kohsuke.stapler.StaplerResponse;
     }
 
     private JobConfigHistoryProjectAction createAction() {
-        when(mockedHudson.getPlugin(JobConfigHistory.class)).thenReturn(mockedPlugin);
         return new JobConfigHistoryProjectActionImpl(mockedHudson, mockedProject);
     }
 
     private JobConfigHistoryProjectAction createActionForMavenModule() {
-        when(mockedHudson.getPlugin(JobConfigHistory.class)).thenReturn(mockedPlugin);
         return new JobConfigHistoryProjectActionImpl(mockedHudson, mockedMavenModule);
     }
 
@@ -251,6 +249,11 @@ import org.kohsuke.stapler.StaplerResponse;
 
         public JobConfigHistoryProjectActionImpl(Hudson hudson, AbstractItem project) {
             super(hudson, project);
+        }
+
+        @Override
+        JobConfigHistory getPlugin() {
+            return mockedPlugin;
         }
 
         @Override
