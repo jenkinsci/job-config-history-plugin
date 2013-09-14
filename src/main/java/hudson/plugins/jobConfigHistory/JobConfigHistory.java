@@ -337,33 +337,14 @@ public class JobConfigHistory extends Plugin {
     }
 
     /**
-     * Returns the configuration data file stored in the specified history directory.
-     * It looks for a file with an 'xml' extension that is not named
-     * {@link JobConfigHistoryConsts#HISTORY_FILE}.
-     * <p>
-     * Relies on the assumption that random '.xml' files
-     * will not appear in the history directories.
-     * <p>
-     * Checks that we are in an actual 'history directory' to prevent use for
-     * getting random xml files.
+     * @see FileHistoryDao#getConfigFile(java.io.File) .
+     *
      * @param historyDir
      *            The history directory to look under.
      * @return The configuration file or null if no file is found.
      */
     protected File getConfigFile(final File historyDir) {
-        File configFile = null;
-        if (historyDir.exists() && HistoryFileFilter.INSTANCE.accept(historyDir)) {
-            // get the *.xml file that is not the JobConfigHistoryConsts.HISTORY_FILE
-            // assumes random .xml files won't appear in the history directory
-            final File[] listing = historyDir.listFiles();
-            for (final File file : listing) {
-                if (!file.getName().equals(JobConfigHistoryConsts.HISTORY_FILE) && file.getName().matches(".*\\.xml$")) {
-                    configFile = file;
-                    break;
-                }
-            }
-        }
-        return configFile;
+        return FileHistoryDao.getConfigFile(historyDir);
     }
 
     /**
