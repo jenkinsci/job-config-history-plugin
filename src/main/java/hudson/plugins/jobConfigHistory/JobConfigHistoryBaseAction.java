@@ -138,15 +138,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * Returns the JobConfigHistory plugin instance.
-     *
-     * @return the JobConfigHistory plugin
-     */
-    protected final JobConfigHistory getPlugin() {
-        return hudson.getPlugin(JobConfigHistory.class);
-    }
-
-    /**
      * Returns the object for which we want to provide access control.
      *
      * @return the access controlled object.
@@ -278,4 +269,23 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     StaplerRequest getCurrentRequest() {
         return Stapler.getCurrentRequest();
     }
+
+    /**
+     * Returns the plugin for tests.
+     *
+     * @return plugin
+     */
+    JobConfigHistory getPlugin() {
+        return PluginUtils.getPlugin();
+    }
+
+    /**
+     * For tests.
+     *
+     * @return historyDao
+     */
+    HistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
+    }
+
 }
