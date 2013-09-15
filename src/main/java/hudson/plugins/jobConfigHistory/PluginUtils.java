@@ -70,7 +70,7 @@ final class PluginUtils {
                 new File(Hudson.getInstance().root.getPath()),
                 User.current(),
                 maxHistoryEntries,
-                getPlugin().getSkipDuplicateHistory());
+                !getPlugin().getSkipDuplicateHistory());
     }
     /**
      * Returns a {@link Date}.
