@@ -13,9 +13,6 @@ import hudson.util.FormValidation;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -376,25 +373,7 @@ public class JobConfigHistory extends Plugin {
         if (item instanceof MavenModule && !saveModuleConfiguration) {
             saveable = false;
         }
-        if (saveable) {
-            saveable = checkDuplicate(xmlFile);
-        }
-
         return saveable;
-    }
-
-    /**
-     * Checks whether the configuration file should not be saved because it's a duplicate.
-     * @param xmlFile The config file
-     * @return True if it should be saved
-     */
-    boolean checkDuplicate(final XmlFile xmlFile) {
-        if (skipDuplicateHistory && hasDuplicateHistory(xmlFile)) {
-            LOG.log(Level.FINE, "found duplicate history, skipping save of {0}", xmlFile);
-            return false;
-        } else {
-            return true;
-        }
     }
 
     /**
@@ -409,36 +388,6 @@ public class JobConfigHistory extends Plugin {
         } else {
             return true;
         }
-    }
-
-
-    /**
-     * Determines if the {@link XmlFile} contains a duplicate of
-     * the last saved information, if there is previous history.
-     *
-     * @param xmlFile
-     *           The {@link XmlFile} configuration file under consideration.
-     * @return true if previous history is accessible, and the file duplicates the previously saved information.
-     */
-    boolean hasDuplicateHistory(XmlFile xmlFile) {
-        boolean isDuplicated = false;
-
-        final File[] historyDirs = getHistoryDir(xmlFile).listFiles(HISTORY_FILTER);
-        if (historyDirs != null && historyDirs.length != 0) {
-            Arrays.sort(historyDirs, Collections.reverseOrder());
-            final File lastFile = new File(historyDirs[0], xmlFile.getFile().getName());
-            if (lastFile.exists()) {
-                final XmlFile lastXmlFile = new XmlFile(lastFile);
-                try {
-                    if (xmlFile.asString().equals(lastXmlFile.asString())) {
-                        isDuplicated = true;
-                    }
-                } catch (IOException e) {
-                    LOG.warning("unable to check for duplicate previous history file: " + lastXmlFile + "\n" + e);
-                }
-            }
-        }
-        return isDuplicated;
     }
 
     /**

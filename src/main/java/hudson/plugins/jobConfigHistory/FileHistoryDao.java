@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -224,12 +225,14 @@ public class FileHistoryDao implements HistoryDao {
 
     @Override
     public void saveItem(AbstractItem item) {
-        createNewHistoryEntryAndCopyConfig(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_CHANGED());
+        saveItem(item.getConfigFile());
     }
 
     @Override
     public void saveItem(XmlFile file) {
-        createNewHistoryEntryAndCopyConfig(file, Messages.ConfigHistoryListenerHelper_CHANGED());
+        if (checkDuplicate(file)) {
+            createNewHistoryEntryAndCopyConfig(file, Messages.ConfigHistoryListenerHelper_CHANGED());
+        }
     }
 
     @Override
@@ -478,6 +481,45 @@ public class FileHistoryDao implements HistoryDao {
             }
         }
         return configFile;
+    }
+
+    /**
+     * Determines if the {@link XmlFile} contains a duplicate of
+     * the last saved information, if there is previous history.
+     *
+     * @param xmlFile
+     *           The {@link XmlFile} configuration file under consideration.
+     * @return true if previous history is accessible, and the file duplicates the previously saved information.
+     */
+    boolean hasDuplicateHistory(XmlFile xmlFile) {
+        boolean isDuplicated = false;
+        final ArrayList<String> timeStamps = new ArrayList<String>(getRevisions(xmlFile).keySet());
+        if (!timeStamps.isEmpty()) {
+            Collections.sort(timeStamps, Collections.reverseOrder());
+            final XmlFile lastRevision = getOldRevision(xmlFile, timeStamps.get(0));
+            try {
+                if (xmlFile.asString().equals(lastRevision.asString())) {
+                    isDuplicated = true;
+                }
+            } catch (IOException e) {
+                LOG.warning("unable to check for duplicate previous history file: " + lastRevision + "\n" + e);
+            }
+        }
+        return isDuplicated;
+    }
+
+    /**
+     * Checks whether the configuration file should not be saved because it's a duplicate.
+     * @param xmlFile The config file
+     * @return True if it should be saved
+     */
+    boolean checkDuplicate(final XmlFile xmlFile) {
+        if (!saveDuplicates && hasDuplicateHistory(xmlFile)) {
+            LOG.log(Level.FINE, "found duplicate history, skipping save of {0}", xmlFile);
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

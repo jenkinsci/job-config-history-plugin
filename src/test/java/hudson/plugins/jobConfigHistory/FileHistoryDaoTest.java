@@ -220,7 +220,7 @@ public class FileHistoryDaoTest {
     public void testSaveItem_AbstractItem() throws IOException {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         sutWithUserAndNoDuplicateHistory.saveItem(mockedItem);
-        assertEquals(6, getHistoryLength());
+        assertEquals(5, getHistoryLength());
     }
 
     /**
@@ -229,6 +229,15 @@ public class FileHistoryDaoTest {
     @Test
     public void testSaveItem_XmlFile() {
         sutWithUserAndNoDuplicateHistory.saveItem(test1Config);
+        assertEquals(5, getHistoryLength());
+    }
+
+    /**
+     * Test of saveItem method, of class FileHistoryDao.
+     */
+    @Test
+    public void testSaveItem_XmlFileDuplicate() {
+        sutWithoutUserAndDuplicateHistory.saveItem(test1Config);
         assertEquals(6, getHistoryLength());
     }
 
@@ -399,5 +408,66 @@ public class FileHistoryDaoTest {
         sutWithUserAndNoDuplicateHistory.purgeOldEntries(test1History, maxEntries);
         final int newLength = getHistoryLength();
         assertEquals(expectedLength, newLength);
+    }
+
+    /**
+     * Test of hasDuplicateHistory method, of class FileHistoryDao.
+     */
+    @Test
+    public void testHasDuplicateHistoryNoDuplicates() throws IOException {
+        XmlFile xmlFile = new XmlFile(new File(test1History, "2012-11-21_11-41-14/history.xml"));
+        final File configFile = new File(test1JobDirectory, "config.xml");
+        IOUtils.write(xmlFile.asString(), new FileOutputStream(configFile));
+        boolean result = sutWithUserAndNoDuplicateHistory.hasDuplicateHistory(new XmlFile(configFile));
+        assertEquals(false, result);
+    }
+
+    /**
+     * Test of hasDuplicateHistory method, of class FileHistoryDao.
+     */
+    @Test
+    public void testHasDuplicateHistoryDuplicates() throws IOException {
+        final File configFile = new File(test1JobDirectory, "config.xml");
+        boolean result = sutWithUserAndNoDuplicateHistory.hasDuplicateHistory(new XmlFile(configFile));
+        assertEquals(true, result);
+    }
+
+    /**
+     * Test of hasDuplicateHistory method, of class FileHistoryDao.
+     */
+    @Test
+    public void testHasDuplicateHistoryNoHistory() throws IOException {
+        final File configFile = new File(jenkinsHome, "jobs/Test2/config.xml");
+        boolean result = sutWithUserAndNoDuplicateHistory.hasDuplicateHistory(new XmlFile(configFile));
+        assertEquals(false, result);
+    }
+
+    /**
+     * Test of checkDuplicate method, of class FileHistoryDao.
+     */
+    @Test
+    public void testCheckDuplicate() throws IOException {
+        XmlFile xmlFile = new XmlFile(new File(test1JobDirectory, "config.xml"));
+        boolean result = sutWithoutUserAndDuplicateHistory.checkDuplicate(xmlFile);
+        assertEquals(true, result);
+    }
+
+    /**
+     * Test of checkDuplicate method, of class FileHistoryDao.
+     */
+    @Test
+    public void testCheckDuplicateSkip() {
+        XmlFile xmlFile = new XmlFile(new File(test1JobDirectory, "config.xml"));
+        boolean result = sutWithUserAndNoDuplicateHistory.checkDuplicate(xmlFile);
+        assertEquals(false, result);
+    }
+    /**
+     * Test of checkDuplicate method, of class FileHistoryDao.
+     */
+    @Test
+    public void testCheckDuplicateHasDuplicate() {
+        XmlFile xmlFile = new XmlFile(new File(jenkinsHome, "jobs/Test2/config.xml"));
+        boolean result = sutWithUserAndNoDuplicateHistory.checkDuplicate(xmlFile);
+        assertEquals(true, result);
     }
 }
