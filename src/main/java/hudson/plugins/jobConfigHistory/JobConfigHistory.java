@@ -80,23 +80,6 @@ public class JobConfigHistory extends Plugin {
     /** our logger. */
     private static final Logger LOG = Logger.getLogger(JobConfigHistory.class.getName());
 
-    /**
-     * A filter to return only those directories of a file listing
-     * that represent configuration history directories.
-     */
-    public static final FileFilter HISTORY_FILTER = new HistoryFileFilter();
-
-    /**
-     * A filter to return only those directories of a file listing
-     * that represent deleted jobs history directories.
-     */
-    public static final FileFilter DELETED_FILTER = new FileFilter() {
-        public boolean accept(File file) {
-            return (file.getName().contains(JobConfigHistoryConsts.DELETED_MARKER));
-        }
-    };
-
-
     @Override
     public void start() throws Exception {
         load();

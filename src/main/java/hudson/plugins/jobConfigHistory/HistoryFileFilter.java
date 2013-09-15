@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 
 /**
- * Filters history files.
+ * A filter to return only those directories of a file listing that represent configuration history directories.
  *
  * @author Mirko Friedenhagen
  */

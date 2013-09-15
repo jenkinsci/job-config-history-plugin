@@ -129,7 +129,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
                     continue;
                 }
                 for (final File historyDir : itemDir
-                        .listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                        .listFiles(HistoryFileFilter.INSTANCE)) {
                     final XmlFile historyXml = new XmlFile(new File(historyDir,
                             JobConfigHistoryConsts.HISTORY_FILE));
                     final HistoryDescr histDescr = (HistoryDescr) historyXml
@@ -189,7 +189,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
         final File[] itemDirs;
         if ("deleted".equals(type)) {
-            itemDirs = rootDir.listFiles(JobConfigHistory.DELETED_FILTER);
+            itemDirs = rootDir.listFiles(DeletedFileFilter.INSTANCE);
         } else {
             itemDirs = rootDir.listFiles();
         }
@@ -226,7 +226,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
 
         final File[] historyDirs = itemDir
-                .listFiles(JobConfigHistory.HISTORY_FILTER);
+                .listFiles(HistoryFileFilter.INSTANCE);
         if (historyDirs.length == 0) {
             return configs;
         }
@@ -317,7 +317,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         for (final File itemDir : historyRootDir.listFiles()) {
             if (itemDir.getName().equals(name)) {
                 for (final File historyDir : itemDir
-                        .listFiles(JobConfigHistory.HISTORY_FILTER)) {
+                        .listFiles(HistoryFileFilter.INSTANCE)) {
                     final XmlFile historyXml = new XmlFile(new File(historyDir,
                             JobConfigHistoryConsts.HISTORY_FILE));
                     final HistoryDescr histDescr = (HistoryDescr) historyXml

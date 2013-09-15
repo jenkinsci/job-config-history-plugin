@@ -97,7 +97,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
         if (itemDirs != null && itemDirs.length > 0) {
             for (File itemDir : itemDirs) {
                 //itemDir: z.B. Test2 or hudson.tasks.Ant
-                final File[] historyDirs = itemDir.listFiles(JobConfigHistory.HISTORY_FILTER);
+                final File[] historyDirs = itemDir.listFiles(HistoryFileFilter.INSTANCE);
                 if (historyDirs != null) {
                     Arrays.sort(historyDirs);
                     for (File historyDir : historyDirs) {
