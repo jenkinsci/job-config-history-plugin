@@ -233,8 +233,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         Arrays.sort(historyDirs, new FileNameComparator());
 
         if ("created".equals(type)) {
-            if (itemDir.getName().contains(
-                    JobConfigHistoryConsts.DELETED_MARKER)) {
+            if (DeletedFileFilter.INSTANCE.accept(itemDir)) {
                 return configs;
             }
             File historyDir = historyDirs[0];
@@ -264,8 +263,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
             for (final File historyDir : historyDirs) {
                 final ConfigInfo config;
                 final HistoryDescr histDescr = readHistoryXml(historyDir);
-                if (!itemDir.getName().contains(
-                        JobConfigHistoryConsts.DELETED_MARKER)) {
+                if (!DeletedFileFilter.INSTANCE.accept(itemDir)) {
                     config = ConfigInfo.create(prefix + itemDir.getName(),
                             historyDir, histDescr, true);
                 } else {
