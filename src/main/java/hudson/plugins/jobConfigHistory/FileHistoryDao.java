@@ -10,6 +10,7 @@ import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.User;
+import java.io.BufferedOutputStream;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -145,10 +146,12 @@ public class FileHistoryDao implements HistoryDao {
      */
     static void copyConfigFile(final File currentConfig, final File timestampedDir) throws FileNotFoundException,
             IOException {
-        final FileOutputStream configCopy = new FileOutputStream(new File(timestampedDir, currentConfig.getName()));
+        final BufferedOutputStream configCopy = new BufferedOutputStream(
+                new FileOutputStream(new File(timestampedDir, currentConfig.getName())));
         try {
             final FileInputStream configOriginal = new FileInputStream(currentConfig);
             try {
+                // in is buffered by copyStream.
                 Util.copyStream(configOriginal, configCopy);
             } finally {
                 configOriginal.close();
