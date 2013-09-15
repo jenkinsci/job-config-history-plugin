@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 
 import org.jvnet.hudson.test.recipes.LocalData;
@@ -128,7 +127,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             Thread.sleep(SLEEP_TIME);
             hudson.save();
         }
-        assertEquals("Verify 1 system history entry after 3 duplicate saves.", 1, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+        assertEquals("Verify 1 system history entry after 3 duplicate saves.", 1, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
 
         // verify non-duplicate history is saved
         project.setDescription("new description");
@@ -136,7 +135,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         assertEquals("Verify non duplicate project history saved.", 2, projectAction.getJobConfigs().size());
 
         // corrupt history record and verify new entry will be saved
-        final File[] historyDirs = jch.getHistoryDir(project.getConfigFile()).listFiles(JobConfigHistory.HISTORY_FILTER);
+        final File[] historyDirs = jch.getHistoryDir(project.getConfigFile()).listFiles(HistoryFileFilter.INSTANCE);
         Arrays.sort(historyDirs, Collections.reverseOrder());
         (new File(historyDirs[0], "config.xml")).renameTo(new File(historyDirs[0], "config"));
         assertNull("Verify history dir is corrupted.", jch.getConfigFile(historyDirs[0]));
@@ -152,7 +151,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         hudson.save();
         project.save();
         assertTrue("Verify duplicate project history entries.", projectAction.getJobConfigs().size() >= 2);
-        assertTrue("Verify duplicate system history entries.", hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length > 1);
+        assertTrue("Verify duplicate system history entries.", hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length > 1);
     }
 
     public void testFormValidation() {
@@ -196,7 +195,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
                 project.save();
             }
             assertEquals("Verify no more than 5 history entries created + 1 'Created' entry that won't be deleted.",
-                            5+1, projectAction.getJobConfigs().size()); 
+                            5+1, projectAction.getJobConfigs().size());
         } catch (Exception e) {
             fail("Unable to complete max history entries test: " + e);
         }
@@ -229,7 +228,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             // clear out all history - setting to 1 will clear out all with the expectation that we are creating a new entry
             jch.setMaxHistoryEntries("1");
             jch.checkForPurgeByQuantity(historyDir);
-            assertEquals("Verify only one entry remains (the 'created' entry of the project).", 1, projectAction.getJobConfigs().size()); 
+            assertEquals("Verify only one entry remains (the 'created' entry of the project).", 1, projectAction.getJobConfigs().size());
 
             // recreate a history entry, set to read-only status, verify it is not deleted
             // NOTE: Windows host seem to ignore the setWritable flag, so the following test will fail on Windows.
@@ -259,7 +258,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             fail("Unable to complete purge test: " + e);
         }
     }
-    
+
     @LocalData
     public void testPurgeByQuantityWithoutCreatedEntries() throws Exception {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
@@ -269,10 +268,10 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
 
         jch.setMaxHistoryEntries("1");
         jch.checkForPurgeByQuantity(historyDir);
-        
+
         assertEquals("Verify no project history entries left.", 0, historyDir.listFiles().length);
     }
-    
+
     @LocalData
     public void testPurgeByQuantityWithCreatedEntries() throws Exception {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
@@ -282,10 +281,10 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
 
         jch.setMaxHistoryEntries("1");
         jch.checkForPurgeByQuantity(historyDir);
-        
+
         assertEquals("Verify 2 project history entries left.", 2, historyDir.listFiles().length);
     }
-    
+
     @LocalData
     public void testPurgeByQuantityWithNoEntries() throws Exception {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
@@ -295,7 +294,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
 
         jch.setMaxHistoryEntries("1");
         jch.checkForPurgeByQuantity(historyDir);
-        
+
         assertEquals("Verify still no project history entries.", 0, historyDir.listFiles().length);
     }
 
@@ -334,14 +333,14 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             //since sometimes two history entries are created, we just check
             //if one of them contains "Created"
             boolean createdEntryFound = false;
-            for (File file : expectedConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER)) {
+            for (File file : expectedConfigDir.listFiles(HistoryFileFilter.INSTANCE)) {
                 if (new XmlFile(new File(file, "history.xml")).asString().contains("Created")) {
                     createdEntryFound = true;
                     break;
                 }
             }
             assertTrue("Verify one \'created\' history entry on creation.", createdEntryFound);
-            final int historyEntryCount = expectedConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length;
+            final int historyEntryCount = expectedConfigDir.listFiles(HistoryFileFilter.INSTANCE).length;
 
             // sleep so we don't overwrite our existing history directory
             Thread.sleep(SLEEP_TIME);
@@ -351,7 +350,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             assertFalse("Verify on rename old project config history directory removed.", expectedConfigDir.exists());
             final File newExpectedConfigDir = new File(expectedConfigDir.toString().replace("testproject", "renamed_testproject"));
             assertTrue("Verify renamed project config history created: " + newExpectedConfigDir, newExpectedConfigDir.exists());
-            assertEquals("Verify two history entries after rename.", historyEntryCount + 1, newExpectedConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+            assertEquals("Verify two history entries after rename.", historyEntryCount + 1, newExpectedConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
 
             // delete project and verify the history directory is gone
             project.delete();
@@ -368,7 +367,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             assertTrue("Verify config history directory of deleted job is not empty", (new File(deletedDir)).listFiles().length > 0);
 
             boolean deletedEntryFound = false;
-            for (File file : (new File(deletedDir)).listFiles(JobConfigHistory.HISTORY_FILTER)) {
+            for (File file : (new File(deletedDir)).listFiles(HistoryFileFilter.INSTANCE)) {
                 if (new XmlFile(new File(file, "history.xml")).asString().contains("Deleted")) {
                     deletedEntryFound = true;
                     break;

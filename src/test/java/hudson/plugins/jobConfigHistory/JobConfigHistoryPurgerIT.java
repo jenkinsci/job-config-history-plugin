@@ -32,18 +32,18 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
     public void testSystemHistoryPurger() throws Exception {
         final String message = "Some nice message";
         final File hudsonConfigDir = new File(jch.getConfiguredHistoryRootDir() + "/config");
-        assertEquals("Verify 5 original system config history entries.", 5, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+        assertEquals("Verify 5 original system config history entries.", 5, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
 
         jch.setSaveSystemConfiguration(true);
         hudson.setSystemMessage(message);
         Thread.sleep(SLEEP_TIME);
-        assertEquals("Verify 5+1 project history entries.", 6, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+        assertEquals("Verify 5+1 project history entries.", 6, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
 
         jch.setMaxDaysToKeepEntries("1");
         purger.run();
 
-        assertEquals("Verify only 1 (new) job history entry is left after purging.", 1, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
-        final XmlFile lastEntry = new XmlFile(new File (hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER)[0], "config.xml"));
+        assertEquals("Verify only 1 (new) job history entry is left after purging.", 1, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
+        final XmlFile lastEntry = new XmlFile(new File (hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE)[0], "config.xml"));
         assertTrue("Verify remaining entry is the newest one", lastEntry.asString().contains(message));
     }
 
@@ -54,12 +54,12 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
     @LocalData
     public void testHistoryPurgerWhenMaxDaysSetToZero() throws Exception {
         final File hudsonConfigDir = new File(jch.getConfiguredHistoryRootDir() + "/config");
-        assertEquals("Verify 5 original system config history entries.", 5, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+        assertEquals("Verify 5 original system config history entries.", 5, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
 
         jch.setMaxDaysToKeepEntries("0");
         purger.run();
 
-        assertEquals("Verify that 5 original entries are still there.", 5, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+        assertEquals("Verify that 5 original entries are still there.", 5, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
     }
 
     /**
@@ -82,11 +82,11 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
 
     private void testWithWrongMaxAge(String maxAge) throws Exception {
         final File hudsonConfigDir = new File(jch.getConfiguredHistoryRootDir() + "/config");
-        assertEquals("Verify 5 original system config history entries.", 5, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+        assertEquals("Verify 5 original system config history entries.", 5, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
 
         jch.setMaxDaysToKeepEntries(maxAge);
         purger.run();
-        assertEquals("Verify that 5 original entries are still there.", 5, hudsonConfigDir.listFiles(JobConfigHistory.HISTORY_FILTER).length);
+        assertEquals("Verify that 5 original entries are still there.", 5, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
     }
 
     /**
