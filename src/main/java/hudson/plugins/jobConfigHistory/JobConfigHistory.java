@@ -11,7 +11,6 @@ import hudson.model.Descriptor.FormException;
 import hudson.util.FormValidation;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;

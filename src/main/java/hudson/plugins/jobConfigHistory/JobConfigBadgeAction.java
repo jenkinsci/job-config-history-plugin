@@ -81,7 +81,7 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
 
                 if (lastBuildDate != null && lastConfigChange.after(lastBuildDate)) {
                     final String[] dates = {lastChange.getTimestamp(),
-                        findLastRelevantConfigChangeDate(historyDescriptions, lastBuildDate)};
+                        findLastRelevantConfigChangeDate(historyDescriptions, lastBuildDate),};
                     build.addAction(new JobConfigBadgeAction(dates));
                 }
             }

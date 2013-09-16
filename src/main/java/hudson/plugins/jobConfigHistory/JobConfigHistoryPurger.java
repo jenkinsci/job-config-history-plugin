@@ -49,6 +49,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
      * For tests with injected plugin.
      *
      * @param plugin injected plugin
+     * @param historyDao injected HistoryDao
      */
     JobConfigHistoryPurger(JobConfigHistory plugin, HistoryDao historyDao) {
         this.plugin = plugin;

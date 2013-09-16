@@ -182,7 +182,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      *            of config-history.
      * @param prefix
      *            prefix.
-     * @throws IOException
+     * @throws IOException if an entry could not be read.
      */
     private void collectConfigs(Collection<ConfigInfo> configs, String type,
             File rootDir, String prefix) throws IOException {
@@ -525,6 +525,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     /**
      * Utility class for comparing file names alphanumerically.
      */
+    @SuppressWarnings("serial")
     private static class FileNameComparator implements Comparator<File>, Serializable {
         /** {@inheritDoc} */
         public int compare(File f1, File f2) {
