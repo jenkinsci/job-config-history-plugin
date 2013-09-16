@@ -4,11 +4,9 @@ import static java.util.logging.Level.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,7 +23,6 @@ import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
 import hudson.util.MultipartFormDataParser;
-import java.util.Collection;
 
 /**
  * 
@@ -166,130 +163,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
                     "{0} is not a directory, assuming that no history exists yet.",
                     historyRootDir);
         } else {
-            collectConfigs(configs, type, historyRootDir, "");
+            configs.addAll(new CollectConfigs(type).collect(historyRootDir, ""));
         }
         return configs;
-    }
-
-    /**
-     * Collects configs.
-     * 
-     * @param configs
-     *            outparameter.
-     * @param type
-     *            of configs to collect
-     * @param rootDir
-     *            of config-history.
-     * @param prefix
-     *            prefix.
-     * @throws IOException if an entry could not be read.
-     */
-    private void collectConfigs(Collection<ConfigInfo> configs, String type,
-            File rootDir, String prefix) throws IOException {
-
-        final File[] itemDirs;
-        if ("deleted".equals(type)) {
-            itemDirs = rootDir.listFiles(DeletedFileFilter.INSTANCE);
-        } else {
-            itemDirs = rootDir.listFiles();
-        }
-        for (final File itemDir : itemDirs) {
-            configs.addAll(getConfigsForType(type, itemDir, prefix));
-
-            final File jobs = new File(itemDir,
-                    JobConfigHistoryConsts.JOBS_HISTORY_DIR);
-            if (jobs.isDirectory()) {
-                // Recurse into folders.
-                collectConfigs(configs, type, jobs, prefix + itemDir.getName()
-                        + "/");
-            }
-        }
-    }
-
-    /**
-     * Gets config history entries for the view options 'created', 'deleted' and
-     * 'jobs'. While 'jobs' displays all available job config history entries,
-     * 'deleted' and 'created' only show the last or the first one respectively.
-     * 
-     * @param type
-     *            'created', 'deleted' or 'jobs'
-     * @param itemDir
-     *            The job directory as File
-     * @param prefix
-     *            Something Jesse Glick came up with but never documented.
-     * @return List of ConfigInfo, may be empty
-     * @throws IOException
-     *             If one of the entries cannot be read.
-     */
-    private List<ConfigInfo> getConfigsForType(String type, File itemDir,
-            String prefix) throws IOException {
-        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-
-        final File[] historyDirs = itemDir
-                .listFiles(HistoryFileFilter.INSTANCE);
-        if (historyDirs.length == 0) {
-            return configs;
-        }
-        Arrays.sort(historyDirs, new FileNameComparator());
-
-        if ("created".equals(type)) {
-            if (DeletedFileFilter.INSTANCE.accept(itemDir)) {
-                return configs;
-            }
-            File historyDir = historyDirs[0];
-            HistoryDescr histDescr = readHistoryXml(historyDir);
-            if ("Created".equals(histDescr.getOperation())) {
-                final ConfigInfo config = ConfigInfo.create(itemDir.getName(),
-                        historyDir, histDescr, true);
-                configs.add(config);
-            } else {
-                historyDir = historyDirs[1];
-                histDescr = readHistoryXml(historyDir);
-                if ("Created".equals(histDescr.getOperation())) {
-                    final ConfigInfo config = ConfigInfo.create(itemDir.getName(),
-                            historyDir, histDescr, true);
-                    configs.add(config);
-                }
-            }
-        } else if ("deleted".equals(type)) {
-            final File historyDir = historyDirs[historyDirs.length - 1];
-            final HistoryDescr histDescr = readHistoryXml(historyDir);
-            if ("Deleted".equals(histDescr.getOperation())) {
-                final ConfigInfo config = ConfigInfo.create(itemDir.getName(),
-                        historyDir, histDescr, false);
-                configs.add(config);
-            }
-        } else {
-            for (final File historyDir : historyDirs) {
-                final ConfigInfo config;
-                final HistoryDescr histDescr = readHistoryXml(historyDir);
-                if (!DeletedFileFilter.INSTANCE.accept(itemDir)) {
-                    config = ConfigInfo.create(prefix + itemDir.getName(),
-                            historyDir, histDescr, true);
-                } else {
-                    config = ConfigInfo.create(prefix + itemDir.getName(),
-                            historyDir, histDescr, false);
-                }
-                configs.add(config);
-            }
-        }
-
-        return configs;
-    }
-
-    /**
-     * Extract HistoryDescriptor from history directory.
-     * 
-     * @param historyDir
-     *            History directory as File. (e.g. 2013-10-10_00-08-15)
-     * @return History descriptor
-     * @throws IOException
-     *             If xml file cannot be read.
-     */
-    private HistoryDescr readHistoryXml(File historyDir) throws IOException {
-        final XmlFile historyXml = new XmlFile(new File(historyDir,
-                JobConfigHistoryConsts.HISTORY_FILE));
-        return (HistoryDescr) historyXml.read();
     }
 
     /**
@@ -520,16 +396,5 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
                     "Invalid directory name because of '..': " + name);
         }
         return true;
-    }
-
-    /**
-     * Utility class for comparing file names alphanumerically.
-     */
-    @SuppressWarnings("serial")
-    private static class FileNameComparator implements Comparator<File>, Serializable {
-        /** {@inheritDoc} */
-        public int compare(File f1, File f2) {
-            return f1.getName().compareTo(f2.getName());
-        }
     }
 }
