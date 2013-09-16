@@ -35,7 +35,7 @@ import org.junit.Rule;
  * @author Mirko Friedenhagen
  */
 public class CollectConfigsTest {
-    
+
     @Rule
     public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
 
@@ -55,11 +55,35 @@ public class CollectConfigsTest {
      * Test of collect method, of class CollectConfigs.
      */
     @Test
-    public void testCollect() throws Exception {        
+    public void testCollectDeleted() throws Exception {
         File rootDir = unpackResourceZip.getResource("config-history/jobs/Test1");
         String prefix = "";
         CollectConfigs sut = new CollectConfigs("deleted");
         List<ConfigInfo> result = sut.collect(rootDir, prefix);
         assertEquals(0, result.size());
-    }    
+    }
+
+    /**
+     * Test of collect method, of class CollectConfigs.
+     */
+    @Test
+    public void testCollectCreated() throws Exception {
+        File rootDir = unpackResourceZip.getResource("config-history/jobs/Test1");
+        String prefix = "";
+        CollectConfigs sut = new CollectConfigs("created");
+        List<ConfigInfo> result = sut.collect(rootDir, prefix);
+        assertEquals(0, result.size());
+    }
+
+    /**
+     * Test of collect method, of class CollectConfigs.
+     */
+    @Test
+    public void testCollectOther() throws Exception {
+        File rootDir = unpackResourceZip.getResource("config-history/jobs/Test1");
+        String prefix = "";
+        CollectConfigs sut = new CollectConfigs("other");
+        List<ConfigInfo> result = sut.collect(rootDir, prefix);
+        assertEquals(0, result.size());
+    }
 }
