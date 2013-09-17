@@ -20,7 +20,7 @@ public class HistoryFileFilterTest {
     @Test
     public void testAcceptRootNotExistent() {
         File file = new File("target/I_DO_NOT_EXIST");
-        assertFalse(HistoryFileFilter.isHistoryDirectory(file));
+        assertFalse(HistoryFileFilter.accepts(file));
     }
 
     /**
@@ -29,7 +29,7 @@ public class HistoryFileFilterTest {
     @Test
     public void testAcceptNoHistoryEntries() {
         File file = unpackResourceZip.getResource("jobs/Test2/");
-        assertFalse(HistoryFileFilter.isHistoryDirectory(file));
+        assertFalse(HistoryFileFilter.accepts(file));
     }
 
     /**
@@ -39,7 +39,7 @@ public class HistoryFileFilterTest {
     public void testAccept() {
         final File singleDirectory = unpackResourceZip.getResource("config-history/jobs/Test1/2012-11-21_11-29-12/");
         assertTrue(
-                HistoryFileFilter.isHistoryDirectory(singleDirectory));
+                HistoryFileFilter.accepts(singleDirectory));
         final File historyDirectory = unpackResourceZip.getResource("config-history/jobs/Test1/");
         assertEquals(
                 5,

@@ -40,7 +40,7 @@ public class DeletedFileFilterTest {
     @Test
     public void testAcceptNoDeletedFile() {
         File file = new File("123");
-        assertEquals(false, DeletedFileFilter.isDeleted(file));
+        assertEquals(false, DeletedFileFilter.accepts(file));
     }
 
     /**
@@ -49,7 +49,7 @@ public class DeletedFileFilterTest {
     @Test
     public void testAcceptDeletedFile() {
         File file = new File("_deleted_");
-        assertEquals(true, DeletedFileFilter.isDeleted(file));
+        assertEquals(true, DeletedFileFilter.accepts(file));
     }
 
 }

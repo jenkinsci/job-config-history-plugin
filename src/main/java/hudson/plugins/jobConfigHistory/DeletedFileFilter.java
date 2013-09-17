@@ -49,7 +49,7 @@ class DeletedFileFilter implements FileFilter {
      * @param file to inspect
      * @return true when file has the special deleted mark.
      */
-    public static boolean isDeleted(File file) {
+    public static boolean accepts(File file) {
         return INSTANCE.accept(file);
     }
 

@@ -24,7 +24,7 @@ class HistoryFileFilter implements FileFilter {
      * @param file to inspect
      * @return true, when file denotes a history directory.
      */
-    public static boolean isHistoryDirectory(File file) {
+    public static boolean accepts(File file) {
         return INSTANCE.accept(file);
     }
 }

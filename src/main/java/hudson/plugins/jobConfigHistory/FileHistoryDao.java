@@ -133,7 +133,7 @@ public class FileHistoryDao implements HistoryDao {
     }
 
     /**
-     * Saves a copy of this project's {@code config.xml} into {@code timestampedDir}.
+     * Saves a copy of this project's {@literal config.xml} into {@literal timestampedDir}.
      *
      * @param currentConfig
      *            which we want to copy.
@@ -472,7 +472,7 @@ public class FileHistoryDao implements HistoryDao {
      */
     static File getConfigFile(final File historyDir) {
         File configFile = null;
-        if (HistoryFileFilter.isHistoryDirectory(historyDir)) {
+        if (HistoryFileFilter.accepts(historyDir)) {
             // get the *.xml file that is not the JobConfigHistoryConsts.HISTORY_FILE
             // assumes random .xml files won't appear in the history directory
             final File[] listing = historyDir.listFiles();

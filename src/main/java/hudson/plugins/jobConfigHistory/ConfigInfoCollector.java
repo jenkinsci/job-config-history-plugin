@@ -83,7 +83,7 @@ final class ConfigInfoCollector {
         Arrays.sort(historyDirs, FileNameComparator.INSTANCE);
         final String itemName = prefix + itemDir.getName();
         if ("created".equals(type)) {
-            if (DeletedFileFilter.isDeleted(itemDir)) {
+            if (DeletedFileFilter.accepts(itemDir)) {
                 return;
             }
             File historyDir = historyDirs[0];
@@ -110,7 +110,7 @@ final class ConfigInfoCollector {
             for (final File historyDir : historyDirs) {
                 final ConfigInfo config;
                 final HistoryDescr histDescr = readHistoryXml(historyDir);
-                if (DeletedFileFilter.isDeleted(itemDir)) {
+                if (DeletedFileFilter.accepts(itemDir)) {
                     config = ConfigInfo.create(itemName, historyDir, histDescr, false);
                 } else {
                     config = ConfigInfo.create(itemName, historyDir, histDescr, true);
