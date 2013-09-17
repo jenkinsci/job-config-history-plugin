@@ -47,7 +47,7 @@ public class ConfigInfoCollectorTest {
      */
     @Test
     public void testCollectDeleted() throws Exception {
-        assertRootFolderHasYItemsOfTypeZ(0, "deleted");
+        assertRootFolderHasYItemsOfTypeZ(1, "deleted");
     }
 
     /**
@@ -66,7 +66,7 @@ public class ConfigInfoCollectorTest {
         FileUtils.copyDirectory(
                 unpackResourceZip.getResource("config-history/jobs/Test1"),
                 unpackResourceZip.getResource("config-history/jobs/Test2"));
-        assertRootFolderHasYItemsOfTypeZ(10, "other");
+        assertRootFolderHasYItemsOfTypeZ(13, "other");
     }
 
     /**
@@ -91,7 +91,7 @@ public class ConfigInfoCollectorTest {
     }
 
     void assertFolderXHasYItemsOfTypeZ(String folderName, int noOfHistoryItems, final String type) throws IOException {
-        ConfigInfoCollector sut = new ConfigInfoCollector(type);
+        ConfigInfoCollector sut = new ConfigInfoCollector(type, null);
         List<ConfigInfo> result = sut.collect(unpackResourceZip.getResource("config-history/jobs"), folderName);
         Collections.sort(result, ParsedDateComparator.DESCENDING);
         assertEquals(StringUtils.join(result, "\n"), noOfHistoryItems, result.size());
