@@ -24,14 +24,14 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Rule;
+import org.junit.Test;
 
 /**
  *
@@ -43,27 +43,11 @@ public class ConfigInfoCollectorTest {
     public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
 
     /**
-     * Test of getConfigsForType method, of class ConfigInfoCollector.
-     */
-    @Test
-    public void testGetConfigsForType() throws Exception {
-        File itemDir = unpackResourceZip.getResource("config-history/jobs/Test1");
-        String prefix = "";
-        ConfigInfoCollector sut = new ConfigInfoCollector("deleted");
-        List<ConfigInfo> result = sut.getConfigsForType(itemDir, prefix);
-        assertEquals(0, result.size());
-    }
-
-    /**
      * Test of collect method, of class ConfigInfoCollector.
      */
     @Test
     public void testCollectDeleted() throws Exception {
-        File rootDir = unpackResourceZip.getResource("config-history");
-        String prefix = "";
-        ConfigInfoCollector sut = new ConfigInfoCollector("deleted");
-        List<ConfigInfo> result = sut.collect(rootDir, prefix);
-        assertEquals(0, result.size());
+        assertRootFolderHasYItemsOfTypeZ(0, "deleted");
     }
 
     /**
@@ -71,11 +55,7 @@ public class ConfigInfoCollectorTest {
      */
     @Test
     public void testCollectCreated() throws Exception {
-        File rootDir = unpackResourceZip.getResource("config-history");
-        String prefix = "";
-        ConfigInfoCollector sut = new ConfigInfoCollector("created");
-        List<ConfigInfo> result = sut.collect(rootDir, prefix);
-        assertEquals(0, result.size());
+        assertRootFolderHasYItemsOfTypeZ(1, "created");
     }
 
     /**
@@ -83,30 +63,37 @@ public class ConfigInfoCollectorTest {
      */
     @Test
     public void testCollectOther() throws Exception {
-        File rootDir = unpackResourceZip.getResource("config-history");
-        String prefix = "jobs";
-        ConfigInfoCollector sut = new ConfigInfoCollector("other");
-        List<ConfigInfo> result = sut.collect(rootDir, prefix);
-        Collections.sort(result, ParsedDateComparator.DESCENDING);
-        System.out.println("\ntestCollectOther\n" + StringUtils.join(result, "\n"));
-        assertEquals(20, result.size());
+        FileUtils.copyDirectory(
+                unpackResourceZip.getResource("config-history/jobs/Test1"),
+                unpackResourceZip.getResource("config-history/jobs/Test2"));
+        assertRootFolderHasYItemsOfTypeZ(10, "other");
     }
 
     /**
      * Test of collect method, of class ConfigInfoCollector.
      */
     @Test
-    public void testCollectJobGroup() throws Exception {
-        File rootDir = unpackResourceZip.getResource("config-history");
-        // Create folder
+    public void testCollectJobFolder() throws Exception {
+        String folderName = "FolderName";
+        // Create folders
         FileUtils.copyDirectory(
-                unpackResourceZip.getResource("config-history/jobs/Test1"), 
-                unpackResourceZip.getResource("config-history/GroupName/jobs/Test1"));
-        String prefix = "GroupName";
-        ConfigInfoCollector sut = new ConfigInfoCollector("other");
-        List<ConfigInfo> result = sut.collect(rootDir, prefix);
+                unpackResourceZip.getResource("config-history/jobs/Test1"),
+                unpackResourceZip.getResource("config-history/jobs/" + folderName + "/Test1"));
+        FileUtils.copyDirectory(
+                unpackResourceZip.getResource("config-history/jobs/Test1"),
+                unpackResourceZip.getResource("config-history/jobs/" + folderName + "/Test2"));
+        assertFolderXHasYItemsOfTypeZ(folderName, 10, "other");
+        assertFolderXHasYItemsOfTypeZ(folderName, 2, "created");
+    }
+
+    void assertRootFolderHasYItemsOfTypeZ(int noOfHistoryItems, final String type) throws IOException {
+        assertFolderXHasYItemsOfTypeZ("", noOfHistoryItems, type);
+    }
+
+    void assertFolderXHasYItemsOfTypeZ(String folderName, int noOfHistoryItems, final String type) throws IOException {
+        ConfigInfoCollector sut = new ConfigInfoCollector(type);
+        List<ConfigInfo> result = sut.collect(unpackResourceZip.getResource("config-history/jobs"), folderName);
         Collections.sort(result, ParsedDateComparator.DESCENDING);
-        System.out.println("\ntestCollectJobGroup\n" + StringUtils.join(result, "\n"));
-        assertEquals(100, result.size());
+        assertEquals(StringUtils.join(result, "\n"), noOfHistoryItems, result.size());
     }
 }

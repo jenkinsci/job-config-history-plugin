@@ -32,10 +32,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Collects all configs of a special type.
+ * Collects all configs of a special type. For Jobs these follow the pattern:
+ * <tt>config-history/jobs/FOLDERNAME/JOBNAME/TIMESTAMP</tt>,
+ * where <tt>FOLDERNAME</tt> may be empty.
  *
  * Extracted from {@link JobConfigHistoryRootAction} for easier testability.
- * 
+ *
  * @author Mirko Friedenhagen.
  */
 final class ConfigInfoCollector {
@@ -73,26 +75,27 @@ final class ConfigInfoCollector {
      * @throws IOException
      *             If one of the entries cannot be read.
      */
-    List<ConfigInfo> getConfigsForType(File itemDir, String prefix) throws IOException {
+    void getConfigsForType(File itemDir, String prefix) throws IOException {
         final File[] historyDirs = itemDir.listFiles(HistoryFileFilter.INSTANCE);
         if (historyDirs.length == 0) {
-            return configs;
+            return;
         }
         Arrays.sort(historyDirs, FileNameComparator.INSTANCE);
+        final String itemName = prefix + itemDir.getName();
         if ("created".equals(type)) {
             if (DeletedFileFilter.INSTANCE.accept(itemDir)) {
-                return configs;
+                return;
             }
             File historyDir = historyDirs[0];
             HistoryDescr histDescr = readHistoryXml(historyDir);
             if ("Created".equals(histDescr.getOperation())) {
-                final ConfigInfo config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, true);
+                final ConfigInfo config = ConfigInfo.create(itemName, historyDir, histDescr, true);
                 configs.add(config);
             } else {
                 historyDir = historyDirs[1];
                 histDescr = readHistoryXml(historyDir);
                 if ("Created".equals(histDescr.getOperation())) {
-                    final ConfigInfo config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, true);
+                    final ConfigInfo config = ConfigInfo.create(itemName, historyDir, histDescr, true);
                     configs.add(config);
                 }
             }
@@ -100,22 +103,21 @@ final class ConfigInfoCollector {
             final File historyDir = historyDirs[historyDirs.length - 1];
             final HistoryDescr histDescr = readHistoryXml(historyDir);
             if ("Deleted".equals(histDescr.getOperation())) {
-                final ConfigInfo config = ConfigInfo.create(itemDir.getName(), historyDir, histDescr, false);
+                final ConfigInfo config = ConfigInfo.create(itemName, historyDir, histDescr, false);
                 configs.add(config);
             }
         } else {
             for (final File historyDir : historyDirs) {
                 final ConfigInfo config;
                 final HistoryDescr histDescr = readHistoryXml(historyDir);
-                if (!DeletedFileFilter.INSTANCE.accept(itemDir)) {
-                    config = ConfigInfo.create(prefix + itemDir.getName(), historyDir, histDescr, true);
+                if (DeletedFileFilter.INSTANCE.accept(itemDir)) {
+                    config = ConfigInfo.create(itemName, historyDir, histDescr, false);
                 } else {
-                    config = ConfigInfo.create(prefix + itemDir.getName(), historyDir, histDescr, false);
+                    config = ConfigInfo.create(itemName, historyDir, histDescr, true);
                 }
                 configs.add(config);
             }
         }
-        return configs;
     }
 
     /**
@@ -123,24 +125,20 @@ final class ConfigInfoCollector {
      *
      * @param rootDir
      *            of config-history.
-     * @param prefix
-     *            prefix.
+     * @param folderName
+     *            folderName, usually just the empty string.
      * @throws IOException if an entry could not be read.
      */
-    public List<ConfigInfo> collect(final File rootDir, final String prefix) throws IOException {
+    public List<ConfigInfo> collect(final File rootDir, final String folderName) throws IOException {
+        final File rootWithFolder = new File(rootDir, folderName);
         final File[] itemDirs;
         if ("deleted".equals(type)) {
-            itemDirs = rootDir.listFiles(DeletedFileFilter.INSTANCE);
+            itemDirs = rootWithFolder.listFiles(DeletedFileFilter.INSTANCE);
         } else {
-            itemDirs = rootDir.listFiles();
+            itemDirs = rootWithFolder.listFiles();
         }
         for (final File itemDir : itemDirs) {
-            configs.addAll(getConfigsForType(itemDir, prefix));
-            final File jobs = new File(itemDir, JobConfigHistoryConsts.JOBS_HISTORY_DIR);
-            if (jobs.isDirectory()) {
-                // Recurse into folders.
-                collect(jobs, prefix + itemDir.getName() + "/");
-            }
+            getConfigsForType(itemDir, folderName);
         }
         return configs;
     }
