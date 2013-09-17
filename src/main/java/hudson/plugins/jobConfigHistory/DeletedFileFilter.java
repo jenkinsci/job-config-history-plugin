@@ -36,7 +36,7 @@ import java.io.FileFilter;
 class DeletedFileFilter implements FileFilter {
 
     /** Only one instance needed. */
-    public static final DeletedFileFilter INSTANCE = new DeletedFileFilter();
+    static final DeletedFileFilter INSTANCE = new DeletedFileFilter();
 
     @Override
     public boolean accept(File file) {
