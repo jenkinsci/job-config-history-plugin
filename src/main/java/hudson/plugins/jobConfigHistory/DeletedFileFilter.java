@@ -28,7 +28,8 @@ import java.io.File;
 import java.io.FileFilter;
 
 /**
- * A filter to return only those directories of a file listing that represent deleted jobs history directories.
+ * A filter to return only those directories of a file listing that represent deleted jobs history directories, the names of which
+ * contain {@link JobConfigHistoryConsts#DELETED_MARKER}.
  *
  * @author Mirko Friedenhagen
  */
@@ -40,6 +41,16 @@ class DeletedFileFilter implements FileFilter {
     @Override
     public boolean accept(File file) {
         return file.getName().contains(JobConfigHistoryConsts.DELETED_MARKER);
+    }
+
+    /**
+     * Is this item deleted?
+     *
+     * @param file to inspect
+     * @return true when file has the special deleted mark.
+     */
+    public static boolean isDeleted(File file) {
+        return INSTANCE.accept(file);
     }
 
 }
