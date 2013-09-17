@@ -34,55 +34,55 @@ import org.junit.Rule;
  *
  * @author Mirko Friedenhagen
  */
-public class CollectConfigsTest {
+public class ConfigsCollectorTest {
 
     @Rule
     public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
 
     /**
-     * Test of getConfigsForType method, of class CollectConfigs.
+     * Test of getConfigsForType method, of class ConfigsCollector.
      */
     @Test
     public void testGetConfigsForType() throws Exception {
         File itemDir = unpackResourceZip.getResource("config-history/jobs/Test1");
         String prefix = "";
-        CollectConfigs sut = new CollectConfigs("deleted");
+        ConfigsCollector sut = new ConfigsCollector("deleted");
         List<ConfigInfo> result = sut.getConfigsForType(itemDir, prefix);
         assertEquals(0, result.size());
     }
 
     /**
-     * Test of collect method, of class CollectConfigs.
+     * Test of collect method, of class ConfigsCollector.
      */
     @Test
     public void testCollectDeleted() throws Exception {
         File rootDir = unpackResourceZip.getResource("config-history/jobs/Test1");
         String prefix = "";
-        CollectConfigs sut = new CollectConfigs("deleted");
+        ConfigsCollector sut = new ConfigsCollector("deleted");
         List<ConfigInfo> result = sut.collect(rootDir, prefix);
         assertEquals(0, result.size());
     }
 
     /**
-     * Test of collect method, of class CollectConfigs.
+     * Test of collect method, of class ConfigsCollector.
      */
     @Test
     public void testCollectCreated() throws Exception {
         File rootDir = unpackResourceZip.getResource("config-history/jobs/Test1");
         String prefix = "";
-        CollectConfigs sut = new CollectConfigs("created");
+        ConfigsCollector sut = new ConfigsCollector("created");
         List<ConfigInfo> result = sut.collect(rootDir, prefix);
         assertEquals(0, result.size());
     }
 
     /**
-     * Test of collect method, of class CollectConfigs.
+     * Test of collect method, of class ConfigsCollector.
      */
     @Test
     public void testCollectOther() throws Exception {
         File rootDir = unpackResourceZip.getResource("config-history/jobs/Test1");
         String prefix = "";
-        CollectConfigs sut = new CollectConfigs("other");
+        ConfigsCollector sut = new ConfigsCollector("other");
         List<ConfigInfo> result = sut.collect(rootDir, prefix);
         assertEquals(0, result.size());
     }

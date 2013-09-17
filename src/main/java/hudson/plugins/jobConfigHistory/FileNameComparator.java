@@ -25,12 +25,16 @@
 package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * Utility class for comparing file names alphanumerically.
+ *
+ * @author Mirko Friedenhagen
  */
-class FileNameComparator implements Comparator<File> {
+@SuppressWarnings("serial")
+final class FileNameComparator implements Comparator<File>, Serializable {
 
     /** The one and only instance. */
     public static final FileNameComparator INSTANCE = new FileNameComparator();

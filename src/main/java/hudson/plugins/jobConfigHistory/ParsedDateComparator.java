@@ -8,7 +8,7 @@ import java.util.Comparator;
  *
  * Sort in descending order.
  *
- * @author mfriedenhagen
+ * @author Mirko Friedenhagen
  */
 @SuppressWarnings("serial")
 final class ParsedDateComparator implements Comparator<ParsedDate>, Serializable {

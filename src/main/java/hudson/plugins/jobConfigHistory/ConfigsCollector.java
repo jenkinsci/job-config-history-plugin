@@ -38,32 +38,25 @@ import java.util.List;
  * 
  * @author Mirko Friedenhagen.
  */
-class CollectConfigs {
+final class ConfigsCollector {
 
     /**
      * outparameter.
      */
-    private final List<ConfigInfo> configs;
+    private final List<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+
     /**
      * type to collect.
      */
     private final String type;
 
+
     /**
-     * Collects configs.
+     * Collects configs of the given type.
      *
-     * @param configs
-     *            outparameter.
-     * @param type
-     *            of configs to collect
-     * @param rootDir
-     *            of config-history.
-     * @param prefix
-     *            prefix.
-     * @throws IOException if an entry could not be read.
+     * @param type may be one of deleted, created or jobs?
      */
-    public CollectConfigs(String type) {
-        this.configs = new ArrayList<ConfigInfo>();
+    public ConfigsCollector(String type) {
         this.type = type;
     }
 
@@ -134,7 +127,7 @@ class CollectConfigs {
      *            prefix.
      * @throws IOException if an entry could not be read.
      */
-    List<ConfigInfo> collect(final File rootDir, final String prefix) throws IOException {
+    public List<ConfigInfo> collect(final File rootDir, final String prefix) throws IOException {
         final File[] itemDirs;
         if ("deleted".equals(type)) {
             itemDirs = rootDir.listFiles(DeletedFileFilter.INSTANCE);
