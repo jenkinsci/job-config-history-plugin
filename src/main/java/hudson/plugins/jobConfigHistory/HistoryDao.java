@@ -3,7 +3,6 @@ package hudson.plugins.jobConfigHistory;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
 import java.io.File;
-import java.util.List;
 import java.util.SortedMap;
 
 /**
