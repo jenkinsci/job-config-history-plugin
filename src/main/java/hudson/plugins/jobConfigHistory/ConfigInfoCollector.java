@@ -69,19 +69,19 @@ final class ConfigInfoCollector {
      *
      * @param itemDir
      *            The job directory as File
-     * @param prefix
-     *            Something Jesse Glick came up with but never documented.
+     * @param folderName
+     *            Something Jesse Glick came up with but never documented, probably the folderName.
      * @return List of ConfigInfo, may be empty
      * @throws IOException
      *             If one of the entries cannot be read.
      */
-    void getConfigsForType(File itemDir, String prefix) throws IOException {
+    void getConfigsForType(File itemDir, String folderName) throws IOException {
         final File[] historyDirs = itemDir.listFiles(HistoryFileFilter.INSTANCE);
         if (historyDirs.length == 0) {
             return;
         }
         Arrays.sort(historyDirs, FileNameComparator.INSTANCE);
-        final String itemName = prefix + itemDir.getName();
+        final String itemName = folderName + itemDir.getName();
         if ("created".equals(type)) {
             if (DeletedFileFilter.accepts(itemDir)) {
                 return;
