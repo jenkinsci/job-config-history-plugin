@@ -525,4 +525,13 @@ public class FileHistoryDao implements HistoryDao {
         }
     }
 
+    @Override
+    public File[] getDeletedJobs() {
+        return getJobHistoryRootDir().listFiles(DeletedFileFilter.INSTANCE);
+    }
+
+    @Override
+    public File[] getSystemConfigs() {
+        return historyRootDir.listFiles(NonJobsDirectoryFileFilter.INSTANCE);
+    }
 }

@@ -461,6 +461,7 @@ public class FileHistoryDaoTest {
         boolean result = sutWithUserAndNoDuplicateHistory.checkDuplicate(xmlFile);
         assertEquals(false, result);
     }
+
     /**
      * Test of checkDuplicate method, of class FileHistoryDao.
      */
@@ -469,5 +470,26 @@ public class FileHistoryDaoTest {
         XmlFile xmlFile = new XmlFile(new File(jenkinsHome, "jobs/Test2/config.xml"));
         boolean result = sutWithUserAndNoDuplicateHistory.checkDuplicate(xmlFile);
         assertEquals(true, result);
+    }
+
+    /**
+     * Test of getSystemConfigs method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetSystemConfigs() {
+        final File[] systemConfigs = sutWithoutUserAndDuplicateHistory.getSystemConfigs();
+        assertEquals(1, systemConfigs.length);
+        assertEquals("config", systemConfigs[0].getName());
+    }
+
+    /**
+     * Test of getDeletedJobs method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetDeletedJobs() {
+        final File[] deletedJobs = sutWithoutUserAndDuplicateHistory.getDeletedJobs();
+        assertEquals(1, deletedJobs.length);
+        final String name = deletedJobs[0].getName();
+        assertThat(name, containsString("Foo"));
     }
 }

@@ -24,6 +24,7 @@
 
 package hudson.plugins.jobConfigHistory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +43,14 @@ public class ConfigInfoCollectorTest {
     @Rule
     public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
 
+    @Test
+    public void testGetConfigsForType() throws IOException {
+        final ConfigInfoCollector sut = createSut("created");
+        final File historyDirWithNoEntries = unpackResourceZip.getResource("config-history/jobs/Test2");
+        historyDirWithNoEntries.mkdir();
+        sut.getConfigsForType(historyDirWithNoEntries, "");
+        assertEquals(0, sut.getConfigs().size());
+    }
     /**
      * Test of collect method, of class ConfigInfoCollector.
      */
@@ -91,9 +100,13 @@ public class ConfigInfoCollectorTest {
     }
 
     void assertFolderXHasYItemsOfTypeZ(String folderName, int noOfHistoryItems, final String type) throws IOException {
-        ConfigInfoCollector sut = new ConfigInfoCollector(type);
+        ConfigInfoCollector sut = createSut(type);
         List<ConfigInfo> result = sut.collect(unpackResourceZip.getResource("config-history/jobs"), folderName);
         Collections.sort(result, ParsedDateComparator.DESCENDING);
         assertEquals(StringUtils.join(result, "\n"), noOfHistoryItems, result.size());
+    }
+
+    private ConfigInfoCollector createSut(final String type) {
+        return new ConfigInfoCollector(type, null);
     }
 }

@@ -51,15 +51,18 @@ final class ConfigInfoCollector {
      * type to collect.
      */
     private final String type;
+    private final HistoryDao historyDao;
 
 
     /**
      * Collects configs of the given type.
      *
      * @param type may be one of deleted, created or jobs?
+     * @param historyDao the value of historyDao
      */
-    public ConfigInfoCollector(String type) {
+    public ConfigInfoCollector(String type, HistoryDao historyDao) {
         this.type = type;
+        this.historyDao = historyDao;
     }
 
     /**
@@ -71,7 +74,6 @@ final class ConfigInfoCollector {
      *            The job directory as File
      * @param folderName
      *            Something Jesse Glick came up with but never documented, probably the folderName.
-     * @return List of ConfigInfo, may be empty
      * @throws IOException
      *             If one of the entries cannot be read.
      */
@@ -90,13 +92,13 @@ final class ConfigInfoCollector {
             HistoryDescr histDescr = readHistoryXml(historyDir);
             if ("Created".equals(histDescr.getOperation())) {
                 final ConfigInfo config = ConfigInfo.create(itemName, historyDir, histDescr, true);
-                configs.add(config);
+                getConfigs().add(config);
             } else {
                 historyDir = historyDirs[1];
                 histDescr = readHistoryXml(historyDir);
                 if ("Created".equals(histDescr.getOperation())) {
                     final ConfigInfo config = ConfigInfo.create(itemName, historyDir, histDescr, true);
-                    configs.add(config);
+                    getConfigs().add(config);
                 }
             }
         } else if ("deleted".equals(type)) {
@@ -104,7 +106,7 @@ final class ConfigInfoCollector {
             final HistoryDescr histDescr = readHistoryXml(historyDir);
             if ("Deleted".equals(histDescr.getOperation())) {
                 final ConfigInfo config = ConfigInfo.create(itemName, historyDir, histDescr, false);
-                configs.add(config);
+                getConfigs().add(config);
             }
         } else {
             for (final File historyDir : historyDirs) {
@@ -115,7 +117,7 @@ final class ConfigInfoCollector {
                 } else {
                     config = ConfigInfo.create(itemName, historyDir, histDescr, true);
                 }
-                configs.add(config);
+                getConfigs().add(config);
             }
         }
     }
@@ -127,6 +129,7 @@ final class ConfigInfoCollector {
      *            of config-history.
      * @param folderName
      *            folderName, usually just the empty string.
+     * @return List of ConfigInfo, may be empty
      * @throws IOException if an entry could not be read.
      */
     public List<ConfigInfo> collect(final File rootDir, final String folderName) throws IOException {
@@ -140,7 +143,7 @@ final class ConfigInfoCollector {
         for (final File itemDir : itemDirs) {
             getConfigsForType(itemDir, folderName);
         }
-        return configs;
+        return getConfigs();
     }
 
     /**
@@ -155,5 +158,12 @@ final class ConfigInfoCollector {
     private HistoryDescr readHistoryXml(File historyDir) throws IOException {
         final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
         return (HistoryDescr) historyXml.read();
+    }
+
+    /**
+     * @return the configs
+     */
+    List<ConfigInfo> getConfigs() {
+        return configs;
     }
 }

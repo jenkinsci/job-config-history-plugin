@@ -316,7 +316,7 @@ public class JobConfigHistory extends Plugin {
     }
 
     /**
-     * @see FileHistoryDao#getConfigFile(java.io.File) .
+     * @see FileHistoryDao#getConfigFile(java.io.File).
      *
      * @param historyDir
      *            The history directory to look under.
@@ -374,7 +374,7 @@ public class JobConfigHistory extends Plugin {
 
     /**
      * Checks if we should purge old history entries under the specified root
-     * using the {@code maxHistoryEntries} value as the criteria, and if required
+     * using the {@literal maxHistoryEntries} value as the criteria, and if required
      * calls the appropriate method to perform the purge.
      *
      * @param itemHistoryRoot

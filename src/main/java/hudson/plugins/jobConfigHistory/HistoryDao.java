@@ -3,6 +3,7 @@ package hudson.plugins.jobConfigHistory;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
 import java.io.File;
+import java.util.List;
 import java.util.SortedMap;
 
 /**
@@ -70,7 +71,7 @@ public interface HistoryDao {
      * @return old revisions mapped to the identifier.
      */
     SortedMap<String, HistoryDescr> getRevisions(XmlFile xmlFile);
-    
+
     /**
      * Returns one old configuration of item.
      *
@@ -114,7 +115,7 @@ public interface HistoryDao {
      * @param maxEntries maximum number of entries.
      */
     void purgeOldEntries(final File itemHistoryRoot, final int maxEntries);
-    
+
     /**
      * Checks whether the respective history entry is a 'Created' entry.
      *
@@ -122,5 +123,19 @@ public interface HistoryDao {
      * @return True if the directory contains a 'Created' entry.
      */
     boolean isCreatedEntry(File historyDir);
+
+    /**
+     * Returns a list of deleted jobs with a history.
+     *
+     * @return list of deleted jobs with a history.
+     */
+    File[] getDeletedJobs();
+
+    /**
+     * Returns a list of all system configuration files with a history.
+     *
+     * @return list of all system configuration files with a history.
+     */
+    File[] getSystemConfigs();
 }
 
