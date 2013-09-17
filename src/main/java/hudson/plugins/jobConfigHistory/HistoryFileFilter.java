@@ -18,4 +18,13 @@ class HistoryFileFilter implements FileFilter {
         return file.exists() && new File(file, JobConfigHistoryConsts.HISTORY_FILE).exists();
     }
 
+    /**
+     * Is file a history directory?
+     *
+     * @param file to inspect
+     * @return true, when file denotes a history directory.
+     */
+    public static boolean isHistoryDirectory(File file) {
+        return INSTANCE.accept(file);
+    }
 }

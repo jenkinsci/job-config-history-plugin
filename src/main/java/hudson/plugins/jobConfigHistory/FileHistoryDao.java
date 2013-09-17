@@ -472,7 +472,7 @@ public class FileHistoryDao implements HistoryDao {
      */
     static File getConfigFile(final File historyDir) {
         File configFile = null;
-        if (HistoryFileFilter.INSTANCE.accept(historyDir)) {
+        if (HistoryFileFilter.isHistoryDirectory(historyDir)) {
             // get the *.xml file that is not the JobConfigHistoryConsts.HISTORY_FILE
             // assumes random .xml files won't appear in the history directory
             final File[] listing = historyDir.listFiles();
