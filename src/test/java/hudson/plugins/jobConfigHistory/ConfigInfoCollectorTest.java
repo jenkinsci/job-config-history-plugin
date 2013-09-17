@@ -91,7 +91,7 @@ public class ConfigInfoCollectorTest {
     }
 
     void assertFolderXHasYItemsOfTypeZ(String folderName, int noOfHistoryItems, final String type) throws IOException {
-        ConfigInfoCollector sut = new ConfigInfoCollector(type, null);
+        ConfigInfoCollector sut = new ConfigInfoCollector(type);
         List<ConfigInfo> result = sut.collect(unpackResourceZip.getResource("config-history/jobs"), folderName);
         Collections.sort(result, ParsedDateComparator.DESCENDING);
         assertEquals(StringUtils.join(result, "\n"), noOfHistoryItems, result.size());
