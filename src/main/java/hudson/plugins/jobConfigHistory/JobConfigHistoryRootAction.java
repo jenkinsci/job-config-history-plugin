@@ -163,7 +163,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
                     "{0} is not a directory, assuming that no history exists yet.",
                     historyRootDir);
         } else {
-            configs.addAll(new ConfigsCollector(type).collect(historyRootDir, ""));
+            configs.addAll(new ConfigInfoCollector(type).collect(historyRootDir, ""));
         }
         return configs;
     }

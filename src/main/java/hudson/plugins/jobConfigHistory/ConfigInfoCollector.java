@@ -38,7 +38,7 @@ import java.util.List;
  * 
  * @author Mirko Friedenhagen.
  */
-final class ConfigsCollector {
+final class ConfigInfoCollector {
 
     /**
      * outparameter.
@@ -56,7 +56,7 @@ final class ConfigsCollector {
      *
      * @param type may be one of deleted, created or jobs?
      */
-    public ConfigsCollector(String type) {
+    public ConfigInfoCollector(String type) {
         this.type = type;
     }
 

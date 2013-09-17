@@ -25,7 +25,10 @@
 package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Rule;
@@ -34,56 +37,76 @@ import org.junit.Rule;
  *
  * @author Mirko Friedenhagen
  */
-public class ConfigsCollectorTest {
+public class ConfigInfoCollectorTest {
 
     @Rule
     public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
 
     /**
-     * Test of getConfigsForType method, of class ConfigsCollector.
+     * Test of getConfigsForType method, of class ConfigInfoCollector.
      */
     @Test
     public void testGetConfigsForType() throws Exception {
         File itemDir = unpackResourceZip.getResource("config-history/jobs/Test1");
         String prefix = "";
-        ConfigsCollector sut = new ConfigsCollector("deleted");
+        ConfigInfoCollector sut = new ConfigInfoCollector("deleted");
         List<ConfigInfo> result = sut.getConfigsForType(itemDir, prefix);
         assertEquals(0, result.size());
     }
 
     /**
-     * Test of collect method, of class ConfigsCollector.
+     * Test of collect method, of class ConfigInfoCollector.
      */
     @Test
     public void testCollectDeleted() throws Exception {
-        File rootDir = unpackResourceZip.getResource("config-history/jobs/Test1");
+        File rootDir = unpackResourceZip.getResource("config-history");
         String prefix = "";
-        ConfigsCollector sut = new ConfigsCollector("deleted");
+        ConfigInfoCollector sut = new ConfigInfoCollector("deleted");
         List<ConfigInfo> result = sut.collect(rootDir, prefix);
         assertEquals(0, result.size());
     }
 
     /**
-     * Test of collect method, of class ConfigsCollector.
+     * Test of collect method, of class ConfigInfoCollector.
      */
     @Test
     public void testCollectCreated() throws Exception {
-        File rootDir = unpackResourceZip.getResource("config-history/jobs/Test1");
+        File rootDir = unpackResourceZip.getResource("config-history");
         String prefix = "";
-        ConfigsCollector sut = new ConfigsCollector("created");
+        ConfigInfoCollector sut = new ConfigInfoCollector("created");
         List<ConfigInfo> result = sut.collect(rootDir, prefix);
         assertEquals(0, result.size());
     }
 
     /**
-     * Test of collect method, of class ConfigsCollector.
+     * Test of collect method, of class ConfigInfoCollector.
      */
     @Test
     public void testCollectOther() throws Exception {
-        File rootDir = unpackResourceZip.getResource("config-history/jobs/Test1");
-        String prefix = "";
-        ConfigsCollector sut = new ConfigsCollector("other");
+        File rootDir = unpackResourceZip.getResource("config-history");
+        String prefix = "jobs";
+        ConfigInfoCollector sut = new ConfigInfoCollector("other");
         List<ConfigInfo> result = sut.collect(rootDir, prefix);
-        assertEquals(0, result.size());
+        Collections.sort(result, ParsedDateComparator.DESCENDING);
+        System.out.println("\ntestCollectOther\n" + StringUtils.join(result, "\n"));
+        assertEquals(20, result.size());
+    }
+
+    /**
+     * Test of collect method, of class ConfigInfoCollector.
+     */
+    //@Test
+    public void testCollectJobGroup() throws Exception {
+        File rootDir = unpackResourceZip.getResource("config-history");
+        // Create folder
+        FileUtils.copyDirectory(
+                unpackResourceZip.getResource("config-history/jobs/Test1"), 
+                unpackResourceZip.getResource("config-history/GroupName/jobs/Test1"));
+        String prefix = "GroupName";
+        ConfigInfoCollector sut = new ConfigInfoCollector("other");
+        List<ConfigInfo> result = sut.collect(rootDir, prefix);
+        Collections.sort(result, ParsedDateComparator.DESCENDING);
+        System.out.println("\ntestCollectJobGroup\n" + StringUtils.join(result, "\n"));
+        assertEquals(100, result.size());
     }
 }
