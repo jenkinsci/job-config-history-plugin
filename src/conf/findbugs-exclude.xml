@@ -6,7 +6,7 @@
         <Class name="~bmsi\.util\.DiffPrint.*" />
     </Match>
     <Match>
-        <Class name="~hudson\.plugins\.jobConfigHistory\.*Comparator"/>
+        <Class name="~hudson\.plugins\.jobConfigHistory\..*Comparator"/>
         <Bug code="SnVI"/>
     </Match>
 </FindBugsFilter>
