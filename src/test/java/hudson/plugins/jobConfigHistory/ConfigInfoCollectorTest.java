@@ -95,7 +95,7 @@ public class ConfigInfoCollectorTest {
     /**
      * Test of collect method, of class ConfigInfoCollector.
      */
-    //@Test
+    @Test
     public void testCollectJobGroup() throws Exception {
         File rootDir = unpackResourceZip.getResource("config-history");
         // Create folder
