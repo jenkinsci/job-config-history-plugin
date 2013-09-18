@@ -2,12 +2,16 @@ package hudson.plugins.jobConfigHistory;
 
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.List;
+
+import org.jvnet.hudson.test.recipes.LocalData;
 
 import hudson.model.FreeStyleProject;
 import hudson.security.LegacyAuthorizationStrategy;
 import hudson.security.HudsonPrivateSecurityRealm;
 
 import com.gargoylesoftware.htmlunit.TextPage;
+import com.gargoylesoftware.htmlunit.WebAssert;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
@@ -220,5 +224,115 @@ public class JobConfigHistoryRootActionIT extends
         final HtmlAnchor rawLink = (HtmlAnchor) htmlPage.getAnchorByText("(RAW)");
         final String rawPage = ((TextPage) rawLink.click()).getContent();
         assertTrue("Verify config file is shown", rawPage.contains(description));
+    }
+    
+    
+    /**
+     * Tests if restoring a project that was disabled before deletion works.
+     * @throws Exception
+     */
+    public void testRestoreAfterDisabled() throws Exception {
+        final String description = "bla";
+        final String name = "TestProject";
+        final FreeStyleProject project = createFreeStyleProject(name);
+        project.setDescription(description);
+        project.disable();
+        Thread.sleep(SLEEP_TIME);
+        project.delete();
+        
+        final HtmlPage jobPage = restoreProject();
+        WebAssert.assertTextPresent(jobPage, name);
+        WebAssert.assertTextPresent(jobPage, description);
+        
+        final HtmlPage historyPage = webClient.goTo("job/" + name + "/" + JobConfigHistoryConsts.URLNAME);
+        System.out.println(historyPage.asXml());
+        assertTrue("History page should contain 'Deleted' entry", historyPage.asXml().contains("Deleted"));
+        final List<HtmlAnchor> hrefs = historyPage.getByXPath("//a[contains(@href, \"configOutput?type=xml\")]");
+        assertTrue(hrefs.size() > 2);
+    }
+    
+    /**
+     * Tests whether finding a new name for a restored project works 
+     * if the old name is already occupied.
+     * @throws Exception
+     */
+    public void testRestoreWithSameName() throws Exception {
+        final String description = "blubb";
+        final String name = "TestProject";
+        final FreeStyleProject project = createFreeStyleProject(name);
+        project.setDescription(description);
+        Thread.sleep(SLEEP_TIME);
+        project.delete();
+        
+        createFreeStyleProject(name);
+
+        final HtmlPage jobPage = restoreProject();
+        WebAssert.assertTextPresent(jobPage, description);
+        WebAssert.assertTextPresent(jobPage, name + "_1");
+    }
+
+    /**
+     * Tests that project gets restored even without previous configs,
+     * because there is one saved at the time of deletion.
+     * @throws Exception
+     */
+    @LocalData
+    public void testRestoreWithoutConfigs() throws Exception {
+        final String name = "JobWithNoConfigHistory";
+        final FreeStyleProject project = (FreeStyleProject) hudson.getItem(name);
+        final String description = project.getDescription();
+        Thread.sleep(SLEEP_TIME);
+        project.delete();
+        
+        final HtmlPage jobPage = restoreProject();
+        WebAssert.assertTextPresent(jobPage, name);
+        WebAssert.assertTextPresent(jobPage, description);
+    }
+
+    /**
+     * A project will not be restored if there are no configs present 
+     * and it has been disabled at the time of deletion.
+     * @throws Exception
+     */
+    @LocalData
+    public void testNoRestoreLinkWhenNoConfigs() throws Exception {
+        final String name = "DisabledJobWithNoConfigHistory";
+        final FreeStyleProject project = (FreeStyleProject) hudson.getItem(name);
+        Thread.sleep(SLEEP_TIME);
+        project.delete();
+        
+        final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
+        WebAssert.assertElementNotPresentByXPath(htmlPage, ("//img[contains(@src, \"restore.png\")]"));
+    }
+ 
+    private HtmlPage restoreProject() throws Exception {
+        final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
+        final HtmlAnchor restoreLink = (HtmlAnchor) htmlPage.getElementById("restore");
+        final HtmlPage reallyRestorePage = (HtmlPage) restoreLink.click();
+        final HtmlForm restoreForm = reallyRestorePage.getFormByName("restore");
+        final HtmlPage jobPage = submit(restoreForm, "Submit");
+        return jobPage;
+    }
+    
+    /**
+     * Tests whether the 'Restore project' button on the history page works as well.
+     * @throws Exception
+     */
+    public void testRestoreFromHistoryPage() throws Exception {
+        final String description = "All your base";
+        final String name = "TestProject";
+        final FreeStyleProject project = createFreeStyleProject(name);
+        project.setDescription(description);
+        Thread.sleep(SLEEP_TIME);
+        project.delete();
+        
+        final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
+        final List<HtmlAnchor> hrefs = htmlPage.getByXPath("//a[contains(@href, \"TestProject_deleted_\")]");
+        final HtmlPage historyPage = (HtmlPage) hrefs.get(0).click();
+        final HtmlPage reallyRestorePage = submit(historyPage.getFormByName("forward"), "Submit");
+        final HtmlPage jobPage = submit(reallyRestorePage.getFormByName("restore"), "Submit");
+
+        WebAssert.assertTextPresent(jobPage, name);
+        WebAssert.assertTextPresent(jobPage, description);
     }
 }
