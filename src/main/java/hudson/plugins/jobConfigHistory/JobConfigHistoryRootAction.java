@@ -2,8 +2,10 @@ package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,9 +18,11 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.XmlFile;
 import hudson.model.Item;
 import hudson.model.RootAction;
+import hudson.model.AbstractProject;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
@@ -396,5 +400,114 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
                     "Invalid directory name because of '..': " + name);
         }
         return true;
+    }
+    
+    /**
+     * Action when 'restore' button is pressed: Restore deleted project.
+     * 
+     * @param req Incoming StaplerRequest
+     * @param rsp Outgoing StaplerResponse
+     * @throws IOException If something goes wrong
+     */
+    public final void doRestore(StaplerRequest req, StaplerResponse rsp) throws IOException {
+        getAccessControlledObject().checkPermission(AbstractProject.CONFIGURE);
+
+        final String deletedName = req.getParameter("name");
+        final String newName = deletedName.split("_deleted_") [0];
+
+        final XmlFile configXml = getLastAvailableConfigXml(deletedName);
+               
+        final InputStream is = new ByteArrayInputStream(configXml.asString().getBytes("UTF-8"));
+        final AbstractProject project = (AbstractProject) getHudson().createProjectFromXML(findNewName(newName), is);
+        copyHistoryFiles(deletedName, newName);
+        
+        rsp.sendRedirect(getHudson().getRootUrl() + project.getUrl());
+    }
+    
+    /**
+     * Retrieves the last or second to last config.xml. 
+     * The latter is necessary when the last config.xml is missing 
+     * although the history entry exists, which happens when a project is deleted 
+     * while being disabled.
+     * 
+     * @param name The name of the deleted project.
+     * @return The last or second to last config as XmlFile or null.
+     */
+    public XmlFile getLastAvailableConfigXml(String name) {
+        XmlFile configXml = null;
+        final List<ConfigInfo> configInfos;
+        try {
+            configInfos = getSingleConfigs(name);
+        } catch (IOException ex) {
+            LOG.finest("Unable to get config history for " +  name);
+            return configXml;
+        }
+                
+        if (configInfos.size() > 1) {
+            Collections.sort(configInfos, ParsedDateComparator.DESCENDING);
+            ConfigInfo lastChange = configInfos.get(1);
+            String timestamp = lastChange.getDate();
+            configXml = getOldConfigXml(name, timestamp);
+        }
+        
+        return configXml;
+    }
+    
+    /**
+     * Finds a name for the project to be restored.
+     * If the old name is already in use by another project, 
+     * "_" plus a number is appended to the name until an unused name is found.
+     * 
+     * @param name The old name as String.
+     * @return the new name as String.
+     */
+    private String findNewName(String name) {
+        if (getHudson().getItem(name) != null) {
+            StringBuffer buf = new StringBuffer(name + "_0");
+            final int nameLength = buf.length() - 1;
+            int i = 1;
+            do {
+                buf = buf.replace(nameLength, buf.length() - 1, String.valueOf(i));
+                i++;
+            } while (getHudson().getItem(buf.toString()) != null);
+            return buf.toString();
+        } else {
+            return name;
+        }
+    }
+    
+    /**
+     * Moves the history files of a restored project from the old location (_deleted_)
+     * to a directory with the new name.
+     * @param oldName The old name of the project (containing "_deleted_")
+     * @param newName The new name of the project
+     */
+    private void copyHistoryFiles(String oldName, String newName) {
+        final FilePath oldFilePath = new FilePath(new File(getPlugin().getJobHistoryRootDir(), oldName));
+        final FilePath newFilePath = new FilePath(new File(getPlugin().getJobHistoryRootDir(), newName));
+        try {
+            oldFilePath.moveAllChildrenTo(newFilePath);
+            oldFilePath.delete();
+        } catch (InterruptedException ex) {
+            LOG.info("Unable to move old history data " + oldFilePath + " to new directory " + newFilePath);
+            LOG.info(ex.getMessage());
+        } catch (IOException ex) {
+            LOG.info("Unable to move old history data " + oldFilePath + " to new directory " + newFilePath);            
+            LOG.info(ex.getMessage());
+        }
+    }
+    
+    /**
+     * Action when 'restore' button in history.jelly is pressed.
+     * Gets required parameter and forwards to restoreQuestion.jelly.
+
+     * @param req StaplerRequest created by pressing the button
+     * @param rsp Outgoing StaplerResponse
+     * @throws IOException If redirect goes wrong
+     */
+    public final void doForwardToRestoreQuestion(StaplerRequest req, StaplerResponse rsp)
+        throws IOException {
+        final String name = req.getParameter("name");
+        rsp.sendRedirect("restoreQuestion?name=" + name);
     }
 }
