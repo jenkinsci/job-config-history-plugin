@@ -3,10 +3,10 @@
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
     <j:set var="timestamp" value="${request.getParameter('timestamp')}" />
-		${%Replace the current configuration with the version from}	${request.getParameter("timestamp")}?
+		${%Replace the current configuration with the version from}	${timestamp}?
     	<br />
 		
-    	<f:form action="restore?timestamp=${request.getParameter('timestamp')}" name="restore" method="post">
+    	<f:form action="restore?timestamp=${timestamp}" name="restore" method="post">
            	<f:entry>
                 <f:submit value="${%Yes}"/>
            	</f:entry>
