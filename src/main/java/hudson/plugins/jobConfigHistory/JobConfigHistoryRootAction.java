@@ -445,9 +445,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
                 
         if (configInfos.size() > 1) {
             Collections.sort(configInfos, ParsedDateComparator.DESCENDING);
-            ConfigInfo lastChange = configInfos.get(1);
-            String timestamp = lastChange.getDate();
-            configXml = getOldConfigXml(name, timestamp);
+            final ConfigInfo lastChange = configInfos.get(1);
+            configXml = getOldConfigXml(name, lastChange.getDate());
         }
         
         return configXml;
