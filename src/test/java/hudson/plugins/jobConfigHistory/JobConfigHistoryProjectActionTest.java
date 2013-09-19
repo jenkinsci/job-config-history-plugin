@@ -15,7 +15,6 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import static org.mockito.Mockito.*;
 import org.kohsuke.stapler.StaplerRequest;
