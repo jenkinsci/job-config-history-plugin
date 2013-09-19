@@ -190,11 +190,13 @@ public class ConfigInfo implements ParsedDate {
      * @return encoded url
      */
     private static String createEncodedUrl(final File file) {
-        final String encodedURL;
-        try {
-            encodedURL = URLEncoder.encode(file.getAbsolutePath(), "utf-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException("Could not encode " + file.getAbsolutePath(), ex);
+        String encodedURL = null;
+        if (file != null) {
+            try {
+                encodedURL = URLEncoder.encode(file.getAbsolutePath(), "utf-8");
+            } catch (UnsupportedEncodingException ex) {
+                throw new RuntimeException("Could not encode " + file.getAbsolutePath(), ex);
+            }
         }
         return encodedURL;
     }

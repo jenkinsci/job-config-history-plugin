@@ -89,6 +89,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
                         project,
                         oldRevision.getFile().getParentFile(),
                         historyDescr));
+            } else if ("Deleted".equals(historyDescr.getOperation())) {
+                configs.add(ConfigInfo.create(
+                        project,
+                        null,
+                        historyDescr));
             }
         }
         Collections.sort(configs, ParsedDateComparator.DESCENDING);
