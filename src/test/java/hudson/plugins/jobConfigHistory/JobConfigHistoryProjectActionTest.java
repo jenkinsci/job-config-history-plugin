@@ -98,11 +98,16 @@ public class JobConfigHistoryProjectActionTest {
      */
     @Test
     public void testGetJobConfigs() throws Exception {
-        when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
-        when(mockedProject.getRootDir()).thenReturn(testConfigs.getResource("jobs/Test1"));
-        final JobConfigHistoryProjectAction sut = createAction();
-        final List<ConfigInfo> result = sut.getJobConfigs();
-        assertEquals(5, result.size());
+        testJobXHasYHistoryEntries("jobs/Test1", 5);
+    }
+
+    /**
+     * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
+     */
+    @Test
+    public void testGetJobConfigsDeleted() throws Exception {
+        final List<ConfigInfo> historyEntries = testJobXHasYHistoryEntries("jobs/Foo_deleted_20130830_223932_071", 3);
+        assertEquals("Deleted", historyEntries.get(0).getOperation());
     }
 
     /**
@@ -110,12 +115,17 @@ public class JobConfigHistoryProjectActionTest {
      */
     @Test
     public void testGetJobConfigsEmpty() throws Exception {
-        when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
-        when(mockedProject.getRootDir()).thenReturn(testConfigs.getResource("jobs/Test1"));
         FileUtils.cleanDirectory(testConfigs.getResource("config-history/jobs/Test1"));
+        testJobXHasYHistoryEntries("jobs/Test1", 0);
+    }
+
+    private List<ConfigInfo> testJobXHasYHistoryEntries(final String jobDir, final int noOfHistoryEntries) throws IOException {
+        when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
+        when(mockedProject.getRootDir()).thenReturn(testConfigs.getResource(jobDir));
         final JobConfigHistoryProjectAction sut = createAction();
         final List<ConfigInfo> result = sut.getJobConfigs();
-        assertEquals(0, result.size());
+        assertEquals(noOfHistoryEntries, result.size());
+        return result;
     }
 
     /**
