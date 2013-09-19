@@ -34,7 +34,7 @@ public class JobConfigHistoryProjectActionTest {
     private final Hudson mockedHudson = mock(hudson.model.Hudson.class);
     private final AbstractItem mockedProject = mock(AbstractItem.class);
     private final StaplerRequest mockedRequest = mock(StaplerRequest.class);
-    //private final StaplerResponse mockedResponse = mock(StaplerResponse.class);
+    private final StaplerResponse mockedResponse = mock(StaplerResponse.class);
     private HistoryDao historyDao;
 
 
@@ -228,30 +228,24 @@ public class JobConfigHistoryProjectActionTest {
      * Test of doRestore method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    @Ignore
     public void testDoRestore() throws Exception {
-        System.out.println("doRestore");
-        StaplerRequest req = null;
-        StaplerResponse rsp = null;
-        JobConfigHistoryProjectAction sut = null;
-        sut.doRestore(req, rsp);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        when(mockedRequest.getParameter("timestamp")).thenReturn("2012-11-21_11-41-14");
+        when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
+        when(mockedProject.getRootDir()).thenReturn(testConfigs.getResource("jobs/Test1"));
+        JobConfigHistoryProjectAction sut = createAction();
+        sut.doRestore(mockedRequest, mockedResponse);
+        verify(mockedProject).save();
     }
 
     /**
      * Test of doForwardToRestoreQuestion method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    @Ignore
     public void testDoForwardToRestoreQuestion() throws Exception {
-        System.out.println("doForwardToRestoreQuestion");
-        StaplerRequest req = null;
-        StaplerResponse rsp = null;
-        JobConfigHistoryProjectAction sut = null;
-        sut.doForwardToRestoreQuestion(req, rsp);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        when(mockedRequest.getParameter("timestamp")).thenReturn("2012-11-21_11-41-14");
+        JobConfigHistoryProjectAction sut = createAction();
+        sut.doForwardToRestoreQuestion(mockedRequest, mockedResponse);
+        verify(mockedResponse).sendRedirect(any(String.class));
     }
 
     private JobConfigHistoryProjectAction createAction() {
