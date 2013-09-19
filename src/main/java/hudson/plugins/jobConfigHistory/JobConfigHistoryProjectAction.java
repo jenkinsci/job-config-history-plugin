@@ -198,14 +198,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      */
     private XmlFile getOldConfigXml(String timestamp) {
         checkConfigurePermission();
-        XmlFile configFile = null;
-        if (checkTimestamp(timestamp)) {
-            configFile = getHistoryDao().getOldRevision(project, timestamp);
-        }
-        if (configFile == null) {
-            throw new IllegalArgumentException("Unable to get history from for " + timestamp);
+        final XmlFile oldRevision = getHistoryDao().getOldRevision(project, timestamp);
+        if (oldRevision.getFile() != null) {
+            return oldRevision;
         } else {
-            return configFile;
+            throw new IllegalArgumentException("Non existent timestamp " + timestamp);
         }
     }
 

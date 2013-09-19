@@ -5,6 +5,7 @@ import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.model.ItemGroup;
+import java.io.IOException;
 import java.util.List;
 import org.acegisecurity.AccessDeniedException;
 import org.apache.commons.io.FileUtils;
@@ -197,13 +198,30 @@ public class JobConfigHistoryProjectActionTest {
      */
     @Test
     public void testGetLines() throws Exception, Throwable {
-        when(mockedRequest.getParameter("timestamp1")).thenReturn("2012-11-21_11-41-14");
-        when(mockedRequest.getParameter("timestamp2")).thenReturn("2012-11-21_11-42-05");
+        final String timestamp1 = "2012-11-21_11-41-14";
+        final String timestamp2 = "2012-11-21_11-42-05";
+        List<SideBySideView.Line> result = prepareGetLines(timestamp1, timestamp2);
+        assertEquals(8, result.size());
+    }
+
+    /**
+     * Test of getLines method, of class JobConfigHistoryProjectAction.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetLinesNonExistingTimestamp() throws IOException {
+        final String timestamp1 = "2012-11-21_11-41-14";
+        final String timestamp2 = "2013-11-21_11-42-05";
+        prepareGetLines(timestamp1, timestamp2);
+    }
+
+    private List<SideBySideView.Line> prepareGetLines(final String timestamp1, final String timestamp2) throws IOException {
+        when(mockedRequest.getParameter("timestamp1")).thenReturn(timestamp1);
+        when(mockedRequest.getParameter("timestamp2")).thenReturn(timestamp2);
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
         when(mockedProject.getRootDir()).thenReturn(testConfigs.getResource("jobs/Test1"));
         JobConfigHistoryProjectAction sut = createAction();
         List<SideBySideView.Line> result = sut.getLines();
-        assertEquals(8, result.size());
+        return result;
     }
 
     /**
