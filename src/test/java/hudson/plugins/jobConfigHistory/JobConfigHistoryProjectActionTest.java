@@ -5,8 +5,10 @@ import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.model.ItemGroup;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import javax.servlet.ServletInputStream;
 import org.acegisecurity.AccessDeniedException;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
@@ -182,15 +184,29 @@ public class JobConfigHistoryProjectActionTest {
      * Test of doDiffFiles method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    @Ignore
     public void testDoDiffFiles() throws Exception {
-        System.out.println("doDiffFiles");
-        StaplerRequest req = null;
-        StaplerResponse rsp = null;
-        JobConfigHistoryProjectAction sut = null;
-        sut.doDiffFiles(req, rsp);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        final String boundary = "AAAA";
+        final String body =
+                "--" + boundary + "\r\n" +
+                "Content-Disposition: form-data; name=\"timestamp1\"\r\n\r\n" +
+                "111\r\n" +
+                "--" + boundary + "\r\n" +
+                "Content-Disposition: form-data; name=\"timestamp2\"\r\n\r\n" +
+                "112\r\n" +
+                "--" + boundary + "--\r\n";
+        final ByteArrayInputStream bodyByteStream = new ByteArrayInputStream(body.getBytes());
+        final ServletInputStream servletInputStream = new ServletInputStream() {
+            @Override
+            public int read() throws IOException {
+                return bodyByteStream.read();
+            }
+        };
+
+        when(mockedRequest.getContentType()).thenReturn("multipart/form-data; boundary=" + boundary);
+        when(mockedRequest.getInputStream()).thenReturn(servletInputStream);
+        JobConfigHistoryProjectAction sut = createAction();
+        sut.doDiffFiles(mockedRequest, mockedResponse);
+        verify(mockedResponse).sendRedirect("showDiffFiles?timestamp1=111&timestamp2=112");
     }
 
     /**
