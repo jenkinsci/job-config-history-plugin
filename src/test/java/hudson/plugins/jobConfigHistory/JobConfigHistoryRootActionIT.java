@@ -245,8 +245,9 @@ public class JobConfigHistoryRootActionIT extends
         WebAssert.assertTextPresent(jobPage, description);
         
         final HtmlPage historyPage = webClient.goTo("job/" + name + "/" + JobConfigHistoryConsts.URLNAME);
-        System.out.println(historyPage.asXml());
-        assertTrue("History page should contain 'Deleted' entry", historyPage.asXml().contains("Deleted"));
+        final String historyAsXml = historyPage.asXml();
+        System.out.println(historyAsXml);
+        assertTrue("History page should contain 'Deleted' entry", historyAsXml.contains("Deleted"));
         final List<HtmlAnchor> hrefs = historyPage.getByXPath("//a[contains(@href, \"configOutput?type=xml\")]");
         assertTrue(hrefs.size() > 2);
     }
