@@ -22,7 +22,7 @@ import org.kohsuke.stapler.StaplerResponse;
  *
  * @author Mirko Friedenhagen
  */
-    public class JobConfigHistoryProjectActionTest {
+public class JobConfigHistoryProjectActionTest {
 
     @Rule
     public UnpackResourceZip testConfigs = UnpackResourceZip.INSTANCE;
@@ -196,15 +196,14 @@ import org.kohsuke.stapler.StaplerResponse;
      * Test of getLines method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    @Ignore
-    public void testGetLines() throws Exception {
-        System.out.println("getLines");
-        JobConfigHistoryProjectAction sut = null;
-        List<SideBySideView.Line> expResult = null;
+    public void testGetLines() throws Exception, Throwable {
+        when(mockedRequest.getParameter("timestamp1")).thenReturn("2012-11-21_11-41-14");
+        when(mockedRequest.getParameter("timestamp2")).thenReturn("2012-11-21_11-42-05");
+        when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
+        when(mockedProject.getRootDir()).thenReturn(testConfigs.getResource("jobs/Test1"));
+        JobConfigHistoryProjectAction sut = createAction();
         List<SideBySideView.Line> result = sut.getLines();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(8, result.size());
     }
 
     /**
