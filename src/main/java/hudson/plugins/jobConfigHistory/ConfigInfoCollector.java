@@ -94,6 +94,8 @@ final class ConfigInfoCollector {
                 final ConfigInfo config = ConfigInfo.create(itemName, historyDir, histDescr, true);
                 getConfigs().add(config);
             } else {
+                // TODO: why would the created entry not be the first one? Could changes accumulate and we have even more
+                // change entries?
                 historyDir = historyDirs[1];
                 histDescr = readHistoryXml(historyDir);
                 if ("Created".equals(histDescr.getOperation())) {
