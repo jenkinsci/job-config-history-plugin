@@ -35,7 +35,8 @@ import java.io.FileFilter;
  */
 class NonDeletedFileFilter implements FileFilter {
 
-    final static NonDeletedFileFilter INSTANCE = new NonDeletedFileFilter();
+    /** Only one instance needed. */
+    static final  NonDeletedFileFilter INSTANCE = new NonDeletedFileFilter();
 
     @Override
     public boolean accept(File pathname) {
