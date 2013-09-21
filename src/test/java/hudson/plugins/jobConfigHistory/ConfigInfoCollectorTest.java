@@ -71,7 +71,7 @@ public class ConfigInfoCollectorTest {
         FileUtils.copyDirectory(
                 unpackResourceZip.getResource("config-history/jobs/Test1"),
                 unpackResourceZip.getResource("config-history/jobs/Test2"));
-        assertThatRootFolderHasYItemsOfTypeZ(10, "other");
+        assertThatRootFolderHasYItemsOfTypeZ(13, "other");
     }
 
     /**

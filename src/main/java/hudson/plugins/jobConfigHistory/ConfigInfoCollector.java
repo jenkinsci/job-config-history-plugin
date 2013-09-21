@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  * Collects all configs of a special type. For Jobs these follow the pattern:
@@ -137,8 +138,9 @@ final class ConfigInfoCollector {
         if ("deleted".equals(type)) {
             itemDirs = historyDao.getDeletedJobs(folderName);
         } else {
-            itemDirs = historyDao.getJobs(folderName);
+            itemDirs = (File[]) ArrayUtils.addAll(historyDao.getDeletedJobs(folderName), historyDao.getJobs(folderName));
         }
+        Arrays.sort(itemDirs, FileNameComparator.INSTANCE);
         for (final File itemDir : itemDirs) {
             getConfigsForType(itemDir, folderName);
         }
