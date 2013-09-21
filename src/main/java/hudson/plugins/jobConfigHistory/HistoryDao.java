@@ -126,9 +126,18 @@ public interface HistoryDao {
     /**
      * Returns a list of deleted jobs with a history.
      *
+     * @param folderName name of folder.
      * @return list of deleted jobs with a history.
      */
-    File[] getDeletedJobs();
+    File[] getDeletedJobs(String folderName);
+
+    /**
+     * Returns a list of jobs with a history.
+     *
+     * @param folderName name of folder
+     * @return list of jobs with a history.
+     */
+    File[] getJobs(String folderName);
 
     /**
      * Returns a list of all system configuration files with a history.

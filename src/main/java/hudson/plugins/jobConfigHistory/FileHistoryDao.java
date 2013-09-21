@@ -222,7 +222,7 @@ public class FileHistoryDao implements HistoryDao {
         try {
             copyConfigFile(configFile.getFile(), timestampedDir);
         } catch (IOException ex) {
-            throw new RuntimeException("Uanble to copy " + configFile, ex);
+            throw new RuntimeException("Unable to copy " + configFile, ex);
         }
     }
 
@@ -526,8 +526,13 @@ public class FileHistoryDao implements HistoryDao {
     }
 
     @Override
-    public File[] getDeletedJobs() {
-        return getJobHistoryRootDir().listFiles(DeletedFileFilter.INSTANCE);
+    public File[] getDeletedJobs(String folderName) {
+        return new File(getJobHistoryRootDir(), folderName).listFiles(DeletedFileFilter.INSTANCE);
+    }
+
+    @Override
+    public File[] getJobs(String folderName) {
+        return new File(getJobHistoryRootDir(), folderName).listFiles(NonDeletedFileFilter.INSTANCE);
     }
 
     @Override

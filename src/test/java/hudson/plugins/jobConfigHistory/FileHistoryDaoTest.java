@@ -487,9 +487,20 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testGetDeletedJobs() {
-        final File[] deletedJobs = sutWithoutUserAndDuplicateHistory.getDeletedJobs();
+        final File[] deletedJobs = sutWithoutUserAndDuplicateHistory.getDeletedJobs("");
         assertEquals(1, deletedJobs.length);
         final String name = deletedJobs[0].getName();
         assertThat(name, containsString("Foo"));
+    }
+
+    /**
+     * Test of getDeletedJobs method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetJobs() {
+        final File[] jobs = sutWithoutUserAndDuplicateHistory.getJobs("");
+        assertEquals(1, jobs.length);
+        final String name = jobs[0].getName();
+        assertThat(name, containsString("Test1"));
     }
 }

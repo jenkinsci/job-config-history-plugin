@@ -127,20 +127,17 @@ final class ConfigInfoCollector {
     /**
      * Collects configs.
      *
-     * @param rootDir
-     *            of config-history.
      * @param folderName
      *            folderName, usually just the empty string.
      * @return List of ConfigInfo, may be empty
      * @throws IOException if an entry could not be read.
      */
-    public List<ConfigInfo> collect(final File rootDir, final String folderName) throws IOException {
-        final File rootWithFolder = new File(rootDir, folderName);
+    public List<ConfigInfo> collect(final String folderName) throws IOException {
         final File[] itemDirs;
         if ("deleted".equals(type)) {
-            itemDirs = rootWithFolder.listFiles(DeletedFileFilter.INSTANCE);
+            itemDirs = historyDao.getDeletedJobs(folderName);
         } else {
-            itemDirs = rootWithFolder.listFiles();
+            itemDirs = historyDao.getJobs(folderName);
         }
         for (final File itemDir : itemDirs) {
             getConfigsForType(itemDir, folderName);

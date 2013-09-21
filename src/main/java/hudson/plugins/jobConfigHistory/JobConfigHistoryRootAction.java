@@ -155,21 +155,11 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      *             if one of the history entries might not be read.
      */
     protected List<ConfigInfo> getJobConfigs(String type) throws IOException {
-        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final File historyRootDir = getPlugin().getJobHistoryRootDir();
-
         if (!hasJobConfigurePermission()) {
-            return configs;
-        }
-
-        if (!historyRootDir.isDirectory()) {
-            LOG.log(FINE,
-                    "{0} is not a directory, assuming that no history exists yet.",
-                    historyRootDir);
+            return Collections.EMPTY_LIST;
         } else {
-            configs.addAll(new ConfigInfoCollector(type, null).collect(historyRootDir, ""));
+            return new ConfigInfoCollector(type, getHistoryDao()).collect("");
         }
-        return configs;
     }
 
     /**

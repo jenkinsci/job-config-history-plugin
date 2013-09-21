@@ -71,7 +71,7 @@ public class ConfigInfoCollectorTest {
         FileUtils.copyDirectory(
                 unpackResourceZip.getResource("config-history/jobs/Test1"),
                 unpackResourceZip.getResource("config-history/jobs/Test2"));
-        assertThatRootFolderHasYItemsOfTypeZ(13, "other");
+        assertThatRootFolderHasYItemsOfTypeZ(10, "other");
     }
 
     /**
@@ -97,12 +97,14 @@ public class ConfigInfoCollectorTest {
 
     void assertThatFolderXHasYItemsOfTypeZ(String folderName, int noOfHistoryItems, final String type) throws IOException {
         ConfigInfoCollector sut = createSut(type);
-        List<ConfigInfo> result = sut.collect(unpackResourceZip.getResource("config-history/jobs"), folderName);
+        List<ConfigInfo> result = sut.collect(folderName);
         Collections.sort(result, ParsedDateComparator.DESCENDING);
         assertEquals(StringUtils.join(result, "\n"), noOfHistoryItems, result.size());
     }
 
     private ConfigInfoCollector createSut(final String type) {
-        return new ConfigInfoCollector(type, null);
+        final FileHistoryDao historyDao = new FileHistoryDao(
+                unpackResourceZip.getResource("config-history"), unpackResourceZip.getRoot(), null, 0, true);
+        return new ConfigInfoCollector(type, historyDao);
     }
 }
