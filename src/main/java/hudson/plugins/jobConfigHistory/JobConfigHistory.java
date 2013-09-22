@@ -312,7 +312,8 @@ public class JobConfigHistory extends Plugin {
      */
     @Deprecated
     protected File getHistoryDir(final XmlFile xmlFile) {
-        return ((FileHistoryDao) getHistoryDao()).getHistoryDir(xmlFile);
+        final File configFile = xmlFile.getFile();
+        return ((FileHistoryDao) getHistoryDao()).getHistoryDir(configFile);
     }
 
     /**

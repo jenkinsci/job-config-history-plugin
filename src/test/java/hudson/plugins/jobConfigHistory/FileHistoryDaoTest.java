@@ -274,9 +274,8 @@ public class FileHistoryDaoTest {
      * Test of getRevisions method, of class FileHistoryDao.
      */
     @Test
-    public void testGetRevisions_Item() throws IOException {
-        when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
-        SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getRevisions(mockedItem);
+    public void testGetRevisions_XmlFile() throws IOException {
+        SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getRevisions(test1Config);
         testGetRevisions(result);
     }
 
@@ -284,8 +283,8 @@ public class FileHistoryDaoTest {
      * Test of getRevisions method, of class FileHistoryDao.
      */
     @Test
-    public void testGetRevisions_XmlFile() throws IOException {
-        SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getRevisions(test1Config);
+    public void testGetRevisions_File() throws IOException {
+        SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getRevisions(test1Config.getFile());
         testGetRevisions(result);
     }
 
@@ -305,10 +304,10 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testGetRevisionsForItemWithoutHistory() throws IOException {
-        String jobWithoutHistory = "NewJobWithoutHistory";
-        File newJobDir = unpackResourceZip.getResource("jobs/" + jobWithoutHistory);
-        when(mockedItem.getRootDir()).thenReturn(newJobDir);
-        assertEquals(0, sutWithUserAndNoDuplicateHistory.getRevisions(mockedItem).size());
+        final String jobWithoutHistory = "NewJobWithoutHistory";
+        final File configFile = new File(unpackResourceZip.getResource("jobs/" + jobWithoutHistory), "config.xml");
+        FileUtils.touch(configFile);
+        assertEquals(0, sutWithUserAndNoDuplicateHistory.getRevisions(configFile).size());
     }
 
     /**
@@ -329,6 +328,16 @@ public class FileHistoryDaoTest {
     public void testGetOldRevision_XmlFile() throws IOException {
         String identifier = "2012-11-21_11-42-05";
         final XmlFile result = sutWithUserAndNoDuplicateHistory.getOldRevision(test1Config, identifier);
+        testGetOldRevision(result);
+    }
+
+    /**
+     * Test of getOldRevision method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetOldRevision_File() throws IOException {
+        String identifier = "2012-11-21_11-42-05";
+        final XmlFile result = sutWithUserAndNoDuplicateHistory.getOldRevision(test1Config.getFile(), identifier);
         testGetOldRevision(result);
     }
 
@@ -358,11 +367,21 @@ public class FileHistoryDaoTest {
     }
 
     /**
+     * Test of getOldRevision method, of class FileHistoryDao.
+     */
+    @Test
+    public void testHasOldRevision_File() throws IOException {
+        assertTrue(sutWithUserAndNoDuplicateHistory.hasOldRevision(test1Config.getFile(), "2012-11-21_11-42-05"));
+        assertFalse(sutWithUserAndNoDuplicateHistory.hasOldRevision(test1Config.getFile(), "1914-11-21_11-42-05"));
+    }
+
+    /**
      * Test of getHistoryDir method, of class FileHistoryDao.
      */
     @Test
     public void testGetHistoryDir() {
-        File result = sutWithUserAndNoDuplicateHistory.getHistoryDir(test1Config);
+        final File configFile = test1Config.getFile();
+        File result = sutWithUserAndNoDuplicateHistory.getHistoryDir(configFile);
         assertEquals(test1History, result);
     }
 
@@ -372,7 +391,8 @@ public class FileHistoryDaoTest {
     @Test
     public void testGetHistoryDirOfSystemXml() throws IOException {
         final XmlFile systemXmlFile = new XmlFile(new File(jenkinsHome, "jenkins.xml"));
-        File result = sutWithUserAndNoDuplicateHistory.getHistoryDir(systemXmlFile);
+        final File configFile = systemXmlFile.getFile();
+        File result = sutWithUserAndNoDuplicateHistory.getHistoryDir(configFile);
         assertThat(result.getPath(), endsWith(File.separatorChar + "jenkins"));
     }
 

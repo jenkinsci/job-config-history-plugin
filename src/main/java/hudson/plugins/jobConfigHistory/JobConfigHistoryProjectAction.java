@@ -80,7 +80,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     public final List<ConfigInfo> getJobConfigs() throws IOException {
         checkConfigurePermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(getHistoryDao().getRevisions(project).values());
+        final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(
+                getHistoryDao().getRevisions(project.getConfigFile()).values());
         for (final HistoryDescr historyDescr : values) {
             final String timestamp = historyDescr.getTimestamp();
             final XmlFile oldRevision = getHistoryDao().getOldRevision(project, timestamp);

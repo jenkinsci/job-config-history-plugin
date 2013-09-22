@@ -50,17 +50,6 @@ public interface HistoryDao {
     void renameItem(AbstractItem item, String oldName, String newName);
 
     /**
-     * Returns a sorted map of all revisions for this item.
-     *
-     * The key is an identifier which may be used in
-     * {@link HistoryDao#getOldRevision(hudson.model.AbstractItem, java.lang.String)}
-     *
-     * @param item project
-     * @return old revisions mapped to the identifier.
-     */
-    SortedMap<String, HistoryDescr> getRevisions(AbstractItem item);
-
-    /**
      * Returns a sorted map of all revisions for this xmlFile.
      *
      * The key is an identifier which may be used in
@@ -70,6 +59,17 @@ public interface HistoryDao {
      * @return old revisions mapped to the identifier.
      */
     SortedMap<String, HistoryDescr> getRevisions(XmlFile xmlFile);
+
+    /**
+     * Returns a sorted map of all revisions for this file.
+     *
+     * The key is an identifier which may be used in
+     * {@link HistoryDao#getOldRevision(hudson.model.AbstractItem, java.lang.String)}
+     *
+     * @param file file
+     * @return old revisions mapped to the identifier.
+     */
+    SortedMap<String, HistoryDescr> getRevisions(File file);
 
     /**
      * Returns one old configuration of item.
@@ -90,6 +90,15 @@ public interface HistoryDao {
     XmlFile getOldRevision(XmlFile xmlFile, String identifier);
 
     /**
+     * Returns one old configuration of file.
+     *
+     * @param file file
+     * @param identifier timestamp or hash
+     * @return old configuration.
+     */
+    XmlFile getOldRevision(File file, String identifier);
+
+    /**
      * Returns whether the revision exists.
      *
      * @param item project
@@ -106,6 +115,15 @@ public interface HistoryDao {
      * @return old configuration.
      */
     boolean hasOldRevision(XmlFile xmlFile, String identifier);
+
+    /**
+     * Returns whether the revision exists.
+     *
+     * @param file file
+     * @param identifier timestamp or hash
+     * @return old configuration.
+     */
+    boolean hasOldRevision(File file, String identifier);
 
    /**
      * Purges old entries for the given history root to maxEntries.

@@ -73,7 +73,7 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
             //get timestamp of config-change
             final HistoryDao historyDao = getHistoryDao();
             final ArrayList<HistoryDescr> historyDescriptions = new ArrayList<HistoryDescr>(
-                    historyDao.getRevisions(project).values());
+                    historyDao.getRevisions(project.getConfigFile()).values());
             if (historyDescriptions.size() > 1) {
                 Collections.sort(historyDescriptions, ParsedDateComparator.DESCENDING);
                 final HistoryDescr lastChange = Collections.min(historyDescriptions, ParsedDateComparator.DESCENDING);

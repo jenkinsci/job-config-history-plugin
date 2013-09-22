@@ -85,7 +85,8 @@ public class FileHistoryDao implements HistoryDao {
      * @return timestamped directory where to store one history entry.
      */
     File getRootDir(final XmlFile xmlFile, final AtomicReference<Calendar> timestampHolder) {
-        final File itemHistoryDir = getHistoryDir(xmlFile);
+        final File configFile = xmlFile.getFile();
+        final File itemHistoryDir = getHistoryDir(configFile);
         // perform check for purge here, when we are actually going to create
         // a new directory, rather than just when we scan it in above method.
         purgeOldEntries(itemHistoryDir, maxHistoryEntries);
@@ -241,7 +242,8 @@ public class FileHistoryDao implements HistoryDao {
     @Override
     public void deleteItem(AbstractItem item) {
         createNewHistoryEntry(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_DELETED());
-        final File currentHistoryDir = getHistoryDir(item.getConfigFile());
+        final File configFile = item.getConfigFile().getFile();
+        final File currentHistoryDir = getHistoryDir(configFile);
         final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
         final String timestamp = buildDateFormat.format(new Date());
         final String deletedHistoryName = item.getName() + JobConfigHistoryConsts.DELETED_MARKER + timestamp;
@@ -255,7 +257,8 @@ public class FileHistoryDao implements HistoryDao {
     public void renameItem(AbstractItem item, String oldName, String newName) {
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         if (historyRootDir != null) {
-            final File currentHistoryDir = getHistoryDir(item.getConfigFile());
+            final File configFile = item.getConfigFile().getFile();
+            final File currentHistoryDir = getHistoryDir(configFile);
             final File historyParentDir = currentHistoryDir.getParentFile();
             final File oldHistoryDir = new File(historyParentDir, oldName);
             if (oldHistoryDir.exists()) {
@@ -279,13 +282,9 @@ public class FileHistoryDao implements HistoryDao {
     }
 
     @Override
-    public SortedMap<String, HistoryDescr> getRevisions(AbstractItem item) {
-        return getRevisions(item.getConfigFile());
-    }
-
-    @Override
     public SortedMap<String, HistoryDescr> getRevisions(XmlFile xmlFile) {
-        final File historiesDir = getHistoryDir(xmlFile);
+        final File configFile = xmlFile.getFile();
+        final File historiesDir = getHistoryDir(configFile);
         final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
         final TreeMap<String, HistoryDescr> map = new TreeMap<String, HistoryDescr>();
         if (historyDirsOfItem == null) {
@@ -306,8 +305,14 @@ public class FileHistoryDao implements HistoryDao {
     }
 
     @Override
+    public SortedMap<String, HistoryDescr> getRevisions(File file) {
+        return getRevisions(new XmlFile(file));
+    }
+
+    @Override
     public XmlFile getOldRevision(AbstractItem item, String identifier) {
-        final File historyDir = new File(getHistoryDir(item.getConfigFile()), identifier);
+        final File configFile = item.getConfigFile().getFile();
+        final File historyDir = new File(getHistoryDir(configFile), identifier);
         if (item instanceof MavenModule) {
             final String path = historyDir + ((MavenModule) item).getParent().getFullName().replace("/", "/jobs/") + "/modules/"
                     + ((MavenModule) item).getModuleName().toFileSystemName() + "/" + identifier;
@@ -319,8 +324,14 @@ public class FileHistoryDao implements HistoryDao {
 
     @Override
     public XmlFile getOldRevision(XmlFile xmlFile, String identifier) {
-        final File historyDir = new File(getHistoryDir(xmlFile), identifier);
+        final File configFile = xmlFile.getFile();
+        final File historyDir = new File(getHistoryDir(configFile), identifier);
         return new XmlFile(getConfigFile(historyDir));
+    }
+
+    @Override
+    public XmlFile getOldRevision(File file, String identifier) {
+        return getOldRevision(new XmlFile(file), identifier);
     }
 
     @Override
@@ -332,6 +343,11 @@ public class FileHistoryDao implements HistoryDao {
     public boolean hasOldRevision(XmlFile xmlFile, String identifier) {
         final XmlFile oldRevision = getOldRevision(xmlFile, identifier);
         return oldRevision.getFile() != null && oldRevision.getFile().exists();
+    }
+
+    @Override
+    public boolean hasOldRevision(File file, String identifier) {
+        return hasOldRevision(new XmlFile(file), identifier);
     }
 
     /**
@@ -363,22 +379,22 @@ public class FileHistoryDao implements HistoryDao {
     /**
      * Returns the configuration history directory for the given configuration file.
      *
-     * @param xmlFile
+     * @param file
      *            The configuration file whose content we are saving.
      * @return The base directory where to store the history,
      *         or null if the file is not a valid Hudson configuration file.
      */
-    File getHistoryDir(final XmlFile xmlFile) {
-        final String configRootDir = xmlFile.getFile().getParent();
+    File getHistoryDir(final File configFile) throws IllegalArgumentException {
+        final String configRootDir = configFile.getParent();
         final String hudsonRootDir = jenkinsHome.getPath();
         if (!configRootDir.startsWith(hudsonRootDir)) {
-            throw new IllegalArgumentException("Trying to get history dir for object outside of HUDSON: " + xmlFile);
+            throw new IllegalArgumentException("Trying to get history dir for object outside of HUDSON: " + configFile);
         }
         //if the file is stored directly under HUDSON_ROOT, it's a system config
         //so create a distinct directory
         String underRootDir = null;
         if (configRootDir.equals(hudsonRootDir)) {
-            final String xmlFileName = xmlFile.getFile().getName();
+            final String xmlFileName = configFile.getName();
             underRootDir = xmlFileName.substring(0, xmlFileName.lastIndexOf('.'));
         }
         final File historyDir;
