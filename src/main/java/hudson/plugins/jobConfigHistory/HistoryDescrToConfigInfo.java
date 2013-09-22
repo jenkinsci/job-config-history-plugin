@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Converts given {@link HistoryDescr} to {@link ConfigInfo},
+ * Converts given {@link HistoryDescr} to {@link ConfigInfo}.
  *
  * @author Mirko Friedenhagen
  */
@@ -39,7 +39,7 @@ class HistoryDescrToConfigInfo {
      */
     private final String name;
     /**
-     * Basedir of history entries
+     * Basedir of history entries.
      */
     private final File historyBaseDir;
     /**
@@ -51,6 +51,13 @@ class HistoryDescrToConfigInfo {
      */
     private final boolean isJob;
 
+    /**
+     * Constructor.
+     * @param name of the job or configuration.
+     * @param historyBaseDir where history is located.
+     * @param historyDescrs history descriptions.
+     * @param isJob is this a job?
+     */
     HistoryDescrToConfigInfo(String name, File historyBaseDir, List<HistoryDescr> historyDescrs, boolean isJob) {
         this.name = name;
         this.historyBaseDir = historyBaseDir;
@@ -58,6 +65,11 @@ class HistoryDescrToConfigInfo {
         this.isJob = isJob;
     }
 
+    /**
+     * Converts to a list of {@link ConfigInfo}.
+     *
+     * @return list of {@link ConfigInfo}s.
+     */
     List<ConfigInfo> convert() {
         final ArrayList<ConfigInfo> configInfos = new ArrayList<ConfigInfo>();
         for (HistoryDescr historyDescr : historyDescrs) {
