@@ -544,7 +544,8 @@ public class FileHistoryDao implements HistoryDao {
     }
 
     /**
-     * Returns an empty array when array is null
+     * Returns an empty array when array is null.
+     *
      * @param array file array.
      * @return an empty array when array is null.
      */
