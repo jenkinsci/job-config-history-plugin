@@ -127,7 +127,7 @@ public interface HistoryDao {
      * Returns a list of deleted jobs with a history.
      *
      * @param folderName name of folder.
-     * @return list of deleted jobs with a history.
+     * @return list of deleted jobs with a history, emtpy when no history exists.
      */
     File[] getDeletedJobs(String folderName);
 
@@ -135,14 +135,14 @@ public interface HistoryDao {
      * Returns a list of jobs with a history.
      *
      * @param folderName name of folder
-     * @return list of jobs with a history.
+     * @return list of jobs with a history, emtpy when no history exists.
      */
     File[] getJobs(String folderName);
 
     /**
      * Returns a list of all system configuration files with a history.
      *
-     * @return list of all system configuration files with a history.
+     * @return list of all system configuration files with a history, emtpy when no history exists.
      */
     File[] getSystemConfigs();
 }

@@ -1,7 +1,5 @@
 package hudson.plugins.jobConfigHistory;
 
-import hudson.model.AbstractItem;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

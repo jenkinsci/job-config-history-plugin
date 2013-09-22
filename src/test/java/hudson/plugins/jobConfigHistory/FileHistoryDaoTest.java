@@ -483,6 +483,16 @@ public class FileHistoryDaoTest {
     }
 
     /**
+     * Test of getSystemConfigs method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetSystemConfigsWithoutData() {
+        new File(jenkinsHome, "config-history").renameTo(new File(jenkinsHome, "invalid"));
+        final File[] systemConfigs = sutWithoutUserAndDuplicateHistory.getSystemConfigs();
+        assertEquals(0, systemConfigs.length);
+    }
+
+    /**
      * Test of getDeletedJobs method, of class FileHistoryDao.
      */
     @Test

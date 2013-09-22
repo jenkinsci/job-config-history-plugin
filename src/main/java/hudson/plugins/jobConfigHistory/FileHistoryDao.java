@@ -527,16 +527,32 @@ public class FileHistoryDao implements HistoryDao {
 
     @Override
     public File[] getDeletedJobs(String folderName) {
-        return new File(getJobHistoryRootDir(), folderName).listFiles(DeletedFileFilter.INSTANCE);
+        return returnEmptyFileArrayForNull(
+                new File(getJobHistoryRootDir(), folderName).listFiles(DeletedFileFilter.INSTANCE));
     }
 
     @Override
     public File[] getJobs(String folderName) {
-        return new File(getJobHistoryRootDir(), folderName).listFiles(NonDeletedFileFilter.INSTANCE);
+        return returnEmptyFileArrayForNull(
+                new File(getJobHistoryRootDir(), folderName).listFiles(NonDeletedFileFilter.INSTANCE));
     }
 
     @Override
     public File[] getSystemConfigs() {
-        return historyRootDir.listFiles(NonJobsDirectoryFileFilter.INSTANCE);
+        return returnEmptyFileArrayForNull(
+                historyRootDir.listFiles(NonJobsDirectoryFileFilter.INSTANCE));
+    }
+
+    /**
+     * Returns an empty array when array is null
+     * @param array file array.
+     * @return an empty array when array is null.
+     */
+    private File[] returnEmptyFileArrayForNull(final File[] array) {
+        if (array != null) {
+            return array;
+        } else {
+            return new File[0];
+        }
     }
 }
