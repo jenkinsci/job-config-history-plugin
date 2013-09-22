@@ -37,20 +37,6 @@ public class ConfigInfoTest {
      * Test of create method, of class ConfigInfo.
      */
     @Test
-    public void testCreate_3args() {
-        ConfigInfo sut = ConfigInfo.create(itemMock, file, historyDescr);
-        assertNotNull(sut);
-        assertEquals("Firstname Lastname", sut.getUser());
-        assertEquals("userId", sut.getUserID());
-        assertEquals("operation", sut.getOperation());
-        assertEquals(DATE, sut.getDate());
-        assertEquals(true, sut.getIsJob());
-    }
-
-    /**
-     * Test of create method, of class ConfigInfo.
-     */
-    @Test
     public void testCreate_4args() {
         ConfigInfo sut = ConfigInfo.create("jobName", file, historyDescr, false);
         assertNotNull(sut);

@@ -43,29 +43,6 @@ public class ConfigInfo implements ParsedDate {
     private boolean isJob;
 
     /**
-     * Returns a new ConfigInfo object for a Hudson job.
-     *
-     * @param item
-     *            a project
-     * @param file
-     *            pointing to {@literal config.xml}
-     * @param histDescr
-     *            metadata of the change
-     * @return a new ConfigInfo object.
-     */
-    public static ConfigInfo create(final AbstractItem item, final File file, final HistoryDescr histDescr) {
-        final String fileUrl = createEncodedUrl(file);
-        return new ConfigInfo(
-                item.getFullName(),
-                fileUrl,
-                histDescr.getTimestamp(),
-                histDescr.getUser(),
-                histDescr.getOperation(),
-                histDescr.getUserID(),
-                true);
-    }
-
-    /**
      * Returns a new ConfigInfo object for a system configuration file.
      * @param name
      *            Name of the configuration entity we are saving.

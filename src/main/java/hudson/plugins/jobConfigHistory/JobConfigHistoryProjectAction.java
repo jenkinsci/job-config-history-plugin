@@ -86,14 +86,16 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             final XmlFile oldRevision = getHistoryDao().getOldRevision(project, timestamp);
             if (oldRevision.getFile() != null) {
                 configs.add(ConfigInfo.create(
-                        project,
+                        project.getFullName(),
                         oldRevision.getFile().getParentFile(),
-                        historyDescr));
+                        historyDescr,
+                        true));
             } else if ("Deleted".equals(historyDescr.getOperation())) {
                 configs.add(ConfigInfo.create(
-                        project,
+                        project.getFullName(),
                         null,
-                        historyDescr));
+                        historyDescr,
+                        true));
             }
         }
         Collections.sort(configs, ParsedDateComparator.DESCENDING);

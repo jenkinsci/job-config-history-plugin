@@ -110,35 +110,21 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      */
     protected List<ConfigInfo> getSystemConfigs() throws IOException {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final File historyRootDir = getPlugin().getConfiguredHistoryRootDir();
-
         if (!hasConfigurePermission()) {
             return configs;
         }
 
-        if (!historyRootDir.isDirectory()) {
-            LOG.log(FINE,
-                    "{0} is not a directory, assuming that no history exists yet.",
-                    historyRootDir);
-        } else {
-            final File[] itemDirs = historyRootDir.listFiles();
-            for (final File itemDir : itemDirs) {
-                // skip the "jobs" directory since we're looking for system
-                // changes
-                if (itemDir.getName().equals(
-                        JobConfigHistoryConsts.JOBS_HISTORY_DIR)) {
-                    continue;
-                }
-                for (final File historyDir : itemDir
-                        .listFiles(HistoryFileFilter.INSTANCE)) {
-                    final XmlFile historyXml = new XmlFile(new File(historyDir,
-                            JobConfigHistoryConsts.HISTORY_FILE));
-                    final HistoryDescr histDescr = (HistoryDescr) historyXml
-                            .read();
-                    final ConfigInfo config = ConfigInfo.create(
-                            itemDir.getName(), historyDir, histDescr, false);
-                    configs.add(config);
-                }
+        final File[] itemDirs = getHistoryDao().getSystemConfigs();
+        for (final File itemDir : itemDirs) {
+            for (final File historyDir : itemDir
+                    .listFiles(HistoryFileFilter.INSTANCE)) {
+                final XmlFile historyXml = new XmlFile(new File(historyDir,
+                        JobConfigHistoryConsts.HISTORY_FILE));
+                final HistoryDescr histDescr = (HistoryDescr) historyXml
+                        .read();
+                final ConfigInfo config = ConfigInfo.create(
+                        itemDir.getName(), historyDir, histDescr, false);
+                configs.add(config);
             }
         }
         return configs;
