@@ -379,12 +379,12 @@ public class FileHistoryDao implements HistoryDao {
     /**
      * Returns the configuration history directory for the given configuration file.
      *
-     * @param file
+     * @param configFile
      *            The configuration file whose content we are saving.
      * @return The base directory where to store the history,
      *         or null if the file is not a valid Hudson configuration file.
      */
-    File getHistoryDir(final File configFile) throws IllegalArgumentException {
+    File getHistoryDir(final File configFile) {
         final String configRootDir = configFile.getParent();
         final String hudsonRootDir = jenkinsHome.getPath();
         if (!configRootDir.startsWith(hudsonRootDir)) {
@@ -394,8 +394,8 @@ public class FileHistoryDao implements HistoryDao {
         //so create a distinct directory
         String underRootDir = null;
         if (configRootDir.equals(hudsonRootDir)) {
-            final String xmlFileName = configFile.getName();
-            underRootDir = xmlFileName.substring(0, xmlFileName.lastIndexOf('.'));
+            final String fileName = configFile.getName();
+            underRootDir = fileName.substring(0, fileName.lastIndexOf('.'));
         }
         final File historyDir;
         if (underRootDir == null) {
