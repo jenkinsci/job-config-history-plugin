@@ -68,17 +68,14 @@ public class JobConfigHistoryPurger extends PeriodicWork {
         if (StringUtils.isNotEmpty(maxAgeString)) {
             try {
                 maxAge = Integer.parseInt(maxAgeString);
-                if (maxAge < 0) {
-                    throw new NumberFormatException();
+                if (maxAge > 0) {
+                    LOG.log(FINE, "checking for history files to purge (max age of {0} days allowed)", maxAge);
+                    this.setMaxAge(maxAge);
+                    purgeHistoryByAge();
                 }
             } catch (NumberFormatException e) {
                 LOG.warning("maximum age of history entries not formatted properly, unable to purge: " + maxAgeString);
             }
-        }
-        if (maxAge > 0) {
-            LOG.log(FINE, "checking for history files to purge (max age of {0} days allowed)", maxAge);
-            this.setMaxAge(maxAge);
-            purgeHistoryByAge();
         }
     }
 

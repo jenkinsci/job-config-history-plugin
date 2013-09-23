@@ -107,7 +107,6 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
 
         // clear out all history - setting to 1 will clear out all with the expectation that we are creating a new entry
         jch.setMaxHistoryEntries("1");
-        jch.checkForPurgeByQuantity(projectHistoryDir);
 
         // reset to empty value
         jch.setMaxHistoryEntries("");
@@ -195,103 +194,6 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         } catch (Exception e) {
             fail("Unable to complete max history entries test: " + e);
         }
-    }
-
-    public void testPurgeByQuantity() {
-        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        try {
-            final FreeStyleProject project = createFreeStyleProject("newproject");
-            final File historyDir = jch.getHistoryDir(project.getConfigFile());
-            final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
-
-            // check with default value
-            jch.checkForPurgeByQuantity(historyDir);
-            assertEquals("Verify 2 history entries exist, default purge quantity: " + projectAction.getJobConfigs(), 2, projectAction.getJobConfigs().size());
-
-            // set to negative value, ensure no purge happens
-            jch.setMaxHistoryEntries("-1");
-            jch.checkForPurgeByQuantity(historyDir);
-            assertEquals("Verify 2 history entries, invalid max quantity.", 2, projectAction.getJobConfigs().size());
-
-            // set to 3, ensure no purge happens
-            jch.setMaxHistoryEntries("3");
-            assertEquals("Verify 2 history entries, max entries > current.", 2, projectAction.getJobConfigs().size());
-
-            // purge attempt on invalid directory
-            jch.checkForPurgeByQuantity(new File("/invaliddir"));
-            assertEquals("Verify history unaffected (still 2 entries) after attempt to purge invalid directory.", 2, projectAction.getJobConfigs().size());
-
-            // clear out all history - setting to 1 will clear out all with the expectation that we are creating a new entry
-            jch.setMaxHistoryEntries("1");
-            jch.checkForPurgeByQuantity(historyDir);
-            assertEquals("Verify only one entry remains (the 'created' entry of the project).", 1, projectAction.getJobConfigs().size());
-
-            // recreate a history entry, set to read-only status, verify it is not deleted
-            // NOTE: Windows host seem to ignore the setWritable flag, so the following test will fail on Windows.
-            // A somewhat crude verification for a windows host.
-            if ((new File("c:/")).exists()) {
-                System.out.println("Skipping permission based rename tests - Windows system detected.");
-            } else {
-                final ArrayList<File> toRestore = new ArrayList<File>();  // to allow cleanup
-
-                // create a new history entry
-                project.save();
-                for (final File file : historyDir.listFiles()) {
-                    file.setWritable(false);
-                    toRestore.add(file);
-                }
-                historyDir.setWritable(false);
-                toRestore.add(historyDir);
-                jch.checkForPurgeByQuantity(historyDir);
-                assertEquals("Verify purge did not happen.", 1, projectAction.getJobConfigs().size());
-
-                for (final File file : toRestore) {
-                    file.setWritable(true);
-                }
-            }
-
-        } catch (IOException e) {
-            fail("Unable to complete purge test: " + e);
-        }
-    }
-
-    @LocalData
-    public void testPurgeByQuantityWithoutCreatedEntries() throws Exception {
-        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        final String name = "JobWithoutCreatedEntries";
-        final File historyDir = new File(jch.getJobHistoryRootDir(), name);
-        assertEquals("Verify 5 original project history entries.", 5, historyDir.listFiles().length);
-
-        jch.setMaxHistoryEntries("1");
-        jch.checkForPurgeByQuantity(historyDir);
-
-        assertEquals("Verify no project history entries left.", 0, historyDir.listFiles().length);
-    }
-
-    @LocalData
-    public void testPurgeByQuantityWithCreatedEntries() throws Exception {
-        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        final String name = "JobWithCreatedEntries";
-        final File historyDir = new File(jch.getJobHistoryRootDir(), name);
-        assertEquals("Verify 5 original project history entries.", 5, historyDir.listFiles().length);
-
-        jch.setMaxHistoryEntries("1");
-        jch.checkForPurgeByQuantity(historyDir);
-
-        assertEquals("Verify 2 project history entries left.", 2, historyDir.listFiles().length);
-    }
-
-    @LocalData
-    public void testPurgeByQuantityWithNoEntries() throws Exception {
-        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        final String name = "JobWithoutAnyEntries";
-        final File historyDir = new File(jch.getJobHistoryRootDir(), name);
-        assertEquals("Verify no original project history entries.", 0, historyDir.listFiles().length);
-
-        jch.setMaxHistoryEntries("1");
-        jch.checkForPurgeByQuantity(historyDir);
-
-        assertEquals("Verify still no project history entries.", 0, historyDir.listFiles().length);
     }
 
     public void testAbsPathHistoryRootDir() throws Exception {
@@ -402,5 +304,45 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         } catch (Exception e) {
             fail("Unable to complete changed root dir test: " + e);
         }
+    }
+    
+    public void testInputOfMaxHistoryEntries() {
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        
+        // check good value
+        jch.setMaxHistoryEntries("5");
+        assertEquals("Verify maxHistoryEntries set to 5", "5", jch.getMaxHistoryEntries());
+
+        // check negative value
+        jch.setMaxHistoryEntries("-1");
+        assertEquals("Verify maxHistoryEntries still set to 5", "5", jch.getMaxHistoryEntries());
+        
+        // check non-number value
+        jch.setMaxHistoryEntries("K");
+        assertEquals("Verify maxHistoryEntries still set to 5", "5", jch.getMaxHistoryEntries());
+
+        // check empty value
+        jch.setMaxHistoryEntries("");
+        assertEquals("Verify maxHistoryEntries empty", "", jch.getMaxHistoryEntries());
+    }
+    
+    public void testInputOfMaxDaysToKeepEntries() {
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        
+        // check good value
+        jch.setMaxDaysToKeepEntries("5");
+        assertEquals("Verify maxDaysToKeepEntries set to 5", "5", jch.getMaxDaysToKeepEntries());
+
+        // check negative value
+        jch.setMaxDaysToKeepEntries("-1");
+        assertEquals("Verify maxDaysToKeepEntries still set to 5", "5", jch.getMaxDaysToKeepEntries());
+        
+        // check non-number value
+        jch.setMaxDaysToKeepEntries("K");
+        assertEquals("Verify maxDaysToKeepEntries still set to 5", "5", jch.getMaxDaysToKeepEntries());
+
+        // check empty value
+        jch.setMaxDaysToKeepEntries("");
+        assertEquals("Verify maxDaysToKeepEntries empty", "", jch.getMaxDaysToKeepEntries());
     }
 }

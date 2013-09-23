@@ -90,8 +90,8 @@ public class JobConfigHistory extends Plugin {
         throws IOException, ServletException, FormException {
 
         historyRootDir = formData.getString("historyRootDir").trim();
-        maxHistoryEntries = formData.getString("maxHistoryEntries").trim();
-        maxDaysToKeepEntries = formData.getString("maxDaysToKeepEntries").trim();
+        setMaxHistoryEntries(formData.getString("maxHistoryEntries").trim());
+        setMaxDaysToKeepEntries(formData.getString("maxDaysToKeepEntries").trim());
         saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
         skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
         excludePattern = formData.getString("excludePattern");
@@ -100,7 +100,7 @@ public class JobConfigHistory extends Plugin {
         save();
         loadRegexpPatterns();
     }
-    
+
     /**
      * @return The configured history root directory.
      */
@@ -123,12 +123,14 @@ public class JobConfigHistory extends Plugin {
     }
 
     /**
-     * This method is for convenience in testing.
-     * @param maxHistoryEntries
+     * Set the maximum number of history entries per item.
+     * @param maxEntryInput
      *        The maximum number of history entries to keep
      */
-    protected void setMaxHistoryEntries(final String maxHistoryEntries) {
-        this.maxHistoryEntries = maxHistoryEntries;
+    protected void setMaxHistoryEntries(String maxEntryInput) {
+        if (maxEntryInput.isEmpty() || isPositiveInteger(maxEntryInput)) {
+            maxHistoryEntries = maxEntryInput;
+        }
     }
 
     /**
@@ -139,12 +141,34 @@ public class JobConfigHistory extends Plugin {
     }
 
     /**
-     * This method is for convenience in testing.
-     * @param maxDays
+     * Set allowed age of history entries.
+     * @param maxDaysInput
      *        For how long history entries should be kept (in days)
      */
-    protected void setMaxDaysToKeepEntries(final String maxDays) {
-        this.maxDaysToKeepEntries = maxDays;
+    protected void setMaxDaysToKeepEntries(final String maxDaysInput) {
+        if (maxDaysInput.isEmpty() || isPositiveInteger(maxDaysInput)) {
+            maxDaysToKeepEntries = maxDaysInput;
+        }
+    }
+
+    /**
+     * Checks if a string evaluates to a positive integer number.
+     *
+     * @param numberString The number in question (as String)
+     * @return Whether the number is a positive integer
+     * 
+     */
+    private boolean isPositiveInteger(String numberString) {
+        try {
+            final int number = Integer.parseInt(numberString);
+            if (number < 0) {
+                throw new NumberFormatException();
+            }
+            return true;
+        } catch (NumberFormatException e) {
+            LOG.warning("No positive integer: " + numberString);
+        }
+        return false;
     }
 
     /**
