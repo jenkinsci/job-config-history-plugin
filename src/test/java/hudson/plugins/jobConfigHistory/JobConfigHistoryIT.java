@@ -90,7 +90,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         assertEquals("Verify build badges setting.", "always", jch.getShowBuildBadges());
 
         final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
-        assertFalse("Verify a system level configuration is not saveable.", jch.isSaveable(hudson, hudsonConfig));
+        assertTrue("Verify a system level configuration is saveable.", jch.isSaveable(hudson, hudsonConfig));
 
         assertTrue("Verify system configuration history location", jch.getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
         testCreateRenameDeleteProject(jch);
@@ -102,7 +102,6 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         submit(form);
 
         final FreeStyleProject project = createFreeStyleProject("testproject");
-        final File projectHistoryDir = jch.getHistoryDir(project.getConfigFile());
         final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
 
         // clear out all history - setting to 1 will clear out all with the expectation that we are creating a new entry
