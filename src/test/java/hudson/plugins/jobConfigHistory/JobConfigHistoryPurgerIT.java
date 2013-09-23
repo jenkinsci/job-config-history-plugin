@@ -9,8 +9,6 @@ import org.jvnet.hudson.test.recipes.LocalData;
 
 import hudson.XmlFile;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.SortedMap;
 
 public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInstanceDir {
@@ -61,14 +59,15 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
      */
     @LocalData
     public void testHistoryPurgerWhenMaxDaysSetToZero() throws Exception {
-        final File hudsonConfigDir = new File(jch.getConfiguredHistoryRootDir() + "/config");
-        final int historyEntries = hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length;
+        final HistoryDao historyDao = purger.getHistoryDao();
+        final File configXml = new File(hudson.root, "config.xml");
+        final int historyEntries = historyDao.getRevisions(configXml).size();
         assertTrue("Verify at least 5 original system config history entries.", historyEntries > 4);
 
         jch.setMaxDaysToKeepEntries("0");
         purger.run();
 
-        assertEquals("Verify that original entries are still there.", historyEntries, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
+        assertEquals("Verify that original entries are still there.", historyEntries, historyDao.getRevisions(configXml).size());
     }
 
     /**
@@ -90,13 +89,14 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
     }
 
     private void testWithWrongMaxAge(String maxAge) throws Exception {
-        final File hudsonConfigDir = new File(jch.getConfiguredHistoryRootDir() + "/config");
-        final int historyEntries = hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length;
+        final HistoryDao historyDao = purger.getHistoryDao();
+        final File configXml = new File(hudson.root, "config.xml");
+        final int historyEntries = historyDao.getRevisions(configXml).size();
         assertTrue("Verify at least 5 original system config history entries.", historyEntries > 4);
 
         jch.setMaxDaysToKeepEntries(maxAge);
         purger.run();
-        assertEquals("Verify that original entries are still there.", historyEntries, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
+        assertEquals("Verify that original entries are still there.", historyEntries, historyDao.getRevisions(configXml).size());
     }
 
     /**
@@ -144,14 +144,14 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
      */
     @LocalData
     public void testJobHistoryPurgerWithCreatedEntries() throws Exception {
-        final String name = "Test1";
-        final File historyDir = new File(jch.getJobHistoryRootDir(), name);
-        assertEquals("Verify 5 original project history entries.", 5, historyDir.listFiles().length);
+        final HistoryDao historyDao = purger.getHistoryDao();
+        final File configXml = new File(hudson.root, "jobs/Test1/config.xml");
+        assertEquals("Verify 5 original project history entries.", 5, historyDao.getRevisions(configXml).size());
 
         jch.setMaxDaysToKeepEntries("1");
         purger.run();
 
-        final List<File> listFilesAfterPurge = Arrays.asList(historyDir.listFiles());
+        final SortedMap<String, HistoryDescr> listFilesAfterPurge = historyDao.getRevisions(configXml);
         assertEquals("Verify 1 project history entries left." + listFilesAfterPurge, 1, listFilesAfterPurge.size());
     }
 }
