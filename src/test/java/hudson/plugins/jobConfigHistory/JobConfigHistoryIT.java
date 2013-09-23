@@ -111,7 +111,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             Thread.sleep(SLEEP_TIME);
             project.save();
         }
-        assertEquals("Verify 1 project history entry after 3 duplicate saves.", 1, projectAction.getJobConfigs().size());
+        assertEquals("Verify 2 project history entry after 3 duplicate saves.", 2, projectAction.getJobConfigs().size());
 
         // system history test - skip duplicate history -hardcode path to Hudson config
         final File hudsonConfigDir = new File(hudson.root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR + "/config");
