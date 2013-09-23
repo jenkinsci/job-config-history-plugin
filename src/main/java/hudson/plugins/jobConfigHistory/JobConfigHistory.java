@@ -49,7 +49,7 @@ public class JobConfigHistory extends Plugin {
      *  A 'system' level configuration is defined as one stored directly
      *  under the HUDSON_ROOT directory.
      */
-    private boolean saveSystemConfiguration;
+    private transient boolean saveSystemConfiguration;
 
     /** Flag to indicate ItemGroups configuration is saved as well. */
     private boolean saveItemGroupConfiguration;
@@ -92,7 +92,6 @@ public class JobConfigHistory extends Plugin {
         historyRootDir = formData.getString("historyRootDir").trim();
         maxHistoryEntries = formData.getString("maxHistoryEntries").trim();
         maxDaysToKeepEntries = formData.getString("maxDaysToKeepEntries").trim();
-        saveSystemConfiguration = formData.getBoolean("saveSystemConfiguration");
         saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
         skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
         excludePattern = formData.getString("excludePattern");
@@ -101,7 +100,7 @@ public class JobConfigHistory extends Plugin {
         save();
         loadRegexpPatterns();
     }
-
+    
     /**
      * @return The configured history root directory.
      */
@@ -146,21 +145,6 @@ public class JobConfigHistory extends Plugin {
      */
     protected void setMaxDaysToKeepEntries(final String maxDays) {
         this.maxDaysToKeepEntries = maxDays;
-    }
-
-    /**
-     * @return true if we should save 'system' configurations.
-     */
-    public boolean getSaveSystemConfiguration() {
-        return saveSystemConfiguration;
-    }
-
-    /**
-     * Used for testing only.
-     * @param bool True if system configuration should be saved.
-     */
-    public void setSaveSystemConfiguration(boolean bool) {
-        saveSystemConfiguration = bool;
     }
 
     /**
@@ -348,7 +332,7 @@ public class JobConfigHistory extends Plugin {
         boolean saveable = false;
         if (item instanceof AbstractProject<?, ?>) {
             saveable = true;
-        } else if (saveSystemConfiguration && xmlFile.getFile().getParentFile().equals(Hudson.getInstance().root)) {
+        } else if (xmlFile.getFile().getParentFile().equals(Hudson.getInstance().root)) {
             saveable = checkRegex(xmlFile);
         } else if (saveItemGroupConfiguration && item instanceof ItemGroup) {
             saveable = true;
@@ -373,28 +357,7 @@ public class JobConfigHistory extends Plugin {
         }
     }
 
-    /**
-     * Checks if we should purge old history entries under the specified root
-     * using the {@literal maxHistoryEntries} value as the criteria, and if required
-     * calls the appropriate method to perform the purge.
-     *
-     * @param itemHistoryRoot
-     *            The directory to consider purging history under.
-     */
-    protected void checkForPurgeByQuantity(final File itemHistoryRoot) {
-        int maxEntries = 0;
-        if (StringUtils.isNotEmpty(maxHistoryEntries)) {
-            try {
-                maxEntries = Integer.parseInt(maxHistoryEntries);
-                if (maxEntries < 0) {
-                    throw new NumberFormatException();
-                }
-            } catch (NumberFormatException e) {
-                LOG.warning("maximum number of history entries not formatted properly, unable to purge: " + maxHistoryEntries);
-            }
-        }
-        getHistoryDao().purgeOldEntries(itemHistoryRoot, maxEntries);
-    }
+ 
 
     /**
      * Validates the user entry for the maximum number of history items to keep.

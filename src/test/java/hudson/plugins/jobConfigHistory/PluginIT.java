@@ -194,7 +194,6 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
         final String firstDescription = "just a test";
         final String secondDescription = "just a second test";
         final int sleepTime = 1100;
-        hudson.getPlugin(JobConfigHistory.class).setSaveSystemConfiguration(true);
 
         try {
             hudson.setSystemMessage(firstDescription);

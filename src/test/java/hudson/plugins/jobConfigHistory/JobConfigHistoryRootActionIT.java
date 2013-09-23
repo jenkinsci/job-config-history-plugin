@@ -37,10 +37,6 @@ public class JobConfigHistoryRootActionIT extends
      * none/system/jobs/deleted/created.
      */
     public void testFilterWithData() throws Exception {
-
-        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        jch.setSaveSystemConfiguration(true);
-
         // create some config history data
         final FreeStyleProject project = createFreeStyleProject("Test1");
         Thread.sleep(SLEEP_TIME);
@@ -95,23 +91,13 @@ public class JobConfigHistoryRootActionIT extends
      */
     private void checkSystemPage(HtmlPage htmlPage) {
         final String page = htmlPage.asXml();
+        System.out.println(page);
         assertTrue("Verify history entry for system change is listed.", htmlPage.getAnchorByText("config") != null);
         assertFalse("Verify no job history entry is listed.", page.contains("Test1"));
         assertFalse("Verify history entry for deleted job is listed.", page.contains(JobConfigHistoryConsts.DELETED_MARKER));
         assertTrue("Check link to historypage exists.", page.contains("history?name"));
     }
 
-    /**
-     * If there is no config history available, it should say so.
-     */
-    public void testFilterWithoutData() {
-        try {
-            final HtmlPage htmlPage = webClient.goTo("jobConfigHistory");
-            assertTrue(htmlPage.asText().contains("No configuration history"));
-        } catch (Exception ex) {
-            fail("Unable to complete testFilterWithoutData: " + ex);
-        }
-    }
 
     /**
      * System config history should only be visible with the right permissions.
@@ -134,8 +120,6 @@ public class JobConfigHistoryRootActionIT extends
      * correctly and showDiffs works.
      */
     public void testSingleSystemHistoryPage() {
-        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
-        jch.setSaveSystemConfiguration(true);
         final String firstMessage = "First Testmessage";
         final String secondMessage = "Second Testmessage";
 
@@ -152,6 +136,7 @@ public class JobConfigHistoryRootActionIT extends
         try {
             final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/history?name=config");
             final String page = htmlPage.asXml();
+            System.out.println(page);
             assertFalse("Check whether configuration data is found.", page.contains("No configuration history"));
             assertTrue("Verify several entries for config changes exist.",
                     page.split("Changed").length > 2);

@@ -34,7 +34,6 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
         final File hudsonConfigDir = new File(jch.getConfiguredHistoryRootDir() + "/config");
         assertEquals("Verify 5 original system config history entries.", 5, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
 
-        jch.setSaveSystemConfiguration(true);
         hudson.setSystemMessage(message);
         Thread.sleep(SLEEP_TIME);
         assertEquals("Verify 5+1 project history entries.", 6, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);

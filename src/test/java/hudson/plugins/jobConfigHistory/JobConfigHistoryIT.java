@@ -50,7 +50,6 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         try {
             final HtmlForm form = webClient.goTo("configure").getFormByName("config");
             form.getInputByName("maxHistoryEntries").setValueAttribute("10");
-            form.getInputByName("saveSystemConfiguration").setChecked(true);
             form.getInputByName("saveModuleConfiguration").setChecked(false);
             form.getInputByName("skipDuplicateHistory").setChecked(false);
             form.getInputByName("excludePattern").setValueAttribute(JobConfigHistoryConsts.DEFAULT_EXCLUDE);
@@ -61,7 +60,6 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             fail("unable to configure Hudson instance " + e);
         }
         assertEquals("Verify history entries to keep setting.", "10", jch.getMaxHistoryEntries());
-        assertTrue("Verify system level configurations setting.", jch.getSaveSystemConfiguration());
         assertFalse("Verify Maven module configuration setting.", jch.getSaveModuleConfiguration());
         assertFalse("Verify skip duplicate history setting.", jch.getSkipDuplicateHistory());
         assertEquals("Verify configured history root directory.", new File(hudson.root + "/jobConfigHistory/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
@@ -86,7 +84,6 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
 
         assertNull("Verify number of history entries to keep default setting.", jch.getMaxHistoryEntries());
-        assertFalse("Verify system level configurations default setting.", jch.getSaveSystemConfiguration());
         assertTrue("Verify Maven module configuration default setting.", jch.getSaveModuleConfiguration());
         assertTrue("Verify skip duplicate history default setting.", jch.getSkipDuplicateHistory());
         assertNull("Verify unconfigured exclude pattern.", jch.getExcludePattern());
@@ -102,7 +99,6 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
     public void testSkipDuplicateHistory() throws IOException, SAXException, Exception {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
         HtmlForm form = webClient.goTo("configure").getFormByName("config");
-        form.getInputByName("saveSystemConfiguration").setChecked(true);
         submit(form);
 
         final FreeStyleProject project = createFreeStyleProject("testproject");

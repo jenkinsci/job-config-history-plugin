@@ -71,7 +71,6 @@ public class JobConfigHistoryJobListenerIT extends AbstractHudsonTestCaseDeletin
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
         final HtmlForm form = webClient.goTo("configure").getFormByName("config");
         form.getInputByName("historyRootDir").setValueAttribute("jobConfigHistory");
-        form.getInputByName("saveSystemConfiguration").setChecked(true);
         submit(form);
         FreeStyleProject project = createFreeStyleProject("newproject");
         File historyDir = jch.getHistoryDir(project.getConfigFile());
