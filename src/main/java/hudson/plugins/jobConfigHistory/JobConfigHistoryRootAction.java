@@ -458,8 +458,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @param newName The new name of the project
      */
     private void copyHistoryFiles(String oldName, String newName) {
-        final FilePath oldFilePath = new FilePath(new File(getPlugin().getJobHistoryRootDir(), oldName));
-        final FilePath newFilePath = new FilePath(new File(getPlugin().getJobHistoryRootDir(), newName));
+        final FilePath oldFilePath = new FilePath(new File(((FileHistoryDao)getHistoryDao()).getJobHistoryRootDir(), oldName));
+        final FilePath newFilePath = new FilePath(new File(((FileHistoryDao)getHistoryDao()).getJobHistoryRootDir(), newName));
         try {
             oldFilePath.moveAllChildrenTo(newFilePath);
             oldFilePath.delete();
@@ -484,5 +484,14 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         throws IOException {
         final String name = req.getParameter("name");
         rsp.sendRedirect("restoreQuestion?name=" + name);
+    }
+    
+    /**
+     * For tests.
+     *
+     * @return historyDao
+     */
+    HistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
     }
 }
