@@ -8,13 +8,11 @@ import hudson.security.HudsonPrivateSecurityRealm;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 
-import org.jvnet.hudson.test.recipes.LocalData;
 import org.xml.sax.SAXException;
 
 /**
@@ -69,10 +67,10 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertTrue("Verify a system level configuration is saveable.", jch.isSaveable(hudson, hudsonConfig));
 
-        assertTrue("Verify system configuration history location", jch.getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
+        assertTrue("Verify system configuration history location", getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
         testCreateRenameDeleteProject(jch);
         try {
-            jch.getHistoryDir(new XmlFile(new File("/tmp")));
+            getHistoryDir(new XmlFile(new File("/tmp")));
             fail("Verify IAE when attempting to get history dir for a file outside of HUDSON_ROOT.");
         } catch (IllegalArgumentException e) {
             assertNotNull("Expected IAE", e);
@@ -92,7 +90,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertTrue("Verify a system level configuration is saveable.", jch.isSaveable(hudson, hudsonConfig));
 
-        assertTrue("Verify system configuration history location", jch.getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
+        assertTrue("Verify system configuration history location", getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
         testCreateRenameDeleteProject(jch);
     }
 
@@ -129,7 +127,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         assertEquals("Verify non duplicate project history saved.", 2, projectAction.getJobConfigs().size());
 
         // corrupt history record and verify new entry will be saved
-        final File[] historyDirs = jch.getHistoryDir(project.getConfigFile()).listFiles(HistoryFileFilter.INSTANCE);
+        final File[] historyDirs = getHistoryDir(project.getConfigFile()).listFiles(HistoryFileFilter.INSTANCE);
         Arrays.sort(historyDirs, Collections.reverseOrder());
         (new File(historyDirs[0], "config.xml")).renameTo(new File(historyDirs[0], "config"));
         assertNull("Verify history dir is corrupted.", jch.getConfigFile(historyDirs[0]));
@@ -224,7 +222,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
             final File jobHistoryRootFile = jch.getJobHistoryRootDir();
 
             final File expectedConfigDir = new File(jobHistoryRootFile, "testproject");
-            assertEquals("Verify history dir configured as expected.", expectedConfigDir, jch.getHistoryDir(project.getConfigFile()));
+            assertEquals("Verify history dir configured as expected.", expectedConfigDir, getHistoryDir(project.getConfigFile()));
             assertTrue("Verify project config history directory created: " + expectedConfigDir, expectedConfigDir.exists());
 
             //since sometimes two history entries are created, we just check
@@ -343,5 +341,11 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         // check empty value
         jch.setMaxDaysToKeepEntries("");
         assertEquals("Verify maxDaysToKeepEntries empty", "", jch.getMaxDaysToKeepEntries());
+    }
+
+    private File getHistoryDir(XmlFile xmlFile) {
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        final File configFile = xmlFile.getFile();
+        return ((FileHistoryDao) jch.getHistoryDao()).getHistoryDir(configFile);
     }
 }

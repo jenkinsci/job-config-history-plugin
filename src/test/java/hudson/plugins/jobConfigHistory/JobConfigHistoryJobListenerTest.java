@@ -1,6 +1,5 @@
 package hudson.plugins.jobConfigHistory;
 
-import hudson.XmlFile;
 import hudson.model.AbstractItem;
 import hudson.model.Item;
 import java.io.File;
@@ -80,7 +79,6 @@ public class JobConfigHistoryJobListenerTest {
         AbstractItem item = mock(AbstractItem.class);
         when(item.getConfigFile()).thenReturn(null);
         when(mockedPlugin.getConfiguredHistoryRootDir()).thenReturn(tempFolder.getRoot());
-        when(mockedPlugin.getHistoryDir(any(XmlFile.class))).thenReturn(tempFolder.newFolder("oldName"));
         JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
         sut.onRenamed(item, "oldName", "newName");
         verify(mockedConfigHistoryListenerHelper).renameItem(item, "oldName", "newName");
@@ -104,7 +102,6 @@ public class JobConfigHistoryJobListenerTest {
     public void testOnDeletedAbstractItem() throws IOException {
         AbstractItem item = mock(AbstractItem.class);
         when(item.getConfigFile()).thenReturn(null);
-        when(mockedPlugin.getHistoryDir(any(XmlFile.class))).thenReturn(tempFolder.newFile());
         JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
         sut.onDeleted(item);
         verify(mockedConfigHistoryListenerHelper).deleteItem(item);

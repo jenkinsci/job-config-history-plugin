@@ -309,22 +309,6 @@ public class JobConfigHistory extends Plugin {
     }
 
     /**
-     * Returns the configuration history directory for the given configuration file.
-     *
-     * @param xmlFile
-     *            The configuration file whose content we are saving.
-     * @return The base directory where to store the history,
-     *         or null if the file is not a valid Hudson configuration file.
-     *
-     * @deprecated replace this with FileHistoryDao invocation.
-     */
-    @Deprecated
-    protected File getHistoryDir(final XmlFile xmlFile) {
-        final File configFile = xmlFile.getFile();
-        return ((FileHistoryDao) getHistoryDao()).getHistoryDir(configFile);
-    }
-
-    /**
      * @see FileHistoryDao#getConfigFile(java.io.File).
      *
      * @param historyDir

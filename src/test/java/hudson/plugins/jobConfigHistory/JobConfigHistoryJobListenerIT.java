@@ -19,6 +19,7 @@ import org.jvnet.hudson.test.Bug;
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import hudson.XmlFile;
 
 /**
  * @author mirko
@@ -73,12 +74,12 @@ public class JobConfigHistoryJobListenerIT extends AbstractHudsonTestCaseDeletin
         form.getInputByName("historyRootDir").setValueAttribute("jobConfigHistory");
         submit(form);
         FreeStyleProject project = createFreeStyleProject("newproject");
-        File historyDir = jch.getHistoryDir(project.getConfigFile());
+        File historyDir = getHistoryDir(project.getConfigFile());
         // force deletion of existing directory
         (new FilePath(historyDir)).deleteRecursive();
         project.renameTo("newproject1");
         assertEquals("Verify only 1 history entry after rename.", 1,
-                jch.getHistoryDir(project.getConfigFile()).list().length);
+                getHistoryDir(project.getConfigFile()).list().length);
 
         // test rename failure - causes renameTo to fail if we lock the parent
         // NOTE: Windows host seem to ignore the setWritable flag, so the following test will fail on Windows.
@@ -86,7 +87,7 @@ public class JobConfigHistoryJobListenerIT extends AbstractHudsonTestCaseDeletin
         if ((new File("c:/")).exists()) {
             System.out.println("Skipping permission based rename tests - Windows system detected.");
         } else {
-            historyDir = jch.getHistoryDir(project.getConfigFile());
+            historyDir = getHistoryDir(project.getConfigFile());
             historyDir.getParentFile().setWritable(false);
             try {
                 project.renameTo("newproject2");
@@ -97,7 +98,7 @@ public class JobConfigHistoryJobListenerIT extends AbstractHudsonTestCaseDeletin
 
                 // test delete rename failure
                 project = createFreeStyleProject("newproject_deleteme");
-                historyDir = jch.getHistoryDir(project.getConfigFile());
+                historyDir = getHistoryDir(project.getConfigFile());
                 historyDir.getParentFile().setWritable(false);
 
                 project.delete();
@@ -115,4 +116,11 @@ public class JobConfigHistoryJobListenerIT extends AbstractHudsonTestCaseDeletin
         final AbstractProject project2 = hudson.copy((AbstractProject)project1, "project2");
         assertEquals("Copied project should have same description as original.", project2.getDescription(), text);
     }
+
+    private File getHistoryDir(XmlFile xmlFile) {
+        final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
+        final File configFile = xmlFile.getFile();
+        return ((FileHistoryDao) jch.getHistoryDao()).getHistoryDir(configFile);
+    }
+
 }
