@@ -8,8 +8,10 @@ import java.util.GregorianCalendar;
 import org.jvnet.hudson.test.recipes.LocalData;
 
 import hudson.XmlFile;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.SortedMap;
 
 public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInstanceDir {
     private static final int SLEEP_TIME = 1100;
@@ -31,20 +33,26 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
     @LocalData
     public void testSystemHistoryPurger() throws Exception {
         final String message = "Some nice message";
-        final File hudsonConfigDir = new File(jch.getConfiguredHistoryRootDir() + "/config");
-        final int historyEntries = hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length;
-        assertTrue("Verify at least 5 original system config history entries.", historyEntries > 4);
+        final HistoryDao historyDao = purger.getHistoryDao();
+        final File configXml = new File(hudson.root, "config.xml");
+        final int historyEntries = historyDao.getRevisions(configXml).size();
+        assertTrue("Verify at least 5 original system config history entries, got " + historyEntries, historyEntries > 4);
 
         hudson.setSystemMessage(message);
         Thread.sleep(SLEEP_TIME);
-        assertEquals("Verify one additional system history entry.", historyEntries + 1, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
+        assertEquals("Verify one additional system history entry.", historyEntries + 1, historyDao.getRevisions(configXml).size());
 
         jch.setMaxDaysToKeepEntries("1");
         purger.run();
 
-        assertTrue("Verify 5 (old) system history entries less after purging.", historyEntries - 5 <= hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
-        final XmlFile lastEntry = new XmlFile(new File (hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE)[0], "config.xml"));
-        assertTrue("Verify remaining entry is the newest one", lastEntry.asString().contains(message));
+        final SortedMap<String, HistoryDescr> revisions = historyDao.getRevisions(configXml);
+        assertTrue("Verify 5 (old) system history entries less after purging.", historyEntries - 5 <= revisions.size());
+        final ArrayList<String> revisionsKeys = new ArrayList<String>(revisions.keySet());
+        System.out.println(revisionsKeys);
+
+        final XmlFile lastEntry = historyDao.getOldRevision(configXml, revisionsKeys.get(revisionsKeys.size() - 1));
+        final String lastEntryAsString = lastEntry.asString();
+        assertTrue("Verify remaining entry is the newest one" + lastEntryAsString, lastEntryAsString.contains(message));
     }
 
     /**
