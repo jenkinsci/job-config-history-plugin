@@ -16,6 +16,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class JobConfigHistoryRootActionIT extends
         AbstractHudsonTestCaseDeletingInstanceDir {
@@ -30,6 +32,11 @@ public class JobConfigHistoryRootActionIT extends
     protected void setUp() throws Exception {
         super.setUp();
         webClient = createWebClient();
+        Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
+        Logger.getLogger("").setLevel(Level.WARNING);
+        Logger.getLogger(this.getClass().getPackage().getName()).setLevel(Level.INFO);
+        webClient.setJavaScriptEnabled(true);
+        webClient.setCssEnabled(false);
     }
 
     /**
@@ -86,7 +93,7 @@ public class JobConfigHistoryRootActionIT extends
 
     /**
      * Checks whether system config history is displayed correctly.
-     * 
+     *
      * @param htmlPage
      */
     private void checkSystemPage(HtmlPage htmlPage) {
@@ -108,7 +115,7 @@ public class JobConfigHistoryRootActionIT extends
         hudson.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
         try {
             final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME);
-            assertTrue("Verify nothing is shown without permission", 
+            assertTrue("Verify nothing is shown without permission",
                     htmlPage.asText().contains("No permission to view"));
         } catch (Exception ex) {
             fail("Unable to complete testFilterWithoutPermissions: " + ex);
@@ -210,8 +217,8 @@ public class JobConfigHistoryRootActionIT extends
         final String rawPage = ((TextPage) rawLink.click()).getContent();
         assertTrue("Verify config file is shown", rawPage.contains(description));
     }
-    
-    
+
+
     /**
      * Tests if restoring a project that was disabled before deletion works.
      * @throws Exception
@@ -224,11 +231,11 @@ public class JobConfigHistoryRootActionIT extends
         project.disable();
         Thread.sleep(SLEEP_TIME);
         project.delete();
-        
+
         final HtmlPage jobPage = restoreProject();
         WebAssert.assertTextPresent(jobPage, name);
         WebAssert.assertTextPresent(jobPage, description);
-        
+
         final HtmlPage historyPage = webClient.goTo("job/" + name + "/" + JobConfigHistoryConsts.URLNAME);
         final String historyAsXml = historyPage.asXml();
         System.out.println(historyAsXml);
@@ -236,9 +243,9 @@ public class JobConfigHistoryRootActionIT extends
         final List<HtmlAnchor> hrefs = historyPage.getByXPath("//a[contains(@href, \"configOutput?type=xml\")]");
         assertTrue(hrefs.size() > 2);
     }
-    
+
     /**
-     * Tests whether finding a new name for a restored project works 
+     * Tests whether finding a new name for a restored project works
      * if the old name is already occupied.
      * @throws Exception
      */
@@ -249,7 +256,7 @@ public class JobConfigHistoryRootActionIT extends
         project.setDescription(description);
         Thread.sleep(SLEEP_TIME);
         project.delete();
-        
+
         createFreeStyleProject(name);
 
         final HtmlPage jobPage = restoreProject();
@@ -269,14 +276,14 @@ public class JobConfigHistoryRootActionIT extends
         final String description = project.getDescription();
         Thread.sleep(SLEEP_TIME);
         project.delete();
-        
+
         final HtmlPage jobPage = restoreProject();
         WebAssert.assertTextPresent(jobPage, name);
         WebAssert.assertTextPresent(jobPage, description);
     }
 
     /**
-     * A project will not be restored if there are no configs present 
+     * A project will not be restored if there are no configs present
      * and it has been disabled at the time of deletion.
      * @throws Exception
      */
@@ -286,11 +293,11 @@ public class JobConfigHistoryRootActionIT extends
         final FreeStyleProject project = (FreeStyleProject) hudson.getItem(name);
         Thread.sleep(SLEEP_TIME);
         project.delete();
-        
+
         final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
         WebAssert.assertElementNotPresentByXPath(htmlPage, ("//img[contains(@src, \"restore.png\")]"));
     }
- 
+
     private HtmlPage restoreProject() throws Exception {
         final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
         final HtmlAnchor restoreLink = (HtmlAnchor) htmlPage.getElementById("restore");
@@ -299,7 +306,7 @@ public class JobConfigHistoryRootActionIT extends
         final HtmlPage jobPage = submit(restoreForm, "Submit");
         return jobPage;
     }
-    
+
     /**
      * Tests whether the 'Restore project' button on the history page works as well.
      * @throws Exception
@@ -311,7 +318,7 @@ public class JobConfigHistoryRootActionIT extends
         project.setDescription(description);
         Thread.sleep(SLEEP_TIME);
         project.delete();
-        
+
         final HtmlPage htmlPage = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
         final List<HtmlAnchor> hrefs = htmlPage.getByXPath("//a[contains(@href, \"TestProject_deleted_\")]");
         final HtmlPage historyPage = (HtmlPage) hrefs.get(0).click();
