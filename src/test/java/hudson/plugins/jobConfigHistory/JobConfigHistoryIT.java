@@ -104,27 +104,34 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
 
         // clear out all history - setting to 1 will clear out all with the expectation that we are creating a new entry
         jch.setMaxHistoryEntries("1");
-
+        project.save();
+        Thread.sleep(SLEEP_TIME);
         // reset to empty value
         jch.setMaxHistoryEntries("");
-        for (int i = 0; i < 3; i++) {
+        project.save();
+        Thread.sleep(SLEEP_TIME);
+        // TODO: why do we have 2 entries after the first save operation?
+        final int jobLengthBeforeSave = projectAction.getJobConfigs().size();
+        for (int i = 0; i < 5; i++) {
             Thread.sleep(SLEEP_TIME);
             project.save();
         }
-        assertEquals("Verify 2 project history entry after 3 duplicate saves.", 2, projectAction.getJobConfigs().size());
+        Thread.sleep(SLEEP_TIME);
+        assertEquals("Verify 2 project history entry after 5 duplicate saves.", jobLengthBeforeSave, projectAction.getJobConfigs().size());
 
         // system history test - skip duplicate history -hardcode path to Hudson config
         final File hudsonConfigDir = new File(hudson.root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR + "/config");
-        for (int i = 0; i < 3; i++) {
+        final int configLengthBeforeSave = hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length;
+        for (int i = 0; i < 5; i++) {
             Thread.sleep(SLEEP_TIME);
             hudson.save();
         }
-        assertEquals("Verify 1 system history entry after 3 duplicate saves.", 1, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
+        assertEquals("Verify system history has still only previous entries after 5 duplicate saves.", configLengthBeforeSave, hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
 
         // verify non-duplicate history is saved
         project.setDescription("new description");
         project.save();
-        assertEquals("Verify non duplicate project history saved.", 2, projectAction.getJobConfigs().size());
+        assertEquals("Verify non duplicate project history saved.", jobLengthBeforeSave + 1, projectAction.getJobConfigs().size());
 
         // corrupt history record and verify new entry will be saved
         final File[] historyDirs = getHistoryDir(project.getConfigFile()).listFiles(HistoryFileFilter.INSTANCE);
