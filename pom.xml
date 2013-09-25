@@ -177,7 +177,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <argLine>${argLine} -Xms256m -Xmx768m -XX:MaxPermSize=256m</argLine>
+                    <argLine>${argLine} -Xms256m -Xmx512m -XX:MaxPermSize=128m</argLine>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <testFailureIgnore>true</testFailureIgnore>
                     <includes>
