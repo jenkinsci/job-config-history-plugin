@@ -45,11 +45,15 @@ public class JobConfigHistory extends Plugin {
     /** Maximum number of days to keep entries. */
     private String maxDaysToKeepEntries;
 
-    /** Flag to indicate we should save 'system' level configurations
-     *  A 'system' level configuration is defined as one stored directly
-     *  under the HUDSON_ROOT directory.
+    /**
+     * Flag to indicate we should save 'system' level configurations.
+     * A 'system' level configuration is defined as one stored directly
+     * under the HUDSON_ROOT directory.
+     * As of version 2.5 this configuration option is deprecated but
+     * left here to avoid unmarshalling problems with older settings.
      */
-    private transient boolean saveSystemConfiguration;
+    @Deprecated
+    private transient boolean saveSystemConfiguration; //NOPMD
 
     /** Flag to indicate ItemGroups configuration is saved as well. */
     private boolean saveItemGroupConfiguration;
