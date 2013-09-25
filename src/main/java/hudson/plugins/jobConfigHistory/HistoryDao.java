@@ -61,15 +61,15 @@ public interface HistoryDao {
     SortedMap<String, HistoryDescr> getRevisions(XmlFile xmlFile);
 
     /**
-     * Returns a sorted map of all revisions for this file.
+     * Returns a sorted map of all revisions for this configFile.
      *
      * The key is an identifier which may be used in
      * {@link HistoryDao#getOldRevision(hudson.model.AbstractItem, java.lang.String)}
      *
-     * @param file file
+     * @param configFile file
      * @return old revisions mapped to the identifier.
      */
-    SortedMap<String, HistoryDescr> getRevisions(File file);
+    SortedMap<String, HistoryDescr> getRevisions(File configFile);
 
     /**
      * Returns one old configuration of item.
@@ -92,11 +92,11 @@ public interface HistoryDao {
     /**
      * Returns one old configuration of file.
      *
-     * @param file file
+     * @param configFile file
      * @param identifier timestamp or hash
      * @return old configuration.
      */
-    XmlFile getOldRevision(File file, String identifier);
+    XmlFile getOldRevision(File configFile, String identifier);
 
     /**
      * Returns whether the revision exists.
@@ -119,11 +119,11 @@ public interface HistoryDao {
     /**
      * Returns whether the revision exists.
      *
-     * @param file file
+     * @param configFile file
      * @param identifier timestamp or hash
      * @return old configuration.
      */
-    boolean hasOldRevision(File file, String identifier);
+    boolean hasOldRevision(File configFile, String identifier);
 
    /**
      * Purges old entries for the given history root to maxEntries.
