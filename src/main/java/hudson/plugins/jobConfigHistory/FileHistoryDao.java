@@ -520,7 +520,8 @@ public class FileHistoryDao implements HistoryDao {
                     isDuplicated = true;
                 }
             } catch (IOException e) {
-                LOG.log(Level.WARNING, "unable to check for duplicate previous history file: {0}\n{1}", new Object[]{lastRevision, e});
+                LOG.log(Level.WARNING, "unable to check for duplicate previous history file: {0}\n{1}",
+                        new Object[]{lastRevision, e});
             }
         }
         return isDuplicated;
