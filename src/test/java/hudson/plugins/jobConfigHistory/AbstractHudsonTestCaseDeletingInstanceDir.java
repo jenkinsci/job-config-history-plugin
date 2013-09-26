@@ -5,6 +5,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
@@ -31,7 +32,7 @@ public abstract class AbstractHudsonTestCaseDeletingInstanceDir extends HudsonTe
     protected void tearDown() throws Exception {
         super.tearDown();
         final File rootDir = hudson.getRootDir();
-        LOG.info("Deleting " + rootDir + " in tearDown");
+        LOG.log(Level.INFO, "Deleting {0} in tearDown", rootDir);
         FileUtils.deleteDirectory(rootDir);
     }
 }

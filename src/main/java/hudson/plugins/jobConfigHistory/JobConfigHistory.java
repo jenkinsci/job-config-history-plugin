@@ -12,6 +12,7 @@ import hudson.util.FormValidation;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -170,7 +171,7 @@ public class JobConfigHistory extends Plugin {
             }
             return true;
         } catch (NumberFormatException e) {
-            LOG.warning("No positive integer: " + numberString);
+            LOG.log(Level.WARNING, "No positive integer: {0}", numberString);
         }
         return false;
     }

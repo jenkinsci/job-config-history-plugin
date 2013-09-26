@@ -3,7 +3,6 @@ package hudson.plugins.jobConfigHistory;
 import hudson.XmlFile;
 import hudson.model.Saveable;
 import org.junit.Test;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 /**

@@ -74,7 +74,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
                     purgeHistoryByAge();
                 }
             } catch (NumberFormatException e) {
-                LOG.warning("maximum age of history entries not formatted properly, unable to purge: " + maxAgeString);
+                LOG.log(WARNING, "maximum age of history entries not formatted properly, unable to purge: {0}", maxAgeString);
             }
         }
     }
@@ -126,7 +126,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
         try {
             parsedDate = dateParser.parse(historyDir.getName());
         } catch (ParseException ex) {
-            LOG.warning("Unable to parse Date: " + ex);
+            LOG.log(WARNING, "Unable to parse Date: {0}", ex);
         }
         final Calendar historyDate = new GregorianCalendar();
         if (parsedDate != null) {

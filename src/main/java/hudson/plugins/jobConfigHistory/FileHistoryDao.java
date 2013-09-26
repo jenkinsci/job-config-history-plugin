@@ -249,7 +249,7 @@ public class FileHistoryDao implements HistoryDao {
         final String deletedHistoryName = item.getName() + JobConfigHistoryConsts.DELETED_MARKER + timestamp;
         final File deletedHistoryDir = new File(currentHistoryDir.getParentFile(), deletedHistoryName);
         if (!currentHistoryDir.renameTo(deletedHistoryDir)) {
-            LOG.warning("unable to rename deleted history dir to: " + deletedHistoryDir);
+            LOG.log(Level.WARNING, "unable to rename deleted history dir to: {0}", deletedHistoryDir);
         }
     }
 
@@ -520,7 +520,7 @@ public class FileHistoryDao implements HistoryDao {
                     isDuplicated = true;
                 }
             } catch (IOException e) {
-                LOG.warning("unable to check for duplicate previous history file: " + lastRevision + "\n" + e);
+                LOG.log(Level.WARNING, "unable to check for duplicate previous history file: {0}\n{1}", new Object[]{lastRevision, e});
             }
         }
         return isDuplicated;

@@ -232,7 +232,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
                             + "&timestamp=" + timestamp;
                 }
             } catch (IOException ex) {
-                LOG.finest("Unable to get config for " + name);
+                LOG.log(FINEST, "Unable to get config for {0}", name);
             }
         } else if (config.getIsJob()) {
             link = getHudson().getRootUrl() + "job/" + name + getUrlName()
@@ -415,7 +415,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         try {
             configInfos = getSingleConfigs(name);
         } catch (IOException ex) {
-            LOG.finest("Unable to get config history for " +  name);
+            LOG.log(FINEST, "Unable to get config history for {0}", name);
             return configXml;
         }
                 
@@ -464,10 +464,10 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
             oldFilePath.moveAllChildrenTo(newFilePath);
             oldFilePath.delete();
         } catch (InterruptedException ex) {
-            LOG.info("Unable to move old history data " + oldFilePath + " to new directory " + newFilePath);
+            LOG.log(INFO, "Unable to move old history data {0} to new directory {1}", new Object[]{oldFilePath, newFilePath});
             LOG.info(ex.getMessage());
         } catch (IOException ex) {
-            LOG.info("Unable to move old history data " + oldFilePath + " to new directory " + newFilePath);            
+            LOG.log(INFO, "Unable to move old history data {0} to new directory {1}", new Object[]{oldFilePath, newFilePath});
             LOG.info(ex.getMessage());
         }
     }
