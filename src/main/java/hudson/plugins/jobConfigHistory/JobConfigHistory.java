@@ -429,6 +429,6 @@ public class JobConfigHistory extends Plugin {
      * @return the historyDao
      */
     HistoryDao getHistoryDao() {
-        return PluginUtils.getHistoryDao();
+        return PluginUtils.getHistoryDao(this);
     }
 }

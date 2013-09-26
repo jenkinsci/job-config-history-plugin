@@ -353,6 +353,6 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
     private File getHistoryDir(XmlFile xmlFile) {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
         final File configFile = xmlFile.getFile();
-        return ((FileHistoryDao) jch.getHistoryDao()).getHistoryDir(configFile);
+        return ((FileHistoryDao) PluginUtils.getHistoryDao(jch)).getHistoryDir(configFile);
     }
 }

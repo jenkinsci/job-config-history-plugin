@@ -55,10 +55,20 @@ final class PluginUtils {
 
     /**
      * For tests.
-     * @return listener
+     * @return historyDao
      */
     public static HistoryDao getHistoryDao() {
-        final String maxHistoryEntriesAsString = getPlugin().getMaxHistoryEntries();
+        final JobConfigHistory plugin = getPlugin();
+        return getHistoryDao(plugin);
+    }
+
+    /**
+     * For tests.
+     * @param plugin the plugin.
+     * @return historyDao
+     */
+    public static HistoryDao getHistoryDao(final JobConfigHistory plugin) {
+        final String maxHistoryEntriesAsString = plugin.getMaxHistoryEntries();
         int maxHistoryEntries = 0;
         try {
             maxHistoryEntries = Integer.valueOf(maxHistoryEntriesAsString);
@@ -66,11 +76,11 @@ final class PluginUtils {
             maxHistoryEntries = 0;
         }
         return new FileHistoryDao(
-                getPlugin().getConfiguredHistoryRootDir(),
+                plugin.getConfiguredHistoryRootDir(),
                 new File(Hudson.getInstance().root.getPath()),
                 User.current(),
                 maxHistoryEntries,
-                !getPlugin().getSkipDuplicateHistory());
+                !plugin.getSkipDuplicateHistory());
     }
     /**
      * Returns a {@link Date}.
