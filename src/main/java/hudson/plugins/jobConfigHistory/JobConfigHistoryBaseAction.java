@@ -10,16 +10,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.Stapler;
 
-import difflib.Chunk;
-import difflib.Delta;
-import difflib.DiffRow;
-import difflib.DiffRow.Tag;
-import difflib.DiffRowGenerator;
-import difflib.DiffUtils;
-import difflib.Patch;
 
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
@@ -142,87 +134,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *             if reading one of the config files does not succeed.
      */
     public final List<Line> getDiffLines(List<String> diffLines) throws IOException {
-        final Patch diff = DiffUtils.parseUnifiedDiff(diffLines);
-        final SideBySideView view = new SideBySideView();
-        final DiffRowGenerator.Builder builder = new DiffRowGenerator.Builder();
-        builder.columnWidth(Integer.MAX_VALUE);
-        final DiffRowGenerator dfg = builder.build();
-
-        int previousLeftPos = 0;
-
-        for (final Delta delta : diff.getDeltas()) {
-            final Chunk original = delta.getOriginal();
-            final Chunk revised = delta.getRevised();
-
-            final List<DiffRow> diffRows = dfg.generateDiffRows(
-                    (List<String>) original.getLines(),
-                    (List<String>) revised.getLines());
-
-            // Chunk#getPosition() returns 0-origin line numbers, but we need 1-origin line numbers
-            int leftPos = original.getPosition() + 1;
-            int rightPos = revised.getPosition() + 1;
-
-            if (previousLeftPos > 0 && leftPos - previousLeftPos > 1) {
-                final Line skippingLine = new Line();
-                skippingLine.setSkipping(true);
-                view.addLine(skippingLine);
-            }
-
-            for (final DiffRow row : diffRows) {
-                final Tag tag = row.getTag();
-                final Line line = new Line();
-                final Line.Item left = line.getLeft();
-                final Line.Item right = line.getRight();
-                if (tag == Tag.INSERT) {
-                    left.setCssClass("diff_original");
-
-                    right.setLineNumber(rightPos);
-                    right.setText(row.getNewLine());
-                    right.setCssClass("diff_revised");
-                    rightPos++;
-
-                } else if (tag == Tag.CHANGE) {
-                    if (StringUtils.isNotEmpty(row.getOldLine())) {
-                        left.setLineNumber(leftPos);
-                        left.setText(row.getOldLine());
-                        leftPos++;
-                    }
-                    left.setCssClass("diff_original");
-
-                    if (StringUtils.isNotEmpty(row.getNewLine())) {
-                        right.setLineNumber(rightPos);
-                        right.setText(row.getNewLine());
-                        rightPos++;
-                    }
-                    right.setCssClass("diff_revised");
-
-                } else if (tag == Tag.DELETE) {
-                    left.setLineNumber(leftPos);
-                    left.setText(row.getOldLine());
-                    left.setCssClass("diff_original");
-                    leftPos++;
-
-                    right.setCssClass("diff_revised");
-
-                } else if (tag == Tag.EQUAL) {
-                    left.setLineNumber(leftPos);
-                    left.setText(row.getOldLine());
-                    leftPos++;
-
-                    right.setLineNumber(rightPos);
-                    right.setText(row.getNewLine());
-                    rightPos++;
-
-                } else {
-                    throw new IllegalStateException("Unknown tag pattern: " + tag);
-                }
-                line.setTag(tag);
-                view.addLine(line);
-                previousLeftPos = leftPos;
-            }
-        }
-        view.clearDuplicateLines();
-        return view.getLines();
+        return new GetDiffLines(diffLines).get();
     }
 
     /**
