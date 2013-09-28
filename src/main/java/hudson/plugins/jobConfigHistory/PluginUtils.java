@@ -75,14 +75,10 @@ final class PluginUtils {
         } catch (NumberFormatException e) {
             maxHistoryEntries = 0;
         }
-        final User currentUser;
-        synchronized(plugin) {
-            currentUser = User.current();
-        }
         return new FileHistoryDao(
                 plugin.getConfiguredHistoryRootDir(),
                 new File(Hudson.getInstance().root.getPath()),
-                currentUser,
+                User.current(),
                 maxHistoryEntries,
                 !plugin.getSkipDuplicateHistory());
     }
@@ -97,6 +93,6 @@ final class PluginUtils {
             return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timeStamp);
         } catch (ParseException ex) {
             throw new IllegalArgumentException("Could not parse Date" + timeStamp, ex);
-        }
+        }        
     }
 }
