@@ -55,23 +55,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         this.hudson = hudson;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * Make method final, as we always want the same display name.
-     */
-    // @Override
+    @Override
     public final String getDisplayName() {
         return Messages.displayName();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * Do not make this method final as {@link JobConfigHistoryRootAction}
-     * overrides this method.
-     */
-    // @Override
+    @Override
     public String getUrlName() {
         return JobConfigHistoryConsts.URLNAME;
     }
