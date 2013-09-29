@@ -49,9 +49,13 @@ final class ConfigInfoCollector {
     private final List<ConfigInfo> configs = new ArrayList<ConfigInfo>();
 
     /**
-     * type to collect.
+     * Type to collect.
      */
     private final String type;
+
+    /**
+     * HistoryDao.
+     */
     private final HistoryDao historyDao;
 
 

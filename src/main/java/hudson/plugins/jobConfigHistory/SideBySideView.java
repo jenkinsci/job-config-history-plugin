@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013 Mirko Friedenhagen.
+ * Copyright 2013 Mirko Friedenhagen, Kojima Takanori
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,8 @@ import java.util.TreeMap;
 
 /**
  * Holds information for the SideBySideView.
+ * @author Kojima Takanori
+ * @author Mirko Friedenhagen
  */
 public class SideBySideView {
     /**

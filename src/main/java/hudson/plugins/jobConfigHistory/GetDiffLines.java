@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013 Mirko Friedenhagen.
+ * Copyright 2013 Mirko Friedenhagen, Kojima Takanori
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,7 @@ import org.apache.commons.lang.StringUtils;
  * Returns side-by-side (i.e. human-readable) diff view lines.
  *
  * @author Mirko Friedenhagen
+ * @author Kojima Takanori
  */
 class GetDiffLines {
 
@@ -100,11 +101,11 @@ class GetDiffLines {
         /**
          * Current leftPos.
          */
-        int leftPos;
+        private int leftPos;
         /**
          * Current rightPos.
          */
-        int rightPos;
+        private int rightPos;
 
         /**
          *
@@ -127,7 +128,8 @@ class GetDiffLines {
         int loop(int previousLeftPos) {
             final Chunk original = delta.getOriginal();
             final Chunk revised = delta.getRevised();
-            final List<DiffRow> diffRows = dfg.generateDiffRows((List<String>) original.getLines(), (List<String>) revised.getLines());
+            final List<DiffRow> diffRows = dfg.generateDiffRows(
+                    (List<String>) original.getLines(), (List<String>) revised.getLines());
             // Chunk#getPosition() returns 0-origin line numbers, but we need 1-origin line numbers
             leftPos = original.getPosition() + 1;
             rightPos = revised.getPosition() + 1;
