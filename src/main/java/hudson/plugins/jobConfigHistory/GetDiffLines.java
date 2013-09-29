@@ -81,26 +81,74 @@ class GetDiffLines {
     }
 
     /**
-     * Extends view with lines of a single delta.
-     *
-     * @param delta to inspect.
-     * @param previousLeftPos indentation.
-     *
-     * @return new previousLeftPos
+     * DeltaLoop.
      */
-    int deltaLoop(final Delta delta, int previousLeftPos) {
-        final Chunk original = delta.getOriginal();
-        final Chunk revised = delta.getRevised();
-        final List<DiffRow> diffRows = dfg.generateDiffRows((List<String>) original.getLines(), (List<String>) revised.getLines());
-        // Chunk#getPosition() returns 0-origin line numbers, but we need 1-origin line numbers
-        int leftPos = original.getPosition() + 1;
-        int rightPos = revised.getPosition() + 1;
-        if (previousLeftPos > 0 && leftPos - previousLeftPos > 1) {
-            final SideBySideView.Line skippingLine = new SideBySideView.Line();
-            skippingLine.setSkipping(true);
-            view.addLine(skippingLine);
+    static class DeltaLoop {
+
+        /**
+         * View.
+         */
+        private final SideBySideView view;
+        /**
+         * Dfg.
+         */
+        private final DiffRowGenerator dfg;
+        /**
+         * delta.
+         */
+        private final Delta delta;
+        /**
+         * Current leftPos.
+         */
+        int leftPos;
+        /**
+         * Current rightPos.
+         */
+        int rightPos;
+
+        /**
+         *
+         * @param view to extend.
+         * @param dfg dfg
+         * @param delta delta
+         */
+        public DeltaLoop(SideBySideView view, DiffRowGenerator dfg, Delta delta) {
+            this.view = view;
+            this.dfg = dfg;
+            this.delta = delta;
         }
-        for (final DiffRow row : diffRows) {
+
+        /**
+         * Loop through Delta.
+         *
+         * @param previousLeftPos previous indentation
+         * @return current indentation
+         */
+        int loop(int previousLeftPos) {
+            final Chunk original = delta.getOriginal();
+            final Chunk revised = delta.getRevised();
+            final List<DiffRow> diffRows = dfg.generateDiffRows((List<String>) original.getLines(), (List<String>) revised.getLines());
+            // Chunk#getPosition() returns 0-origin line numbers, but we need 1-origin line numbers
+            leftPos = original.getPosition() + 1;
+            rightPos = revised.getPosition() + 1;
+            if (previousLeftPos > 0 && leftPos - previousLeftPos > 1) {
+                final SideBySideView.Line skippingLine = new SideBySideView.Line();
+                skippingLine.setSkipping(true);
+                view.addLine(skippingLine);
+            }
+            for (final DiffRow row : diffRows) {
+                previousLeftPos = processDiffRow(row);
+            }
+            return previousLeftPos;
+        }
+
+        /**
+         * Processes one DiffRow.
+         *
+         * @param row to process
+         * @return indentation
+         */
+        int processDiffRow(final DiffRow row) {
             final DiffRow.Tag tag = row.getTag();
             final SideBySideView.Line line = new SideBySideView.Line();
             final SideBySideView.Line.Item left = line.getLeft();
@@ -142,9 +190,21 @@ class GetDiffLines {
             }
             line.setTag(tag);
             view.addLine(line);
-            previousLeftPos = leftPos;
+            return leftPos;
         }
-        return previousLeftPos;
+
+    }
+
+    /**
+     * Extends view with lines of a single delta.
+     *
+     * @param delta to inspect.
+     * @param previousLeftPos indentation.
+     *
+     * @return new previousLeftPos
+     */
+    int deltaLoop(final Delta delta, int previousLeftPos) {
+        return new DeltaLoop(view, dfg, delta).loop(previousLeftPos);
     }
 
 }
