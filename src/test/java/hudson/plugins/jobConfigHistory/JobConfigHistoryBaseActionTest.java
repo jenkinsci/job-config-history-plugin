@@ -144,17 +144,6 @@ public class JobConfigHistoryBaseActionTest {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         List<SideBySideView.Line> result = sut.getDiffLines(lines);
         assertEquals(24, result.size());
-        SideBySideView.Line firstLine = result.get(0);
-        assertEquals("import bmsi.util.Diff;", firstLine.getLeft().getText());
-        assertEquals("import bmsi.util.Diff;", firstLine.getRight().getText());
-        SideBySideView.Line fourthLine = result.get(3);
-        final SideBySideView.Line.Item left = fourthLine.getLeft();
-        final SideBySideView.Line.Item right = fourthLine.getRight();
-        assertEquals("3", right.getLineNumber());
-        assertNull(left.getText());
-        assertEquals("import org.kohsuke.stapler.StaplerRequest;", right.getText());
-        assertEquals("diff_original", left.getCssClass());
-        assertEquals("diff_revised", right.getCssClass());
     }
 
     /**
