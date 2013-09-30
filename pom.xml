@@ -83,6 +83,7 @@
         <jacoco.version>0.6.3.201306030806</jacoco.version>
         <maven-surefire-plugin.version>2.16</maven-surefire-plugin.version>
         <maven-surefire-report-plugin.version>2.16</maven-surefire-report-plugin.version>
+        <maven-javadoc-plugin.version>2.9.1</maven-javadoc-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -254,10 +255,11 @@
                 <configuration>
                     <show>private</show>
                     <quiet>true</quiet>
+                    <aggregate>false</aggregate>
                     <links>
-                        <link>http://download.oracle.com/javase/1.5.0/docs/api/</link>
+                        <link>http://docs.oracle.com/javase/6/docs/api/</link>
                         <link>http://javadoc.jenkins-ci.org/</link>
-                        <link>http://stapler.java.net/apidocs/</link>
+                        <link>http://stapler.kohsuke.org/apidocs/</link>
                     </links>
                 </configuration>
             </plugin>
