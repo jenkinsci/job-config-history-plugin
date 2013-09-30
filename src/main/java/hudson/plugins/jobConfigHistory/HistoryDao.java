@@ -13,13 +13,6 @@ import java.util.SortedMap;
 public interface HistoryDao extends ItemListenerHistoryDao {
 
     /**
-     * Adds and saves the initial configuration of an item.
-     *
-     * @param item project
-     */
-    void createNewItem(AbstractItem item);
-
-    /**
      * Saves the current configuration of an item.
      *
      * @param item project
@@ -32,22 +25,6 @@ public interface HistoryDao extends ItemListenerHistoryDao {
      * @param file xmlFile
      */
     void saveItem(XmlFile file);
-
-    /**
-     * Deletes the history of an item.
-     *
-     * @param item project
-     */
-    void deleteItem(AbstractItem item);
-
-    /**
-     * Save and renames the item.
-     *
-     * @param item project
-     * @param oldName old project name
-     * @param newName new name
-     */
-    void renameItem(AbstractItem item, String oldName, String newName);
 
     /**
      * Returns a sorted map of all revisions for this xmlFile.

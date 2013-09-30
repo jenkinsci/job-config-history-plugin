@@ -73,7 +73,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
      * @return listener
      */
 
-    HistoryDao getHistoryDao() {
+    ItemListenerHistoryDao getHistoryDao() {
         return PluginUtils.getHistoryDao();
     }
 }

@@ -21,13 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.plugins.jobConfigHistory;
 
+import hudson.model.AbstractItem;
+import hudson.model.listeners.ItemListener;
+
 /**
+ * Operations for historization of config files suitable for the {@link ItemListener}.
  *
  * @author Mirko Friedenhagen
  */
 public interface ItemListenerHistoryDao {
 
+    /**
+     * Adds and saves the initial configuration of an item.
+     *
+     * @param item project
+     */
+    void createNewItem(AbstractItem item);
+
+    /**
+     * Save and renames the item.
+     *
+     * @param item project
+     * @param oldName old project name
+     * @param newName new name
+     */
+    void renameItem(AbstractItem item, String oldName, String newName);
+
+    /**
+     * Deletes the history of an item.
+     *
+     * @param item project
+     */
+    void deleteItem(AbstractItem item);
 }

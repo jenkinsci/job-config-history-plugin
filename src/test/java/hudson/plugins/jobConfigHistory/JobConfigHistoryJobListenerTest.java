@@ -18,7 +18,7 @@ public class JobConfigHistoryJobListenerTest {
 
     final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
 
-    final HistoryDao mockedConfigHistoryListenerHelper = mock(HistoryDao.class);
+    final ItemListenerHistoryDao mockedConfigHistoryListenerHelper = mock(ItemListenerHistoryDao.class);
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder(new File("target"));
@@ -115,7 +115,7 @@ public class JobConfigHistoryJobListenerTest {
         }
 
         @Override
-        HistoryDao getHistoryDao() {
+        ItemListenerHistoryDao getHistoryDao() {
             return mockedConfigHistoryListenerHelper;
         }
     }
