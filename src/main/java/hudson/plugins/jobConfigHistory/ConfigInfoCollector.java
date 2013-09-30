@@ -99,8 +99,7 @@ final class ConfigInfoCollector {
                 final ConfigInfo config = ConfigInfo.create(itemName, historyDir, histDescr, true);
                 getConfigs().add(config);
             } else {
-                // TODO: why would the created entry not be the first one? Could changes accumulate and we have even more
-                // change entries?
+                //Why would the created entry not be the first one? Answer:
                 //There's always a 'Changed' entry before the 'Created' entry, 
                 //because in the Jenkins core, when creating a new job, 
                 //the SaveableListener (which handles changes) fires 
