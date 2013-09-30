@@ -25,6 +25,9 @@ public abstract class AbstractHudsonTestCaseDeletingInstanceDir extends HudsonTe
     static {
         new File("target/tmp").mkdir();
         System.setProperty("java.io.tmpdir", "target/tmp");
+        // Possible workaround for https://issues.jenkins-ci.org/browse/JENKINS-19244
+        // jenkins random hang during startup - Solaris and Linux
+        System.setProperty("hudson.model.Hudson.parallelLoad", "false");
     }
 
     /** {@inheritDoc} */
