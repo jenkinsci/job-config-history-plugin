@@ -210,7 +210,8 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao {
 
     @Override
     public void createNewItem(Item item) {
-        createNewHistoryEntryAndCopyConfig(((AbstractItem)item).getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED());
+        final AbstractItem aItem = (AbstractItem) item;
+        createNewHistoryEntryAndCopyConfig(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED());
     }
 
     /**
@@ -242,7 +243,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao {
 
     @Override
     public void deleteItem(Item item) {
-        AbstractItem aItem = (AbstractItem)item;
+        final AbstractItem aItem = (AbstractItem) item;
         createNewHistoryEntry(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_DELETED());
         final File configFile = aItem.getConfigFile().getFile();
         final File currentHistoryDir = getHistoryDir(configFile);
@@ -257,7 +258,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao {
 
     @Override
     public void renameItem(Item item, String oldName, String newName) {
-        AbstractItem aItem = (AbstractItem)item;
+        final AbstractItem aItem = (AbstractItem) item;
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         if (historyRootDir != null) {
             final File configFile = aItem.getConfigFile().getFile();
