@@ -116,7 +116,8 @@ public class JobConfigHistoryJobListenerTest {
 
         @Override
         ItemListenerHistoryDao getHistoryDao(Item item) {
-            return mockedConfigHistoryListenerHelper;
+            return item instanceof AbstractItem ? 
+                    mockedConfigHistoryListenerHelper : JobConfigHistoryJobListener.NoOpItemListenerHistoryDao.INSTANCE;
         }
     }
 

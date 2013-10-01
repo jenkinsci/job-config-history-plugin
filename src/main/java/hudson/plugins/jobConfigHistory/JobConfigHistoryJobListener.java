@@ -28,7 +28,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
     @Override
     public void onCreated(Item item) {
         LOG.log(FINEST, "In onCreated for {0}", item);
-        getHistoryDao(item).createNewItem(((AbstractItem) item));
+        getHistoryDao(item).createNewItem((item));
         LOG.log(FINEST, "onCreated for {0} done.", item);
         //        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
@@ -44,7 +44,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
     public void onRenamed(Item item, String oldName, String newName) {
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         LOG.log(FINEST, "In onRenamed for {0}{1}", new Object[]{item, onRenameDesc});
-        getHistoryDao(item).renameItem((AbstractItem) item, oldName, newName);
+        getHistoryDao(item).renameItem(item, oldName, newName);
         LOG.log(FINEST, "Completed onRename for {0} done.", item);
     }
 
@@ -54,7 +54,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
     @Override
     public void onDeleted(Item item) {
         LOG.log(FINEST, "In onDeleted for {0}", item);
-        getHistoryDao(item).deleteItem((AbstractItem) item);
+        getHistoryDao(item).deleteItem(item);
         LOG.log(FINEST, "onDeleted for {0} done.", item);
     }
 
@@ -87,17 +87,17 @@ public class JobConfigHistoryJobListener extends ItemListener {
         static final NoOpItemListenerHistoryDao INSTANCE = new NoOpItemListenerHistoryDao();
 
         @Override
-        public void createNewItem(AbstractItem item) {
+        public void createNewItem(Item item) {
             LOG.log(Level.FINEST, "onCreated: not an AbstractItem {0}, skipping.", item);
         }
 
         @Override
-        public void renameItem(AbstractItem item, String oldName, String newName) {
+        public void renameItem(Item item, String oldName, String newName) {
             LOG.log(Level.FINEST, "onRenamed: not an AbstractItem {0}, skipping.", item);
         }
 
         @Override
-        public void deleteItem(AbstractItem item) {
+        public void deleteItem(Item item) {
             LOG.log(Level.FINEST, "onDeleted: not an AbstractItem {0}, skipping.", item);
         }
 

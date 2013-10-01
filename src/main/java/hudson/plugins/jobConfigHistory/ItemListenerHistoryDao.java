@@ -23,7 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import hudson.model.AbstractItem;
+import hudson.model.Item;
 import hudson.model.listeners.ItemListener;
 
 /**
@@ -38,7 +38,7 @@ public interface ItemListenerHistoryDao {
      *
      * @param item project
      */
-    void createNewItem(AbstractItem item);
+    void createNewItem(Item item);
 
     /**
      * Save and renames the item.
@@ -47,12 +47,12 @@ public interface ItemListenerHistoryDao {
      * @param oldName old project name
      * @param newName new name
      */
-    void renameItem(AbstractItem item, String oldName, String newName);
+    void renameItem(Item item, String oldName, String newName);
 
     /**
      * Deletes the history of an item.
      *
      * @param item project
      */
-    void deleteItem(AbstractItem item);
+    void deleteItem(Item item);
 }

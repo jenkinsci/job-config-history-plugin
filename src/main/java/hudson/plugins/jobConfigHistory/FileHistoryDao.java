@@ -9,6 +9,7 @@ import hudson.Util;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
+import hudson.model.Item;
 import hudson.model.User;
 import java.io.BufferedOutputStream;
 
@@ -208,8 +209,8 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao {
 
 
     @Override
-    public void createNewItem(AbstractItem item) {
-        createNewHistoryEntryAndCopyConfig(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED());
+    public void createNewItem(Item item) {
+        createNewHistoryEntryAndCopyConfig(((AbstractItem)item).getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED());
     }
 
     /**
@@ -240,9 +241,10 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao {
     }
 
     @Override
-    public void deleteItem(AbstractItem item) {
-        createNewHistoryEntry(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_DELETED());
-        final File configFile = item.getConfigFile().getFile();
+    public void deleteItem(Item item) {
+        AbstractItem aItem = (AbstractItem)item;
+        createNewHistoryEntry(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_DELETED());
+        final File configFile = aItem.getConfigFile().getFile();
         final File currentHistoryDir = getHistoryDir(configFile);
         final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
         final String timestamp = buildDateFormat.format(new Date());
@@ -254,10 +256,11 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao {
     }
 
     @Override
-    public void renameItem(AbstractItem item, String oldName, String newName) {
+    public void renameItem(Item item, String oldName, String newName) {
+        AbstractItem aItem = (AbstractItem)item;
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         if (historyRootDir != null) {
-            final File configFile = item.getConfigFile().getFile();
+            final File configFile = aItem.getConfigFile().getFile();
             final File currentHistoryDir = getHistoryDir(configFile);
             final File historyParentDir = currentHistoryDir.getParentFile();
             final File oldHistoryDir = new File(historyParentDir, oldName);
@@ -278,7 +281,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao {
             }
 
         }
-        createNewHistoryEntryAndCopyConfig(item.getConfigFile(), Messages.ConfigHistoryListenerHelper_RENAMED());
+        createNewHistoryEntryAndCopyConfig(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_RENAMED());
     }
 
     @Override
