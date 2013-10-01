@@ -28,7 +28,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
     @Override
     public void onCreated(Item item) {
         LOG.log(FINEST, "In onCreated for {0}", item);
-        getHistoryDao(item).createNewItem((item));
+        switchHistoryDao(item).createNewItem((item));
         LOG.log(FINEST, "onCreated for {0} done.", item);
         //        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
@@ -44,7 +44,7 @@ public class JobConfigHistoryJobListener extends ItemListener {
     public void onRenamed(Item item, String oldName, String newName) {
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         LOG.log(FINEST, "In onRenamed for {0}{1}", new Object[]{item, onRenameDesc});
-        getHistoryDao(item).renameItem(item, oldName, newName);
+        switchHistoryDao(item).renameItem(item, oldName, newName);
         LOG.log(FINEST, "Completed onRename for {0} done.", item);
     }
 
@@ -54,32 +54,33 @@ public class JobConfigHistoryJobListener extends ItemListener {
     @Override
     public void onDeleted(Item item) {
         LOG.log(FINEST, "In onDeleted for {0}", item);
-        getHistoryDao(item).deleteItem(item);
+        switchHistoryDao(item).deleteItem(item);
         LOG.log(FINEST, "onDeleted for {0} done.", item);
     }
 
     /**
-     * Returns the plugin for tests.
+     * Returns ItemListenerHistoryDao depending on the item type.
      *
-     * @return plugin
+     * @param item the item to switch on.
+     * @return dao
      */
-    JobConfigHistory getPlugin() {
-        return PluginUtils.getPlugin();
+    private ItemListenerHistoryDao switchHistoryDao(Item item) {
+        return item instanceof AbstractItem ? getHistoryDao() : NoOpItemListenerHistoryDao.INSTANCE;
     }
 
     /**
-     * Return ItemListenerHistoryDao depending on the item type.
+     * Just for tests.
      *
-     * @return listener
+     * @return ItemListenerHistoryDao.
      */
-    ItemListenerHistoryDao getHistoryDao(Item item) {
-        return item instanceof AbstractItem ? PluginUtils.getHistoryDao() : NoOpItemListenerHistoryDao.INSTANCE;
+    ItemListenerHistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
     }
 
     /**
      * No operation ItemListenerHistoryDao.
      */
-    static class NoOpItemListenerHistoryDao implements ItemListenerHistoryDao {
+    private static class NoOpItemListenerHistoryDao implements ItemListenerHistoryDao {
 
         /**
          * The instance.

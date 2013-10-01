@@ -2,12 +2,8 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.model.AbstractItem;
 import hudson.model.Item;
-import java.io.File;
 import java.io.IOException;
-
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import static org.mockito.Mockito.*;
 
 /**
@@ -16,21 +12,16 @@ import static org.mockito.Mockito.*;
  */
 public class JobConfigHistoryJobListenerTest {
 
-    final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
-
     final ItemListenerHistoryDao mockedConfigHistoryListenerHelper = mock(ItemListenerHistoryDao.class);
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder(new File("target"));
+    final JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
 
     /**
      * Test of onCreated method, of class JobConfigHistoryJobListener.
      */
     @Test
     public void testOnCreated() {
-        Item item = mock(Item.class);
-        when(item.toString()).thenReturn("item");
-        JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
+        Item item = createItem();
         sut.onCreated(item);
         verifyZeroInteractions(mockedConfigHistoryListenerHelper);
     }
@@ -40,10 +31,7 @@ public class JobConfigHistoryJobListenerTest {
      */
     @Test
     public void testOnCreatedAbstractItem() {
-        AbstractItem item = mock(AbstractItem.class);
-        when(item.toString()).thenReturn("item");
-        when(item.getConfigFile()).thenReturn(null);
-        JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
+        AbstractItem item = createAbstractItem();
         sut.onCreated(item);
         verify(mockedConfigHistoryListenerHelper).createNewItem(item);
     }
@@ -53,8 +41,7 @@ public class JobConfigHistoryJobListenerTest {
      */
     @Test
     public void testOnRenamed() {
-        Item item = mock(Item.class);
-        JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
+        Item item = createItem();
         sut.onRenamed(item, "", "");
         verifyZeroInteractions(mockedConfigHistoryListenerHelper);
     }
@@ -64,22 +51,7 @@ public class JobConfigHistoryJobListenerTest {
      */
     @Test
     public void testOnRenamedAbstractItemWithoutConfiguredHistoryRootDir() {
-        AbstractItem item = mock(AbstractItem.class);
-        when(item.getConfigFile()).thenReturn(null);
-        JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
-        sut.onRenamed(item, "oldName", "newName");
-        verify(mockedConfigHistoryListenerHelper).renameItem(item, "oldName", "newName");
-    }
-
-    /**
-     * Test of onRenamed method, of class JobConfigHistoryJobListener.
-     */
-    @Test
-    public void testOnRenamedAbstractItemWithConfiguredHistoryRootDir() throws IOException {
-        AbstractItem item = mock(AbstractItem.class);
-        when(item.getConfigFile()).thenReturn(null);
-        when(mockedPlugin.getConfiguredHistoryRootDir()).thenReturn(tempFolder.getRoot());
-        JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
+        AbstractItem item = createAbstractItem();
         sut.onRenamed(item, "oldName", "newName");
         verify(mockedConfigHistoryListenerHelper).renameItem(item, "oldName", "newName");
     }
@@ -89,8 +61,7 @@ public class JobConfigHistoryJobListenerTest {
      */
     @Test
     public void testOnDeleted() {
-        Item item = mock(Item.class);
-        JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
+        Item item = createItem();
         sut.onDeleted(item);
         verifyZeroInteractions(mockedConfigHistoryListenerHelper);
     }
@@ -100,24 +71,29 @@ public class JobConfigHistoryJobListenerTest {
      */
     @Test
     public void testOnDeletedAbstractItem() throws IOException {
-        AbstractItem item = mock(AbstractItem.class);
-        when(item.getConfigFile()).thenReturn(null);
-        JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
+        AbstractItem item = createAbstractItem();
         sut.onDeleted(item);
         verify(mockedConfigHistoryListenerHelper).deleteItem(item);
+    }
+
+    private AbstractItem createAbstractItem() {
+        AbstractItem item = mock(AbstractItem.class);
+        when(item.toString()).thenReturn("abstractItem");
+        when(item.getConfigFile()).thenReturn(null);
+        return item;
+    }
+
+    private Item createItem() {
+        Item item = mock(Item.class);
+        when(item.toString()).thenReturn("item");
+        return item;
     }
 
     private class JobConfigHistoryJobListenerWithMocks extends JobConfigHistoryJobListener {
 
         @Override
-        JobConfigHistory getPlugin() {
-            return mockedPlugin;
-        }
-
-        @Override
-        ItemListenerHistoryDao getHistoryDao(Item item) {
-            return item instanceof AbstractItem ? 
-                    mockedConfigHistoryListenerHelper : JobConfigHistoryJobListener.NoOpItemListenerHistoryDao.INSTANCE;
+        ItemListenerHistoryDao getHistoryDao() {
+            return mockedConfigHistoryListenerHelper;
         }
     }
 
