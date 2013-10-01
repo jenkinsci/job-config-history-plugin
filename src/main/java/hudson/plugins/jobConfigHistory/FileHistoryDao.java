@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  *
  * @author mfriedenhagen
  */
-public class FileHistoryDao implements HistoryDao {
+public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao {
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(FileHistoryDao.class.getName());

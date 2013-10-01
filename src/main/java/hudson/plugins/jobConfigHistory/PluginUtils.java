@@ -57,7 +57,7 @@ final class PluginUtils {
      * For tests.
      * @return historyDao
      */
-    public static HistoryDao getHistoryDao() {
+    public static FileHistoryDao getHistoryDao() {
         final JobConfigHistory plugin = getPlugin();
         return getHistoryDao(plugin);
     }
@@ -67,7 +67,7 @@ final class PluginUtils {
      * @param plugin the plugin.
      * @return historyDao
      */
-    public static HistoryDao getHistoryDao(final JobConfigHistory plugin) {
+    public static FileHistoryDao getHistoryDao(final JobConfigHistory plugin) {
         final String maxHistoryEntriesAsString = plugin.getMaxHistoryEntries();
         int maxHistoryEntries = 0;
         try {

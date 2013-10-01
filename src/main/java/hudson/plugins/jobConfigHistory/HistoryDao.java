@@ -10,7 +10,7 @@ import java.util.SortedMap;
  *
  * @author Mirko Friedenhagen
  */
-public interface HistoryDao extends ItemListenerHistoryDao {
+public interface HistoryDao {
 
     /**
      * Saves the current configuration of an item.
