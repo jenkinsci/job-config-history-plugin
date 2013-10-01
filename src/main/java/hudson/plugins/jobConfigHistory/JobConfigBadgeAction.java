@@ -19,7 +19,7 @@ import jenkins.model.RunAction2;
  *
  * @author kstutz
  */
-public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
+public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 
     /**
      * The dates of the last two config changes as Strings.
@@ -36,7 +36,7 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
      *
      * @param configDates The dates of the last two config changes
      */
-    private JobConfigBadgeAction(String[] configDates) {
+    JobConfigBadgeAction(String[] configDates) {
         this.configDates = configDates.clone();
     }
 
@@ -152,9 +152,18 @@ public final class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 
      * @return Link target as String.
      */
     public String createLink() {
-        return Hudson.getInstance().getRootUrl() + build.getProject().getUrl()
+        return getRootUrl() + build.getProject().getUrl()
                 + JobConfigHistoryConsts.URLNAME + "/showDiffFiles?timestamp1=" + configDates[1]
                 + "&timestamp2=" + configDates[0];
+    }
+
+    /**
+     * For tests.
+     *
+     * @return root-URL of Jenkins.
+     */
+    String getRootUrl() {
+        return Hudson.getInstance().getRootUrl();
     }
 
     /**
