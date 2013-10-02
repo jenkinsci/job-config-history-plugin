@@ -12,6 +12,7 @@ import hudson.model.Hudson;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
+import java.util.List;
 import jenkins.model.RunAction2;
 
 /**
@@ -69,11 +70,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
             if (project.getLastBuild().getPreviousBuild() != null) {
                 lastBuildDate = project.getLastBuild().getPreviousBuild().getTime();
             }
-
-            //get timestamp of config-change
-            final HistoryDao historyDao = getHistoryDao();
-            final ArrayList<HistoryDescr> historyDescriptions = new ArrayList<HistoryDescr>(
-                    historyDao.getRevisions(project.getConfigFile()).values());
+            List<HistoryDescr> historyDescriptions = getRevisions(project);
             if (historyDescriptions.size() > 1) {
                 Collections.sort(historyDescriptions, ParsedDateComparator.DESCENDING);
                 final HistoryDescr lastChange = Collections.min(historyDescriptions, ParsedDateComparator.DESCENDING);
@@ -90,6 +87,18 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
         }
 
         /**
+         * For tests.
+         * @param project to inspect.
+         * @return list of revisions
+         */
+        List<HistoryDescr> getRevisions(final AbstractProject<?, ?> project) {
+            final HistoryDao historyDao = PluginUtils.getHistoryDao();
+            final ArrayList<HistoryDescr> historyDescriptions = new ArrayList<HistoryDescr>(
+                    historyDao.getRevisions(project.getConfigFile()).values());
+            return historyDescriptions;
+        }
+
+        /**
          * Finds the date of the last config change that happened before the last build. This is needed for the link in the build
          * history that shows the difference between the current configuration and the version that was in place when the last
          * build happened.
@@ -98,7 +107,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
          * @param lastBuildDate The date of the lastBuild (as Date).
          * @return The date of the last relevant config change (as String).
          */
-        private String findLastRelevantConfigChangeDate(ArrayList<HistoryDescr> historyDescriptions, Date lastBuildDate) {
+        private String findLastRelevantConfigChangeDate(List<HistoryDescr> historyDescriptions, Date lastBuildDate) {
             for (int i = 1; i < historyDescriptions.size(); i++) {
                 final HistoryDescr oldConfigChange = historyDescriptions.get(i);
                 final Date changeDate = oldConfigChange.parsedDate();
@@ -107,16 +116,6 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
                 }
             }
             return historyDescriptions.get(1).getTimestamp();
-        }
-
-        /**
-         * For tests.
-         *
-         * @return listener
-         */
-
-        HistoryDao getHistoryDao() {
-            return PluginUtils.getHistoryDao();
         }
     } // end Listener
 

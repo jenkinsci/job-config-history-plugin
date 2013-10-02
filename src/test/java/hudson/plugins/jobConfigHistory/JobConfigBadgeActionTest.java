@@ -26,12 +26,13 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.AbstractProject;
 import hudson.model.Build;
 import hudson.model.ItemGroup;
+import hudson.model.Project;
 import hudson.model.TaskListener;
-import java.util.Calendar;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 import static org.mockito.Mockito.*;
 
 /**
@@ -44,7 +45,7 @@ public class JobConfigBadgeActionTest {
     private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
     private final HistoryDao mockedHistoryDao = mock(HistoryDao.class);
     private final Build mockedBuild = mock(Build.class);
-    private final AbstractProject mockedProject = mock(AbstractProject.class);
+    private final Project mockedProject = mock(Project.class);
     private final String[] configDates = {"2013_01_01", "2013_01_02"};
     private JobConfigBadgeAction sut = createSut();
 
@@ -181,22 +182,32 @@ public class JobConfigBadgeActionTest {
     }
 
     @Test
-    @Ignore("getTime is final")
     public void testListenerOnStarted() {
         final JobConfigBadgeAction.Listener psut = createListenerSut();
         when(mockedProject.getNextBuildNumber()).thenReturn(3);
         when(mockedProject.getLastBuild()).thenReturn(mockedBuild);
-        when(mockedBuild.getPreviousBuild()).thenReturn(mockedBuild);
-        when(mockedBuild.getTime()).thenReturn(GregorianCalendar.getInstance().getTime());
+        //when(mockedHistoryDao.getRevisions(any(XmlFile.class))).thenReturn(null)
+        final GregorianCalendar calendar = new GregorianCalendar(2013, 9, 30, 23, 0, 5);
+        final Build previousBuild = new Build(mockedProject, calendar) {
+            @Override
+            public Project getParent() {
+                return mockedProject;
+            }
+        };
+        when(mockedBuild.getPreviousBuild()).thenReturn(previousBuild);
         psut.onStarted(mockedBuild, TaskListener.NULL);
     }
 
     private JobConfigBadgeAction.Listener createListenerSut() {
         return new JobConfigBadgeAction.Listener() {
+
             @Override
-            HistoryDao getHistoryDao() {
-                return mockedHistoryDao;
+            List<HistoryDescr> getRevisions(AbstractProject<?, ?> project) {
+                return Arrays.asList(
+                        new HistoryDescr("user", "userId", "changed", "2013-10-30_23-00-06"),
+                        new HistoryDescr("user", "userId", "changed", "2013-10-30_23-00-07"));
             }
+
         };
     }
 
