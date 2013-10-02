@@ -26,8 +26,12 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.AbstractProject;
 import hudson.model.Build;
 import hudson.model.ItemGroup;
+import hudson.model.TaskListener;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 import static org.mockito.Mockito.*;
 
 /**
@@ -162,12 +166,42 @@ public class JobConfigBadgeActionTest {
         assertEquals(expResult, result);
     }
 
-    JobConfigBadgeAction createSut() {
-        return createSut(configDates);
+    @Test
+    public void testListenerOnStartedBuildNumberLessThan2() {
+        final JobConfigBadgeAction.Listener lsut = createListenerSut();
+        lsut.onStarted(mockedBuild, TaskListener.NULL);
     }
 
-    JobConfigBadgeAction createSut(final String[] theConfigDates) {
-        return new JobConfigBadgeAction(theConfigDates) {
+    @Test
+    public void testListenerOnStartedGreatherThan2ButNoPreviousBuild() {
+        final JobConfigBadgeAction.Listener psut = createListenerSut();
+        when(mockedProject.getNextBuildNumber()).thenReturn(3);
+        when(mockedProject.getLastBuild()).thenReturn(mockedBuild);
+        psut.onStarted(mockedBuild, TaskListener.NULL);
+    }
+
+    @Test
+    @Ignore("getTime is final")
+    public void testListenerOnStarted() {
+        final JobConfigBadgeAction.Listener psut = createListenerSut();
+        when(mockedProject.getNextBuildNumber()).thenReturn(3);
+        when(mockedProject.getLastBuild()).thenReturn(mockedBuild);
+        when(mockedBuild.getPreviousBuild()).thenReturn(mockedBuild);
+        when(mockedBuild.getTime()).thenReturn(GregorianCalendar.getInstance().getTime());
+        psut.onStarted(mockedBuild, TaskListener.NULL);
+    }
+
+    private JobConfigBadgeAction.Listener createListenerSut() {
+        return new JobConfigBadgeAction.Listener() {
+            @Override
+            HistoryDao getHistoryDao() {
+                return mockedHistoryDao;
+            }
+        };
+    }
+
+    JobConfigBadgeAction createSut() {
+        return new JobConfigBadgeAction(configDates) {
 
             @Override
             JobConfigHistory getPlugin() {
@@ -186,5 +220,4 @@ public class JobConfigBadgeActionTest {
 
         };
     }
-
 }
