@@ -39,6 +39,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
      */
     JobConfigBadgeAction(String[] configDates) {
         this.configDates = configDates.clone();
+        this.build = null;
     }
 
     @Override
