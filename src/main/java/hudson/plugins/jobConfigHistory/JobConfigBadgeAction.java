@@ -108,8 +108,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
          * @return The date of the last relevant config change (as String).
          */
         private String findLastRelevantConfigChangeDate(List<HistoryDescr> historyDescriptions, Date lastBuildDate) {
-            for (int i = 1; i < historyDescriptions.size(); i++) {
-                final HistoryDescr oldConfigChange = historyDescriptions.get(i);
+            for (HistoryDescr oldConfigChange : historyDescriptions.subList(1, historyDescriptions.size())) {
                 final Date changeDate = oldConfigChange.parsedDate();
                 if (changeDate != null && changeDate.before(lastBuildDate)) {
                     return oldConfigChange.getTimestamp();
