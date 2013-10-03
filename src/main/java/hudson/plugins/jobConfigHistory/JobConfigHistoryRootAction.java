@@ -114,7 +114,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
             return configs;
         }
 
-        final File[] itemDirs = getHistoryDao().getSystemConfigs();
+        final File[] itemDirs = getOverviewHistoryDao().getSystemConfigs();
         for (final File itemDir : itemDirs) {
             for (final File historyDir : itemDir
                     .listFiles(HistoryFileFilter.INSTANCE)) {
@@ -144,7 +144,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         if (!hasJobConfigurePermission()) {
             return Collections.EMPTY_LIST;
         } else {
-            return new ConfigInfoCollector(type, getHistoryDao()).collect("");
+            return new ConfigInfoCollector(type, getOverviewHistoryDao()).collect("");
         }
     }
 
@@ -492,6 +492,14 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @return historyDao
      */
     HistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
+    }
+    /**
+     * For tests.
+     *
+     * @return historyDao
+     */
+    OverviewHistoryDao getOverviewHistoryDao() {
         return PluginUtils.getHistoryDao();
     }
 }

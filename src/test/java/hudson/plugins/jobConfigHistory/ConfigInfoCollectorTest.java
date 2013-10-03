@@ -103,7 +103,7 @@ public class ConfigInfoCollectorTest {
     }
 
     private ConfigInfoCollector createSut(final String type) {
-        final FileHistoryDao historyDao = new FileHistoryDao(
+        final OverviewHistoryDao historyDao = new FileHistoryDao(
                 unpackResourceZip.getResource("config-history"), unpackResourceZip.getRoot(), null, 0, true);
         return new ConfigInfoCollector(type, historyDao);
     }

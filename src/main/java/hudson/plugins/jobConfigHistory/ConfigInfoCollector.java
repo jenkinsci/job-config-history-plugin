@@ -56,7 +56,7 @@ final class ConfigInfoCollector {
     /**
      * HistoryDao.
      */
-    private final HistoryDao historyDao;
+    private final OverviewHistoryDao historyDao;
 
 
     /**
@@ -65,7 +65,7 @@ final class ConfigInfoCollector {
      * @param type may be one of deleted, created or jobs?
      * @param historyDao the value of historyDao
      */
-    public ConfigInfoCollector(String type, HistoryDao historyDao) {
+    public ConfigInfoCollector(String type, OverviewHistoryDao historyDao) {
         this.type = type;
         this.historyDao = historyDao;
     }
