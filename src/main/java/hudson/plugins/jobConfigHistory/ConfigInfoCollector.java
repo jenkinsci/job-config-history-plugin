@@ -56,18 +56,18 @@ final class ConfigInfoCollector {
     /**
      * HistoryDao.
      */
-    private final OverviewHistoryDao historyDao;
+    private final OverviewHistoryDao overViewhistoryDao;
 
 
     /**
      * Collects configs of the given type.
      *
      * @param type may be one of deleted, created or jobs?
-     * @param historyDao the value of historyDao
+     * @param overviewHistoryDao the value of historyDao
      */
-    public ConfigInfoCollector(String type, OverviewHistoryDao historyDao) {
+    public ConfigInfoCollector(String type, OverviewHistoryDao overviewHistoryDao) {
         this.type = type;
-        this.historyDao = historyDao;
+        this.overViewhistoryDao = overviewHistoryDao;
     }
 
     /**
@@ -145,9 +145,9 @@ final class ConfigInfoCollector {
     public List<ConfigInfo> collect(final String folderName) throws IOException {
         final File[] itemDirs;
         if ("deleted".equals(type)) {
-            itemDirs = historyDao.getDeletedJobs(folderName);
+            itemDirs = overViewhistoryDao.getDeletedJobs(folderName);
         } else {
-            itemDirs = (File[]) ArrayUtils.addAll(historyDao.getDeletedJobs(folderName), historyDao.getJobs(folderName));
+            itemDirs = (File[]) ArrayUtils.addAll(overViewhistoryDao.getDeletedJobs(folderName), overViewhistoryDao.getJobs(folderName));
         }
         Arrays.sort(itemDirs, FileNameComparator.INSTANCE);
         for (final File itemDir : itemDirs) {
