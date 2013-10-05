@@ -114,7 +114,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *
      * @return the hudson
      */
-    protected final Hudson getHudson() {
+    protected Hudson getHudson() {
         return hudson;
     }
 
