@@ -199,6 +199,39 @@ public class JobConfigHistoryRootActionTest {
     }
 
     /**
+     * Test of checkParameters method, of class JobConfigHistoryRootAction.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testCheckParametersIAE() {
+        createSut().checkParameters("foo", "bar");
+    }
+
+    /**
+     * Test of checkParameters method, of class JobConfigHistoryRootAction.
+     */
+    @Test
+    public void testCheckParametersNameIsNull() {
+        assertFalse(createSut().checkParameters(null, "2013-01-18_18-24-33"));
+        assertFalse(createSut().checkParameters("null", "2013-01-18_18-24-33"));
+    }
+
+    /**
+     * Test of checkParameters method, of class JobConfigHistoryRootAction.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testCheckParametersNameHasDots() {
+        createSut().checkParameters("../foo", "2013-01-18_18-24-33");
+    }
+
+    /**
+     * Test of checkParameters method, of class JobConfigHistoryRootAction.
+     */
+    @Test
+    public void testCheckParameters() {
+        assertTrue(createSut().checkParameters("foo", "2013-01-18_18-24-33"));
+    }
+
+    /**
      * Test of doDiffFiles method, of class JobConfigHistoryRootAction.
      */
     @Test

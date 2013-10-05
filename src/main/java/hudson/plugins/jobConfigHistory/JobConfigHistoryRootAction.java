@@ -365,8 +365,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      *            Timestamp of config change.
      * @return True if parameters are okay.
      */
-    private boolean checkParameters(String name, String timestamp) {
-        if (name == null || "null".equals(name) || !checkTimestamp(timestamp)) {
+    boolean checkParameters(String name, String timestamp) {
+        checkTimestamp(timestamp);
+        if (name == null || "null".equals(name)) {
             return false;
         }
         if (name.contains("..")) {
