@@ -100,11 +100,11 @@ final class ConfigInfoCollector {
                 getConfigs().add(config);
             } else {
                 //Why would the created entry not be the first one? Answer:
-                //There's always a 'Changed' entry before the 'Created' entry, 
-                //because in the Jenkins core, when creating a new job, 
-                //the SaveableListener (which handles changes) fires 
+                //There's always a 'Changed' entry before the 'Created' entry,
+                //because in the Jenkins core, when creating a new job,
+                //the SaveableListener (which handles changes) fires
                 //before the ItemListener (which handles creation, deletion etc.)
-                //Older versions of the plugin didn't show this behaviour 
+                //Older versions of the plugin didn't show this behaviour
                 //since it was masked by some race condition.
                 historyDir = historyDirs[1];
                 histDescr = readHistoryXml(historyDir);
@@ -147,7 +147,9 @@ final class ConfigInfoCollector {
         if ("deleted".equals(type)) {
             itemDirs = overViewhistoryDao.getDeletedJobs(folderName);
         } else {
-            itemDirs = (File[]) ArrayUtils.addAll(overViewhistoryDao.getDeletedJobs(folderName), overViewhistoryDao.getJobs(folderName));
+            itemDirs = (File[]) ArrayUtils.addAll(
+                    overViewhistoryDao.getDeletedJobs(folderName),
+                    overViewhistoryDao.getJobs(folderName));
         }
         Arrays.sort(itemDirs, FileNameComparator.INSTANCE);
         for (final File itemDir : itemDirs) {
