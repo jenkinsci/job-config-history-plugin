@@ -32,7 +32,7 @@ import java.io.FilenameFilter;
  *
  * @author Mirko Friedenhagen
  */
-class NameFilenameFilter implements FilenameFilter {
+final class NameFilenameFilter implements FilenameFilter {
 
     /** Name to compare. */
     private final String name;
