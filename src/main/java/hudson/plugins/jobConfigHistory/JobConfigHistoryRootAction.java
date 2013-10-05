@@ -168,18 +168,16 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
             historyRootDir = getPlugin().getConfiguredHistoryRootDir();
         }
 
-        for (final File itemDir : historyRootDir.listFiles()) {
-            if (itemDir.getName().equals(name)) {
-                for (final File historyDir : itemDir
-                        .listFiles(HistoryFileFilter.INSTANCE)) {
-                    final XmlFile historyXml = new XmlFile(new File(historyDir,
-                            JobConfigHistoryConsts.HISTORY_FILE));
-                    final HistoryDescr histDescr = (HistoryDescr) historyXml
-                            .read();
-                    final ConfigInfo config = ConfigInfo.create(
-                            itemDir.getName(), historyDir, histDescr, false);
-                    configs.add(config);
-                }
+        for (final File itemDir : historyRootDir.listFiles(NameFilenameFilter.valueOf(name))) {
+            for (final File historyDir : itemDir
+                    .listFiles(HistoryFileFilter.INSTANCE)) {
+                final XmlFile historyXml = new XmlFile(new File(historyDir,
+                        JobConfigHistoryConsts.HISTORY_FILE));
+                final HistoryDescr histDescr = (HistoryDescr) historyXml
+                        .read();
+                final ConfigInfo config = ConfigInfo.create(
+                        itemDir.getName(), historyDir, histDescr, false);
+                configs.add(config);
             }
         }
         Collections.sort(configs, ParsedDateComparator.DESCENDING);
