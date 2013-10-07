@@ -50,6 +50,7 @@ public class JobConfigHistoryRootActionTest {
     private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
     private final Hudson mockedHudson = mock(Hudson.class);
     private final ACL mockedACL = mock(ACL.class);
+    private final StaplerRequest mockedStaplerRequest = mock(StaplerRequest.class);
 
     public JobConfigHistoryRootActionTest() {
     }
@@ -88,15 +89,27 @@ public class JobConfigHistoryRootActionTest {
     }
 
     /**
+     * Test of getIconFileName method, of class JobConfigHistoryRootAction.
+     */
+    @Test
+    public void testGetIconFileNameWithJobPermission() {
+        when(mockedACL.hasPermission(Item.CONFIGURE)).thenReturn(true);
+        assertNotNull(createSut().getIconFileName());
+    }
+
+    /**
      * Test of getConfigs method, of class JobConfigHistoryRootAction.
      */
     @Test
-    @Ignore
     public void testGetConfigs() throws Exception {
-        JobConfigHistoryRootAction sut = createSut();
-        List<ConfigInfo> expResult = null;
-        List<ConfigInfo> result = sut.getConfigs();
-        assertEquals(expResult, result);
+        when(mockedStaplerRequest.getParameter("filter")).thenReturn(null);
+        assertEquals(0, createSut().getConfigs().size());
+        when(mockedStaplerRequest.getParameter("filter")).thenReturn("system");
+        assertEquals(0, createSut().getConfigs().size());
+        when(mockedStaplerRequest.getParameter("filter")).thenReturn("all");
+        assertEquals(0, createSut().getConfigs().size());
+        when(mockedStaplerRequest.getParameter("filter")).thenReturn("other");
+        assertEquals(0, createSut().getConfigs().size());
     }
 
     /**
@@ -319,6 +332,10 @@ public class JobConfigHistoryRootActionTest {
                 return mockedHudson;
             }
 
+            @Override
+            StaplerRequest getCurrentRequest() {
+                return mockedStaplerRequest;
+            }
         };
     }
 
