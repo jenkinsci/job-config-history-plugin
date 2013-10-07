@@ -135,13 +135,11 @@ public class JobConfigHistoryRootActionTest {
      * Test of getSingleConfigs method, of class JobConfigHistoryRootAction.
      */
     @Test
-    @Ignore
     public void testGetSingleConfigs() throws Exception {
-        String name = "";
-        JobConfigHistoryRootAction sut = createSut();
-        List<ConfigInfo> expResult = null;
-        List<ConfigInfo> result = sut.getSingleConfigs(name);
-        assertEquals(expResult, result);
+        when(mockedPlugin.getJobHistoryRootDir()).thenReturn(unpackResourceZip.getResource("config-history/jobs"));
+        when(mockedPlugin.getConfiguredHistoryRootDir()).thenReturn(unpackResourceZip.getResource("config-history"));
+        assertEquals(5, createSut().getSingleConfigs("config").size());
+        assertEquals(3, createSut().getSingleConfigs("Foo_deleted_20130830_223932_071").size());
     }
 
     /**
