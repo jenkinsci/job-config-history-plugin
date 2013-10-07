@@ -116,25 +116,19 @@ public class JobConfigHistoryRootActionTest {
      * Test of getSystemConfigs method, of class JobConfigHistoryRootAction.
      */
     @Test
-    @Ignore
     public void testGetSystemConfigs() throws Exception {
-        JobConfigHistoryRootAction sut = createSut();
-        List<ConfigInfo> expResult = null;
-        List<ConfigInfo> result = sut.getSystemConfigs();
-        assertEquals(expResult, result);
+        when(mockedACL.hasPermission(Permission.CONFIGURE)).thenReturn(true);
+        assertEquals(5, createSut().getSystemConfigs().size());
     }
 
     /**
      * Test of getJobConfigs method, of class JobConfigHistoryRootAction.
      */
     @Test
-    @Ignore
     public void testGetJobConfigs() throws Exception {
-        String type = "";
-        JobConfigHistoryRootAction sut = createSut();
-        List<ConfigInfo> expResult = null;
-        List<ConfigInfo> result = sut.getJobConfigs(type);
-        assertEquals(expResult, result);
+        when(mockedACL.hasPermission(Item.CONFIGURE)).thenReturn(true);
+        assertEquals(8, createSut().getJobConfigs("").size());
+        assertEquals(1, createSut().getJobConfigs("deleted").size());
     }
 
     /**
@@ -335,6 +329,16 @@ public class JobConfigHistoryRootActionTest {
             @Override
             StaplerRequest getCurrentRequest() {
                 return mockedStaplerRequest;
+            }
+
+            @Override
+            OverviewHistoryDao getOverviewHistoryDao() {
+                return new FileHistoryDao(
+                        unpackResourceZip.getResource("config-history"),
+                        unpackResourceZip.getRoot(),
+                        null,
+                        0,
+                        true);
             }
         };
     }
