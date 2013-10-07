@@ -28,6 +28,7 @@ import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.security.ACL;
 import hudson.security.Permission;
+import java.io.File;
 import java.util.List;
 import org.junit.Test;
 import org.kohsuke.stapler.StaplerRequest;
@@ -146,12 +147,41 @@ public class JobConfigHistoryRootActionTest {
      * Test of getFile method, of class JobConfigHistoryRootAction.
      */
     @Test
-    @Ignore
+    public void testGetFileWithoutPermissions() throws Exception {
+        when(mockedStaplerRequest.getParameter("name")).thenReturn("jobs/Test1");
+        assertEquals("No permission to view config files", createSut().getFile());
+        when(mockedStaplerRequest.getParameter("name")).thenReturn("Foo_deleted_20130830_223932_071");
+        assertEquals("No permission to view config files", createSut().getFile());
+    }
+
+    /**
+     * Test of getFile method, of class JobConfigHistoryRootAction.
+     */
+    @Test
     public void testGetFile() throws Exception {
-        JobConfigHistoryRootAction sut = createSut();
-        String expResult = "";
-        String result = sut.getFile();
-        assertEquals(expResult, result);
+        when(mockedStaplerRequest.getParameter("name")).thenReturn("jobs/Test1");
+        when(mockedStaplerRequest.getParameter("timestamp")).thenReturn("2012-11-21_11-42-05");
+        when(mockedPlugin.getConfiguredHistoryRootDir()).thenReturn(unpackResourceZip.getResource("config-history"));
+        when(mockedPlugin.getConfigFile(any(File.class))).thenReturn(
+                unpackResourceZip.getResource("config-history/jobs/Test1/2012-11-21_11-42-05/config.xml"));
+        when(mockedACL.hasPermission(Permission.CONFIGURE)).thenReturn(true);
+        final String result = createSut().getFile();
+        assertTrue(result.startsWith("<?xml"));
+    }
+
+    /**
+     * Test of getFile method, of class JobConfigHistoryRootAction.
+     */
+    @Test
+    public void testGetFileDeleted() throws Exception {
+        when(mockedStaplerRequest.getParameter("name")).thenReturn("Foo_deleted_20130830_223932_071");
+        when(mockedStaplerRequest.getParameter("timestamp")).thenReturn("2013-08-30_22-39-32");
+        when(mockedPlugin.getJobHistoryRootDir()).thenReturn(unpackResourceZip.getResource("config-history/jobs"));
+        when(mockedPlugin.getConfigFile(any(File.class))).thenReturn(
+                unpackResourceZip.getResource("config-history/jobs/Foo_deleted_20130830_223932_071/2013-08-30_22-39-32/config.xml"));
+        when(mockedACL.hasPermission(Item.CONFIGURE)).thenReturn(true);
+        final String result = createSut().getFile();
+        assertTrue(result.startsWith("<?xml"));
     }
 
     /**
