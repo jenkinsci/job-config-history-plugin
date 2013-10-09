@@ -191,14 +191,45 @@ public class JobConfigHistoryRootActionTest {
      * Test of createLinkToFiles method, of class JobConfigHistoryRootAction.
      */
     @Test
-    @Ignore
+    public void testCreateLinkToFilesDeleted() {
+        final ConfigInfo config = mock(ConfigInfo.class);
+        when(config.getJob()).thenReturn("Foo_deleted_20130830_223932_071");
+        when(config.getDate()).thenReturn("2013-08-30_22-39-32");
+        when(mockedPlugin.getJobHistoryRootDir()).thenReturn(unpackResourceZip.getResource("config-history/jobs"));
+        String expResult = "configOutput?type=&name=Foo_deleted_20130830_223932_071&timestamp=2013-08-30_22-35-05";
+        assertEquals(expResult, createSut().createLinkToFiles(config, ""));
+        when(config.getJob()).thenReturn("Unknown_deleted_20130830_223932_072");
+        assertEquals(null, createSut().createLinkToFiles(config, ""));
+    }
+
+    /**
+     * Test of createLinkToFiles method, of class JobConfigHistoryRootAction.
+     */
+    @Test
     public void testCreateLinkToFiles() {
-        ConfigInfo config = null;
-        String type = "";
-        JobConfigHistoryRootAction sut = createSut();
-        String expResult = "";
-        String result = sut.createLinkToFiles(config, type);
-        assertEquals(expResult, result);
+        final ConfigInfo config = mock(ConfigInfo.class);
+        when(config.getJob()).thenReturn("Test1");
+        when(config.getDate()).thenReturn("2012-11-21_11-42-05");
+        when(config.getIsJob()).thenReturn(true);
+        when(mockedHudson.getRootUrl()).thenReturn("/jenkins/");
+        String expResult = "/jenkins/job/Test1/jobConfigHistory/configOutput?type=xml&timestamp=2012-11-21_11-42-05";
+        assertEquals(expResult, createSut().createLinkToFiles(config, "xml"));
+        when(config.getJob()).thenReturn("config");
+        when(config.getDate()).thenReturn("2012-11-21_11-42-05");
+        when(config.getIsJob()).thenReturn(false);
+    }
+
+    /**
+     * Test of createLinkToFiles method, of class JobConfigHistoryRootAction.
+     */
+    @Test
+    public void testCreateLinkToFilesSystem() {
+        final ConfigInfo config = mock(ConfigInfo.class);
+        when(config.getJob()).thenReturn("config");
+        when(config.getDate()).thenReturn("2012-11-21_11-42-05");
+        when(config.getIsJob()).thenReturn(false);
+        String expResult = "configOutput?type=xml&name=config&timestamp=2012-11-21_11-42-05";
+        assertEquals(expResult, createSut().createLinkToFiles(config, "xml"));
     }
 
     /**
