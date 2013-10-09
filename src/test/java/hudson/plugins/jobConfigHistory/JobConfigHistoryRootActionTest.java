@@ -356,10 +356,10 @@ public class JobConfigHistoryRootActionTest {
         when(mockedHudson.getItem("foo")).thenReturn(null);
         assertEquals("foo", createSut().findNewName("foo"));
         when(mockedHudson.getItem("foo")).thenReturn(mock(TopLevelItem.class));
-        assertEquals("foo_10", createSut().findNewName("foo"));
+        assertEquals("foo_1", createSut().findNewName("foo"));
         when(mockedHudson.getItem("foo")).thenReturn(mock(TopLevelItem.class));
-        when(mockedHudson.getItem("foo_10")).thenReturn(mock(TopLevelItem.class));
-        assertEquals("foo_20", createSut().findNewName("foo"));
+        when(mockedHudson.getItem("foo_1")).thenReturn(mock(TopLevelItem.class));
+        assertEquals("foo_2", createSut().findNewName("foo"));
     }
 
     /**

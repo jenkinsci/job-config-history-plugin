@@ -29,7 +29,7 @@ import hudson.security.Permission;
 import hudson.util.MultipartFormDataParser;
 
 /**
- * 
+ *
  * @author Stefan Brausch, mfriedenhagen
  */
 
@@ -50,7 +50,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * This actions always starts from the context directly, so prefix
      * {@link JobConfigHistoryConsts#URLNAME} with a slash.
      */
@@ -61,7 +61,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * Make method final, as we always want the same icon file. Returns
      * {@literal null} to hide the icon if the user is not allowed to configure
      * jobs.
@@ -77,7 +77,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     /**
      * Returns the configuration history entries for either {@link AbstractItem}
      * s or system changes or deleted jobs or all of the above.
-     * 
+     *
      * @return list of configuration histories (as ConfigInfo)
      * @throws IOException
      *             if one of the history entries might not be read.
@@ -103,7 +103,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     /**
      * Returns the configuration history entries for all system files in this
      * Hudson instance.
-     * 
+     *
      * @return List of config infos.
      * @throws IOException
      *             if one of the history entries might not be read.
@@ -133,7 +133,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     /**
      * Returns the configuration history entries for all jobs or deleted jobs in
      * this Hudson instance.
-     * 
+     *
      * @param type
      *            Whether we want to see all jobs or just the deleted jobs.
      * @return List of config infos.
@@ -151,7 +151,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     /**
      * Returns the configuration history entries for one group of system files
      * or deleted jobs.
-     * 
+     *
      * @param name
      *            of the item.
      * @return Configs list for one group of system configuration files.
@@ -187,7 +187,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     /**
      * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as
      * String.
-     * 
+     *
      * @return content of the {@literal config.xml} found in directory given by
      *         the request parameter {@literal file}.
      * @throws IOException
@@ -209,7 +209,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     /**
      * Creates links to the correct configOutput.jellys for job history vs.
      * system history and for xml vs. plain text.
-     * 
+     *
      * @param config
      *            ConfigInfo.
      * @param type
@@ -260,7 +260,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
     /**
      * Returns whether the current user may configure jobs.
-     * 
+     *
      * @return true if the current user may configure jobs.
      */
     public boolean hasJobConfigurePermission() {
@@ -270,7 +270,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     /**
      * Parses the incoming {@literal POST} request and redirects as
      * {@literal GET showDiffFiles}.
-     * 
+     *
      * @param req
      *            incoming request
      * @param rsp
@@ -293,7 +293,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * Returns the diff between two config files as a list of single lines.
      * Takes the two timestamps and the name of the system property or the
      * deleted job from the url parameters.
-     * 
+     *
      * @return Differences between two config versions as list of lines.
      * @throws IOException
      *             If diff doesn't work or xml files can't be read.
@@ -323,7 +323,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
     /**
      * Gets the version of the config.xml that was saved at a certain time.
-     * 
+     *
      * @param name
      *            The name of the system property or deleted job.
      * @param timestamp
@@ -358,7 +358,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     /**
      * Checks the url parameters 'name' and 'timestamp' and returns true if they
      * are neither null nor suspicious.
-     * 
+     *
      * @param name
      *            Name of deleted job or system property.
      * @param timestamp
@@ -376,10 +376,10 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         }
         return true;
     }
-    
+
     /**
      * Action when 'restore' button is pressed: Restore deleted project.
-     * 
+     *
      * @param req Incoming StaplerRequest
      * @param rsp Outgoing StaplerResponse
      * @throws IOException If something goes wrong
@@ -391,20 +391,20 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         final String newName = deletedName.split("_deleted_") [0];
 
         final XmlFile configXml = getLastAvailableConfigXml(deletedName);
-               
+
         final InputStream is = new ByteArrayInputStream(configXml.asString().getBytes("UTF-8"));
         final AbstractProject project = (AbstractProject) getHudson().createProjectFromXML(findNewName(newName), is);
         copyHistoryFiles(deletedName, newName);
-        
+
         rsp.sendRedirect(getHudson().getRootUrl() + project.getUrl());
     }
-    
+
     /**
-     * Retrieves the last or second to last config.xml. 
-     * The latter is necessary when the last config.xml is missing 
-     * although the history entry exists, which happens when a project is deleted 
+     * Retrieves the last or second to last config.xml.
+     * The latter is necessary when the last config.xml is missing
+     * although the history entry exists, which happens when a project is deleted
      * while being disabled.
-     * 
+     *
      * @param name The name of the deleted project.
      * @return The last or second to last config as XmlFile or null.
      */
@@ -417,39 +417,34 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
             LOG.log(FINEST, "Unable to get config history for {0}", name);
             return configXml;
         }
-                
+
         if (configInfos.size() > 1) {
             Collections.sort(configInfos, ParsedDateComparator.DESCENDING);
             final ConfigInfo lastChange = configInfos.get(1);
             configXml = getOldConfigXml(name, lastChange.getDate());
         }
-        
+
         return configXml;
     }
-    
+
     /**
      * Finds a name for the project to be restored.
-     * If the old name is already in use by another project, 
+     * If the old name is already in use by another project,
      * "_" plus a number is appended to the name until an unused name is found.
-     * 
+     *
      * @param name The old name as String.
      * @return the new name as String.
      */
     String findNewName(String name) {
-        if (getHudson().getItem(name) != null) {
-            StringBuffer buf = new StringBuffer(name + "_0");
-            final int nameLength = buf.length() - 1;
-            int i = 1;
-            do {
-                buf = buf.replace(nameLength, buf.length() - 1, String.valueOf(i));
-                i++;
-            } while (getHudson().getItem(buf.toString()) != null);
-            return buf.toString();
-        } else {
-            return name;
+        String newName = name;
+        int i = 1;
+        while (getHudson().getItem(newName) != null) {
+            newName = name + "_" + String.valueOf(i);
+            i++;
         }
+        return newName;
     }
-    
+
     /**
      * Moves the history files of a restored project from the old location (_deleted_)
      * to a directory with the new name.
@@ -470,7 +465,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
             LOG.info(ex.getMessage());
         }
     }
-    
+
     /**
      * Action when 'restore' button in history.jelly is pressed.
      * Gets required parameter and forwards to restoreQuestion.jelly.
@@ -484,7 +479,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         final String name = req.getParameter("name");
         rsp.sendRedirect("restoreQuestion?name=" + name);
     }
-    
+
     /**
      * For tests.
      *
