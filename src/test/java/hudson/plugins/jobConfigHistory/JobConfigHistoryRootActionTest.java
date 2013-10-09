@@ -174,11 +174,14 @@ public class JobConfigHistoryRootActionTest {
      */
     @Test
     public void testGetFileDeleted() throws Exception {
-        when(mockedStaplerRequest.getParameter("name")).thenReturn("Foo_deleted_20130830_223932_071");
-        when(mockedStaplerRequest.getParameter("timestamp")).thenReturn("2013-08-30_22-39-32");
-        when(mockedPlugin.getJobHistoryRootDir()).thenReturn(unpackResourceZip.getResource("config-history/jobs"));
+        final String name = "Foo_deleted_20130830_223932_071";
+        when(mockedStaplerRequest.getParameter("name")).thenReturn(name);
+        final String timestamp = "2013-08-30_22-39-32";
+        when(mockedStaplerRequest.getParameter("timestamp")).thenReturn(timestamp);
+        final String jobHistoryRoot = "config-history/jobs";
+        when(mockedPlugin.getJobHistoryRootDir()).thenReturn(unpackResourceZip.getResource(jobHistoryRoot));
         when(mockedPlugin.getConfigFile(any(File.class))).thenReturn(
-                unpackResourceZip.getResource("config-history/jobs/Foo_deleted_20130830_223932_071/2013-08-30_22-39-32/config.xml"));
+                unpackResourceZip.getResource(jobHistoryRoot + "/" + name + "/" + timestamp + "/config.xml"));
         when(mockedACL.hasPermission(Item.CONFIGURE)).thenReturn(true);
         final String result = createSut().getFile();
         assertTrue(result.startsWith("<?xml"));
