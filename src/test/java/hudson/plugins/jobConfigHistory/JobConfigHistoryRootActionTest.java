@@ -26,6 +26,7 @@ package hudson.plugins.jobConfigHistory;
 import hudson.XmlFile;
 import hudson.model.Hudson;
 import hudson.model.Item;
+import hudson.model.TopLevelItem;
 import hudson.security.ACL;
 import hudson.security.Permission;
 import java.io.File;
@@ -345,6 +346,20 @@ public class JobConfigHistoryRootActionTest {
         when(mockedStaplerRequest.getParameter("name")).thenReturn("Test1");
         assertEquals(0, createSut().getLines().size());
 
+    }
+
+    /**
+     * Test of findNewName method, of class JobConfigHistoryRootAction.
+     */
+    @Test
+    public void testFindNewName() throws Exception {
+        when(mockedHudson.getItem("foo")).thenReturn(null);
+        assertEquals("foo", createSut().findNewName("foo"));
+        when(mockedHudson.getItem("foo")).thenReturn(mock(TopLevelItem.class));
+        assertEquals("foo_10", createSut().findNewName("foo"));
+        when(mockedHudson.getItem("foo")).thenReturn(mock(TopLevelItem.class));
+        when(mockedHudson.getItem("foo_10")).thenReturn(mock(TopLevelItem.class));
+        assertEquals("foo_20", createSut().findNewName("foo"));
     }
 
     /**

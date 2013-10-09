@@ -435,7 +435,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @param name The old name as String.
      * @return the new name as String.
      */
-    private String findNewName(String name) {
+    String findNewName(String name) {
         if (getHudson().getItem(name) != null) {
             StringBuffer buf = new StringBuffer(name + "_0");
             final int nameLength = buf.length() - 1;
