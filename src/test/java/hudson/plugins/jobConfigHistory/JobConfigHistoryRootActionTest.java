@@ -318,12 +318,32 @@ public class JobConfigHistoryRootActionTest {
      * Test of getLines method, of class JobConfigHistoryRootAction.
      */
     @Test
-    @Ignore
     public void testGetLines() throws Exception {
-        JobConfigHistoryRootAction sut = createSut();
-        List<SideBySideView.Line> expResult = null;
-        List<SideBySideView.Line> result = sut.getLines();
-        assertEquals(expResult, result);
+        final String name = "jobs/Test1";
+        final String timestamp1 = "2012-11-21_11-29-12";
+        final String timestamp2 = "2012-11-21_11-35-12";
+        final File configHistory = unpackResourceZip.getResource("config-history");
+        final File jobHistory = new File(configHistory, name);
+        when(mockedACL.hasPermission(Permission.CONFIGURE)).thenReturn(true, true);
+        when(mockedPlugin.getConfiguredHistoryRootDir()).thenReturn(configHistory);
+        when(mockedPlugin.getConfigFile(any(File.class))).thenReturn(
+                new File(jobHistory, "2012-11-21_11-29-12/config.xml"),
+                new File(jobHistory, "2012-11-21_11-35-12/config.xml"));
+        when(mockedStaplerRequest.getParameter("name")).thenReturn(name);
+        when(mockedStaplerRequest.getParameter("timestamp1")).thenReturn(timestamp1);
+        when(mockedStaplerRequest.getParameter("timestamp2")).thenReturn(timestamp2);
+        final List<SideBySideView.Line> result = createSut().getLines();
+        assertEquals(8, result.size());
+
+    }
+
+    /**
+     * Test of getLines method, of class JobConfigHistoryRootAction.
+     */
+    @Test
+    public void testGetLinesNoPermissions() throws Exception {
+        when(mockedStaplerRequest.getParameter("name")).thenReturn("Test1");
+        assertEquals(0, createSut().getLines().size());
 
     }
 
