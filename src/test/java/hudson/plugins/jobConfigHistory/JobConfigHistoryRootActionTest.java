@@ -304,12 +304,14 @@ public class JobConfigHistoryRootActionTest {
      * Test of doDiffFiles method, of class JobConfigHistoryRootAction.
      */
     @Test
-    @Ignore
     public void testDoDiffFiles() throws Exception {
-        StaplerRequest req = null;
-        StaplerResponse rsp = null;
+        final String boundary = "AAAA";
+        when(mockedStaplerRequest.getContentType()).thenReturn("multipart/form-data; boundary=" + boundary);
+        when(mockedStaplerRequest.getInputStream()).thenReturn(TUtils.createServletInputStreamFromMultiPartFormData(boundary));
+        StaplerResponse rsp = mock(StaplerResponse.class);
         JobConfigHistoryRootAction sut = createSut();
-        sut.doDiffFiles(req, rsp);
+        sut.doDiffFiles(mockedStaplerRequest, rsp);
+        verify(rsp).sendRedirect("showDiffFiles?name=foo&timestamp1=111&timestamp2=112");
     }
 
     /**

@@ -195,29 +195,12 @@ public class JobConfigHistoryProjectActionTest {
     @Test
     public void testDoDiffFiles() throws Exception {
         final String boundary = "AAAA";
-        final String body =
-                "--" + boundary + "\r\n" +
-                "Content-Disposition: form-data; name=\"timestamp1\"\r\n\r\n" +
-                "111\r\n" +
-                "--" + boundary + "\r\n" +
-                "Content-Disposition: form-data; name=\"timestamp2\"\r\n\r\n" +
-                "112\r\n" +
-                "--" + boundary + "--\r\n";
-        final ByteArrayInputStream bodyByteStream = new ByteArrayInputStream(body.getBytes());
-        final ServletInputStream servletInputStream = new ServletInputStream() {
-            @Override
-            public int read() throws IOException {
-                return bodyByteStream.read();
-            }
-        };
-
         when(mockedRequest.getContentType()).thenReturn("multipart/form-data; boundary=" + boundary);
-        when(mockedRequest.getInputStream()).thenReturn(servletInputStream);
+        when(mockedRequest.getInputStream()).thenReturn(TUtils.createServletInputStreamFromMultiPartFormData(boundary));
         JobConfigHistoryProjectAction sut = createAction();
         sut.doDiffFiles(mockedRequest, mockedResponse);
         verify(mockedResponse).sendRedirect("showDiffFiles?timestamp1=111&timestamp2=112");
     }
-
     /**
      * Test of getLines method, of class JobConfigHistoryProjectAction.
      */
