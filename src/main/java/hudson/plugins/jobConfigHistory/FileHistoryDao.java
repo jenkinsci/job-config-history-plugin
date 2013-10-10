@@ -293,6 +293,16 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     @Override
     public SortedMap<String, HistoryDescr> getRevisions(File configFile) {
         final File historiesDir = getHistoryDir(configFile);
+        return getRevisions(historiesDir, configFile);
+    }
+
+    /**
+     * Returns a sorted map of all revisions for this configFile.
+     * @param historiesDir to search.
+     * @param configFile for exception
+     * @return sorted map
+     */
+    private SortedMap<String, HistoryDescr> getRevisions(final File historiesDir, File configFile) {
         final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
         final TreeMap<String, HistoryDescr> map = new TreeMap<String, HistoryDescr>();
         if (historyDirsOfItem == null) {
@@ -576,4 +586,10 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
             return new File[0];
         }
     }
+
+    @Override
+    public SortedMap<String, HistoryDescr> getJobHistory(final String jobName) {
+        return getRevisions(new File(getJobHistoryRootDir(), jobName), new File(jobName));
+    }
+
 }

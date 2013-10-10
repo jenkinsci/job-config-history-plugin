@@ -25,6 +25,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
+import java.util.SortedMap;
 
 /**
  * HistoryDao which returns all jobs, system configurations or deleted jobs.
@@ -55,5 +56,12 @@ public interface OverviewHistoryDao {
      * @return list of all system configuration files with a history, emtpy when no history exists.
      */
     File[] getSystemConfigs();
+
+    /**
+     * Returns a sorted map of all HistoryDescr for a given job.
+     * @param jobName of the job
+     * @return sorted map.
+     */
+    public SortedMap<String, HistoryDescr> getJobHistory(final String jobName);
 
 }

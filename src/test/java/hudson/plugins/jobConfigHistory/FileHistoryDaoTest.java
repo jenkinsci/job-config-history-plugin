@@ -533,4 +533,14 @@ public class FileHistoryDaoTest {
         final String name = jobs[0].getName();
         assertThat(name, containsString("Test1"));
     }
+
+    /**
+     * Test of getJobHistory method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetJobHistory() {
+        final SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getJobHistory("Test1");
+        assertEquals(5, result.size());
+        assertEquals("2012-11-21_11-29-12", result.firstKey());
+    }
 }
