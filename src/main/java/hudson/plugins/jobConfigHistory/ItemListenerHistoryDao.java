@@ -24,7 +24,6 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.model.Item;
-import hudson.model.listeners.ItemListener;
 
 /**
  * Operations for historization of config files suitable for the {@link ItemListener}.
