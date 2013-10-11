@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013 mirko.
+ * Copyright 2013 Mirko Friedenhagen.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,17 @@ class DeletedFileFilter implements FileFilter {
 
     @Override
     public boolean accept(File file) {
-        return file.getName().contains(JobConfigHistoryConsts.DELETED_MARKER);
+        return accept(file.getName());
+    }
+
+    /**
+     * Deleted?
+     *
+     * @param fileName to inspect
+     * @return true when fileName has the special deleted mark.
+     */
+    private boolean accept(final String fileName) {
+        return fileName.contains(JobConfigHistoryConsts.DELETED_MARKER);
     }
 
     /**
@@ -51,6 +61,16 @@ class DeletedFileFilter implements FileFilter {
      */
     public static boolean accepts(File file) {
         return INSTANCE.accept(file);
+    }
+
+    /**
+     * Is this item deleted?
+     *
+     * @param fileName to inspect
+     * @return true when fileName has the special deleted mark.
+     */
+    public static boolean accepts(String fileName) {
+        return INSTANCE.accept(fileName);
     }
 
 }

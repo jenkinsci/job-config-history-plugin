@@ -52,4 +52,12 @@ public class DeletedFileFilterTest {
         assertEquals(true, DeletedFileFilter.accepts(file));
     }
 
+    /**
+     * Test of accept method, of class DeletedFileFilter.
+     */
+    @Test
+    public void testAcceptDeletedFileName() {
+        assertEquals(true, DeletedFileFilter.accepts("_deleted_"));
+    }
+
 }
