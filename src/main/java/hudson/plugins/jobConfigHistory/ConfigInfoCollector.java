@@ -114,7 +114,7 @@ final class ConfigInfoCollector {
         } else if ("deleted".equals(type)) {
             final HistoryDescr histDescr = historyEntries.get(historyEntries.size()-1);
             if ("Deleted".equals(histDescr.getOperation())) {
-                final ConfigInfo config = ConfigInfo.create(itemName, true, histDescr, false);
+                final ConfigInfo config = ConfigInfo.create(itemName, false, histDescr, false);
                 getConfigs().add(config);
             }
         } else {
