@@ -44,8 +44,8 @@ public class ConfigInfo implements ParsedDate {
      * Returns a new ConfigInfo object for a system configuration file.
      * @param name
      *            Name of the configuration entity we are saving.
-     * @param file
-     *            The file with configuration data.
+     * @param configExists
+     *            Does the config file exist?
      * @param histDescr
      *            metadata of the change.
      * @param isJob
@@ -65,7 +65,7 @@ public class ConfigInfo implements ParsedDate {
 
     /**
      * @param job see {@link ConfigInfo#job}.
-     * @param file see {@link ConfigInfo#file}.
+     * @param configExists see {@link ConfigInfo#configExists}.
      * @param date see {@link ConfigInfo#date}
      * @param user see {@link ConfigInfo#user}
      * @param operation see {@link ConfigInfo#operation}
@@ -120,7 +120,7 @@ public class ConfigInfo implements ParsedDate {
      */
     @Exported
     public boolean hasConfig() {
-        return true;
+        return configExists;
     }
 
     /**
@@ -155,24 +155,6 @@ public class ConfigInfo implements ParsedDate {
     @Override
     public String toString() {
         return operation + " on " + job + " @" + date;
-    }
-
-    /**
-     * Converts give file to encode URL string.
-     *
-     * @param file to convert
-     * @return encoded url
-     */
-    private static String createEncodedUrl(final File file) {
-        String encodedURL = null;
-        if (file != null) {
-            try {
-                encodedURL = URLEncoder.encode(file.getAbsolutePath(), "utf-8");
-            } catch (UnsupportedEncodingException ex) {
-                throw new RuntimeException("Could not encode " + file.getAbsolutePath(), ex);
-            }
-        }
-        return encodedURL;
     }
 
     /**
