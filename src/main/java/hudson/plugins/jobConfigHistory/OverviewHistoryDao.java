@@ -62,6 +62,6 @@ public interface OverviewHistoryDao {
      * @param jobName of the job
      * @return sorted map.
      */
-    public SortedMap<String, HistoryDescr> getJobHistory(final String jobName);
+    SortedMap<String, HistoryDescr> getJobHistory(final String jobName);
 
 }
