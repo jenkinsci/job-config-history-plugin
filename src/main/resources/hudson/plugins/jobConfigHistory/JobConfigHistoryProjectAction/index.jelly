@@ -37,7 +37,7 @@
                       <td>${config.operation}</td>
                       <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
                       <td>
-                        <j:set var="fileMissing" value="${config.getFile() == null}"/>
+                        <j:set var="fileMissing" value="${config.hasConfig()}"/>
                         <j:if test="${!fileMissing}">
                           <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}">
                             <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}

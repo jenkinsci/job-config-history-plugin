@@ -38,7 +38,7 @@ public class ConfigInfoTest {
      */
     @Test
     public void testCreate_4args() {
-        ConfigInfo sut = ConfigInfo.create("jobName", file, historyDescr, false);
+        ConfigInfo sut = ConfigInfo.create("jobName", true, historyDescr, false);
         assertNotNull(sut);
         assertEquals(false, sut.getIsJob());
     }
@@ -48,7 +48,7 @@ public class ConfigInfoTest {
      */
     @Test
     public void testToString() {
-        ConfigInfo sut = ConfigInfo.create("jobName", file, historyDescr, false);
+        ConfigInfo sut = ConfigInfo.create("jobName", true, historyDescr, false);
         String result = sut.toString();
         assertThat(result, startsWith("operation on "));
     }
@@ -59,7 +59,7 @@ public class ConfigInfoTest {
     @Test
     public void testParsedDate() {
         //"2012-11-21_11-29-12"
-        ConfigInfo sut = ConfigInfo.create("jobName", file, historyDescr, false);
+        ConfigInfo sut = ConfigInfo.create("jobName", true, historyDescr, false);
         Date expResult = new Date(112, 10, 21, 11, 29, 12);
         Date result = sut.parsedDate();
         assertEquals(expResult, result);

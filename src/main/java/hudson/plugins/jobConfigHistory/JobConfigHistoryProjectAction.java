@@ -88,13 +88,13 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             if (oldRevision.getFile() != null) {
                 configs.add(ConfigInfo.create(
                         project.getFullName(),
-                        oldRevision.getFile().getParentFile(),
+                        true,
                         historyDescr,
                         true));
             } else if ("Deleted".equals(historyDescr.getOperation())) {
                 configs.add(ConfigInfo.create(
                         project.getFullName(),
-                        null,
+                        false,
                         historyDescr,
                         true));
             }

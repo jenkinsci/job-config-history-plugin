@@ -96,7 +96,7 @@ final class ConfigInfoCollector {
             File historyDir = historyDirs[0];
             HistoryDescr histDescr = readHistoryXml(historyDir);
             if ("Created".equals(histDescr.getOperation())) {
-                final ConfigInfo config = ConfigInfo.create(itemName, historyDir, histDescr, true);
+                final ConfigInfo config = ConfigInfo.create(itemName, true, histDescr, true);
                 getConfigs().add(config);
             } else {
                 //Why would the created entry not be the first one? Answer:
@@ -109,7 +109,7 @@ final class ConfigInfoCollector {
                 historyDir = historyDirs[1];
                 histDescr = readHistoryXml(historyDir);
                 if ("Created".equals(histDescr.getOperation())) {
-                    final ConfigInfo config = ConfigInfo.create(itemName, historyDir, histDescr, true);
+                    final ConfigInfo config = ConfigInfo.create(itemName, true, histDescr, true);
                     getConfigs().add(config);
                 }
             }
@@ -117,7 +117,7 @@ final class ConfigInfoCollector {
             final File historyDir = historyDirs[historyDirs.length - 1];
             final HistoryDescr histDescr = readHistoryXml(historyDir);
             if ("Deleted".equals(histDescr.getOperation())) {
-                final ConfigInfo config = ConfigInfo.create(itemName, historyDir, histDescr, false);
+                final ConfigInfo config = ConfigInfo.create(itemName, true, histDescr, false);
                 getConfigs().add(config);
             }
         } else {
@@ -125,9 +125,9 @@ final class ConfigInfoCollector {
                 final ConfigInfo config;
                 final HistoryDescr histDescr = readHistoryXml(historyDir);
                 if (DeletedFileFilter.accepts(itemDir)) {
-                    config = ConfigInfo.create(itemName, historyDir, histDescr, false);
+                    config = ConfigInfo.create(itemName, true, histDescr, false);
                 } else {
-                    config = ConfigInfo.create(itemName, historyDir, histDescr, true);
+                    config = ConfigInfo.create(itemName, true, histDescr, true);
                 }
                 getConfigs().add(config);
             }

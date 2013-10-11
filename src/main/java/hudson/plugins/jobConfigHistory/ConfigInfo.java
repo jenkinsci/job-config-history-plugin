@@ -26,8 +26,8 @@ public class ConfigInfo implements ParsedDate {
     /** The date of the change. */
     private final String date;
 
-    /** The urlencoded path to the config file of the job. */
-    private final String file;
+    /** Does the configuration exist?. */
+    private final boolean configExists;
 
     /** The name of the job or file. */
     private final String job;
@@ -52,11 +52,10 @@ public class ConfigInfo implements ParsedDate {
      *            whether it is a job's config info or not.
      * @return a new ConfigInfo object.
      */
-    public static ConfigInfo create(final String name, final File file, final HistoryDescr histDescr, final boolean isJob) {
-        final String encodedURL = createEncodedUrl(file);
+    public static ConfigInfo create(final String name, final boolean configExists, final HistoryDescr histDescr, final boolean isJob) {
         return new ConfigInfo(
                 name,
-                encodedURL,
+                configExists,
                 histDescr.getTimestamp(),
                 histDescr.getUser(),
                 histDescr.getOperation(),
@@ -73,9 +72,9 @@ public class ConfigInfo implements ParsedDate {
      * @param userID see {@link ConfigInfo#userID}
      * @param isJob see {@link ConfigInfo#isJob}
      */
-    ConfigInfo(String job, String file, String date, String user, String operation, String userID, boolean isJob) {
+    ConfigInfo(String job, boolean configExists, String date, String user, String operation, String userID, boolean isJob) {
         this.job = job;
-        this.file = file;
+        this.configExists = configExists;
         this.date = date;
         this.user = user;
         this.operation = operation;
@@ -115,13 +114,13 @@ public class ConfigInfo implements ParsedDate {
     }
 
     /**
-     * Returns the URL encoded absolute name of the file.
+     * Does the configuration of the file exist?
      *
      * @return URL encoded filename
      */
     @Exported
-    public String getFile() {
-        return file;
+    public boolean hasConfig() {
+        return true;
     }
 
     /**
@@ -155,7 +154,7 @@ public class ConfigInfo implements ParsedDate {
 
     @Override
     public String toString() {
-        return operation + " on " + file + " @" + date;
+        return operation + " on " + job + " @" + date;
     }
 
     /**

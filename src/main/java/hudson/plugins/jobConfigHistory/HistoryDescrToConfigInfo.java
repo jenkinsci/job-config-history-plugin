@@ -73,7 +73,7 @@ class HistoryDescrToConfigInfo {
     List<ConfigInfo> convert() {
         final ArrayList<ConfigInfo> configInfos = new ArrayList<ConfigInfo>();
         for (HistoryDescr historyDescr : historyDescrs) {
-            configInfos.add(ConfigInfo.create(name, new File(historyBaseDir, historyDescr.getTimestamp()), historyDescr, isJob));
+            configInfos.add(ConfigInfo.create(name, true, historyDescr, isJob));
         }
         return configInfos;
     }

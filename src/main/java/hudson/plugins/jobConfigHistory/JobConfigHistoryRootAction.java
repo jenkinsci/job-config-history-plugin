@@ -123,7 +123,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
                 final HistoryDescr histDescr = (HistoryDescr) historyXml
                         .read();
                 final ConfigInfo config = ConfigInfo.create(
-                        itemDir.getName(), historyDir, histDescr, false);
+                        itemDir.getName(), true, histDescr, false);
                 configs.add(config);
             }
         }
@@ -176,7 +176,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
                 final HistoryDescr histDescr = (HistoryDescr) historyXml
                         .read();
                 final ConfigInfo config = ConfigInfo.create(
-                        itemDir.getName(), historyDir, histDescr, false);
+                        itemDir.getName(), true, histDescr, false);
                 configs.add(config);
             }
         }
