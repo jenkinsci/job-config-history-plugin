@@ -24,11 +24,11 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import hudson.XmlFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -83,18 +83,17 @@ final class ConfigInfoCollector {
      *             If one of the entries cannot be read.
      */
     void getConfigsForType(File itemDir, String folderName) throws IOException {
-        final File[] historyDirs = itemDir.listFiles(HistoryFileFilter.INSTANCE);
-        if (historyDirs.length == 0) {
+        final String itemName = folderName.isEmpty() ? itemDir.getName() : folderName + "/" + itemDir.getName();
+        final List<HistoryDescr> historyEntries = new ArrayList<HistoryDescr>(
+                overViewhistoryDao.getJobHistory(itemName).values());
+        if (historyEntries.isEmpty()) {
             return;
         }
-        Arrays.sort(historyDirs, FileNameComparator.INSTANCE);
-        final String itemName = folderName + itemDir.getName();
         if ("created".equals(type)) {
-            if (DeletedFileFilter.accepts(itemDir)) {
+            if (DeletedFileFilter.accepts(itemName)) {
                 return;
             }
-            File historyDir = historyDirs[0];
-            HistoryDescr histDescr = readHistoryXml(historyDir);
+            HistoryDescr histDescr = historyEntries.get(0);
             if ("Created".equals(histDescr.getOperation())) {
                 final ConfigInfo config = ConfigInfo.create(itemName, true, histDescr, true);
                 getConfigs().add(config);
@@ -106,30 +105,22 @@ final class ConfigInfoCollector {
                 //before the ItemListener (which handles creation, deletion etc.)
                 //Older versions of the plugin didn't show this behaviour
                 //since it was masked by some race condition.
-                historyDir = historyDirs[1];
-                histDescr = readHistoryXml(historyDir);
+                histDescr = historyEntries.get(1);
                 if ("Created".equals(histDescr.getOperation())) {
                     final ConfigInfo config = ConfigInfo.create(itemName, true, histDescr, true);
                     getConfigs().add(config);
                 }
             }
         } else if ("deleted".equals(type)) {
-            final File historyDir = historyDirs[historyDirs.length - 1];
-            final HistoryDescr histDescr = readHistoryXml(historyDir);
+            final HistoryDescr histDescr = historyEntries.get(historyEntries.size()-1);
             if ("Deleted".equals(histDescr.getOperation())) {
                 final ConfigInfo config = ConfigInfo.create(itemName, true, histDescr, false);
                 getConfigs().add(config);
             }
         } else {
-            for (final File historyDir : historyDirs) {
-                final ConfigInfo config;
-                final HistoryDescr histDescr = readHistoryXml(historyDir);
-                if (DeletedFileFilter.accepts(itemDir)) {
-                    config = ConfigInfo.create(itemName, true, histDescr, false);
-                } else {
-                    config = ConfigInfo.create(itemName, true, histDescr, true);
-                }
-                getConfigs().add(config);
+            final Collection<HistoryDescr> values = overViewhistoryDao.getJobHistory(itemName).values();
+            for (HistoryDescr historyDescr : values) {
+                getConfigs().add(ConfigInfo.create(itemName, true, historyDescr, DeletedFileFilter.accepts(itemName)));
             }
         }
     }
@@ -156,20 +147,6 @@ final class ConfigInfoCollector {
             getConfigsForType(itemDir, folderName);
         }
         return getConfigs();
-    }
-
-    /**
-     * Extract HistoryDescriptor from history directory.
-     *
-     * @param historyDir
-     *            History directory as File. (e.g. 2013-10-10_00-08-15)
-     * @return History descriptor
-     * @throws IOException
-     *             If xml file cannot be read.
-     */
-    private HistoryDescr readHistoryXml(File historyDir) throws IOException {
-        final XmlFile historyXml = new XmlFile(new File(historyDir, JobConfigHistoryConsts.HISTORY_FILE));
-        return (HistoryDescr) historyXml.read();
     }
 
     /**
