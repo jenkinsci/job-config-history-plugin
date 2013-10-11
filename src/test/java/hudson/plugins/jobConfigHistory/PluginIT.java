@@ -5,7 +5,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.containsString;
+import static org.hamcrest.CoreMatchers.containsString;
 
 import java.io.IOException;
 import java.util.List;
