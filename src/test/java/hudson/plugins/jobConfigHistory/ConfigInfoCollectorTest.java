@@ -40,7 +40,7 @@ import org.junit.Test;
 public class ConfigInfoCollectorTest {
 
     @Rule
-    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
+    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.create();
 
     @Test
     public void testGetConfigsForType() throws IOException {

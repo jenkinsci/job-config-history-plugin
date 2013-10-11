@@ -25,7 +25,7 @@ import org.kohsuke.stapler.StaplerResponse;
 public class JobConfigHistoryProjectActionTest {
 
     @Rule
-    public UnpackResourceZip testConfigs = UnpackResourceZip.INSTANCE;
+    public UnpackResourceZip testConfigs = UnpackResourceZip.create();
 
     private final ItemGroup mockedItemGroup = mock(ItemGroup.class);
     private final MavenModule mockedMavenModule = mock(MavenModule.class);

@@ -12,7 +12,7 @@ import org.junit.Rule;
 public class HistoryFileFilterTest {
 
     @Rule
-    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
+    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.create();
 
     /**
      * Test of accept method, of class HistoryFileFilter.

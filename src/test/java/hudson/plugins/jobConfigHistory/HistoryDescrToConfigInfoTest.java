@@ -42,7 +42,7 @@ public class HistoryDescrToConfigInfoTest {
     private File historyRoot;
     private File jenkinsHome;
     @Rule
-    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
+    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.create();
 
     @Before
     public void setUp() {

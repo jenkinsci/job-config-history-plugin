@@ -47,7 +47,7 @@ import static org.mockito.BDDMockito.*;
 public class JobConfigHistoryRootActionTest {
 
     @ClassRule
-    public final static UnpackResourceZip UNPACK_RESOURCE_ZIP = UnpackResourceZip.INSTANCE;
+    public final static UnpackResourceZip UNPACK_RESOURCE_ZIP = UnpackResourceZip.create();
 
     private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
     private final Hudson mockedHudson = mock(Hudson.class);

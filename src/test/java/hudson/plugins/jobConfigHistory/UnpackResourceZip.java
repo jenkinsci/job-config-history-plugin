@@ -24,9 +24,11 @@ public class UnpackResourceZip extends ExternalResource {
 
     private final URL resourceURL;
 
-    public final static UnpackResourceZip INSTANCE = new UnpackResourceZip(
+    public static UnpackResourceZip create() {
+        return new UnpackResourceZip(
             UnpackResourceZip.class.getResource("JobConfigHistoryPurgerIT.zip"));
-    
+    }
+
     public UnpackResourceZip(URL resourceURL) {
         this.resourceURL = resourceURL;
     }

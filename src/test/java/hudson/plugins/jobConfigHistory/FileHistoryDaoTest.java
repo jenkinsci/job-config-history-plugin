@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 public class FileHistoryDaoTest {
 
     @Rule
-    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.INSTANCE;
+    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.create();
 
     private final User mockedUser = mock(User.class);
 
