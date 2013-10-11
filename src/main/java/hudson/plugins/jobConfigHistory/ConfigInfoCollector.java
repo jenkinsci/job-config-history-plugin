@@ -89,8 +89,10 @@ final class ConfigInfoCollector {
         if (historyEntries.isEmpty()) {
             return;
         }
+        final boolean isADeletedJob = DeletedFileFilter.accepts(itemName);
+        final boolean isNotADeletedJob = !isADeletedJob;
         if ("created".equals(type)) {
-            if (DeletedFileFilter.accepts(itemName)) {
+            if (isADeletedJob) {
                 return;
             }
             HistoryDescr histDescr = historyEntries.get(0);
@@ -120,7 +122,7 @@ final class ConfigInfoCollector {
         } else {
             final Collection<HistoryDescr> values = overViewhistoryDao.getJobHistory(itemName).values();
             for (HistoryDescr historyDescr : values) {
-                getConfigs().add(ConfigInfo.create(itemName, true, historyDescr, DeletedFileFilter.accepts(itemName)));
+                getConfigs().add(ConfigInfo.create(itemName, true, historyDescr, isNotADeletedJob));
             }
         }
     }
