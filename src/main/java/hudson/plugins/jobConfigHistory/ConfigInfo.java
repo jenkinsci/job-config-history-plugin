@@ -1,8 +1,5 @@
 package hudson.plugins.jobConfigHistory;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Date;
 
 import org.kohsuke.stapler.export.Exported;
@@ -52,7 +49,8 @@ public class ConfigInfo implements ParsedDate {
      *            whether it is a job's config info or not.
      * @return a new ConfigInfo object.
      */
-    public static ConfigInfo create(final String name, final boolean configExists, final HistoryDescr histDescr, final boolean isJob) {
+    public static ConfigInfo create(
+            final String name, final boolean configExists, final HistoryDescr histDescr, final boolean isJob) {
         return new ConfigInfo(
                 name,
                 configExists,
