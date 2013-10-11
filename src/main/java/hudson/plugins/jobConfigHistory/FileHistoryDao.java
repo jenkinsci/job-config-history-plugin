@@ -592,4 +592,9 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
         return getRevisions(new File(getJobHistoryRootDir(), jobName), new File(jobName));
     }
 
+    @Override
+    public SortedMap<String, HistoryDescr> getSystemHistory(String name) {
+        return getRevisions(new File(historyRootDir, name), new File(name));
+    }
+
 }

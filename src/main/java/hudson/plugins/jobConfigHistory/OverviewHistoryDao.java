@@ -64,4 +64,10 @@ public interface OverviewHistoryDao {
      */
     SortedMap<String, HistoryDescr> getJobHistory(final String jobName);
 
+    /**
+     * Returns a sorted map of all HistoryDescr for a given system configuration.
+     * @param name of the configuration
+     * @return sorted map.
+     */
+    SortedMap<String, HistoryDescr> getSystemHistory(final String name);
 }

@@ -543,4 +543,31 @@ public class FileHistoryDaoTest {
         assertEquals(5, result.size());
         assertEquals("2012-11-21_11-29-12", result.firstKey());
     }
+
+    /**
+     * Test of getJobHistory method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetJobHistoryNonExistent() {
+        final SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getJobHistory("JobDoesNotExist");
+        assertTrue(result.isEmpty());
+    }
+
+    /**
+     * Test of getJobHistory method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetSystemHistory() {
+        final SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getSystemHistory("config");
+        assertEquals(5, result.size());
+        assertEquals("2013-01-18_17-34-22", result.firstKey());
+    }
+    /**
+     * Test of getJobHistory method, of class FileHistoryDao.
+     */
+    @Test
+    public void testGetSystemHistoryNonExistent() {
+        final SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getSystemHistory("config-does-not-exist");
+        assertTrue(result.isEmpty());        
+    }
 }
