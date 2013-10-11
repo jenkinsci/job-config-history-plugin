@@ -23,7 +23,6 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,10 +38,6 @@ class HistoryDescrToConfigInfo {
      */
     private final String name;
     /**
-     * Basedir of history entries.
-     */
-    private final File historyBaseDir;
-    /**
      * List of history descriptions.
      */
     private final List<HistoryDescr> historyDescrs;
@@ -54,13 +49,11 @@ class HistoryDescrToConfigInfo {
     /**
      * Constructor.
      * @param name of the job or configuration.
-     * @param historyBaseDir where history is located.
      * @param historyDescrs history descriptions.
      * @param isJob is this a job?
      */
-    HistoryDescrToConfigInfo(String name, File historyBaseDir, List<HistoryDescr> historyDescrs, boolean isJob) {
+    HistoryDescrToConfigInfo(String name, List<HistoryDescr> historyDescrs, boolean isJob) {
         this.name = name;
-        this.historyBaseDir = historyBaseDir;
         this.historyDescrs = historyDescrs;
         this.isJob = isJob;
     }

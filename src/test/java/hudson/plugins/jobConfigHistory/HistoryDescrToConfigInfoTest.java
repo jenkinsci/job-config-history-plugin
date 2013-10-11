@@ -58,7 +58,6 @@ public class HistoryDescrToConfigInfoTest {
     public void testConvert() {
         HistoryDescrToConfigInfo sut = new HistoryDescrToConfigInfo(
                 "Test1",
-                new File(historyRoot, "/jobs/Test1"),
                 new ArrayList<HistoryDescr>(
                         historyDao.getRevisions(new XmlFile(new File(jenkinsHome, "jobs/Test1/config.xml"))).values()),
                 true);

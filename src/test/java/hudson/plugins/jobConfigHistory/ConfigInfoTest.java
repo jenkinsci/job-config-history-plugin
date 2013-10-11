@@ -2,7 +2,6 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.model.AbstractItem;
 import hudson.model.ItemGroup;
-import java.io.File;
 import java.util.Date;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
@@ -19,8 +18,6 @@ public class ConfigInfoTest {
     private final ItemGroup itemGroupMock = mock(ItemGroup.class);
 
     private final AbstractItem itemMock = mock(AbstractItem.class);
-
-    private final File file = new File("");
 
     private static final String DATE = "2012-11-21_11-29-12";
 
