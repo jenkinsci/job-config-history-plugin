@@ -67,6 +67,17 @@ public class ConfigInfoCollectorTest {
      * Test of collect method, of class ConfigInfoCollector.
      */
     @Test
+    public void testCollectCreatedWithChangeEventBeforeCreated() throws Exception {
+        FileUtils.copyDirectory(
+                unpackResourceZip.getResource("config-history/jobs/Test1/2012-11-21_11-35-12"),
+                unpackResourceZip.getResource("config-history/jobs/Test1/2012-11-21_11-28-12"));
+        assertThatRootFolderHasYItemsOfTypeZ(1, "created");
+    }
+
+    /**
+     * Test of collect method, of class ConfigInfoCollector.
+     */
+    @Test
     public void testCollectOther() throws Exception {
         FileUtils.copyDirectory(
                 unpackResourceZip.getResource("config-history/jobs/Test1"),
