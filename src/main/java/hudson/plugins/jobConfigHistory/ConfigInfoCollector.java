@@ -98,7 +98,7 @@ final class ConfigInfoCollector {
             HistoryDescr histDescr = historyEntries.get(0);
             if ("Created".equals(histDescr.getOperation())) {
                 final ConfigInfo config = ConfigInfo.create(itemName, true, histDescr, true);
-                getConfigs().add(config);
+                configs.add(config);
             } else {
                 //Why would the created entry not be the first one? Answer:
                 //There's always a 'Changed' entry before the 'Created' entry,
@@ -110,19 +110,19 @@ final class ConfigInfoCollector {
                 histDescr = historyEntries.get(1);
                 if ("Created".equals(histDescr.getOperation())) {
                     final ConfigInfo config = ConfigInfo.create(itemName, true, histDescr, true);
-                    getConfigs().add(config);
+                    configs.add(config);
                 }
             }
         } else if ("deleted".equals(type)) {
             final HistoryDescr histDescr = historyEntries.get(historyEntries.size() - 1);
             if ("Deleted".equals(histDescr.getOperation())) {
                 final ConfigInfo config = ConfigInfo.create(itemName, false, histDescr, false);
-                getConfigs().add(config);
+                configs.add(config);
             }
         } else {
             final Collection<HistoryDescr> values = overViewhistoryDao.getJobHistory(itemName).values();
             for (HistoryDescr historyDescr : values) {
-                getConfigs().add(ConfigInfo.create(itemName, true, historyDescr, isNotADeletedJob));
+                configs.add(ConfigInfo.create(itemName, true, historyDescr, isNotADeletedJob));
             }
         }
     }
@@ -148,13 +148,6 @@ final class ConfigInfoCollector {
         for (final File itemDir : itemDirs) {
             getConfigsForType(itemDir, folderName);
         }
-        return getConfigs();
-    }
-
-    /**
-     * @return the configs
-     */
-    List<ConfigInfo> getConfigs() {
         return configs;
     }
 }
