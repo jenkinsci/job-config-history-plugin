@@ -64,7 +64,7 @@ public class JobConfigHistoryRootActionIT extends
         // check page with job history entries
         final HtmlPage htmlPageJobs = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=jobs");
         assertTrue("Verify history entry for job is listed.", htmlPageJobs.getAnchorByText("Test1") != null);
-        final String htmlPageJobsBody = htmlPageJobs.asText();
+        final String htmlPageJobsBody = htmlPageJobs.asXml();
         assertTrue("Verify history entry for deleted job is listed.", htmlPageJobsBody.contains(JobConfigHistoryConsts.DELETED_MARKER));
         assertFalse("Verify that no history entry for system change is listed.", htmlPageJobsBody.contains("config (system)"));
         assertTrue("Check link to job page.", htmlPageJobsBody.contains("job/Test1/" + JobConfigHistoryConsts.URLNAME));
