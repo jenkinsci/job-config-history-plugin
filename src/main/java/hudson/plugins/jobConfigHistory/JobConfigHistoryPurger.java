@@ -35,14 +35,17 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     /**The maximum allowed age of history entries in days.*/
     private int maxAge;
     
-    /**The dao.*/
+    /** The dao. */
     private HistoryDao historyDao;
+
+    /** The overviewDao. */
+    private final OverviewHistoryDao overviewHistoryDao;
 
     /**
      * Standard constructor using instance.
      */
     public JobConfigHistoryPurger() {
-        this(Hudson.getInstance().getPlugin(JobConfigHistory.class), PluginUtils.getHistoryDao());
+        this(Hudson.getInstance().getPlugin(JobConfigHistory.class), PluginUtils.getHistoryDao(), PluginUtils.getHistoryDao());
     }
 
     /**
@@ -50,10 +53,12 @@ public class JobConfigHistoryPurger extends PeriodicWork {
      *
      * @param plugin injected plugin
      * @param historyDao injected HistoryDao
+     * @param overviewHistoryDao the value of overviewHistoryDao
      */
-    JobConfigHistoryPurger(JobConfigHistory plugin, HistoryDao historyDao) {
+    JobConfigHistoryPurger(JobConfigHistory plugin, HistoryDao historyDao, OverviewHistoryDao overviewHistoryDao) {
         this.plugin = plugin;
         this.historyDao = historyDao;
+        this.overviewHistoryDao = overviewHistoryDao;
     }
 
     @Override
@@ -83,8 +88,8 @@ public class JobConfigHistoryPurger extends PeriodicWork {
      * Performs the actual purge of history entries.
      */
     void purgeHistoryByAge() {
-        purgeSystemOrJobHistory(plugin.getConfiguredHistoryRootDir().listFiles());
-        purgeSystemOrJobHistory(plugin.getJobHistoryRootDir().listFiles());
+        purgeSystemOrJobHistory(overviewHistoryDao.getSystemConfigs());
+        purgeSystemOrJobHistory(overviewHistoryDao.getJobs(""));
     }
 
     /**
