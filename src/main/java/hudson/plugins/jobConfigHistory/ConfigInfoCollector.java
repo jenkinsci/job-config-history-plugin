@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -120,10 +119,7 @@ final class ConfigInfoCollector {
                 configs.add(config);
             }
         } else {
-            final Collection<HistoryDescr> values = overViewhistoryDao.getJobHistory(itemName).values();
-            for (HistoryDescr historyDescr : values) {
-                configs.add(ConfigInfo.create(itemName, true, historyDescr, isNotADeletedJob));
-            }
+            configs.addAll(HistoryDescrToConfigInfo.convert(itemName, true, historyEntries, isNotADeletedJob));
         }
     }
 

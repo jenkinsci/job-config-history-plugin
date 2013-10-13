@@ -24,6 +24,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -38,9 +39,13 @@ class HistoryDescrToConfigInfo {
      */
     private final String name;
     /**
+     * Does the configuration file exist?
+     */
+    private final boolean configExists;
+    /**
      * List of history descriptions.
      */
-    private final List<HistoryDescr> historyDescrs;
+    private final Collection<HistoryDescr> historyDescrs;
     /**
      * Is this a job?
      */
@@ -49,11 +54,13 @@ class HistoryDescrToConfigInfo {
     /**
      * Constructor.
      * @param name of the job or configuration.
+     * @param configExists Does the configuration file exist?
      * @param historyDescrs history descriptions.
      * @param isJob is this a job?
      */
-    HistoryDescrToConfigInfo(String name, List<HistoryDescr> historyDescrs, boolean isJob) {
+    HistoryDescrToConfigInfo(String name, boolean configExists, Collection<HistoryDescr> historyDescrs, boolean isJob) {
         this.name = name;
+        this.configExists = configExists;
         this.historyDescrs = historyDescrs;
         this.isJob = isJob;
     }
@@ -66,9 +73,22 @@ class HistoryDescrToConfigInfo {
     List<ConfigInfo> convert() {
         final ArrayList<ConfigInfo> configInfos = new ArrayList<ConfigInfo>();
         for (HistoryDescr historyDescr : historyDescrs) {
-            configInfos.add(ConfigInfo.create(name, true, historyDescr, isJob));
+            configInfos.add(ConfigInfo.create(name, configExists, historyDescr, isJob));
         }
         return configInfos;
+    }
+
+    /**
+     * Converts to a list of {@link ConfigInfo}.
+     *
+     * @param name of the job or configuration.
+     * @param configExists Does the configuration file exist?
+     * @param historyDescrs history descriptions.
+     * @param isJob is this a job?
+     * @return list of {@link ConfigInfo}s.
+     */
+    static List<ConfigInfo> convert(String name, boolean configExists, Collection<HistoryDescr> historyDescrs, boolean isJob) {
+       return new HistoryDescrToConfigInfo(name, configExists, historyDescrs, isJob).convert();
     }
 
 }

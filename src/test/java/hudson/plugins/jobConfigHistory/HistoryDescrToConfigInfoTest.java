@@ -48,7 +48,7 @@ public class HistoryDescrToConfigInfoTest {
     public void setUp() {
         jenkinsHome = unpackResourceZip.getRoot();
         historyRoot = unpackResourceZip.getResource("config-history");
-        historyDao = new FileHistoryDao(historyRoot, jenkinsHome, null, 0, true);        
+        historyDao = new FileHistoryDao(historyRoot, jenkinsHome, null, 0, true);
     }
 
     /**
@@ -56,12 +56,12 @@ public class HistoryDescrToConfigInfoTest {
      */
     @Test
     public void testConvert() {
-        HistoryDescrToConfigInfo sut = new HistoryDescrToConfigInfo(
+        List<ConfigInfo> result = HistoryDescrToConfigInfo.convert(
                 "Test1",
+                true,
                 new ArrayList<HistoryDescr>(
                         historyDao.getRevisions(new XmlFile(new File(jenkinsHome, "jobs/Test1/config.xml"))).values()),
                 true);
-        List<ConfigInfo> result = sut.convert();
         assertEquals(5, result.size());
-    }    
+    }
 }
