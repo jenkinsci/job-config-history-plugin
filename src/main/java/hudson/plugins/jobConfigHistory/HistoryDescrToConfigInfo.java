@@ -88,7 +88,7 @@ class HistoryDescrToConfigInfo {
      * @return list of {@link ConfigInfo}s.
      */
     static List<ConfigInfo> convert(String name, boolean configExists, Collection<HistoryDescr> historyDescrs, boolean isJob) {
-       return new HistoryDescrToConfigInfo(name, configExists, historyDescrs, isJob).convert();
+        return new HistoryDescrToConfigInfo(name, configExists, historyDescrs, isJob).convert();
     }
 
 }
