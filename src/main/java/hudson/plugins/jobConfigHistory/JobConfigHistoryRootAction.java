@@ -27,6 +27,7 @@ import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
 import hudson.util.MultipartFormDataParser;
+import java.util.Collection;
 
 /**
  *
@@ -109,23 +110,18 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      *             if one of the history entries might not be read.
      */
     protected List<ConfigInfo> getSystemConfigs() throws IOException {
-        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+        final List<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         if (!hasConfigurePermission()) {
             return configs;
         }
 
         final File[] itemDirs = getOverviewHistoryDao().getSystemConfigs();
         for (final File itemDir : itemDirs) {
-            for (final File historyDir : itemDir
-                    .listFiles(HistoryFileFilter.INSTANCE)) {
-                final XmlFile historyXml = new XmlFile(new File(historyDir,
-                        JobConfigHistoryConsts.HISTORY_FILE));
-                final HistoryDescr histDescr = (HistoryDescr) historyXml
-                        .read();
-                final ConfigInfo config = ConfigInfo.create(
-                        itemDir.getName(), true, histDescr, false);
-                configs.add(config);
-            }
+            final String itemName = itemDir.getName();
+            configs.addAll(
+                    HistoryDescrToConfigInfo.convert(
+                            itemName, true, getOverviewHistoryDao().getSystemHistory(itemName).values(), false));
+
         }
         return configs;
     }
@@ -160,26 +156,13 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      */
     public final List<ConfigInfo> getSingleConfigs(String name)
         throws IOException {
-        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final File historyRootDir;
+        final Collection<HistoryDescr> historyDescriptions;
         if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
-            historyRootDir = getPlugin().getJobHistoryRootDir();
+            historyDescriptions = getOverviewHistoryDao().getJobHistory(name).values();
         } else {
-            historyRootDir = getPlugin().getConfiguredHistoryRootDir();
+            historyDescriptions = getOverviewHistoryDao().getSystemHistory(name).values();
         }
-
-        for (final File itemDir : historyRootDir.listFiles(NameFilenameFilter.valueOf(name))) {
-            for (final File historyDir : itemDir
-                    .listFiles(HistoryFileFilter.INSTANCE)) {
-                final XmlFile historyXml = new XmlFile(new File(historyDir,
-                        JobConfigHistoryConsts.HISTORY_FILE));
-                final HistoryDescr histDescr = (HistoryDescr) historyXml
-                        .read();
-                final ConfigInfo config = ConfigInfo.create(
-                        itemDir.getName(), true, histDescr, false);
-                configs.add(config);
-            }
-        }
+        final List<ConfigInfo> configs = HistoryDescrToConfigInfo.convert(name, true, historyDescriptions, false);
         Collections.sort(configs, ParsedDateComparator.DESCENDING);
         return configs;
     }
