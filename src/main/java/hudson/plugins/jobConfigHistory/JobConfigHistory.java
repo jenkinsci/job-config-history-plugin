@@ -238,7 +238,7 @@ public class JobConfigHistory extends Plugin {
             return true;
         } else if ("userWithConfigPermission".equals(showBuildBadges) && project.hasPermission(AbstractProject.CONFIGURE)) {
             return true;
-        } else if ("adminUser".equals(showBuildBadges) && Hudson.getInstance().hasPermission(Jenkins.ADMINISTER)) {
+        } else if ("adminUser".equals(showBuildBadges) && getJenkins().hasPermission(Jenkins.ADMINISTER)) {
             return true;
         }
         return false;
@@ -312,14 +312,6 @@ public class JobConfigHistory extends Plugin {
             }
         }
         return rootDir;
-    }
-
-    /**
-     * For tests.
-     * @return JENKINS_HOME
-     */
-    File getJenkinsHome() {
-        return Hudson.getInstance().root;
     }
 
     /**
@@ -434,10 +426,27 @@ public class JobConfigHistory extends Plugin {
     }
 
     /**
-     *
+     * For tests.
      * @return the historyDao
      */
     HistoryDao getHistoryDao() {
         return PluginUtils.getHistoryDao(this);
     }
+
+    /**
+     * For tests.
+     * @return JENKINS_HOME
+     */
+    File getJenkinsHome() {
+        return Hudson.getInstance().root;
+    }
+
+    /**
+     * For tests.
+     * @return Jenkins instance.
+     */
+    Jenkins getJenkins() {
+        return Hudson.getInstance();
+    }
+
 }

@@ -28,11 +28,13 @@ import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.ItemGroup;
 import hudson.model.User;
+import hudson.security.ACL;
 import hudson.util.FormValidation;
 import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 import javax.servlet.ServletException;
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -98,10 +100,14 @@ public class JobConfigHistoryTest {
      */
     @Test
     public void testSetMaxHistoryEntries() {
-        String maxEntryInput = "";
         JobConfigHistory sut = createSut();
-        sut.setMaxHistoryEntries(maxEntryInput);
-
+        assertNull(sut.getMaxHistoryEntries());
+        sut.setMaxHistoryEntries("");
+        assertEquals("", sut.getMaxHistoryEntries());
+        sut.setMaxHistoryEntries("4");
+        assertEquals("4", sut.getMaxHistoryEntries());
+        sut.setMaxHistoryEntries("-2");
+        assertEquals("4", sut.getMaxHistoryEntries());
     }
 
     /**
@@ -119,9 +125,14 @@ public class JobConfigHistoryTest {
      */
     @Test
     public void testSetMaxDaysToKeepEntries() {
-        String maxDaysInput = "";
         JobConfigHistory sut = createSut();
-        sut.setMaxDaysToKeepEntries(maxDaysInput);
+        assertNull(sut.getMaxDaysToKeepEntries());
+        sut.setMaxDaysToKeepEntries("");
+        assertEquals("", sut.getMaxDaysToKeepEntries());
+        sut.setMaxDaysToKeepEntries("4");
+        assertEquals("4", sut.getMaxDaysToKeepEntries());
+        sut.setMaxDaysToKeepEntries("-1");
+        assertEquals("4", sut.getMaxDaysToKeepEntries());
     }
 
     /**
@@ -220,10 +231,26 @@ public class JobConfigHistoryTest {
     @Test
     public void testShowBuildBadgesUserWithConfigPermission() {
         AbstractProject mockedProject = mock(AbstractProject.class);
-        when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
+        when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true, false);
         JobConfigHistory sut = createSut();
         sut.setShowBuildBadges("userWithConfigPermission");
         assertTrue(sut.showBuildBadges(mockedProject));
+        assertFalse(sut.showBuildBadges(mockedProject));
+    }
+
+    /**
+     * Test of showBuildBadges method, of class JobConfigHistory.
+     */
+    @Test
+    public void testShowBuildBadgesAdminUser() {
+        JobConfigHistory sut = createSut();
+        AbstractProject mockedProject = mock(AbstractProject.class);
+        final ACL mockedACL = mock(ACL.class);
+        when(mockedACL.hasPermission(Jenkins.ADMINISTER)).thenReturn(true, false);
+        when(sut.getJenkins().getACL()).thenReturn(mockedACL, mockedACL);
+        sut.setShowBuildBadges("adminUser");
+        assertTrue(sut.showBuildBadges(mockedProject));
+        assertFalse(sut.showBuildBadges(mockedProject));
     }
 
     /**
@@ -321,6 +348,8 @@ public class JobConfigHistoryTest {
     private JobConfigHistory createSut() {
         return new JobConfigHistory() {
 
+            final Jenkins mockedJenkins = mock(Jenkins.class);
+
             @Override
             HistoryDao getHistoryDao() {
                 return new FileHistoryDao(
@@ -330,6 +359,11 @@ public class JobConfigHistoryTest {
             @Override
             File getJenkinsHome() {
                 return unpackResourceZip.getRoot();
+            }
+
+            @Override
+            Jenkins getJenkins() {
+                return mockedJenkins;
             }
 
             @Override
