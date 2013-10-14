@@ -348,6 +348,12 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     }
 
     @Override
+    public XmlFile getOldRevision(String configFileName, String identifier) {
+        final File historyDir = new File(new File(historyRootDir, configFileName), identifier);
+        return new XmlFile(getConfigFile(historyDir));
+    }
+
+    @Override
     public boolean hasOldRevision(AbstractItem item, String identifier) {
         return hasOldRevision(item.getConfigFile(), identifier);
     }

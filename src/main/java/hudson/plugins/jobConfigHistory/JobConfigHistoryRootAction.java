@@ -314,27 +314,17 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @return The config file as XmlFile.
      */
     protected XmlFile getOldConfigXml(String name, String timestamp) {
-        final JobConfigHistory plugin = getPlugin();
-        final String rootDir;
-        File configFile = null;
-        String path = null;
-
         if (checkParameters(name, timestamp)) {
             if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
-                rootDir = plugin.getJobHistoryRootDir().getPath();
+                return getHistoryDao().getOldRevision("jobs/" + name, timestamp);
             } else {
-                rootDir = plugin.getConfiguredHistoryRootDir().getPath();
                 checkConfigurePermission();
+                return getHistoryDao().getOldRevision(name, timestamp);
+                
             }
-            path = rootDir + "/" + name + "/" + timestamp;
-            configFile = plugin.getConfigFile(new File(path));
-        }
-
-        if (configFile == null) {
-            throw new IllegalArgumentException("Unable to get history from: "
-                    + path);
         } else {
-            return new XmlFile(configFile);
+            throw new IllegalArgumentException("Unable to get history from: "
+                    + name);
         }
     }
 

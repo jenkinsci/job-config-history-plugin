@@ -76,6 +76,15 @@ public interface HistoryDao {
     XmlFile getOldRevision(File configFile, String identifier);
 
     /**
+     * Returns one old configuration of file.
+     *
+     * @param configFileName file
+     * @param identifier timestamp or hash
+     * @return old configuration.
+     */
+    XmlFile getOldRevision(String configFileName, String identifier);
+
+    /**
      * Returns whether the revision exists.
      *
      * @param item project
