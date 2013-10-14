@@ -150,7 +150,7 @@ public class JobConfigHistory extends Plugin {
      * @param maxDaysInput
      *        For how long history entries should be kept (in days)
      */
-    protected void setMaxDaysToKeepEntries(final String maxDaysInput) {
+    void setMaxDaysToKeepEntries(final String maxDaysInput) {
         if (maxDaysInput.isEmpty() || isPositiveInteger(maxDaysInput)) {
             maxDaysToKeepEntries = maxDaysInput;
         }
@@ -161,9 +161,9 @@ public class JobConfigHistory extends Plugin {
      *
      * @param numberString The number in question (as String)
      * @return Whether the number is a positive integer
-     * 
+     *
      */
-    private boolean isPositiveInteger(String numberString) {
+    boolean isPositiveInteger(String numberString) {
         try {
             final int number = Integer.parseInt(numberString);
             if (number < 0) {
@@ -299,18 +299,27 @@ public class JobConfigHistory extends Plugin {
      */
     protected File getConfiguredHistoryRootDir() {
         File rootDir;
+        final File jenkinsHome = getJenkinsHome();
 
         if (historyRootDir == null || historyRootDir.isEmpty()) {
-            rootDir = new File(Hudson.getInstance().root.getPath() + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
+            rootDir = new File(jenkinsHome, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
         } else {
             if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*")) {
                 rootDir = new File(historyRootDir + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
             } else {
-                rootDir = new File(Hudson.getInstance().root.getPath() + "/" + historyRootDir + "/"
+                rootDir = new File(jenkinsHome, historyRootDir + "/"
                             + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
             }
         }
         return rootDir;
+    }
+
+    /**
+     * For tests.
+     * @return JENKINS_HOME
+     */
+    File getJenkinsHome() {
+        return Hudson.getInstance().root;
     }
 
     /**
@@ -341,11 +350,11 @@ public class JobConfigHistory extends Plugin {
      *            The configuration file for the above item.
      * @return true if the item configuration should be saved.
      */
-    protected boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
+    boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
         boolean saveable = false;
         if (item instanceof AbstractProject<?, ?>) {
             saveable = true;
-        } else if (xmlFile.getFile().getParentFile().equals(Hudson.getInstance().root)) {
+        } else if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) {
             saveable = checkRegex(xmlFile);
         } else if (saveItemGroupConfiguration && item instanceof ItemGroup) {
             saveable = true;
@@ -370,7 +379,7 @@ public class JobConfigHistory extends Plugin {
         }
     }
 
- 
+
 
     /**
      * Validates the user entry for the maximum number of history items to keep.
