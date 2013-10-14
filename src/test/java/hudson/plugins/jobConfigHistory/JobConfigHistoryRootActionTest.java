@@ -372,8 +372,6 @@ public class JobConfigHistoryRootActionTest {
         final String timestamp = "2012-11-21_11-35-12";
         final File jobConfig = new File(configHistory, name + "/" + timestamp + "/config.xml");
         given(mockedACL.hasPermission(Permission.CONFIGURE)).willReturn(true);
-        given(mockedPlugin.getConfiguredHistoryRootDir()).willReturn(configHistory);
-        given(mockedPlugin.getConfigFile(any(File.class))).willReturn(jobConfig);
         assertEquals(jobConfig, createSut().getOldConfigXml(name, timestamp).getFile());
     }
 
@@ -381,12 +379,10 @@ public class JobConfigHistoryRootActionTest {
      * Test of getOldConfigXml method, of class JobConfigHistoryRootAction.
      */
     @Test(expected = IllegalArgumentException.class)
-    @Ignore
     public void testGetOldConfigXmlNonExisting() {
         final String name = "jobs/I_DO_NOT_EXIST";
         final String timestamp = "2012-11-21_11-35-12";
         given(mockedACL.hasPermission(Permission.CONFIGURE)).willReturn(true);
-        given(mockedPlugin.getConfiguredHistoryRootDir()).willReturn(configHistory);
         createSut().getOldConfigXml(name, timestamp);
     }
 

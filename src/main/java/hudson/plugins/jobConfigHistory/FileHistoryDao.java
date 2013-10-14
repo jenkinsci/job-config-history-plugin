@@ -350,7 +350,11 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     @Override
     public XmlFile getOldRevision(String configFileName, String identifier) {
         final File historyDir = new File(new File(historyRootDir, configFileName), identifier);
-        return new XmlFile(getConfigFile(historyDir));
+        final File configFile = getConfigFile(historyDir);
+        if (configFile == null) {
+            throw new IllegalArgumentException("Could not find " + historyDir);
+        }
+        return new XmlFile(configFile);
     }
 
     @Override
@@ -514,7 +518,6 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
             for (final File file : listing) {
                 if (!file.getName().equals(JobConfigHistoryConsts.HISTORY_FILE) && file.getName().matches(".*\\.xml$")) {
                     configFile = file;
-                    break;
                 }
             }
         }
