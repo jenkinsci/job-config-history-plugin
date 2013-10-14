@@ -314,11 +314,12 @@ public class JobConfigHistoryTest {
      */
     @Test
     public void testDoCheckMaxHistoryEntries() {
-        String value = "";
         JobConfigHistory sut = createSut();
-        FormValidation expResult = FormValidation.ok();
-        FormValidation result = sut.doCheckMaxHistoryEntries(value);
-        assertEquals(expResult, result);
+        final FormValidation expectedResult = FormValidation.ok();
+        assertEquals(expectedResult, sut.doCheckMaxHistoryEntries(""));
+        assertEquals(expectedResult, sut.doCheckMaxHistoryEntries("5"));
+        assertNotEquals(expectedResult, sut.doCheckMaxHistoryEntries("-1"));
+        assertNotEquals(expectedResult, sut.doCheckMaxHistoryEntries("A"));
     }
 
     /**
@@ -326,11 +327,12 @@ public class JobConfigHistoryTest {
      */
     @Test
     public void testDoCheckMaxDaysToKeepEntries() {
-        String value = "";
         JobConfigHistory sut = createSut();
-        FormValidation expResult = FormValidation.ok();
-        FormValidation result = sut.doCheckMaxDaysToKeepEntries(value);
-        assertEquals(expResult, result);
+        final FormValidation expectedResult = FormValidation.ok();
+        assertEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries(""));
+        assertEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries("5"));
+        assertNotEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries("-1"));
+        assertNotEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries("A"));
     }
 
     /**
@@ -338,11 +340,10 @@ public class JobConfigHistoryTest {
      */
     @Test
     public void testDoCheckExcludePattern() {
-        String value = "";
         JobConfigHistory sut = createSut();
         FormValidation expResult = FormValidation.ok();
-        FormValidation result = sut.doCheckExcludePattern(value);
-        assertEquals(expResult, result);
+        assertEquals(expResult, sut.doCheckExcludePattern(""));
+        assertNotEquals(expResult, sut.doCheckExcludePattern("[.*"));
     }
 
     private JobConfigHistory createSut() {
