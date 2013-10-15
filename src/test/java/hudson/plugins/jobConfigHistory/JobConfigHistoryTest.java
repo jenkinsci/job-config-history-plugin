@@ -311,10 +311,17 @@ public class JobConfigHistoryTest {
     public void testIsSaveable() throws IOException, ServletException, Descriptor.FormException {
         XmlFile xmlFile = new XmlFile(unpackResourceZip.getResource("jobs/Test1/config.xml"));
         JobConfigHistory sut = createSut();
-        sut.configure(null, createFormData());
+        final JSONObject formData = createFormData();
+
+        sut.configure(null, formData);
         assertTrue(sut.isSaveable(mock(AbstractProject.class), xmlFile));
         assertTrue(sut.isSaveable(null, new XmlFile(unpackResourceZip.getResource("config.xml"))));
         assertTrue(sut.isSaveable(mock(ItemGroup.class), xmlFile));
+        assertFalse(sut.isSaveable(null, xmlFile));
+
+        formData.put("saveItemGroupConfiguration", false);
+        sut.configure(null, formData);
+        assertFalse(sut.isSaveable(mock(ItemGroup.class), xmlFile));
     }
 
     /**
