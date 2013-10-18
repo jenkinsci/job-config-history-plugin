@@ -423,12 +423,12 @@ public class JobConfigHistoryRootActionTest {
      * Test of doForwardToRestoreQuestion method, of class JobConfigHistoryRootAction.
      */
     @Test
-    @Ignore
     public void testDoForwardToRestoreQuestion() throws Exception {
-        StaplerRequest req = null;
-        StaplerResponse rsp = null;
+        given(mockedStaplerRequest.getParameter("name")).willReturn("foo");
+        StaplerResponse mockedResponse = mock(StaplerResponse.class);
         JobConfigHistoryRootAction sut = createSut();
-        sut.doForwardToRestoreQuestion(req, rsp);
+        sut.doForwardToRestoreQuestion(mockedStaplerRequest, mockedResponse);
+        verify(mockedResponse).sendRedirect("restoreQuestion?name=foo");
     }
 
     JobConfigHistoryRootAction createSut() {
