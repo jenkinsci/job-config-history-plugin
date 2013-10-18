@@ -23,7 +23,6 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import hudson.XmlFile;
 import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.TopLevelItem;
@@ -35,6 +34,7 @@ import org.junit.Test;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.endsWith;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -402,13 +402,21 @@ public class JobConfigHistoryRootActionTest {
      * Test of getLastAvailableConfigXml method, of class JobConfigHistoryRootAction.
      */
     @Test
-    @Ignore
     public void testGetLastAvailableConfigXml() {
-        String name = "";
-        JobConfigHistoryRootAction sut = createSut();
-        XmlFile expResult = null;
-        XmlFile result = sut.getLastAvailableConfigXml(name);
-        assertEquals(expResult, result);
+        given(mockedACL.hasPermission(Permission.CONFIGURE)).willReturn(true);
+        String name = "jobs/Test1";
+        assertThat(createSut().getLastAvailableConfigXml(name).getFile().getPath(),
+                endsWith("Test1/2012-11-21_11-41-14/config.xml"));
+    }
+
+    /**
+     * Test of getLastAvailableConfigXml method, of class JobConfigHistoryRootAction.
+     */
+    @Test
+    public void testGetLastAvailableConfigXmlNoConfigs() {
+        given(mockedACL.hasPermission(Permission.CONFIGURE)).willReturn(true);
+        String name = "jobs/I_DO_NOT_EXIST";
+        assertNull(createSut().getLastAvailableConfigXml(name));
     }
 
     /**
