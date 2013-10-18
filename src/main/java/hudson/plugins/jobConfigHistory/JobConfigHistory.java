@@ -278,21 +278,6 @@ public class JobConfigHistory extends Plugin {
     }
 
     /**
-     * Returns the File object representing the job history directory,
-     * which is for reasons of backwards compatibility either a sibling or child
-     * of the configured history root dir.
-     *
-     * @return The job history File object.
-     *
-     * @deprecated replace this with FileHistoryDao invocation.
-     */
-    @Deprecated
-    protected File getJobHistoryRootDir() {
-        return ((FileHistoryDao) getHistoryDao()).getJobHistoryRootDir();
-    }
-
-
-    /**
      * Returns the File object representing the configured root history directory.
      *
      * @return The configured root history File object.

@@ -265,16 +265,6 @@ public class JobConfigHistoryTest {
     }
 
     /**
-     * Test of getJobHistoryRootDir method, of class JobConfigHistory.
-     */
-    @Test
-    public void testGetJobHistoryRootDir() {
-        JobConfigHistory sut = createSut();
-        File result = sut.getJobHistoryRootDir();
-        assertThat(result.getPath(), endsWith("config-history/jobs"));
-    }
-
-    /**
      * Test of getConfiguredHistoryRootDir method, of class JobConfigHistory.
      */
     @Test

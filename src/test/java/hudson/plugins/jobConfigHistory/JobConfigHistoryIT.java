@@ -226,7 +226,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
     private void testCreateRenameDeleteProject(final JobConfigHistory jch) {
         try {
             final FreeStyleProject project = createFreeStyleProject("testproject");
-            final File jobHistoryRootFile = jch.getJobHistoryRootDir();
+            final File jobHistoryRootFile = new File(jch.getConfiguredHistoryRootDir(), "jobs");
 
             final File expectedConfigDir = new File(jobHistoryRootFile, "testproject");
             assertEquals("Verify history dir configured as expected.", expectedConfigDir, getHistoryDir(project.getConfigFile()));

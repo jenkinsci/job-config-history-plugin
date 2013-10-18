@@ -139,7 +139,6 @@ public class JobConfigHistoryRootActionTest {
      */
     @Test
     public void testGetSingleConfigs() throws Exception {
-        given(mockedPlugin.getJobHistoryRootDir()).willReturn(UNPACK_RESOURCE_ZIP.getResource("config-history/jobs"));
         given(mockedPlugin.getConfiguredHistoryRootDir()).willReturn(configHistory);
         assertEquals(5, createSut().getSingleConfigs("config").size());
         assertEquals(3, createSut().getSingleConfigs("Foo_deleted_20130830_223932_071").size());
@@ -181,7 +180,6 @@ public class JobConfigHistoryRootActionTest {
         final String timestamp = "2013-08-30_22-39-32";
         given(mockedStaplerRequest.getParameter("timestamp")).willReturn(timestamp);
         final String jobHistoryRoot = "config-history/jobs";
-        given(mockedPlugin.getJobHistoryRootDir()).willReturn(UNPACK_RESOURCE_ZIP.getResource(jobHistoryRoot));
         given(mockedPlugin.getConfigFile(any(File.class))).willReturn(
                 UNPACK_RESOURCE_ZIP.getResource(jobHistoryRoot + "/" + name + "/" + timestamp + "/config.xml"));
         given(mockedACL.hasPermission(Item.CONFIGURE)).willReturn(true);
@@ -197,7 +195,6 @@ public class JobConfigHistoryRootActionTest {
         final ConfigInfo config = mock(ConfigInfo.class);
         given(config.getJob()).willReturn("Foo_deleted_20130830_223932_071");
         given(config.getDate()).willReturn("2013-08-30_22-39-32");
-        given(mockedPlugin.getJobHistoryRootDir()).willReturn(UNPACK_RESOURCE_ZIP.getResource("config-history/jobs"));
         String expResult = "configOutput?type=&name=Foo_deleted_20130830_223932_071&timestamp=2013-08-30_22-35-05";
         assertEquals(expResult, createSut().createLinkToFiles(config, ""));
         given(config.getJob()).willReturn("Unknown_deleted_20130830_223932_072");
