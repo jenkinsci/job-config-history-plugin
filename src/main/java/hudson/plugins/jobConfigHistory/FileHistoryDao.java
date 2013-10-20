@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import static java.util.logging.Level.FINEST;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Defines some helper functions needed by {@link JobConfigHistoryJobListener} and
@@ -604,6 +605,17 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     @Override
     public SortedMap<String, HistoryDescr> getSystemHistory(String name) {
         return getRevisions(new File(historyRootDir, name), new File(name));
+    }
+
+    @Override
+    public void moveHistory(String oldName, String newName) {
+        final File oldFile = new File(getJobHistoryRootDir(), oldName);
+        final File newFile = new File(getJobHistoryRootDir(), newName);
+        try {
+            FileUtils.moveDirectory(oldFile, newFile);
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Unable to move from " + oldFile + " to " + newFile, ex);
+        }
     }
 
 }

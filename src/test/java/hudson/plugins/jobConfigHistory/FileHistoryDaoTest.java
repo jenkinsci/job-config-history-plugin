@@ -554,7 +554,7 @@ public class FileHistoryDaoTest {
     }
 
     /**
-     * Test of getJobHistory method, of class FileHistoryDao.
+     * Test of getSystemHistory method, of class FileHistoryDao.
      */
     @Test
     public void testGetSystemHistory() {
@@ -562,12 +562,30 @@ public class FileHistoryDaoTest {
         assertEquals(5, result.size());
         assertEquals("2013-01-18_17-34-22", result.firstKey());
     }
+
     /**
-     * Test of getJobHistory method, of class FileHistoryDao.
+     * Test of getSystemHistory method, of class FileHistoryDao.
      */
     @Test
     public void testGetSystemHistoryNonExistent() {
         final SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getSystemHistory("config-does-not-exist");
-        assertTrue(result.isEmpty());        
+        assertTrue(result.isEmpty());
+    }
+
+    /**
+     * Test of moveHistory method, of class FileHistoryDao.
+     */
+    @Test
+    public void testMoveHistory() {
+        sutWithUserAndNoDuplicateHistory.moveHistory("Foo_deleted_20130830_223932_071", "Foo");
+        assertEquals(3, sutWithUserAndNoDuplicateHistory.getJobHistory("Foo").size());
+    }
+
+    /**
+     * Test of moveHistory method, of class FileHistoryDao.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testMoveHistoryIOException() {
+        sutWithUserAndNoDuplicateHistory.moveHistory("Test1", "Test1");
     }
 }

@@ -18,7 +18,6 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.XmlFile;
 import hudson.model.Item;
 import hudson.model.RootAction;
@@ -367,7 +366,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
         final InputStream is = new ByteArrayInputStream(configXml.asString().getBytes("UTF-8"));
         final AbstractProject project = (AbstractProject) getHudson().createProjectFromXML(findNewName(newName), is);
-        copyHistoryFiles(deletedName, newName);
+        moveHistoryFiles(deletedName, newName);
 
         rsp.sendRedirect(getHudson().getRootUrl() + project.getUrl());
     }
@@ -424,19 +423,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @param oldName The old name of the project (containing "_deleted_")
      * @param newName The new name of the project
      */
-    private void copyHistoryFiles(String oldName, String newName) {
-        final FilePath oldFilePath = new FilePath(new File(((FileHistoryDao) getHistoryDao()).getJobHistoryRootDir(), oldName));
-        final FilePath newFilePath = new FilePath(new File(((FileHistoryDao) getHistoryDao()).getJobHistoryRootDir(), newName));
-        try {
-            oldFilePath.moveAllChildrenTo(newFilePath);
-            oldFilePath.delete();
-        } catch (InterruptedException ex) {
-            LOG.log(INFO, "Unable to move old history data {0} to new directory {1}", new Object[]{oldFilePath, newFilePath});
-            LOG.info(ex.getMessage());
-        } catch (IOException ex) {
-            LOG.log(INFO, "Unable to move old history data {0} to new directory {1}", new Object[]{oldFilePath, newFilePath});
-            LOG.info(ex.getMessage());
-        }
+    private void moveHistoryFiles(String oldName, String newName) {
+        getHistoryDao().moveHistory(oldName, newName);
     }
 
     /**
