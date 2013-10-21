@@ -424,7 +424,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @param newName The new name of the project
      */
     private void moveHistoryFiles(String oldName, String newName) {
-        getHistoryDao().moveHistory(oldName, newName);
+        getHistoryDao().copyHistoryAndDelete(oldName, newName);
     }
 
     /**

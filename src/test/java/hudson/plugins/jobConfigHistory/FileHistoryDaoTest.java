@@ -573,19 +573,19 @@ public class FileHistoryDaoTest {
     }
 
     /**
-     * Test of moveHistory method, of class FileHistoryDao.
+     * Test of copyHistoryAndDelete method, of class FileHistoryDao.
      */
     @Test
     public void testMoveHistory() {
-        sutWithUserAndNoDuplicateHistory.moveHistory("Foo_deleted_20130830_223932_071", "Foo");
+        sutWithUserAndNoDuplicateHistory.copyHistoryAndDelete("Foo_deleted_20130830_223932_071", "Foo");
         assertEquals(3, sutWithUserAndNoDuplicateHistory.getJobHistory("Foo").size());
     }
 
     /**
-     * Test of moveHistory method, of class FileHistoryDao.
+     * Test of copyHistoryAndDelete method, of class FileHistoryDao.
      */
     @Test(expected = IllegalArgumentException.class)
     public void testMoveHistoryIOException() {
-        sutWithUserAndNoDuplicateHistory.moveHistory("Test1", "Test1");
+        sutWithUserAndNoDuplicateHistory.copyHistoryAndDelete("Test1", "Test1");
     }
 }

@@ -608,11 +608,12 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     }
 
     @Override
-    public void moveHistory(String oldName, String newName) {
+    public void copyHistoryAndDelete(String oldName, String newName) {
         final File oldFile = new File(getJobHistoryRootDir(), oldName);
         final File newFile = new File(getJobHistoryRootDir(), newName);
         try {
-            FileUtils.moveDirectory(oldFile, newFile);
+            FileUtils.copyDirectory(oldFile, newFile);
+            FileUtils.deleteDirectory(oldFile);
         } catch (IOException ex) {
             throw new IllegalArgumentException("Unable to move from " + oldFile + " to " + newFile, ex);
         }

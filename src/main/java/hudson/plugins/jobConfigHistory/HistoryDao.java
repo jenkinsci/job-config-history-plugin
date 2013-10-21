@@ -128,11 +128,12 @@ public interface HistoryDao {
     boolean isCreatedEntry(File historyDir);
 
     /**
-     * Moves the history files of a restored project from the old location (_deleted_) to a directory with the new name.
+     * Copies the history files of a restored project from the old location (_deleted_) to a directory with the new name and
+     * deletes the old entries.
      *
      * @param oldName The old name of the project (containing "_deleted_")
      * @param newName The new name of the project
      */
-    void moveHistory(String oldName, String newName);
+    void copyHistoryAndDelete(String oldName, String newName);
 }
 
