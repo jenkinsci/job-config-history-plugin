@@ -4,7 +4,8 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.519</version>
+        <!-- Do not use 1.509.4 because of SNAPSHOT-dependencies -->
+        <version>1.509.3</version>
     </parent>
 
     <artifactId>jobConfigHistory</artifactId>
@@ -227,6 +228,12 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <!-- 1.509.X uses a SNAPSHOT-version of this plugin! -->
+                <plugin>
+                    <groupId>org.kohsuke</groupId>
+                    <artifactId>access-modifier-checker</artifactId>
+                    <version>1.4</version>
                 </plugin>
             </plugins>
         </pluginManagement>
