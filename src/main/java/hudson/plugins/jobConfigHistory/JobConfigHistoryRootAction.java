@@ -365,8 +365,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         final XmlFile configXml = getLastAvailableConfigXml(deletedName);
 
         final InputStream is = new ByteArrayInputStream(configXml.asString().getBytes("UTF-8"));
-        final AbstractProject project = (AbstractProject) getHudson().createProjectFromXML(findNewName(newName), is);
-        moveHistoryFiles(deletedName, newName);
+        final String calculatedNewName = findNewName(newName);
+        final AbstractProject project = (AbstractProject) getHudson().createProjectFromXML(calculatedNewName, is);
+        moveHistoryFiles(deletedName, calculatedNewName);
 
         rsp.sendRedirect(getHudson().getRootUrl() + project.getUrl());
     }
