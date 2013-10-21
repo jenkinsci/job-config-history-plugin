@@ -367,7 +367,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         final InputStream is = new ByteArrayInputStream(configXml.asString().getBytes("UTF-8"));
         final String calculatedNewName = findNewName(newName);
         final AbstractProject project = (AbstractProject) getHudson().createProjectFromXML(calculatedNewName, is);
-        moveHistoryFiles(deletedName, calculatedNewName);
+        getHistoryDao().copyHistoryAndDelete(deletedName, calculatedNewName);
 
         rsp.sendRedirect(getHudson().getRootUrl() + project.getUrl());
     }
@@ -416,16 +416,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
             i++;
         }
         return newName;
-    }
-
-    /**
-     * Moves the history files of a restored project from the old location (_deleted_)
-     * to a directory with the new name.
-     * @param oldName The old name of the project (containing "_deleted_")
-     * @param newName The new name of the project
-     */
-    private void moveHistoryFiles(String oldName, String newName) {
-        getHistoryDao().copyHistoryAndDelete(oldName, newName);
     }
 
     /**
