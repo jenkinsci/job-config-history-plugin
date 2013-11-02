@@ -7,15 +7,15 @@ import hudson.security.AccessControlled;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.List;
 
 import org.kohsuke.stapler.Stapler;
 
 
-import bmsi.util.Diff;
-import bmsi.util.DiffPrint;
-import bmsi.util.Diff.change;
+import difflib.DiffUtils;
+import difflib.Patch;
+import difflib.StringUtills;
+import java.util.Arrays;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -152,14 +152,10 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected final String getDiffAsString(final File file1, final File file2,
             final String[] file1Lines, final String[] file2Lines) {
-        final change change = new Diff(file1Lines, file2Lines).diff_2(false);
-        final DiffPrint.UnifiedPrint unifiedPrint = new DiffPrint.UnifiedPrint(
-                file1Lines, file2Lines);
-        final StringWriter output = new StringWriter();
-        unifiedPrint.setOutput(output);
-        unifiedPrint.print_header(file1.getPath(), file2.getPath());
-        unifiedPrint.print_script(change);
-        return output.toString();
+        final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
+        final List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(
+                file1.getPath(), file2.getPath(), Arrays.asList(file1Lines), patch, 3);
+        return StringUtills.join(unifiedDiff, "\n") + "\n";
     }
 
     /**

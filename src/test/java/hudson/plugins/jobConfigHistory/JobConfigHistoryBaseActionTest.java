@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -151,13 +152,29 @@ public class JobConfigHistoryBaseActionTest {
      */
     @Test
     public void testGetDiffAsString() throws IOException {
-        File file1 = new File(JobConfigHistoryBaseActionTest.class.getResource("file1.txt").getPath());
-        File file2 = new File(JobConfigHistoryBaseActionTest.class.getResource("file2.txt").getPath());
-        String[] file1Lines = readResourceLines("file1.txt").toArray(new String[]{});
-        String[] file2Lines = readResourceLines("file2.txt").toArray(new String[]{});
+        String result = testGetDiffAsString("file1.txt", "file2.txt");
+        assertThat(result, endsWith("@@ -1,1 +1,1 @@\n-a\n+b\n"));
+        assertThat(result, containsString("--- "));
+        assertThat(result, containsString("+++ "));
+    }
+
+    /**
+     * Test of getDiffAsString method, of class JobConfigHistoryBaseAction.
+     */
+    @Test
+    public void testGetDiffAsStringOfEqualFiles() throws IOException {
+        String result = testGetDiffAsString("file1.txt", "file1.txt");
+        assertEquals("\n", result);
+    }
+
+    private String testGetDiffAsString(final String file1txt, final String file2txt) throws IOException {
+        File file1 = new File(JobConfigHistoryBaseActionTest.class.getResource(file1txt).getPath());
+        File file2 = new File(JobConfigHistoryBaseActionTest.class.getResource(file2txt).getPath());
+        String[] file1Lines = readResourceLines(file1txt).toArray(new String[]{});
+        String[] file2Lines = readResourceLines(file2txt).toArray(new String[]{});
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         String result = sut.getDiffAsString(file1, file2, file1Lines, file2Lines);
-        assertThat(result, endsWith("@@ -1 +1 @@\n-a\n+b\n"));
+        return result;
     }
 
     private List<String> readResourceLines(final String resourceName) throws IOException {

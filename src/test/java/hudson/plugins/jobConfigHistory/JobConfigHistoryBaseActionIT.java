@@ -72,7 +72,7 @@ public class JobConfigHistoryBaseActionIT extends AbstractHudsonTestCaseDeleting
      */
     public void testGetDiffFileStringStringEmpty() {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
-        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependent(action.getDiffAsString(file1, file2, new String[0], new String[0])));
+        assertEquals("\n", makeResultPlatformIndependent(action.getDiffAsString(file1, file2, new String[0], new String[0])));
     }
 
     /**
@@ -105,7 +105,7 @@ public class JobConfigHistoryBaseActionIT extends AbstractHudsonTestCaseDeleting
      */
     public void testGetDiffFileStringStringDifferentLineLength() {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();        
-        assertEquals("--- old/config.xml\n+++ new/config.xml\n", makeResultPlatformIndependent(action.getDiffAsString(file1, file2, "123\n346".split("\n"), "123\n346\n".split("\n"))));
+        assertEquals("\n", makeResultPlatformIndependent(action.getDiffAsString(file1, file2, "123\n346".split("\n"), "123\n346\n".split("\n"))));
         assertEquals("--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,3 @@\n 123\n 346\n+123\n", makeResultPlatformIndependent(action.getDiffAsString(file1, file2, "123\n346".split("\n"), "123\n346\n123".split("\n"))));
     }
 
