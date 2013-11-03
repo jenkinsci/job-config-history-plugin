@@ -24,8 +24,11 @@
 
 package hudson.plugins.jobConfigHistory;
 
+import hudson.util.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 import javax.servlet.ServletInputStream;
 
 /**
@@ -53,6 +56,15 @@ public class TUtils {
                 return bodyByteStream.read();
             }
         };
+    }
+
+    static List<String> readResourceLines(final String resourceName) throws IOException {
+        final InputStream stream = TUtils.class.getResourceAsStream(resourceName);
+        try {
+            return IOUtils.readLines(stream, "UTF-8");
+        } finally {
+            stream.close();
+        }
     }
 
 }

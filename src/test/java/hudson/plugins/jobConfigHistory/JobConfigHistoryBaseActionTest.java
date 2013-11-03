@@ -2,10 +2,8 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.model.Hudson;
 import hudson.security.AccessControlled;
-import hudson.util.IOUtils;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
@@ -141,7 +139,7 @@ public class JobConfigHistoryBaseActionTest {
     @Test
     public void testGetDiffLines() throws Exception {
         final String resourceName = "diff.txt";
-        final List<String> lines = readResourceLines(resourceName);
+        final List<String> lines = TUtils.readResourceLines(resourceName);
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         List<SideBySideView.Line> result = sut.getDiffLines(lines);
         assertEquals(24, result.size());
@@ -170,20 +168,11 @@ public class JobConfigHistoryBaseActionTest {
     private String testGetDiffAsString(final String file1txt, final String file2txt) throws IOException {
         File file1 = new File(JobConfigHistoryBaseActionTest.class.getResource(file1txt).getPath());
         File file2 = new File(JobConfigHistoryBaseActionTest.class.getResource(file2txt).getPath());
-        String[] file1Lines = readResourceLines(file1txt).toArray(new String[]{});
-        String[] file2Lines = readResourceLines(file2txt).toArray(new String[]{});
+        String[] file1Lines = TUtils.readResourceLines(file1txt).toArray(new String[]{});
+        String[] file2Lines = TUtils.readResourceLines(file2txt).toArray(new String[]{});
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         String result = sut.getDiffAsString(file1, file2, file1Lines, file2Lines);
         return result;
-    }
-
-    private List<String> readResourceLines(final String resourceName) throws IOException {
-        final InputStream stream = JobConfigHistoryBaseActionTest.class.getResourceAsStream(resourceName);
-        try {
-            return IOUtils.readLines(stream, "UTF-8");
-        } finally {
-            stream.close();
-        }
     }
 
     public class JobConfigHistoryBaseActionImpl extends JobConfigHistoryBaseAction {

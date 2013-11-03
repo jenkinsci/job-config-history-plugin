@@ -23,9 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import hudson.util.IOUtils;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -60,18 +58,9 @@ public class GetDiffLinesTest {
 
     GetDiffLines createGetDiffLines() throws IOException {
         final String resourceName = "diff.txt";
-        final List<String> lines = readResourceLines(resourceName);
+        final List<String> lines = TUtils.readResourceLines(resourceName);
         GetDiffLines sut = new GetDiffLines(lines);
         return sut;
-    }
-
-    private List<String> readResourceLines(final String resourceName) throws IOException {
-        final InputStream stream = GetDiffLinesTest.class.getResourceAsStream(resourceName);
-        try {
-            return IOUtils.readLines(stream, "UTF-8");
-        } finally {
-            stream.close();
-        }
     }
 
 }
