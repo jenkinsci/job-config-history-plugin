@@ -389,6 +389,20 @@ public class FileHistoryDaoTest {
      * Test of getHistoryDir method, of class FileHistoryDao.
      */
     @Test
+    public void testGetHistoryDirWithFolder() throws IOException {
+        String folderName = "FolderName";
+        final File destDir = unpackResourceZip.getResource("config-history/jobs/" + folderName + "/jobs/Test1");
+        // Create folders
+        FileUtils.copyDirectory(unpackResourceZip.getResource("config-history/jobs/Test1"), destDir);
+        final File configFile = unpackResourceZip.getResource("jobs/" + folderName + "/jobs/Test1/config.xml");
+        File result = sutWithUserAndNoDuplicateHistory.getHistoryDir(configFile);
+        assertEquals(destDir, result);
+    }
+
+    /**
+     * Test of getHistoryDir method, of class FileHistoryDao.
+     */
+    @Test
     public void testGetHistoryDirOfSystemXml() throws IOException {
         final XmlFile systemXmlFile = new XmlFile(new File(jenkinsHome, "jenkins.xml"));
         final File configFile = systemXmlFile.getFile();
