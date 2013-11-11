@@ -584,7 +584,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
      * @return history directory for a job in a folder.
      */
     private File getJobDirectoryIncludingFolder(String folderName) {
-        final String realFolderName = folderName == "" ? "" : folderName + "/jobs";
+        final String realFolderName = folderName.isEmpty() ? folderName : folderName + "/jobs";
         return new File(getJobHistoryRootDir(), realFolderName);
     }
 
