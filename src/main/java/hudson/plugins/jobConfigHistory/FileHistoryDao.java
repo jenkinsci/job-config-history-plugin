@@ -568,13 +568,24 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     @Override
     public File[] getDeletedJobs(String folderName) {
         return returnEmptyFileArrayForNull(
-                new File(getJobHistoryRootDir(), folderName).listFiles(DeletedFileFilter.INSTANCE));
+                getJobDirectoryIncludingFolder(folderName).listFiles(DeletedFileFilter.INSTANCE));
     }
 
     @Override
     public File[] getJobs(String folderName) {
         return returnEmptyFileArrayForNull(
-                new File(getJobHistoryRootDir(), folderName).listFiles(NonDeletedFileFilter.INSTANCE));
+                getJobDirectoryIncludingFolder(folderName).listFiles(NonDeletedFileFilter.INSTANCE));
+    }
+
+    /**
+     * Returns the history directory for a job in a folder.
+     *
+     * @param folderName name of the folder.
+     * @return history directory for a job in a folder.
+     */
+    private File getJobDirectoryIncludingFolder(String folderName) {
+        final String realFolderName = folderName == "" ? "" : folderName + "/jobs";
+        return new File(getJobHistoryRootDir(), realFolderName);
     }
 
     @Override

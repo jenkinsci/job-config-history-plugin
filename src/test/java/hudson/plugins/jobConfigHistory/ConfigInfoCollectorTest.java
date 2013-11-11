@@ -94,10 +94,10 @@ public class ConfigInfoCollectorTest {
         // Create folders
         FileUtils.copyDirectory(
                 unpackResourceZip.getResource("config-history/jobs/Test1"),
-                unpackResourceZip.getResource("config-history/jobs/" + folderName + "/Test1"));
+                unpackResourceZip.getResource("config-history/jobs/" + folderName + "/jobs/Test1"));
         FileUtils.copyDirectory(
                 unpackResourceZip.getResource("config-history/jobs/Test1"),
-                unpackResourceZip.getResource("config-history/jobs/" + folderName + "/Test2"));
+                unpackResourceZip.getResource("config-history/jobs/" + folderName + "/jobs/Test2"));
         assertThatFolderXHasYItemsOfTypeZ(folderName, 10, "other");
         assertThatFolderXHasYItemsOfTypeZ(folderName, 2, "created");
     }

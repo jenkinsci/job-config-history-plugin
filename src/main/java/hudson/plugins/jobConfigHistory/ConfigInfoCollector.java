@@ -82,7 +82,7 @@ final class ConfigInfoCollector {
      *             If one of the entries cannot be read.
      */
     void getConfigsForType(File itemDir, String folderName) throws IOException {
-        final String itemName = folderName.isEmpty() ? itemDir.getName() : folderName + "/" + itemDir.getName();
+        final String itemName = folderName.isEmpty() ? itemDir.getName() : folderName + "/jobs/" + itemDir.getName();
         final List<HistoryDescr> historyEntries = new ArrayList<HistoryDescr>(
                 overViewhistoryDao.getJobHistory(itemName).values());
         if (historyEntries.isEmpty()) {
