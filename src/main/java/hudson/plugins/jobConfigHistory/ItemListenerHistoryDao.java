@@ -38,7 +38,13 @@ public interface ItemListenerHistoryDao {
      * @param item project
      */
     void createNewItem(Item item);
-
+    
+    /**
+     * Saves the current configuration of the item passed as argument.
+     *
+     * @param item project
+     */
+    void saveItem(Item item);
     /**
      * Save and renames the item.
      *
