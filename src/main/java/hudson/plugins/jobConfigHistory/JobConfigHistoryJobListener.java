@@ -57,6 +57,16 @@ public class JobConfigHistoryJobListener extends ItemListener {
         switchHistoryDao(item).deleteItem(item);
         LOG.log(FINEST, "onDeleted for {0} done.", item);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onUpdated(Item item) {
+        LOG.log(FINEST, "In onUpdate for {0}", item);
+        switchHistoryDao(item).saveItem(item);
+        LOG.log(FINEST, "onUpdate for {0} done.", item);
+    }
 
     /**
      * Returns ItemListenerHistoryDao depending on the item type.
@@ -100,6 +110,11 @@ public class JobConfigHistoryJobListener extends ItemListener {
         @Override
         public void deleteItem(Item item) {
             LOG.log(Level.FINEST, "onDeleted: not an AbstractItem {0}, skipping.", item);
+        }
+        
+        @Override
+        public void saveItem(Item item) {
+            LOG.log(Level.FINEST, "onUpdate: not an AbstractItem {0}, skipping.", item);
         }
 
     }

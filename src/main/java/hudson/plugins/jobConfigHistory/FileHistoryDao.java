@@ -230,6 +230,11 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
         }
     }
 
+    public void saveItem(Item item) {
+        final AbstractItem aItem = (AbstractItem) item;
+        saveItem(aItem);
+    }
+    
     @Override
     public void saveItem(AbstractItem item) {
         saveItem(item.getConfigFile());

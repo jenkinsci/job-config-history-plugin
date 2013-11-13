@@ -65,6 +65,26 @@ public class JobConfigHistoryJobListenerTest {
         sut.onDeleted(item);
         verifyZeroInteractions(mockedConfigHistoryListenerHelper);
     }
+    
+    /**
+     * Test of onUpdated method, of class JobConfigHistoryJobListener.
+     */
+    @Test
+    public void testOnUpdated() {
+        Item item = createItem();
+        sut.onUpdated(item);
+        verifyZeroInteractions(mockedConfigHistoryListenerHelper);
+    }
+    
+    /**
+     * Test of onUpdated method, of class JobConfigHistoryJobListener.
+     */
+    @Test
+    public void testOnUpdatedAbstractItem() {
+        Item item = createAbstractItem();
+        sut.onUpdated(item);
+        verify(mockedConfigHistoryListenerHelper).saveItem(item);
+    }
 
     /**
      * Test of onDeleted method, of class JobConfigHistoryJobListener.
