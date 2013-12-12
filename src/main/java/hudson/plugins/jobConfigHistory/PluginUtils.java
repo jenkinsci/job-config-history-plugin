@@ -68,6 +68,10 @@ final class PluginUtils {
      * @return historyDao
      */
     public static FileHistoryDao getHistoryDao(final JobConfigHistory plugin) {
+        return getHistoryDao(plugin, User.current());
+    }
+
+    static FileHistoryDao getHistoryDao(final JobConfigHistory plugin, final User user) {
         final String maxHistoryEntriesAsString = plugin.getMaxHistoryEntries();
         int maxHistoryEntries = 0;
         try {
@@ -78,7 +82,7 @@ final class PluginUtils {
         return new FileHistoryDao(
                 plugin.getConfiguredHistoryRootDir(),
                 new File(Hudson.getInstance().root.getPath()),
-                User.current(),
+                user,
                 maxHistoryEntries,
                 !plugin.getSkipDuplicateHistory());
     }

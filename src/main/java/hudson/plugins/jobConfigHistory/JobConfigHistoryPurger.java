@@ -45,7 +45,11 @@ public class JobConfigHistoryPurger extends PeriodicWork {
      * Standard constructor using instance.
      */
     public JobConfigHistoryPurger() {
-        this(Hudson.getInstance().getPlugin(JobConfigHistory.class), PluginUtils.getHistoryDao(), PluginUtils.getHistoryDao());
+        this(Hudson.getInstance().getPlugin(JobConfigHistory.class));
+    }
+
+    private JobConfigHistoryPurger(JobConfigHistory plugin) {
+        this(plugin, PluginUtils.getHistoryDao(plugin, null), PluginUtils.getHistoryDao(plugin, null));
     }
 
     /**
