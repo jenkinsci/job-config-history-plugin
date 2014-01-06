@@ -5,7 +5,7 @@
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <!-- Do not use 1.509.4 because of SNAPSHOT-dependencies -->
-        <version>1.509.3</version>
+        <version>1.532.1</version>
     </parent>
 
     <artifactId>jobConfigHistory</artifactId>
@@ -87,6 +87,7 @@
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
+            <version>1.532</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
