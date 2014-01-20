@@ -24,6 +24,11 @@
 
 package hudson.plugins.jobConfigHistory;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.io.PrintStream;
+import jenkins.model.Jenkins;
+import hudson.model.Node;
 import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
@@ -35,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -79,6 +85,8 @@ public class FileHistoryDaoTest {
     private static final String USER_ID = "userId";
 
     private File test1JobDirectory;
+    
+    private final Node mockedNode = mock(Node.class);
 
     public FileHistoryDaoTest() {
     }
@@ -277,7 +285,7 @@ public class FileHistoryDaoTest {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         sutWithUserAndNoDuplicateHistory.deleteItem(mockedItem);
     }
-
+    
     /**
      * Test of renameItem method, of class FileHistoryDao.
      */
@@ -626,4 +634,119 @@ public class FileHistoryDaoTest {
     public void testMoveHistoryIOException() {
         sutWithUserAndNoDuplicateHistory.copyHistoryAndDelete("Test1", "Test1");
     }
+    
+    @Test
+    public void testCreateNewNode()throws Exception{
+        when(mockedNode.getNodeName()).thenReturn("slave1");
+        sutWithUserAndNoDuplicateHistory.createNewNode(mockedNode);
+        File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
+        File revisions = new File(file, "slave1");
+        assertEquals("Slave1 should have only one save history.", 1, revisions.list().length);
+        File config = new File(revisions.listFiles()[0], "config.xml");
+        assertTrue("File config.xml should be saved.", config.exists());
+        File history = new File(revisions.listFiles()[0], JobConfigHistoryConsts.HISTORY_FILE);
+        assertTrue("File history.xml should be saved.", history.exists());
+    }
+    
+    @Test
+    public void testDeleteNode()throws Exception{
+        when(mockedNode.getNodeName()).thenReturn("slave1");
+        File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
+        File revisions = new File(file, "slave1");
+        File revision = new File(revisions, "2014-01-20_10-12-34");
+        revision.mkdirs();
+        File config = new File(revision, "config.xml");
+        File history = new File(revision, JobConfigHistoryConsts.HISTORY_FILE);
+        Jenkins.getInstance().XSTREAM2.toXMLUTF8(mockedNode, new PrintStream(config));
+        HistoryDescr descr = new HistoryDescr("User", "user", "created", "2014-01-20_10-12-34");
+        Jenkins.getInstance().XSTREAM2.toXMLUTF8(descr, new FileOutputStream(history));
+        sutWithUserAndNoDuplicateHistory.deleteNode(mockedNode);
+        assertFalse("File config.xml should be deleted.", config.exists());
+        assertFalse("File history.xml should be deleted.", history.exists());
+        assertFalse("Revision directory should be deleted", revision.exists());
+    }
+    
+    @Test
+    public void testRenameNode() throws Exception{
+        when(mockedNode.getNodeName()).thenReturn("slave1");
+        File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
+        File revisions = new File(file, "slave1");
+        File revision = new File(revisions, "2014-01-20_10-12-34");
+        revision.mkdirs();
+        File config = new File(revision, "config.xml");
+        File history = new File(revision, JobConfigHistoryConsts.HISTORY_FILE);
+        Jenkins.getInstance().XSTREAM2.toXMLUTF8(mockedNode, new PrintStream(config));
+        HistoryDescr descr = new HistoryDescr("User", "user", "created", "2014-01-20_10-12-34");
+        Jenkins.getInstance().XSTREAM2.toXMLUTF8(descr, new FileOutputStream(history));
+        when(mockedNode.getNodeName()).thenReturn("slave2");
+        sutWithUserAndNoDuplicateHistory.renameNode(mockedNode, "slave1", "slave2");
+        config = new File(new File(file, "slave2"), revision.getName() + "/config.xml");
+        history = new File(new File(file, "slave2"), revision.getName() + "/" + JobConfigHistoryConsts.HISTORY_FILE);
+        assertTrue("File config.xml should be moved.", config.exists());
+        assertTrue("File history.xml should be moved.", history.exists());
+        assertFalse("Revision directory with old name should not exists", revisions.exists());
+    }
+    
+    @Test
+    public void testGetRevisions() throws Exception{
+        when(mockedNode.getNodeName()).thenReturn("slave1");
+        createNodeRevision ("2014-01-18_10-12-34", mockedNode);
+        createNodeRevision ("2014-01-19_10-12-34", mockedNode);
+        createNodeRevision ("2014-01-20_10-12-34", mockedNode);
+        createNodeRevision ("2014-01-20_10-21-34", mockedNode);
+        SortedMap<String, HistoryDescr> revisions = sutWithUserAndNoDuplicateHistory.getRevisions(mockedNode);
+        assertNotNull("Revisiosn 2014-01-18_10-12-34 should be returned.", revisions.get("2014-01-18_10-12-34"));
+        assertNotNull("Revisiosn 2014-01-19_10-12-34 should be returned.", revisions.get("2014-01-19_10-12-34"));
+        assertNotNull("Revisiosn 2014-01-20_10-12-34 should be returned.", revisions.get("2014-01-20_10-12-34"));
+        assertNotNull("Revisiosn 2014-01-20_10-21-34 should be returned.", revisions.get("2014-01-20_10-21-34"));
+    }
+    
+    private File createNodeRevision(String timestamp, Node node) throws Exception{
+        File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
+        File revisions = new File(file, "slave1");
+        File revision = new File(revisions, timestamp);
+        revision.mkdirs();
+        Jenkins.getInstance().XSTREAM2.toXMLUTF8(mockedNode, new PrintStream(new File(revision,"config.xml")));
+        HistoryDescr descr = new HistoryDescr("User", "user", "created", timestamp);
+        Jenkins.getInstance().XSTREAM2.toXMLUTF8(descr, new FileOutputStream(new File(revision, JobConfigHistoryConsts.HISTORY_FILE)));
+        return revision;
+    }
+    
+    @Test
+    public void testSaveNode(){
+        when(mockedNode.getNodeName()).thenReturn("slave1");      
+        File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
+        File revisions = new File(file, "slave1");
+        sutWithUserAndNoDuplicateHistory.saveNode(mockedNode);
+        assertEquals("New revision should be saved.", 1, revisions.list().length);
+    }
+    
+    @Test
+    public void testGetOldRevision_Node() throws Exception{
+        when(mockedNode.getNodeName()).thenReturn("slave1");
+        when(mockedNode.getNumExecutors()).thenReturn(1);
+        File revision1 = createNodeRevision ("2014-01-18_10-12-34", mockedNode);
+        when(mockedNode.getNumExecutors()).thenReturn(2);
+        File revision2 = createNodeRevision ("2014-01-19_10-12-34", mockedNode);
+        when(mockedNode.getNumExecutors()).thenReturn(3);
+        File revision3 = createNodeRevision ("2014-01-20_10-12-34", mockedNode);
+        XmlFile file1 = sutWithUserAndNoDuplicateHistory.getOldRevision(mockedNode, "2014-01-18_10-12-34");
+        XmlFile file2 = sutWithUserAndNoDuplicateHistory.getOldRevision(mockedNode, "2014-01-19_10-12-34");
+        XmlFile file3 = sutWithUserAndNoDuplicateHistory.getOldRevision(mockedNode, "2014-01-20_10-12-34");
+        assertEquals("Should return config.xml file of revision 2014-01-18_10-12-34", new File(revision1,"config.xml").getAbsolutePath(), file1.getFile().getAbsolutePath());
+        assertEquals("Should return config.xml file of revision 2014-01-19_10-12-34", new File(revision2,"config.xml").getAbsolutePath(), file2.getFile().getAbsolutePath());
+        assertEquals("Should return config.xml file of revision 2014-01-20_10-12-34", new File(revision3,"config.xml").getAbsolutePath(), file3.getFile().getAbsolutePath());
+    }
+    
+    @Test
+    public void getNodes(){
+        List<File> slaves = new ArrayList<File>();
+        slaves.add(new File(sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir(), "slave1"));
+        slaves.add(new File(sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir(), "slave2"));
+        slaves.add(new File(sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir(), "slave3"));
+        File [] files = sutWithUserAndNoDuplicateHistory.getNodes("nodes");
+        assertTrue("All directories of saved slaves should be returned.", slaves.containsAll(Arrays.asList(files)));
+    }
+    
+
 }

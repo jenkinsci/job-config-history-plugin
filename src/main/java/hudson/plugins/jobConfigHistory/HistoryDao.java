@@ -1,5 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
+import hudson.model.Node;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
 import java.io.File;
@@ -18,6 +19,13 @@ public interface HistoryDao {
      * @param item project
      */
     void saveItem(AbstractItem item);
+    
+    /**
+     * Saves the current configuration of an node.
+     *
+     * @param node
+     */
+    void saveNode(Node node);
 
     /**
      * Saves a copy of an xml file.
@@ -47,6 +55,17 @@ public interface HistoryDao {
      * @return old revisions mapped to the identifier.
      */
     SortedMap<String, HistoryDescr> getRevisions(File configFile);
+    
+    /**
+     * Returns a sorted map of all revisions for this node.
+     *
+     * The key is an identifier which may be used in
+     * {@link HistoryDao#getOldRevision(hudson.model.Node, java.lang.String)}
+     *
+     * @param Node node
+     * @return old revisions mapped to the identifier.
+     */
+    SortedMap<String, HistoryDescr> getRevisions(Node node);
 
     /**
      * Returns one old configuration of item.
@@ -56,6 +75,15 @@ public interface HistoryDao {
      * @return old configuration.
      */
     XmlFile getOldRevision(AbstractItem item, String identifier);
+    
+    /**
+     * Returns one old configuration of node.
+     *
+     * @param node
+     * @param identifier timestamp or hash
+     * @return old configuration.
+     */
+    XmlFile getOldRevision(Node node, String identifier);
 
     /**
      * Returns one old configuration of xmlFile.
@@ -92,6 +120,15 @@ public interface HistoryDao {
      * @return old configuration.
      */
     boolean hasOldRevision(AbstractItem item, String identifier);
+    
+    /**
+     * Returns whether the revision exists.
+     *
+     * @param node
+     * @param identifier timestamp or hash
+     * @return old configuration.
+     */
+    boolean hasOldRevision(Node node, String identifier);
 
     /**
      * Returns whether the revision exists.
@@ -135,5 +172,14 @@ public interface HistoryDao {
      * @param newName The new name of the project
      */
     void copyHistoryAndDelete(String oldName, String newName);
+    
+    /**
+     * Copies the history files of a restored node from the old location (_deleted_) to a directory with the new name and
+     * deletes the old entries.
+     *
+     * @param oldName The old name of the node (containing "_deleted_")
+     * @param newName The new name of the node
+     */
+    void copyNodeHistoryAndDelete(String oldName, String newName);
 }
 

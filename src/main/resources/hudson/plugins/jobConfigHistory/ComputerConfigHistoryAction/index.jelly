@@ -1,0 +1,88 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <l:layout title="Job Configuration History">
+    <st:include it="${it.slave.toComputer()}" page="sidepanel.jelly" />
+    <l:main-panel>
+      <h1>${%Job Configuration History}</h1>
+      <h2>${it.getSlave().getNodeName()}</h2>
+      <div>
+        <j:set var="configs" value="${it.getSlaveConfigs()}" />
+        <j:choose>
+          <j:when test="${configs.size() == 0}">
+              ${%No job configuration history available}
+          </j:when>
+          <j:otherwise>
+            <br/>
+            <div>
+              <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
+	            <j:if test="${configs.size() > 1}">
+                  <div align="right">
+                    <f:submit value="${%Show Diffs}" />
+                  </div>
+      		    </j:if>
+                <table class="pane sortable" style="width:100%">
+                  <tr>
+                    <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
+                    <td class="pane-header" align="left">${%Operation}</td>
+                    <td class="pane-header" align="left">${%User}</td>
+                    <td class="pane-header" align="left">${%Show File}</td>
+                    <td class="pane-header" align="left">${%Restore old config}</td>
+                    <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
+                    <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
+                  </tr>
+                  <j:set var="configNr" value="0"/>
+                  <j:forEach var="config" items="${configs}">
+                    <j:set var="configNr" value="${configNr + 1}"/>
+                    <tr>
+                      <td>${config.date}</td>
+                      <td>${config.operation}</td>
+                      <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                      <td>
+                        <j:set var="fileMissing" value="${!config.hasConfig()}"/>
+                        <j:if test="${!fileMissing}">
+                          <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}">
+                            <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
+                          </a>
+                          <st:nbsp />
+                          <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}">
+                            (${%RAW})
+                          </a>
+                        </j:if>
+                      </td>
+                      <td><j:if test="${configNr > 1 and !fileMissing}">
+							<a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
+								<img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
+							</a>
+                          </j:if>
+                      </td>
+                      <j:if test="${configNr == 2 and fileMissing}">
+                        <j:set var="offsetIfFileMissing" value="1"/>
+                      </j:if>
+                      <td align="center" style="border-left: solid 1px #bbb;">
+                        <j:if test="${!fileMissing}">
+                          <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfFileMissing) ? true:false}" />
+                        </j:if>
+                      </td>
+                      <td align="center" style="border-left: solid 1px #bbb;">
+                        <j:if test="${!fileMissing}">
+                          <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" />
+                        </j:if>
+                      </td>
+                    </tr>
+                      <f:invisibleEntry>
+              	        <f:textbox name="name" value="${config.getJob()}" />
+                      </f:invisibleEntry>
+                  </j:forEach>
+                </table>
+	            <j:if test="${configs.size() > 1}">
+                  <div align="right">
+                    <f:submit value="${%Show Diffs}" />
+                  </div>
+      		    </j:if>
+              </f:form>
+            </div>
+          </j:otherwise>
+        </j:choose>
+      </div>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>
