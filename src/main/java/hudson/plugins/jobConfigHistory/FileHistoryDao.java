@@ -30,6 +30,7 @@ import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.Item;
+import hudson.model.Node;
 import hudson.model.User;
 import java.io.BufferedOutputStream;
 
@@ -38,6 +39,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +53,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import static java.util.logging.Level.FINEST;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -59,7 +62,7 @@ import org.apache.commons.io.FileUtils;
  *
  * @author mfriedenhagen
  */
-public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, OverviewHistoryDao {
+public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, OverviewHistoryDao, NodeListenerHistoryDao {
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(FileHistoryDao.class.getName());
@@ -607,6 +610,17 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
         final String realFolderName = folderName.isEmpty() ? folderName : folderName + "/jobs";
         return new File(getJobHistoryRootDir(), realFolderName);
     }
+    
+    /**
+     * Returns the history directory for a node in a folder.
+     *
+     * @param folderName name of the folder.
+     * @return history directory for a node in a folder.
+     */
+    private File getNodeDirectoryIncludingFolder(String folderName) {
+        final String realFolderName = folderName.isEmpty() ? folderName : folderName + "/nodes";
+        return new File(getNodeHistoryRootDir(), realFolderName);
+    }
 
     @Override
     public File[] getSystemConfigs() {
@@ -649,5 +663,211 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
             throw new IllegalArgumentException("Unable to move from " + oldFile + " to " + newFile, ex);
         }
     }
+    
+    @Override
+    public void createNewNode(Node node){
+        String content = Jenkins.XSTREAM2.toXML(node);
+        createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_CREATED());
+    }
+    
+    void createNewHistoryEntryAndSaveConfig(Node node, String content, final String operation){
+        final File timestampedDir = createNewHistoryEntry(node, operation);
+        File nodeConfigHistoryFile = new File(timestampedDir, "config.xml");
+        try {
+            PrintStream stream = new PrintStream(nodeConfigHistoryFile);
+            stream.print(content);
+        } catch (IOException ex) {
+            throw new RuntimeException("Unable to write " + nodeConfigHistoryFile, ex);
+        }
+        
+    }
 
+    @Override
+    public void deleteNode(Node node){
+        createNewHistoryEntry(node, Messages.ConfigHistoryListenerHelper_DELETED());
+       // final File configFile = aItem.getConfigFile().getFile();
+        final File currentHistoryDir = getHistoryDirForNode(node);
+        final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
+        final String timestamp = buildDateFormat.format(new Date());
+        final String deletedHistoryName = node.getNodeName() + JobConfigHistoryConsts.DELETED_MARKER + timestamp;
+        final File deletedHistoryDir = new File(currentHistoryDir.getParentFile(), deletedHistoryName);
+        if (!currentHistoryDir.renameTo(deletedHistoryDir)) {
+            LOG.log(Level.WARNING, "unable to rename deleted history dir to: {0}", deletedHistoryDir);
+        }
+    }
+
+    @Override
+    public void renameNode(Node node, String oldName, String newName) {
+        final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
+        if (historyRootDir != null) {
+            //final File configFile = aItem.getConfigFile().getSlaveFile();
+            final File currentHistoryDir = getHistoryDirForNode(node);
+            final File historyParentDir = currentHistoryDir.getParentFile();
+            final File oldHistoryDir = new File(historyParentDir, oldName);
+            if (oldHistoryDir.exists()) {
+                final FilePath fp = new FilePath(oldHistoryDir);
+                // catch all exceptions so Hudson can continue with other rename tasks.
+                try {
+                    fp.copyRecursiveTo(new FilePath(currentHistoryDir));
+                    fp.deleteRecursive();
+                    LOG.log(Level.FINEST, "completed move of old history files on rename.{0}", onRenameDesc);
+                } catch (IOException e) {
+                    final String ioExceptionStr = "unable to move old history on rename." + onRenameDesc;
+                    LOG.log(Level.SEVERE, ioExceptionStr, e);
+                } catch (InterruptedException e) {
+                    final String irExceptionStr = "interrupted while moving old history on rename." + onRenameDesc;
+                    LOG.log(Level.WARNING, irExceptionStr, e);
+                }
+            }
+
+        }
+        String content = Jenkins.XSTREAM2.toXML(node);
+        createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_RENAMED());
+    }
+    
+    @Override
+    public SortedMap<String, HistoryDescr> getRevisions(Node node){
+        File historiesDir = getHistoryDirForNode(node);
+        final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
+        final TreeMap<String, HistoryDescr> map = new TreeMap<String, HistoryDescr>();
+        if (historyDirsOfItem == null) {
+            return map;
+        } else {
+            for (File historyDir : historyDirsOfItem) {
+                final XmlFile historyXml = getHistoryXmlFile(historyDir);
+                final HistoryDescr historyDescription;
+                try {
+                    historyDescription = (HistoryDescr) historyXml.read();
+                } catch (IOException ex) {
+                    throw new RuntimeException("Unable to read history for " + node.getDisplayName(), ex);
+                }
+                map.put(historyDir.getName(), historyDescription);
+            }
+            return map;
+        }
+    }
+    
+    File getRootDir(Node node, final AtomicReference<Calendar> timestampHolder) {
+        final File itemHistoryDir = getHistoryDirForNode(node);
+        // perform check for purge here, when we are actually going to create
+        // a new directory, rather than just when we scan it in above method.
+        purgeOldEntries(itemHistoryDir, maxHistoryEntries);
+        return createNewHistoryDir(itemHistoryDir, timestampHolder);
+    }
+
+    
+    File createNewHistoryEntry(Node node, final String operation) {
+        try {
+            final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
+            final File timestampedDir = getRootDir(node, timestampHolder);
+            LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
+            createHistoryXmlFile(timestampHolder.get(), timestampedDir, operation);
+            assert timestampHolder.get() != null;
+            return timestampedDir;
+        } catch (IOException e) {
+            // If not able to create the history entry, log, but continue without it.
+            // A known issue is where Hudson core fails to move the folders on rename,
+            // but continues as if it did.
+            // Reference https://issues.jenkins-ci.org/browse/JENKINS-8318
+            throw new RuntimeException(
+                    "Unable to create history entry for configuration file of node " + node.getDisplayName(), e);
+        }
+    }
+
+    /**
+     * Returns the configuration history directory for the given configuration file.
+     *
+     * @param configFile
+     *            The configuration file whose content we are saving.
+     * @return The base directory where to store the history,
+     *         or null if the file is not a valid Hudson configuration file.
+     */
+    File getHistoryDirForNode(Node node){
+        String name = node.getNodeName();
+        File configHistoryDir = getNodeHistoryRootDir();
+        File configHistoryNodeDir = new File(configHistoryDir, name);
+        return configHistoryNodeDir;
+    }
+
+    File getNodeHistoryRootDir(){
+        return new File(historyRootDir, "/" + JobConfigHistoryConsts.NODES_HISTORY_DIR);
+    }
+    
+    boolean hasDuplicateHistory(Node node) {
+        String content = Jenkins.XSTREAM2.toXML(node);
+        boolean isDuplicated = false;
+        final ArrayList<String> timeStamps = new ArrayList<String>(getRevisions(node).keySet());
+        if (!timeStamps.isEmpty()) {
+            Collections.sort(timeStamps, Collections.reverseOrder());
+            final XmlFile lastRevision = getOldRevision(node, timeStamps.get(0));
+            try {
+                if (content.equals(lastRevision.asString())) {
+                    isDuplicated = true;
+                }
+            } catch (IOException e) {
+                LOG.log(Level.WARNING, "unable to check for duplicate previous history file: {0}\n{1}",
+                        new Object[]{lastRevision, e});
+            }
+        }
+        return isDuplicated;
+    }
+    
+    boolean checkDuplicate(Node node){
+         if (!saveDuplicates && hasDuplicateHistory(node)) {
+            LOG.log(Level.FINE, "found duplicate history, skipping save of {0}", node.getDisplayName());
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public void copyNodeHistoryAndDelete(String oldName, String newName) {
+        final File oldFile = new File(getNodeHistoryRootDir(), oldName);
+        final File newFile = new File(getNodeHistoryRootDir(), newName);
+        try {
+            FileUtils.copyDirectory(oldFile, newFile);
+            FileUtils.deleteDirectory(oldFile);
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Unable to move from " + oldFile + " to " + newFile, ex);
+        }
+    }
+
+    @Override
+    public void saveNode(Node node) {
+        String content = Jenkins.XSTREAM2.toXML(node);
+        if (checkDuplicate(node)) {
+            createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_CHANGED());
+        }
+    }
+
+    @Override
+    public XmlFile getOldRevision(Node node, String identifier) {
+        final File historyDir = new File(getHistoryDirForNode(node), identifier);
+            return new XmlFile(getConfigFile(historyDir));
+    }
+
+    @Override
+    public boolean hasOldRevision(Node node, String identifier) {
+        XmlFile oldRevision = getOldRevision(node, identifier);
+        return oldRevision.getFile() != null && oldRevision.getFile().exists();
+    }
+
+    @Override
+    public File[] getDeletedNodes(String folderName) {
+        return returnEmptyFileArrayForNull(
+                getNodeDirectoryIncludingFolder(folderName).listFiles(DeletedFileFilter.INSTANCE));
+    }
+
+    @Override
+    public File[] getNodes(String folderName) {
+        return returnEmptyFileArrayForNull(
+                getNodeDirectoryIncludingFolder(folderName).listFiles(NonDeletedFileFilter.INSTANCE));
+    }
+
+    @Override
+    public SortedMap<String, HistoryDescr> getNodeHistory(String nodeName) {
+        return getRevisions(new File(getNodeHistoryRootDir(), nodeName), new File(nodeName));
+    }
+ 
 }

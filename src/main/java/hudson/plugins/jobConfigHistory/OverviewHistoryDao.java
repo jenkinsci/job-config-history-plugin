@@ -41,6 +41,14 @@ public interface OverviewHistoryDao {
      * @return list of deleted jobs with a history, emtpy when no history exists.
      */
     File[] getDeletedJobs(String folderName);
+       
+    /**
+     * Returns a list of deleted nodes with a history.
+     *
+     * @param folderName name of folder.
+     * @return list of deleted nodes with a history, emtpy when no history exists.
+     */
+    File[] getDeletedNodes(String folderName);
 
     /**
      * Returns a list of jobs with a history.
@@ -50,6 +58,14 @@ public interface OverviewHistoryDao {
      */
     File[] getJobs(String folderName);
 
+    /**
+     * Returns a list of nodes with a history.
+     *
+     * @param folderName name of folder
+     * @return list of nodes with a history, emtpy when no history exists.
+     */
+    File[] getNodes(String folderName);
+    
     /**
      * Returns a list of all system configuration files with a history.
      *
@@ -63,6 +79,13 @@ public interface OverviewHistoryDao {
      * @return sorted map.
      */
     SortedMap<String, HistoryDescr> getJobHistory(final String jobName);
+    
+    /**
+     * Returns a sorted map of all HistoryDescr for a given node.
+     * @param nodeName of the node
+     * @return sorted map.
+     */
+    SortedMap<String, HistoryDescr> getNodeHistory(final String nodeName);
 
     /**
      * Returns a sorted map of all HistoryDescr for a given system configuration.

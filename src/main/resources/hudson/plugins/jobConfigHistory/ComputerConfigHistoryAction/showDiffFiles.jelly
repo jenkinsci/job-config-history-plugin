@@ -1,0 +1,54 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+  <l:layout title="Job Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
+    <st:include it="${it.slave.toComputer()}" page="sidepanel.jelly" />
+    <l:main-panel>
+      <h1>${%Job Configuration Difference}</h1>
+      <div>
+        <j:choose>
+          <j:when test="${!it.hasConfigurePermission()}">
+            ${%No permission to view config history}
+          </j:when>
+          <j:when test="${it.getSlaveConfigs().size() == 0}">
+              ${%No job configuration history available}
+          </j:when>
+          <j:otherwise>
+            <div>
+              <j:choose>
+                <j:when test="${it.getLines().size() == 0}">
+                  <p>${%No lines changed}</p>
+                </j:when>
+                <j:otherwise>
+                  <table class="pane" style="width:100%">
+                    <j:forEach items="${it.getLines()}" var="line">
+                      <tr>
+                        <j:choose>
+                          <j:when test="${line.skipping}">
+                            <th class="lineNum">...</th>
+                            <td class="skipping"></td>
+                            <th class="lineNum">...</th>
+                            <td class="skipping"></td>
+                          </j:when>
+                          <j:otherwise>
+                            <th class="lineNum">${line.left.lineNumber}</th>
+                            <td class="${line.left.cssClass}"><pre>${line.left.text}</pre></td>
+                            <th class="lineNum">${line.right.lineNumber}</th>
+                            <td class="${line.right.cssClass}"><pre>${line.right.text}</pre></td>
+                          </j:otherwise>
+                        </j:choose>
+                      </tr>
+                    </j:forEach>
+                  </table>
+                  <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
+                    <div align="right">
+                      <f:submit value="${%Restore old version}" />
+                    </div>
+                  </f:form>
+                </j:otherwise>
+              </j:choose>
+            </div>
+          </j:otherwise>
+        </j:choose>
+      </div>
+    </l:main-panel>
+  </l:layout>
+</j:jelly>

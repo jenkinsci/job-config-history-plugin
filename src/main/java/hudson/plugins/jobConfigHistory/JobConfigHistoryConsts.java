@@ -25,6 +25,9 @@ public final class JobConfigHistoryConsts {
     
     /** Default directory for storing job history. */
     public static final String JOBS_HISTORY_DIR = "jobs";
+    
+    /** Default directory for storing node history. */
+    public static final String NODES_HISTORY_DIR = "nodes";
 
     /** name of history xml file. */
     public static final String HISTORY_FILE = "history.xml";
