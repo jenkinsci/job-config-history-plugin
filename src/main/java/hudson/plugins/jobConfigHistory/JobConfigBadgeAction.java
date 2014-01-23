@@ -57,7 +57,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
      * Listener.
      */
     @Extension
-    public static class Listener extends RunListener<AbstractBuild> {
+    public static class Listener extends RunListener<AbstractBuild <?, ?>> {
 
         @Override
         public void onStarted(AbstractBuild build, TaskListener listener) {
