@@ -22,9 +22,9 @@ public class ComputerConfigHistoryActionFactory extends TransientComputerActionF
 
     @Override
     public Collection<? extends Action> createFor(Computer computer) {
-        List<Action> actions = new ArrayList<Action>();
-        if (computer.getNode() instanceof Slave){
-            actions.add(new ComputerConfigHistoryAction((Slave)computer.getNode()));
+        final List<Action> actions = new ArrayList<Action>();
+        if (computer.getNode() instanceof Slave) {
+            actions.add(new ComputerConfigHistoryAction((Slave) computer.getNode()));
         }
         return actions;
     }

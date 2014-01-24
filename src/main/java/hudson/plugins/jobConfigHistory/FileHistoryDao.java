@@ -665,25 +665,38 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     }
     
     @Override
-    public void createNewNode(Node node){
-        String content = Jenkins.XSTREAM2.toXML(node);
+    public void createNewNode(Node node) {
+        final String content = Jenkins.XSTREAM2.toXML(node);
         createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_CREATED());
     }
-    
-    void createNewHistoryEntryAndSaveConfig(Node node, String content, final String operation){
+    /**
+     * Creates a new history entry and saves the slave configuration.
+     *
+     * @param node node.
+     * @param content content.
+     * @param operation operation.
+     * @return an empty array when array is null.
+     */
+    void createNewHistoryEntryAndSaveConfig(Node node, String content, final String operation) {
         final File timestampedDir = createNewHistoryEntry(node, operation);
-        File nodeConfigHistoryFile = new File(timestampedDir, "config.xml");
+        final File nodeConfigHistoryFile = new File(timestampedDir, "config.xml");
+        PrintStream stream = null;
         try {
-            PrintStream stream = new PrintStream(nodeConfigHistoryFile);
+            stream = new PrintStream(nodeConfigHistoryFile);
             stream.print(content);
         } catch (IOException ex) {
             throw new RuntimeException("Unable to write " + nodeConfigHistoryFile, ex);
+        }
+        finally {
+            if (stream != null) {
+               stream.close();
+            }
         }
         
     }
 
     @Override
-    public void deleteNode(Node node){
+    public void deleteNode(Node node) {
         createNewHistoryEntry(node, Messages.ConfigHistoryListenerHelper_DELETED());
        // final File configFile = aItem.getConfigFile().getFile();
         final File currentHistoryDir = getHistoryDirForNode(node);
@@ -777,15 +790,14 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     /**
      * Returns the configuration history directory for the given configuration file.
      *
-     * @param configFile
-     *            The configuration file whose content we are saving.
+     * @param node node
      * @return The base directory where to store the history,
      *         or null if the file is not a valid Hudson configuration file.
      */
     File getHistoryDirForNode(Node node) {
-        String name = node.getNodeName();
-        File configHistoryDir = getNodeHistoryRootDir();
-        File configHistoryNodeDir = new File(configHistoryDir, name);
+        final String name = node.getNodeName();
+        final File configHistoryDir = getNodeHistoryRootDir();
+        final File configHistoryNodeDir = new File(configHistoryDir, name);
         return configHistoryNodeDir;
     }
 
@@ -812,8 +824,14 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
         return isDuplicated;
     }
     
+    /**
+     * Check if it is a duplicate
+     * 
+     * @param node node
+     * @return true if it is a duplicate
+     */
     boolean checkDuplicate(Node node) {
-         if (!saveDuplicates && hasDuplicateHistory(node)) {
+        if (!saveDuplicates && hasDuplicateHistory(node)) {
             LOG.log(Level.FINE, "found duplicate history, skipping save of {0}", node.getDisplayName());
             return false;
         } else {
@@ -835,7 +853,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
 
     @Override
     public void saveNode(Node node) {
-        String content = Jenkins.XSTREAM2.toXML(node);
+        final String content = Jenkins.XSTREAM2.toXML(node);
         if (checkDuplicate(node)) {
             createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_CHANGED());
         }
@@ -849,7 +867,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
 
     @Override
     public boolean hasOldRevision(Node node, String identifier) {
-        XmlFile oldRevision = getOldRevision(node, identifier);
+        final XmlFile oldRevision = getOldRevision(node, identifier);
         return oldRevision.getFile() != null && oldRevision.getFile().exists();
     }
 

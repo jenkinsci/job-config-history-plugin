@@ -31,6 +31,9 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     
+    /**
+     * The slave.
+     */
     private Slave slave;
     
     /**
@@ -38,6 +41,9 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      */
     private final Hudson hudson;
    
+    /**
+     * Standard constructor using instance.
+     */
     public ComputerConfigHistoryAction(Slave slave) {
         this.slave = slave;
         hudson = Hudson.getInstance();
@@ -52,6 +58,12 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     public String getUrlName() {
         return JobConfigHistoryConsts.URLNAME;
     }
+    
+    /**
+     * Returns the slave.
+     *
+     * @return the slave.
+     */
     
     public Slave getSlave() {
         return slave;
@@ -207,8 +219,8 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 
         final XmlFile xmlFile = getHistoryDao().getOldRevision(slave, timestamp);
         final InputStream is = new ByteArrayInputStream(xmlFile.asString().getBytes("UTF-8"));
-        Slave newSlave = (Slave) Jenkins.getInstance().XSTREAM2.fromXML(xmlFile.getFile());
-        List<Node> nodes = new ArrayList<Node>();
+        final Slave newSlave = (Slave) Jenkins.getInstance().XSTREAM2.fromXML(xmlFile.getFile());
+        final List<Node> nodes = new ArrayList<Node>();
         nodes.addAll(hudson.getNodes());
         nodes.remove(slave);
         nodes.add(newSlave);

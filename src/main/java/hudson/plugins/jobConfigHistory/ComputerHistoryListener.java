@@ -26,28 +26,28 @@ public class ComputerHistoryListener extends ComputerListener {
     
     @Override
     public void onConfigurationChange() {
-        if(nodes.size() < Jenkins.getInstance().getNodes().size()) {
+        if (nodes.size() < Jenkins.getInstance().getNodes().size()) {
             onAdd();
             nodes = Jenkins.getInstance().getNodes();
             return;
         }
-        if(nodes.size() > Jenkins.getInstance().getNodes().size()) {
+        if (nodes.size() > Jenkins.getInstance().getNodes().size()) {
             onRemove();
             nodes = Jenkins.getInstance().getNodes();
             return;
         }
-        if(!nodes.equals(Jenkins.getInstance().getNodes())) {
+        if (!nodes.equals(Jenkins.getInstance().getNodes())) {
             onRename();
             nodes = Jenkins.getInstance().getNodes();
         }
-        if(nodes.size() == Jenkins.getInstance().getNodes().size()) {
+        if (nodes.size() == Jenkins.getInstance().getNodes().size()) {
             onChange();  
         }
     }
     
     private void onAdd() {
-        for(Node node: Jenkins.getInstance().getNodes()) {
-            if(!nodes.contains(node)){
+        for (Node node: Jenkins.getInstance().getNodes()) {
+            if (!nodes.contains(node)){
                 switchHistoryDao(node).createNewNode(node);
                 return;
             }
@@ -64,7 +64,7 @@ public class ComputerHistoryListener extends ComputerListener {
     }
     
     private void onChange() {
-        FileHistoryDao hdao = PluginUtils.getHistoryDao();
+        final FileHistoryDao hdao = PluginUtils.getHistoryDao();
         for (Node node : Jenkins.getInstance().getNodes()) {
             if (!hdao.hasDuplicateHistory(node)) {
                 PluginUtils.getHistoryDao().saveNode(node);
@@ -75,23 +75,20 @@ public class ComputerHistoryListener extends ComputerListener {
     
     private void onRename() {
         Node originalNode = null;
-        for (Node node: nodes){
-            if (!Jenkins.getInstance().getNodes().contains(node))
+        for (Node node : nodes){
+            if (!Jenkins.getInstance().getNodes().contains(node)) {
                 originalNode = node;
+            }
         }
         if (originalNode == null){
             LOG.log(Level.WARNING, "Can not find changed node.");
             return;
         } 
         Node newNode = null;
-        for (Node node: Jenkins.getInstance().getNodes()) {
+        for (Node node : Jenkins.getInstance().getNodes()) {
             if (!nodes.contains(node))
                newNode = node; 
         }
-        if (originalNode == null){
-            LOG.log(Level.WARNING, "Can not find changed node.");
-            return;
-        } 
         if (!originalNode.getNodeName().equals(newNode.getNodeName())) {
             switchHistoryDao(originalNode).renameNode(newNode, originalNode.getNodeName(), newNode.getNodeName());
         }
