@@ -207,7 +207,7 @@ public class JobConfigBadgeActionIT extends AbstractHudsonTestCaseDeletingInstan
         final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage.getElementById("showDiff");
         final HtmlPage showDiffPage = showDiffLink.click();
         final String page = showDiffPage.asText();
-        assertTrue("ShowDiffFiles page should be reached now", page.contains("Restore old version"));
+        assertTrue("ShowDiffFiles page should be reached now", page.contains("Restore file A configuration"));
         assertTrue("ShowDiff page should contain second description", page.contains(secondDescription));
         assertTrue("ShowDiff page should contain last description", page.contains(lastDescription));
     }
@@ -237,7 +237,7 @@ public class JobConfigBadgeActionIT extends AbstractHudsonTestCaseDeletingInstan
         final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage.getElementById("showDiff");
         final HtmlPage showDiffPage = showDiffLink.click();
         final String page = showDiffPage.asText();
-        assertTrue("ShowDiffFiles page should be reached now", page.contains("Restore old version"));
+        assertTrue("ShowDiffFiles page should be reached now", page.contains("Restore file A configuration"));
         assertTrue("ShowDiff page should contain second description", page.contains(secondDescription));
         assertTrue("ShowDiff page should contain last description", page.contains(lastDescription));
     }
