@@ -83,7 +83,7 @@ public class JobConfigBadgeActionIT extends AbstractHudsonTestCaseDeletingInstan
         final HtmlPage htmlPage = webClient.goTo("job/" + oldJobName);
         final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage.getElementById("showDiff");
         final HtmlPage showDiffPage = showDiffLink.click();
-        assertTrue("ShowDiffFiles page should be reached now", showDiffPage.asText().contains("Restore old version"));
+        assertTrue("ShowDiffFiles page should be reached now", showDiffPage.asText().contains("Restore file A configuration"));
 
         project.renameTo(newJobName);
         Thread.sleep(SLEEP_TIME);
@@ -93,7 +93,7 @@ public class JobConfigBadgeActionIT extends AbstractHudsonTestCaseDeletingInstan
         final HtmlPage htmlPage2 = webClient.goTo("job/" + newJobName);
         final HtmlAnchor oldShowDiffLink = (HtmlAnchor) htmlPage2.getByXPath("//a[@id='showDiff']").get(1);
         final HtmlPage showDiffPage2 = oldShowDiffLink.click();
-        assertTrue("ShowDiffFiles page should be reached now", showDiffPage2.asText().contains("Restore old version"));
+        assertTrue("ShowDiffFiles page should be reached now", showDiffPage2.asText().contains("Restore file A configuration"));
     }
     
     public void testProjectWithConfigsButMissingBuilds() throws Exception {
