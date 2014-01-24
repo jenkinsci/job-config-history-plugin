@@ -23,7 +23,7 @@ public interface HistoryDao {
     /**
      * Saves the current configuration of an node.
      *
-     * @param node
+     * @param node node
      */
     void saveNode(Node node);
 
@@ -62,7 +62,7 @@ public interface HistoryDao {
      * The key is an identifier which may be used in
      * {@link HistoryDao#getOldRevision(hudson.model.Node, java.lang.String)}
      *
-     * @param Node node
+     * @param node node
      * @return old revisions mapped to the identifier.
      */
     SortedMap<String, HistoryDescr> getRevisions(Node node);
@@ -79,7 +79,7 @@ public interface HistoryDao {
     /**
      * Returns one old configuration of node.
      *
-     * @param node
+     * @param node node
      * @param identifier timestamp or hash
      * @return old configuration.
      */
@@ -124,7 +124,7 @@ public interface HistoryDao {
     /**
      * Returns whether the revision exists.
      *
-     * @param node
+     * @param node node
      * @param identifier timestamp or hash
      * @return old configuration.
      */

@@ -15,14 +15,14 @@ public interface NodeListenerHistoryDao {
     /**
      * Adds and saves the initial configuration of a node.
      *
-     * @param node
+     * @param node node
      */
     void createNewNode(Node node);
 
     /**
      * Save and renames the node.
      *
-     * @param node
+     * @param node node
      * @param oldName old node name
      * @param newName new name
      */
@@ -31,7 +31,7 @@ public interface NodeListenerHistoryDao {
     /**
      * Deletes the history of an node.
      *
-     * @param node
+     * @param node node
      */
     void deleteNode(Node node);
     

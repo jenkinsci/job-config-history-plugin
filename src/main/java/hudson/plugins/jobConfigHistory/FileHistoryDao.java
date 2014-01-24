@@ -782,14 +782,14 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
      * @return The base directory where to store the history,
      *         or null if the file is not a valid Hudson configuration file.
      */
-    File getHistoryDirForNode(Node node){
+    File getHistoryDirForNode(Node node) {
         String name = node.getNodeName();
         File configHistoryDir = getNodeHistoryRootDir();
         File configHistoryNodeDir = new File(configHistoryDir, name);
         return configHistoryNodeDir;
     }
 
-    File getNodeHistoryRootDir(){
+    File getNodeHistoryRootDir() {
         return new File(historyRootDir, "/" + JobConfigHistoryConsts.NODES_HISTORY_DIR);
     }
     
@@ -812,7 +812,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
         return isDuplicated;
     }
     
-    boolean checkDuplicate(Node node){
+    boolean checkDuplicate(Node node) {
          if (!saveDuplicates && hasDuplicateHistory(node)) {
             LOG.log(Level.FINE, "found duplicate history, skipping save of {0}", node.getDisplayName());
             return false;
@@ -844,7 +844,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     @Override
     public XmlFile getOldRevision(Node node, String identifier) {
         final File historyDir = new File(getHistoryDirForNode(node), identifier);
-            return new XmlFile(getConfigFile(historyDir));
+        return new XmlFile(getConfigFile(historyDir));
     }
 
     @Override

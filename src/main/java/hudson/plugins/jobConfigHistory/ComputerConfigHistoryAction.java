@@ -29,7 +29,7 @@ import org.kohsuke.stapler.StaplerResponse;
  *
  * @author Lucie Votypkova
  */
-public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction{
+public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     
     private Slave slave;
     
@@ -38,7 +38,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction{
      */
     private final Hudson hudson;
    
-    public ComputerConfigHistoryAction(Slave slave){
+    public ComputerConfigHistoryAction(Slave slave) {
         this.slave = slave;
         hudson = Hudson.getInstance();
     }
@@ -53,7 +53,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction{
         return JobConfigHistoryConsts.URLNAME;
     }
     
-    public Slave getSlave(){
+    public Slave getSlave() {
         return slave;
     }
 

@@ -18,12 +18,12 @@ import java.util.List;
  * @author Lucie Votypkova
  */
 @Extension
-public class ComputerConfigHistoryActionFactory extends TransientComputerActionFactory{
+public class ComputerConfigHistoryActionFactory extends TransientComputerActionFactory {
 
     @Override
     public Collection<? extends Action> createFor(Computer computer) {
         List<Action> actions = new ArrayList<Action>();
-        if(computer.getNode() instanceof Slave){
+        if (computer.getNode() instanceof Slave){
             actions.add(new ComputerConfigHistoryAction((Slave)computer.getNode()));
         }
         return actions;
