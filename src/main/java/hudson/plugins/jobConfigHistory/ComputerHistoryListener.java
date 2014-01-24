@@ -44,9 +44,11 @@ public class ComputerHistoryListener extends ComputerListener {
             onChange();  
         }
     }
-    
+    /**
+     * If a new slave get added.
+     */
     private void onAdd() {
-        for (Node node: Jenkins.getInstance().getNodes()) {
+        for (Node node : Jenkins.getInstance().getNodes()) {
             if (!nodes.contains(node)){
                 switchHistoryDao(node).createNewNode(node);
                 return;
@@ -54,8 +56,11 @@ public class ComputerHistoryListener extends ComputerListener {
         }
     }
     
+    /**
+     * If a slave get removed.
+     */
     private void onRemove() {
-        for (Node node: nodes) {
+        for (Node node : nodes) {
             if (!Jenkins.getInstance().getNodes().contains(node)) {
                 switchHistoryDao(node).deleteNode(node);
                 return;
@@ -63,6 +68,9 @@ public class ComputerHistoryListener extends ComputerListener {
         }
     }
     
+    /**
+     * If a slave configuration get changed.
+     */
     private void onChange() {
         final FileHistoryDao hdao = PluginUtils.getHistoryDao();
         for (Node node : Jenkins.getInstance().getNodes()) {
@@ -73,21 +81,25 @@ public class ComputerHistoryListener extends ComputerListener {
         }
     }
     
+    /**
+     * If a slave get renamed.
+     */
     private void onRename() {
         Node originalNode = null;
-        for (Node node : nodes){
+        for (Node node : nodes) {
             if (!Jenkins.getInstance().getNodes().contains(node)) {
                 originalNode = node;
             }
         }
-        if (originalNode == null){
+        if (originalNode == null) {
             LOG.log(Level.WARNING, "Can not find changed node.");
             return;
         } 
         Node newNode = null;
         for (Node node : Jenkins.getInstance().getNodes()) {
-            if (!nodes.contains(node))
+            if (!nodes.contains(node)) {
                newNode = node; 
+            }
         }
         if (!originalNode.getNodeName().equals(newNode.getNodeName())) {
             switchHistoryDao(originalNode).renameNode(newNode, originalNode.getNodeName(), newNode.getNodeName());
