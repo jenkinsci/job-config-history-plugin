@@ -168,7 +168,50 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
                 + "&timestamp2=" + parser.get("timestamp2"));
     }
 
+    /**
+     * Used in the Difference jelly only. Returns one of the two timestamps that
+     * have been passed to the Difference page as parameter. timestampNumber
+     * must be 1 or 2.
+     * 
+     * @param timestampNumber
+     *            1 for timestamp1 and 2 for timestamp2
+     * @return the timestamp as String.
+     */
+    public final String getTimestamp(short timestampNumber) {
+        checkConfigurePermission();
+        return this.getRequestParameter("timestamp" + timestampNumber);
+    }
 
+    /**
+     * Used in the Difference jelly only. Returns the user that made the change
+     * in one of the Files shown in the Difference view(A or B). timestampNumber
+     * decides between File A and File B.
+     * 
+     * @param timestampNumber
+     *            1 for File A and 2 for File B
+     * @return the user as String.
+     */
+    public final String getUser(short timestampNumber) {
+        checkConfigurePermission();
+        return getHistoryDao().getRevisions(this.project.getConfigFile())
+                .get(getTimestamp(timestampNumber)).getUser();
+    }
+
+    /**
+     * Used in the Difference jelly only. Returns the operation made on one of
+     * the two Files A and B. timestampNumber decides which file exactly.
+     * 
+     * @param timestampNumber
+     *            1 for File A, 2 for File B
+     * @return the operation as String.
+     */
+    public final String getOperation(short timestampNumber) {
+        checkConfigurePermission();
+        return getHistoryDao().getRevisions(this.project.getConfigFile())
+                .get(getTimestamp(timestampNumber)).getOperation();
+    }
+    
+    
     /**
      * Takes the two timestamp request parameters and returns the diff between the corresponding
      * config files of this project as a list of single lines.
@@ -208,7 +251,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             throw new IllegalArgumentException("Non existent timestamp " + timestamp);
         }
     }
-
 
     /**
      * Action when 'restore' button is pressed: Replace current config file by older version.
