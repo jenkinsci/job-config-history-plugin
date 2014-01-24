@@ -1,15 +1,15 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-  <l:layout title="Job Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
+  <l:layout title="Slave Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
     <st:include it="${it.slave.toComputer()}" page="sidepanel.jelly" />
     <l:main-panel>
-      <h1>${%Job Configuration Difference}</h1>
+      <h1>${%Slave Configuration Difference}</h1>
       <div>
         <j:choose>
           <j:when test="${!it.hasConfigurePermission()}">
             ${%No permission to view config history}
           </j:when>
           <j:when test="${it.getSlaveConfigs().size() == 0}">
-              ${%No job configuration history available}
+              ${%No slave configuration history available}
           </j:when>
           <j:otherwise>
             <div>
