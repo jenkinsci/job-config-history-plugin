@@ -4,12 +4,8 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import hudson.slaves.ComputerListener;
-import org.jvnet.hudson.test.TestExtension;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import java.util.List;
 import hudson.model.Slave;
 import java.util.SortedMap;
 import org.junit.Rule;
