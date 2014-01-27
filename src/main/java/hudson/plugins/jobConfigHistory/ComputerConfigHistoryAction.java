@@ -38,13 +38,13 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     
     /**
      * The hudson instance.
-     * 
-     * * @param slave Slave.
      */
     private final Hudson hudson;
    
     /**
      * Standard constructor using instance.
+     * 
+     * * @param slave Slave.
      */
     public ComputerConfigHistoryAction(Slave slave) {
         this.slave = slave;
@@ -220,7 +220,6 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         final String timestamp = req.getParameter("timestamp");
 
         final XmlFile xmlFile = getHistoryDao().getOldRevision(slave, timestamp);
-        final InputStream is = new ByteArrayInputStream(xmlFile.asString().getBytes("UTF-8"));
         final Slave newSlave = (Slave) Jenkins.getInstance().XSTREAM2.fromXML(xmlFile.getFile());
         final List<Node> nodes = new ArrayList<Node>();
         nodes.addAll(hudson.getNodes());
