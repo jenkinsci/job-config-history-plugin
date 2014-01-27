@@ -685,7 +685,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
             stream.print(content);
         } catch (IOException ex) {
             throw new RuntimeException("Unable to write " + nodeConfigHistoryFile, ex);
-        }finally {
+        } finally {
             if (stream != null) {
                 stream.close();
             }
