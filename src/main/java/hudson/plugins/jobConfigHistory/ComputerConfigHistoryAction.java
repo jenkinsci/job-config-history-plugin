@@ -38,6 +38,8 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     
     /**
      * The hudson instance.
+     * 
+     * * @param slave Slave.
      */
     private final Hudson hudson;
    

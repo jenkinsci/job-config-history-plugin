@@ -49,7 +49,7 @@ public class ComputerHistoryListener extends ComputerListener {
      */
     private void onAdd() {
         for (Node node : Jenkins.getInstance().getNodes()) {
-            if (!nodes.contains(node)){
+            if (!nodes.contains(node)) {
                 switchHistoryDao(node).createNewNode(node);
                 return;
             }
@@ -98,7 +98,7 @@ public class ComputerHistoryListener extends ComputerListener {
         Node newNode = null;
         for (Node node : Jenkins.getInstance().getNodes()) {
             if (!nodes.contains(node)) {
-               newNode = node; 
+                newNode = node; 
             }
         }
         if (!originalNode.getNodeName().equals(newNode.getNodeName())) {

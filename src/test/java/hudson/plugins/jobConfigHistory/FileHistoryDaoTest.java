@@ -701,7 +701,7 @@ public class FileHistoryDaoTest {
         assertNotNull("Revisiosn 2014-01-20_10-21-34 should be returned.", revisions.get("2014-01-20_10-21-34"));
     }
     
-    private File createNodeRevision(String timestamp, Node node) throws Exception{
+    private File createNodeRevision(String timestamp, Node mockedNode) throws Exception{
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
         File revisions = new File(file, "slave1");
         File revision = new File(revisions, timestamp);

@@ -675,7 +675,6 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
      * @param node node.
      * @param content content.
      * @param operation operation.
-     * @return an empty array when array is null.
      */
     void createNewHistoryEntryAndSaveConfig(Node node, String content, final String operation) {
         final File timestampedDir = createNewHistoryEntry(node, operation);
@@ -686,10 +685,9 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
             stream.print(content);
         } catch (IOException ex) {
             throw new RuntimeException("Unable to write " + nodeConfigHistoryFile, ex);
-        }
-        finally {
+        }finally {
             if (stream != null) {
-               stream.close();
+                stream.close();
             }
         }
         
@@ -734,13 +732,13 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
             }
 
         }
-        String content = Jenkins.XSTREAM2.toXML(node);
+        final String content = Jenkins.XSTREAM2.toXML(node);
         createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_RENAMED());
     }
     
     @Override
-    public SortedMap<String, HistoryDescr> getRevisions(Node node){
-        File historiesDir = getHistoryDirForNode(node);
+    public SortedMap<String, HistoryDescr> getRevisions(Node node) {
+        final File historiesDir = getHistoryDirForNode(node);
         final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
         final TreeMap<String, HistoryDescr> map = new TreeMap<String, HistoryDescr>();
         if (historyDirsOfItem == null) {
@@ -806,7 +804,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     }
     
     boolean hasDuplicateHistory(Node node) {
-        String content = Jenkins.XSTREAM2.toXML(node);
+        final String content = Jenkins.XSTREAM2.toXML(node);
         boolean isDuplicated = false;
         final ArrayList<String> timeStamps = new ArrayList<String>(getRevisions(node).keySet());
         if (!timeStamps.isEmpty()) {
@@ -825,7 +823,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     }
     
     /**
-     * Check if it is a duplicate
+     * Check if it is a duplicate.
      * 
      * @param node node
      * @return true if it is a duplicate
