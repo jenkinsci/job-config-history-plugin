@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
  *
  * @author lucinka
  */
-public class ComputerHistoryListenerTest {
+public class ComputerHistoryListenerIT {
     
     @Rule
     public JenkinsRule rule = new JenkinsRule();
