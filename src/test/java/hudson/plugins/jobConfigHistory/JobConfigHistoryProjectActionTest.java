@@ -199,6 +199,15 @@ public class JobConfigHistoryProjectActionTest {
         sut.doDiffFiles(mockedRequest, mockedResponse);
         verify(mockedResponse).sendRedirect("showDiffFiles?timestamp1=111&timestamp2=112");
     }
+    
+    @Test
+    public void testGetTimestamp() throws Exception, Throwable {
+        when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
+        when(mockedRequest.getParameter(any(String.class))).thenReturn("2012-11-21_11-41-14");
+        JobConfigHistoryProjectAction sut = createAction();
+        assertEquals("2012-11-21_11-41-14", sut.getTimestamp(1));
+    }
+    
     /**
      * Test of getLines method, of class JobConfigHistoryProjectAction.
      */

@@ -18,7 +18,18 @@
                   <p>${%No lines changed}</p>
                 </j:when>
                 <j:otherwise>
-                  <table class="pane" style="width:100%">
+				  <table style="width:100%;">
+				  	<thead>
+				  	  <tr>
+                        <td colspan="2"> <font size="3"> File A </font></td>
+                        <td colspan="2"> <font size="3"> File B </font></td>
+				  	  </tr>
+				  	  <tr>
+                        <td colspan="2">  ${it.getTimestamp(1)}; ${it.getOperation(1)}; <a href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
+                        <td colspan="2">  ${it.getTimestamp(2)}; ${it.getOperation(2)}; <a href="${rootURL}/user/${it.getUser(2)}">${it.getUser(2)}</a> </td>
+				  	  </tr>
+				  	</thead>
+				  	<tbody style="outline: 1pt solid #B2B2B2;">
                     <j:forEach items="${it.getLines()}" var="line">
                       <tr>
                         <j:choose>
@@ -37,12 +48,24 @@
                         </j:choose>
                       </tr>
                     </j:forEach>
+                    </tbody>
                   </table>
-                  <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
-                    <div align="right">
-                      <f:submit value="${%Restore old version}" />
-                    </div>
-                  </f:form>
+                  <div align="right">
+                    <table>
+                  	  <tr>
+                        <td>
+                  		  <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
+                      		<f:submit value="${%Restore file A configuration}" />
+                  		  </f:form>
+                  		</td>
+                  		<td>
+                  		  <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" name="forward">
+                      		<f:submit value="${%Restore file B configuration}" />
+                  		  </f:form>
+                  		</td>
+                      </tr>
+                    </table>
+                  </div>
                 </j:otherwise>
               </j:choose>
             </div>

@@ -30,7 +30,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
     /**
      * We need the build in order to get the project name.
      */
-    private transient AbstractBuild build;
+    private transient AbstractBuild<?, ?> build;
 
     /**
      * Creates a new JobConfigBadgeAction.
@@ -44,13 +44,13 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 
     @Override
     public void onAttached(Run<?, ?> r) {
-        build = (AbstractBuild) r;
+        build = (AbstractBuild<?, ?>) r;
 
     }
 
     @Override
     public void onLoad(Run<?, ?> r) {
-        build = (AbstractBuild) r;
+        build = (AbstractBuild<?, ?>) r;
     }
 
     /**
@@ -60,7 +60,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
     public static class Listener extends RunListener<AbstractBuild<?, ?>> {
 
         @Override
-        public void onStarted(AbstractBuild build, TaskListener listener) {
+        public void onStarted(AbstractBuild<?, ?> build, TaskListener listener) {
             final AbstractProject<?, ?> project = build.getProject();
             if (project.getNextBuildNumber() <= 2) {
                 super.onStarted(build, listener);
@@ -68,7 +68,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
             }
 
             Date lastBuildDate = null;
-            if (project.getLastBuild().getPreviousBuild() != null) {
+            if (project != null && project.getLastBuild() != null && project.getLastBuild().getPreviousBuild() != null) {
                 lastBuildDate = project.getLastBuild().getPreviousBuild().getTime();
             }
             final List<HistoryDescr> historyDescriptions = getRevisions(project);
@@ -136,7 +136,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
      */
     public boolean oldConfigsExist() {
         final HistoryDao historyDao = getHistoryDao();
-        final AbstractProject project = build.getProject();
+        final AbstractProject<?, ?> project = build.getProject();
         for (String timestamp : configDates) {
             if (!historyDao.hasOldRevision(project, timestamp)) {
                 return false;
