@@ -177,7 +177,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      *            1 for timestamp1 and 2 for timestamp2
      * @return the timestamp as String.
      */
-    public final String getTimestamp(short timestampNumber) {
+    public final String getTimestamp(int timestampNumber) {
         checkConfigurePermission();
         return this.getRequestParameter("timestamp" + timestampNumber);
     }
@@ -191,7 +191,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      *            1 for File A and 2 for File B
      * @return the user as String.
      */
-    public final String getUser(short timestampNumber) {
+    public final String getUser(int timestampNumber) {
         checkConfigurePermission();
         return getHistoryDao().getRevisions(this.project.getConfigFile())
                 .get(getTimestamp(timestampNumber)).getUser();
@@ -205,7 +205,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      *            1 for File A, 2 for File B
      * @return the operation as String.
      */
-    public final String getOperation(short timestampNumber) {
+    public final String getOperation(int timestampNumber) {
         checkConfigurePermission();
         return getHistoryDao().getRevisions(this.project.getConfigFile())
                 .get(getTimestamp(timestampNumber)).getOperation();

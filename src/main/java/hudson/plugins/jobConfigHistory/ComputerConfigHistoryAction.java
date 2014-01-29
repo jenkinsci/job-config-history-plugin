@@ -12,9 +12,7 @@ import hudson.model.Slave;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -126,6 +124,49 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         Collections.sort(configs, ParsedDateComparator.DESCENDING);
         return configs;
     }
+    
+    /**
+     * Used in the Difference jelly only. Returns one of the two timestamps that
+     * have been passed to the Difference page as parameter. timestampNumber
+     * must be 1 or 2.
+     * 
+     * @param timestampNumber
+     *            1 for timestamp1 and 2 for timestamp2
+     * @return the timestamp as String.
+     */
+    public final String getTimestamp(int timestampNumber) {
+        checkConfigurePermission();
+        return this.getRequestParameter("timestamp" + timestampNumber);
+    }
+
+    /**
+     * Used in the Difference jelly only. Returns the user that made the change
+     * in one of the Files shown in the Difference view(A or B). timestampNumber
+     * decides between File A and File B.
+     * 
+     * @param timestampNumber
+     *            1 for File A and 2 for File B
+     * @return the user as String.
+     */
+    public final String getUser(int timestampNumber) {
+        checkConfigurePermission();
+        return getHistoryDao().getRevisions(this.slave)
+                .get(getTimestamp(timestampNumber)).getUser();
+    }
+
+    /**
+     * Used in the Difference jelly only. Returns the operation made on one of
+     * the two Files A and B. timestampNumber decides which file exactly.
+     * 
+     * @param timestampNumber
+     *            1 for File A, 2 for File B
+     * @return the operation as String.
+     */
+    public final String getOperation(int timestampNumber) {
+        checkConfigurePermission();
+        return getHistoryDao().getRevisions(this.slave)
+                .get(getTimestamp(timestampNumber)).getOperation();
+    }
 
     /**
      * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as
@@ -220,7 +261,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         final String timestamp = req.getParameter("timestamp");
 
         final XmlFile xmlFile = getHistoryDao().getOldRevision(slave, timestamp);
-        final Slave newSlave = (Slave) Jenkins.getInstance().XSTREAM2.fromXML(xmlFile.getFile());
+        final Slave newSlave = (Slave) Jenkins.XSTREAM2.fromXML(xmlFile.getFile());
         final List<Node> nodes = new ArrayList<Node>();
         nodes.addAll(hudson.getNodes());
         nodes.remove(slave);
