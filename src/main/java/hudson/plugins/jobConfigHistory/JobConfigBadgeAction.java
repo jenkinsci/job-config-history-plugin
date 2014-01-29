@@ -68,7 +68,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
             }
 
             Date lastBuildDate = null;
-            if (project != null && project.getLastBuild() != null && project.getLastBuild().getPreviousBuild() != null) {
+            if (project.getLastBuild() != null && project.getLastBuild().getPreviousBuild() != null) {
                 lastBuildDate = project.getLastBuild().getPreviousBuild().getTime();
             }
             final List<HistoryDescr> historyDescriptions = getRevisions(project);
