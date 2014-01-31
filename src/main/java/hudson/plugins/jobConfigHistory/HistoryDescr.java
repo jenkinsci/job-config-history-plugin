@@ -9,6 +9,8 @@ import java.util.Date;
  */
 public class HistoryDescr implements ParsedDate {
 
+    static final HistoryDescr EMPTY_HISTORY_DESCR = new HistoryDescr(null, null, null, null);
+
     /** Display name of the user doing the operation. */
     private final String user;
 
