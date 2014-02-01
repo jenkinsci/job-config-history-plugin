@@ -73,8 +73,7 @@ public class LazyHistoryDescr extends HistoryDescr {
      */
     @Override
     public String getUser() {
-        loadHistoryWhenNotEmpty();
-        return historyDescr.getUser();
+        return loadAndGetHistory().getUser();
     }
 
     /**
@@ -82,8 +81,7 @@ public class LazyHistoryDescr extends HistoryDescr {
      */
     @Override
     public String getUserID() {
-        loadHistoryWhenNotEmpty();
-        return historyDescr.getUserID();
+        return loadAndGetHistory().getUserID();
     }
 
     /**
@@ -91,8 +89,7 @@ public class LazyHistoryDescr extends HistoryDescr {
      */
     @Override
     public String getOperation() {
-        loadHistoryWhenNotEmpty();
-        return historyDescr.getOperation();
+        return loadAndGetHistory().getOperation();
     }
 
     /**
@@ -100,15 +97,14 @@ public class LazyHistoryDescr extends HistoryDescr {
      */
     @Override
     public String getTimestamp() {
-        loadHistoryWhenNotEmpty();
-        return historyDescr.getTimestamp();
+        return loadAndGetHistory().getTimestamp();
     }
 
     /**
      * Loads configurations on first access of any property.
-     * @throws RuntimeException
+     * @return historyDescr
      */
-    void loadHistoryWhenNotEmpty() throws RuntimeException {
+    private HistoryDescr loadAndGetHistory() {
         if (historyDescr == HistoryDescr.EMPTY_HISTORY_DESCR) {
             try {
                 historyDescr = (HistoryDescr) historyDescriptionFile.read();
@@ -118,6 +114,7 @@ public class LazyHistoryDescr extends HistoryDescr {
                 throw new RuntimeException(historyDescriptionFile.getFile() + " is not a history description", ex);
             }
         }
+        return historyDescr;
     }
 
 }
