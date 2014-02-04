@@ -119,7 +119,7 @@ public class JobConfigHistoryTest {
         JobConfigHistory sut = createSut();
         sut.configure(null, createFormData());
         String expResult = "50";
-        String result = sut.getMaxEntriesPerSite();
+        String result = sut.getMaxEntriesPerPage();
         assertEquals(expResult, result);
     }
 
@@ -129,13 +129,13 @@ public class JobConfigHistoryTest {
     @Test
     public void testSetMaxEntriesPerSite() {
         JobConfigHistory sut = createSut();
-        assertNull(sut.getMaxEntriesPerSite());
-        sut.setMaxEntriesPerSite("");
-        assertEquals("", sut.getMaxEntriesPerSite());
-        sut.setMaxEntriesPerSite("50");
-        assertEquals("50", sut.getMaxEntriesPerSite());
-        sut.setMaxEntriesPerSite("-2");
-        assertEquals("50", sut.getMaxEntriesPerSite());
+        assertNull(sut.getMaxEntriesPerPage());
+        sut.setMaxEntriesPerPage("");
+        assertEquals("", sut.getMaxEntriesPerPage());
+        sut.setMaxEntriesPerPage("50");
+        assertEquals("50", sut.getMaxEntriesPerPage());
+        sut.setMaxEntriesPerPage("-2");
+        assertEquals("50", sut.getMaxEntriesPerPage());
     }
 
     /**
@@ -414,7 +414,7 @@ public class JobConfigHistoryTest {
                 "\"historyRootDir\": \"" + unpackResourceZip.getResource("config-history").getPath() + "\"," +
                 "\"maxHistoryEntries\": \"5\"," +
                 "\"maxDaysToKeepEntries\": \"5\"," +
-                "\"maxEntriesPerSite\": \"50\"," +
+                "\"maxEntriesPerPage\": \"50\"," +
                 "\"saveItemGroupConfiguration\": true," +
                 "\"skipDuplicateHistory\": true," +
                 "\"excludePattern\": \"5\"," +

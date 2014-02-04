@@ -44,7 +44,7 @@ public class JobConfigHistory extends Plugin {
     private String maxHistoryEntries;
 
     /** Maximum number of history entries per site to show. */
-    private String maxEntriesPerSite;
+    private String maxEntriesPerPage;
     
     /** Maximum number of days to keep entries. */
     private String maxDaysToKeepEntries;
@@ -100,7 +100,7 @@ public class JobConfigHistory extends Plugin {
         historyRootDir = formData.getString("historyRootDir").trim();
         setMaxHistoryEntries(formData.getString("maxHistoryEntries").trim());
         setMaxDaysToKeepEntries(formData.getString("maxDaysToKeepEntries").trim());
-        setMaxEntriesPerSite(formData.getString("maxEntriesPerSite").trim());
+        setMaxEntriesPerPage(formData.getString("maxEntriesPerPage").trim());
         saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
         skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
         excludePattern = formData.getString("excludePattern");
@@ -145,8 +145,8 @@ public class JobConfigHistory extends Plugin {
     /**
      * @return The maximum number of history entries to show per site.
      */
-    public String getMaxEntriesPerSite() {
-        return maxEntriesPerSite;
+    public String getMaxEntriesPerPage() {
+        return maxEntriesPerPage;
     }
     
     /**
@@ -154,9 +154,9 @@ public class JobConfigHistory extends Plugin {
      * @param maxEntryInput
      *        The maximum number of history entries to show per site
      */
-    protected void setMaxEntriesPerSite(String maxEntryInput) {
+    protected void setMaxEntriesPerPage(String maxEntryInput) {
         if (maxEntryInput.isEmpty() || isPositiveInteger(maxEntryInput)) {
-            maxEntriesPerSite = maxEntryInput;
+            maxEntriesPerPage = maxEntryInput;
         }
     }
 
