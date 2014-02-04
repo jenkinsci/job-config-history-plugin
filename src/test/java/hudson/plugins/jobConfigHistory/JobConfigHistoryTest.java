@@ -110,6 +110,19 @@ public class JobConfigHistoryTest {
         assertEquals("4", sut.getMaxHistoryEntries());
     }
     
+    
+    /**
+     * Test of getEntriesPerSite method, of class JobConfigHistory.
+     */
+    @Test
+    public void testGetEntriesPerSite() throws IOException, ServletException, Descriptor.FormException {
+        JobConfigHistory sut = createSut();
+        sut.configure(null, createFormData());
+        String expResult = "50";
+        String result = sut.getMaxEntriesPerSite();
+        assertEquals(expResult, result);
+    }
+
     /**
      * Test of setMaxEntriesPerSite method, of class JobConfigHistory.
      */
@@ -401,6 +414,7 @@ public class JobConfigHistoryTest {
                 "\"historyRootDir\": \"" + unpackResourceZip.getResource("config-history").getPath() + "\"," +
                 "\"maxHistoryEntries\": \"5\"," +
                 "\"maxDaysToKeepEntries\": \"5\"," +
+                "\"maxEntriesPerSite\": \"50\"," +
                 "\"saveItemGroupConfiguration\": true," +
                 "\"skipDuplicateHistory\": true," +
                 "\"excludePattern\": \"5\"," +
