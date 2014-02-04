@@ -82,7 +82,14 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(
                 getHistoryDao().getRevisions(project.getConfigFile()).values());
-        for (final HistoryDescr historyDescr : values) {
+        String maxEntriesPerPageAsString = getPlugin().getMaxEntriesPerPage();
+        final int maxEntriesPerPage;
+        if (maxEntriesPerPageAsString != null && !maxEntriesPerPageAsString.isEmpty()) {
+            maxEntriesPerPage = Integer.parseInt(maxEntriesPerPageAsString);
+        } else {
+            maxEntriesPerPage = values.size();
+        }
+        for (final HistoryDescr historyDescr : values.subList(0, maxEntriesPerPage)) {
             final String timestamp = historyDescr.getTimestamp();
             final XmlFile oldRevision = getHistoryDao().getOldRevision(project, timestamp);
             if (oldRevision.getFile() != null) {

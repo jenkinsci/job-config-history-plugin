@@ -95,7 +95,17 @@ public class JobConfigHistoryProjectActionTest {
      */
     @Test
     public void testGetJobConfigs() throws Exception {
+        when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("");
         testJobXHasYHistoryEntries("jobs/Test1", 5);
+    }
+
+    /**
+     * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
+     */
+    @Test
+    public void testGetJobConfigsLimitedTo3() throws Exception {
+        when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("3");
+        testJobXHasYHistoryEntries("jobs/Test1", 3);
     }
 
     /**
