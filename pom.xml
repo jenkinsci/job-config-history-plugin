@@ -51,6 +51,12 @@
             <email>kathi.stutz@1und1.de</email>
             <timezone>+1</timezone>
         </developer>
+        <developer>
+            <id>boev</id>
+            <name>Yordan Boev</name>
+            <email>iordan.boev@gmail.com</email>
+            <timezone>+1</timezone>
+        </developer>
     </developers>
 
     <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
