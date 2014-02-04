@@ -112,6 +112,15 @@ public class JobConfigHistoryProjectActionTest {
      * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
      */
     @Test
+    public void testGetJobConfigsLimitedTo1000() throws Exception {
+        when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("1000");
+        testJobXHasYHistoryEntries("jobs/Test1", 5);
+    }
+
+    /**
+     * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
+     */
+    @Test
     public void testGetJobConfigsDeleted() throws Exception {
         final List<ConfigInfo> historyEntries = testJobXHasYHistoryEntries("jobs/Foo_deleted_20130830_223932_071", 3);
         assertEquals("Deleted", historyEntries.get(0).getOperation());

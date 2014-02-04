@@ -85,7 +85,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         String maxEntriesPerPageAsString = getPlugin().getMaxEntriesPerPage();
         final int maxEntriesPerPage;
         if (maxEntriesPerPageAsString != null && !maxEntriesPerPageAsString.isEmpty()) {
-            maxEntriesPerPage = Integer.parseInt(maxEntriesPerPageAsString);
+            maxEntriesPerPage = Math.min(values.size(), Integer.parseInt(maxEntriesPerPageAsString));
         } else {
             maxEntriesPerPage = values.size();
         }
