@@ -405,7 +405,7 @@ public class JobConfigHistory extends Plugin {
      *            The form input entered by the user.
      * @return ok if the entry is blank or a non-negative integer.
      */
-    public FormValidation doCheckMaxEntriesPerSite(@QueryParameter final String value) {
+    public FormValidation doCheckMaxEntriesPerPage(@QueryParameter final String value) {
         try {
             if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
                 throw new NumberFormatException();
