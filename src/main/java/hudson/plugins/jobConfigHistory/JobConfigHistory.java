@@ -43,6 +43,9 @@ public class JobConfigHistory extends Plugin {
     /** Maximum number of configuration history entries to keep. */
     private String maxHistoryEntries;
 
+    /** Maximum number of history entries per site to show. */
+    private String maxEntriesPerSite;
+    
     /** Maximum number of days to keep entries. */
     private String maxDaysToKeepEntries;
 
@@ -97,6 +100,7 @@ public class JobConfigHistory extends Plugin {
         historyRootDir = formData.getString("historyRootDir").trim();
         setMaxHistoryEntries(formData.getString("maxHistoryEntries").trim());
         setMaxDaysToKeepEntries(formData.getString("maxDaysToKeepEntries").trim());
+        setMaxEntriesPerSite(formData.getString("maxEntriesPerSite").trim());
         saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
         skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
         excludePattern = formData.getString("excludePattern");
@@ -135,6 +139,24 @@ public class JobConfigHistory extends Plugin {
     protected void setMaxHistoryEntries(String maxEntryInput) {
         if (maxEntryInput.isEmpty() || isPositiveInteger(maxEntryInput)) {
             maxHistoryEntries = maxEntryInput;
+        }
+    }
+    
+    /**
+     * @return The maximum number of history entries to show per site.
+     */
+    public String getMaxEntriesPerSite() {
+        return maxEntriesPerSite;
+    }
+    
+    /**
+     * Set the maximum number of history entries to show per site.
+     * @param maxEntryInput
+     *        The maximum number of history entries to show per site
+     */
+    protected void setMaxEntriesPerSite(String maxEntryInput) {
+        if (maxEntryInput.isEmpty() || isPositiveInteger(maxEntryInput)) {
+            maxEntriesPerSite = maxEntryInput;
         }
     }
 
@@ -366,6 +388,24 @@ public class JobConfigHistory extends Plugin {
      * @return ok if the entry is blank or a non-negative integer.
      */
     public FormValidation doCheckMaxHistoryEntries(@QueryParameter final String value) {
+        try {
+            if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
+                throw new NumberFormatException();
+            }
+            return FormValidation.ok();
+        } catch (NumberFormatException ex) {
+            return FormValidation.error("Enter a valid positive integer");
+        }
+    }
+    
+    /**
+     * Validates the user entry for the maximum number of history items to show per site.
+     * Must be blank or a non-negative integer.
+     * @param value
+     *            The form input entered by the user.
+     * @return ok if the entry is blank or a non-negative integer.
+     */
+    public FormValidation doCheckMaxEntriesPerSite(@QueryParameter final String value) {
         try {
             if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
                 throw new NumberFormatException();

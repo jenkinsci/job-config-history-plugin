@@ -109,6 +109,21 @@ public class JobConfigHistoryTest {
         sut.setMaxHistoryEntries("-2");
         assertEquals("4", sut.getMaxHistoryEntries());
     }
+    
+    /**
+     * Test of setMaxEntriesPerSite method, of class JobConfigHistory.
+     */
+    @Test
+    public void testSetMaxEntriesPerSite() {
+        JobConfigHistory sut = createSut();
+        assertNull(sut.getMaxEntriesPerSite());
+        sut.setMaxEntriesPerSite("");
+        assertEquals("", sut.getMaxEntriesPerSite());
+        sut.setMaxEntriesPerSite("50");
+        assertEquals("50", sut.getMaxEntriesPerSite());
+        sut.setMaxEntriesPerSite("-2");
+        assertEquals("50", sut.getMaxEntriesPerSite());
+    }
 
     /**
      * Test of getMaxDaysToKeepEntries method, of class JobConfigHistory.

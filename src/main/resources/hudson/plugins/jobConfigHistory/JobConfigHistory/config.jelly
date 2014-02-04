@@ -13,6 +13,10 @@
         <f:textbox name="maxDaysToKeepEntries" value="${it.maxDaysToKeepEntries}"
            checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxDaysToKeepEntries?value='+escape(this.value)"/>
       </f:entry>
+      <f:entry title="${%Max number of history entries to show per site}" help="/plugin/jobConfigHistory/help/help-maxEntriesPerSite.html">
+        <f:textbox name="maxEntriesPerSite" value="${it.maxEntriesPerSite}"
+           checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxEntriesPerSite?value='+escape(this.value)"/>
+      </f:entry>
       <f:entry title="${%Save folder configuration changes}" help="/plugin/jobConfigHistory/help/help-saveItemGroupConfiguration.html">
         <f:checkbox name="saveItemGroupConfiguration" checked="${it.saveItemGroupConfiguration}"/>
       </f:entry>
