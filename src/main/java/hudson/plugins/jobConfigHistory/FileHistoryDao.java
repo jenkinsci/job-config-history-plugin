@@ -334,7 +334,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
         } else {
             for (File historyDir : historyDirsOfItem) {
                 final XmlFile historyXml = getHistoryXmlFile(historyDir);
-                final LazyHistoryDescr historyDescription = new LazyHistoryDescr((historyXml));
+                final LazyHistoryDescr historyDescription = new LazyHistoryDescr(historyXml);
                 map.put(historyDir.getName(), historyDescription);
             }
             return map;
