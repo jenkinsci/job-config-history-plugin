@@ -108,7 +108,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @throws IOException
      *             if one of the history entries might not be read.
      */
-    protected List<ConfigInfo> getSystemConfigs() throws IOException {
+    List<ConfigInfo> getSystemConfigs() throws IOException {
         final List<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         if (!hasConfigurePermission()) {
             return configs;
@@ -135,7 +135,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @throws IOException
      *             if one of the history entries might not be read.
      */
-    protected List<ConfigInfo> getJobConfigs(String type) throws IOException {
+    List<ConfigInfo> getJobConfigs(String type) throws IOException {
         if (!hasJobConfigurePermission()) {
             return Collections.EMPTY_LIST;
         } else {
