@@ -17,15 +17,18 @@
             <j:set var="prev2" value="${it.getPrevTimestamp(2)}"/>
             <j:set var="next1" value="${it.getNextTimestamp(1)}"/>
             <j:set var="next2" value="${it.getNextTimestamp(2)}"/>
+            <j:set var="timestamp1" value="${it.getTimestamp(1)}"/>
+            <j:set var="timestamp2" value="${it.getTimestamp(2)}"/>
+            
 			<table style="width:100%;">
 			 	<thead>
 			  	  <tr>
-                     <td colspan="2"> <font size="3"> File A </font></td>
-                     <td colspan="2"> <font size="3"> File B </font></td>
+                     <td colspan="2"> <font size="3"> Older File </font></td>
+                     <td colspan="2"> <font size="3"> Newer File </font></td>
 			  	  </tr>
 			  	  <tr>
-			         <td colspan="2">  ${it.getTimestamp(1)}; ${it.getOperation(1)}; <a href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
-                     <td colspan="2">  ${it.getTimestamp(2)}; ${it.getOperation(2)}; <a href="${rootURL}/user/${it.getUser(2)}">${it.getUser(2)}</a> </td>
+			         <td colspan="2">  ${timestamp1} / ${it.getOperation(1)} / <a href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
+                     <td colspan="2">  ${timestamp2} / ${it.getOperation(2)} / <a href="${rootURL}/user/${it.getUser(2)}">${it.getUser(2)}</a> </td>
 			  	  </tr>
 			  	</thead>
 				  	<tbody style="outline: 1pt solid #B2B2B2;">
@@ -61,9 +64,23 @@
               </j:choose>
               </tbody>
                   </table>
-                  <div align="right">
+                  <div align="middle">
                     <table>
                       <tr>
+                        <td>
+                           <j:if test="${prev1 != timestamp1}">
+                              <f:form method="post" action="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${timestamp2}" name="prevEntry" >
+                                 <f:submit value="&lt; ${%Expand Diff}" />
+                              </f:form>
+                           </j:if>
+                        </td>
+                        <td>
+                           <j:if test="${next1 != timestamp1}">
+                              <f:form method="post" action="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${timestamp2}" name="nextEntry" >
+                                 <f:submit value="${%Shrink Diff} &gt;" />
+                              </f:form>
+                           </j:if>
+                        </td>
                         <td>
                            <j:if test="${prev1 != prev2}">
                               <f:form method="post" action="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${prev2}" name="prevEntry" >
@@ -78,6 +95,21 @@
                               </f:form>
                            </j:if>
                         </td>
+                        <td>
+                           <j:if test="${prev2 != timestamp2}">
+                              <f:form method="post" action="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${prev2}" name="prevEntry" >
+                                 <f:submit value="&lt; ${%Shrink Diff}" />
+                              </f:form>
+                           </j:if>
+                        </td>
+                        <td>
+                           <j:if test="${next2 != timestamp2}">
+                              <f:form method="post" action="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${next2}" name="nextEntry" >
+                                 <f:submit value="${%Expand Diff} &gt;" />
+                              </f:form>
+                           </j:if>
+                        </td>
+                        
                       </tr>
                     </table>
                   </div>         
