@@ -15,7 +15,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 
 import javax.servlet.ServletException;
 import javax.xml.transform.Source;
@@ -174,6 +177,24 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         rsp.sendRedirect("showDiffFiles?timestamp1=" + parser.get("timestamp1")
                 + "&timestamp2=" + parser.get("timestamp2"));
     }
+    
+    
+    /**
+     * Action when 'Prev' or 'Next' button in showDiffFiles.jelly is pressed.
+     * Forwards to the previous or next diff.
+
+     * @param req StaplerRequest created by pressing the button
+     * @param rsp Outgoing StaplerResponse
+     * @throws IOException If XML file can't be read
+     */
+    public final void doDiffFilesPrevNext(StaplerRequest req, StaplerResponse rsp)
+            throws IOException {
+            final String timestamp1 = req.getParameter("timestamp1");
+            final String timestamp2 = req.getParameter("timestamp2");
+            rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
+                    + "&timestamp2=" + timestamp2);
+    }
+      
 
     /**
      * Used in the Difference jelly only. Returns one of the two timestamps that
@@ -218,7 +239,57 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
                 .get(getTimestamp(timestampNumber)).getOperation();
     }
     
+    /**
+     * Used in the Difference jelly only. Returns the next timestamp of
+     * the next entry of the two Files A and B. timestampNumber decides which 
+     * file exactly.
+     * 
+     * @param timestampNumber
+     *            1 for File A, 2 for File B
+     * @return the timestamp of the next entry as String.
+     */
+    public final String getNextTimestamp(int timestampNumber) {
+        checkConfigurePermission();
+        final String timestamp = this.getRequestParameter("timestamp" + timestampNumber);
+        final SortedMap <String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.project.getConfigFile());
+        final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet().iterator();
+        while(itr.hasNext()) {
+            if (itr.next().getValue().getTimestamp().equals((String)timestamp)) {
+                if (itr.hasNext()){
+                   return itr.next().getValue().getTimestamp();
+                }
+            }
+        }
+        //no next entry found
+        return timestamp;
+    }
     
+    /**
+     * Used in the Difference jelly only. Returns the previous timestamp of
+     * the next entry of the two Files A and B. timestampNumber decides which 
+     * file exactly.
+     * 
+     * @param timestampNumber
+     *            1 for File A, 2 for File B
+     * @return the timestamp of the preious entry as String.
+     */
+    public final String getPrevTimestamp(int timestampNumber) {
+        checkConfigurePermission();
+        final String timestamp = this.getRequestParameter("timestamp" + timestampNumber);
+        final SortedMap <String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.project.getConfigFile());
+        final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet().iterator();
+        String prevTimestamp = timestamp;
+        while(itr.hasNext()) {
+            final String checkTimestamp = itr.next().getValue().getTimestamp();
+            if (checkTimestamp.equals((String)timestamp)) {
+                return prevTimestamp;
+            }
+            else prevTimestamp = checkTimestamp;
+        }
+        //no previous entry found
+        return timestamp;
+    }
+            
     /**
      * Takes the two timestamp request parameters and returns the diff between the corresponding
      * config files of this project as a list of single lines.
