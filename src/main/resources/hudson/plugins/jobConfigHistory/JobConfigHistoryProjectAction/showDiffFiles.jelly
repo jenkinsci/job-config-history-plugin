@@ -23,8 +23,8 @@
 			<table style="width:100%;">
 			 	<thead>
 			  	  <tr>
-                     <td colspan="2"> <font size="3"> Older File </font></td>
-                     <td colspan="2"> <font size="3"> Newer File </font></td>
+                     <td colspan="2"> <font size="3"> Older Change </font></td>
+                     <td colspan="2"> <font size="3"> Newer Change </font></td>
 			  	  </tr>
 			  	  <tr>
 			         <td colspan="2">  ${timestamp1} / ${it.getOperation(1)} / <a href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
