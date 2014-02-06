@@ -85,7 +85,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(
                 getHistoryDao().getRevisions(project.getConfigFile()).values());
-        String maxEntriesPerPageAsString = getPlugin().getMaxEntriesPerPage();
+        final String maxEntriesPerPageAsString = getPlugin().getMaxEntriesPerPage();
         final int maxEntriesPerPage;
         if (maxEntriesPerPageAsString != null && !maxEntriesPerPageAsString.isEmpty()) {
             maxEntriesPerPage = Math.min(values.size(), Integer.parseInt(maxEntriesPerPageAsString));
@@ -188,11 +188,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @throws IOException If XML file can't be read
      */
     public final void doDiffFilesPrevNext(StaplerRequest req, StaplerResponse rsp)
-            throws IOException {
-            final String timestamp1 = req.getParameter("timestamp1");
-            final String timestamp2 = req.getParameter("timestamp2");
-            rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
-                    + "&timestamp2=" + timestamp2);
+        throws IOException {
+        final String timestamp1 = req.getParameter("timestamp1");
+        final String timestamp2 = req.getParameter("timestamp2");
+        rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
+               + "&timestamp2=" + timestamp2);
     }
       
 
@@ -251,12 +251,12 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     public final String getNextTimestamp(int timestampNumber) {
         checkConfigurePermission();
         final String timestamp = this.getRequestParameter("timestamp" + timestampNumber);
-        final SortedMap <String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.project.getConfigFile());
+        final SortedMap<String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.project.getConfigFile());
         final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet().iterator();
-        while(itr.hasNext()) {
-            if (itr.next().getValue().getTimestamp().equals((String)timestamp)) {
-                if (itr.hasNext()){
-                   return itr.next().getValue().getTimestamp();
+        while (itr.hasNext()) {
+            if (itr.next().getValue().getTimestamp().equals((String) timestamp)) {
+                if (itr.hasNext()) {
+                    return itr.next().getValue().getTimestamp();
                 }
             }
         }
@@ -276,15 +276,16 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     public final String getPrevTimestamp(int timestampNumber) {
         checkConfigurePermission();
         final String timestamp = this.getRequestParameter("timestamp" + timestampNumber);
-        final SortedMap <String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.project.getConfigFile());
+        final SortedMap<String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.project.getConfigFile());
         final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet().iterator();
         String prevTimestamp = timestamp;
-        while(itr.hasNext()) {
+        while (itr.hasNext()) {
             final String checkTimestamp = itr.next().getValue().getTimestamp();
-            if (checkTimestamp.equals((String)timestamp)) {
+            if (checkTimestamp.equals((String) timestamp)) {
                 return prevTimestamp;
+            } else {
+                prevTimestamp = checkTimestamp;
             }
-            else prevTimestamp = checkTimestamp;
         }
         //no previous entry found
         return timestamp;
