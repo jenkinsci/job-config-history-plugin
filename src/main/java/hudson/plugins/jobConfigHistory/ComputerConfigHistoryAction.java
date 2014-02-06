@@ -12,13 +12,20 @@ import hudson.model.Slave;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.Map.Entry;
+
 import javax.servlet.ServletException;
+
 import jenkins.model.Jenkins;
+
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -167,6 +174,56 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         return getHistoryDao().getRevisions(this.slave)
                 .get(getTimestamp(timestampNumber)).getOperation();
     }
+    
+    /**
+     * Used in the Difference jelly only. Returns the next timestamp of
+     * the next entry of the two Files A and B. timestampNumber decides which 
+     * file exactly.
+     * 
+     * @param timestampNumber
+     *            1 for File A, 2 for File B
+     * @return the timestamp of the next entry as String.
+     */
+    public final String getNextTimestamp(int timestampNumber) {
+        checkConfigurePermission();
+        final String timestamp = this.getRequestParameter("timestamp" + timestampNumber);
+        final SortedMap<String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.slave);
+        final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet().iterator();
+        while (itr.hasNext()) {
+            if (itr.next().getValue().getTimestamp().equals((String) timestamp) && itr.hasNext()) {
+                return itr.next().getValue().getTimestamp();
+            }
+        }
+        //no next entry found
+        return timestamp;
+    }
+    
+    /**
+     * Used in the Difference jelly only. Returns the previous timestamp of
+     * the next entry of the two Files A and B. timestampNumber decides which 
+     * file exactly.
+     * 
+     * @param timestampNumber
+     *            1 for File A, 2 for File B
+     * @return the timestamp of the preious entry as String.
+     */
+    public final String getPrevTimestamp(int timestampNumber) {
+        checkConfigurePermission();
+        final String timestamp = this.getRequestParameter("timestamp" + timestampNumber);
+        final SortedMap<String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.slave);
+        final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet().iterator();
+        String prevTimestamp = timestamp;
+        while (itr.hasNext()) {
+            final String checkTimestamp = itr.next().getValue().getTimestamp();
+            if (checkTimestamp.equals((String) timestamp)) {
+                return prevTimestamp;
+            } else {
+                prevTimestamp = checkTimestamp;
+            }
+        }
+        //no previous entry found
+        return timestamp;
+    }
 
     /**
      * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as
@@ -207,6 +264,22 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
                 + "&timestamp2=" + parser.get("timestamp2"));
     }
 
+    
+    /**
+     * Action when 'Prev' or 'Next' button in showDiffFiles.jelly is pressed.
+     * Forwards to the previous or next diff.
+
+     * @param req StaplerRequest created by pressing the button
+     * @param rsp Outgoing StaplerResponse
+     * @throws IOException If XML file can't be read
+     */
+    public final void doDiffFilesPrevNext(StaplerRequest req, StaplerResponse rsp)
+        throws IOException {
+        final String timestamp1 = req.getParameter("timestamp1");
+        final String timestamp2 = req.getParameter("timestamp2");
+        rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
+               + "&timestamp2=" + timestamp2);
+    }
 
     /**
      * Takes the two timestamp request parameters and returns the diff between the corresponding
