@@ -216,7 +216,7 @@ public class JobConfigHistoryProjectActionTest {
         when(mockedRequest.getInputStream()).thenReturn(TUtils.createServletInputStreamFromMultiPartFormData(boundary));
         JobConfigHistoryProjectAction sut = createAction();
         sut.doDiffFiles(mockedRequest, mockedResponse);
-        verify(mockedResponse).sendRedirect("showDiffFiles?timestamp1=111&timestamp2=112");
+        verify(mockedResponse).sendRedirect("showDiffFiles?timestamp1=2014-02-05_10-42-37&timestamp2=2014-03-12_11-02-12");
     }
     
     @Test

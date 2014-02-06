@@ -41,10 +41,10 @@ public class TUtils {
         final String body =
                 "--" + boundary + "\r\n" +
                 "Content-Disposition: form-data; name=\"timestamp1\"\r\n\r\n" +
-                "111\r\n" +
+                "2014-02-05_10-42-37\r\n" +
                 "--" + boundary + "\r\n" +
                 "Content-Disposition: form-data; name=\"timestamp2\"\r\n\r\n" +
-                "112\r\n" +
+                "2014-03-12_11-02-12\r\n" +
                 "--" + boundary + "\r\n" +
                 "Content-Disposition: form-data; name=\"name\"\r\n\r\n" +
                 "foo\r\n" +

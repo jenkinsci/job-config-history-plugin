@@ -310,7 +310,7 @@ public class JobConfigHistoryRootActionTest {
         StaplerResponse rsp = mock(StaplerResponse.class);
         JobConfigHistoryRootAction sut = createSut();
         sut.doDiffFiles(mockedStaplerRequest, rsp);
-        verify(rsp).sendRedirect("showDiffFiles?name=foo&timestamp1=111&timestamp2=112");
+        verify(rsp).sendRedirect("showDiffFiles?name=foo&timestamp1=2014-02-05_10-42-37&timestamp2=2014-03-12_11-02-12");
     }
 
     /**
