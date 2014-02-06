@@ -254,10 +254,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         final SortedMap<String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.project.getConfigFile());
         final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet().iterator();
         while (itr.hasNext()) {
-            if (itr.next().getValue().getTimestamp().equals((String) timestamp)) {
-                if (itr.hasNext()) {
-                    return itr.next().getValue().getTimestamp();
-                }
+            if (itr.hasNext() && itr.next().getValue().getTimestamp().equals((String) timestamp)) {
+                return itr.next().getValue().getTimestamp();
             }
         }
         //no next entry found
