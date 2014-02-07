@@ -1,4 +1,4 @@
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+ <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="Job Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
     <st:include it="${it.slave.toComputer()}" page="sidepanel.jelly" />
     <l:main-panel>
@@ -13,91 +13,122 @@
           </j:when>
           <j:otherwise>
             <div>
-            <j:set var="prev1" value="${it.getPrevTimestamp(1)}"/>
-            <j:set var="prev2" value="${it.getPrevTimestamp(2)}"/>
-            <j:set var="next1" value="${it.getNextTimestamp(1)}"/>
-            <j:set var="next2" value="${it.getNextTimestamp(2)}"/>
-			<table style="width:100%;">
-			 	<thead>
-			  	  <tr>
-                     <td colspan="2"> <font size="3"> File A </font></td>
-                     <td colspan="2"> <font size="3"> File B </font></td>
-			  	  </tr>
-			  	  <tr>
-			         <td colspan="2">  ${it.getTimestamp(1)}; ${it.getOperation(1)}; <a href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
-                     <td colspan="2">  ${it.getTimestamp(2)}; ${it.getOperation(2)}; <a href="${rootURL}/user/${it.getUser(2)}">${it.getUser(2)}</a> </td>
-			  	  </tr>
-			  	</thead>
-				  	<tbody style="outline: 1pt solid #B2B2B2;">
-				  	<j:choose>
-			 	  	   <j:when test="${it.getLines().size() == 0}">
-                         <tr>
-                            <td colspan="4">
-                               <p>${%No lines changed}</p>
-                            </td>
-                         </tr>
-                       </j:when>
-                    <j:otherwise>
-			        <j:forEach items="${it.getLines()}" var="line">
+              <j:set var="prev1" value="${it.getPrevTimestamp(1)}"/>
+              <j:set var="prev2" value="${it.getPrevTimestamp(2)}"/>
+              <j:set var="next1" value="${it.getNextTimestamp(1)}"/>
+              <j:set var="next2" value="${it.getNextTimestamp(2)}"/>
+              <j:set var="timestamp1" value="${it.getTimestamp(1)}"/>
+              <j:set var="timestamp2" value="${it.getTimestamp(2)}"/>
+              <table style="width:100%;">
+                <thead>
+                  <tr>
+                    <td colspan="2"> <font size="3"> Older Change </font></td>
+                    <td colspan="2"> <font size="3"> Newer Change </font></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2"><b>Date:</b> ${timestamp1}</td>
+                    <td colspan="2"><b>Date:</b> ${timestamp2}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="2"><b>Operation:</b> ${it.getOperation(1)}</td>
+                    <td colspan="2"><b>Operation:</b> ${it.getOperation(2)}</td>
+                  </tr>
+                  <tr>
+                    <td><b>User:</b> <a href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
+                    <td align="right">
+                      <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
+                        <f:submit value="${%Restore this configuration}" />
+                      </f:form>
+                    </td>
+                    <td><b>User:</b> <a href="${rootURL}/user/${it.getUser(1)}">${it.getUser(2)}</a> </td>
+                    <td align="right">
+                      <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" name="forward">
+                        <f:submit value="${%Restore this configuration}" />
+                      </f:form>
+                    </td>            
+                  </tr>
+                </thead>
+                <tbody style="outline: 1pt solid #B2B2B2;">
+                  <j:choose>
+                    <j:when test="${it.getLines().size() == 0}">
+                      <tr>
+                        <td colspan="4">
+                          <p>${%No lines changed}</p>
+                        </td>
+                      </tr>
+                    </j:when>
+                  <j:otherwise>
+                    <j:forEach items="${it.getLines()}" var="line">
                       <tr>
                         <j:choose>
                           <j:when test="${line.skipping}">
                             <th class="lineNum">...</th>
-                            <td class="skipping"></td>
+                              <td class="skipping"></td>
                             <th class="lineNum">...</th>
-                            <td class="skipping"></td>
-                          </j:when>
-                          <j:otherwise>
-                            <th class="lineNum">${line.left.lineNumber}</th>
-                            <td class="${line.left.cssClass}"><pre>${line.left.text}</pre></td>
-                            <th class="lineNum">${line.right.lineNumber}</th>
-                            <td class="${line.right.cssClass}"><pre>${line.right.text}</pre></td>
-                          </j:otherwise>
-                        </j:choose>
-                      </tr>
-                    </j:forEach>
-                    
-                </j:otherwise>
-              </j:choose>
-              </tbody>
-                  </table>
-                  <div align="right">
-                    <table>
-                      <tr>
-                        <td>
-                           <j:if test="${prev1 != prev2}">
-                              <f:form method="post" action="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${prev2}" name="prevEntry" >
-                                 <f:submit value="&lt; ${%Prev}" />
-                              </f:form>
-                           </j:if>
-                        </td>
-                        <td>
-                           <j:if test="${next1 != next2}">
-                              <f:form method="post" action="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${next2}" name="nextEntry" >
-                                 <f:submit value="${%Next} &gt;" />
-                              </f:form>
-                           </j:if>
-                        </td>
-                      </tr>
-                    </table>
-                  </div>         
-                  <div align="right">
-                    <table>
-                  	  <tr>
-                        <td>
-                  		  <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
-                      		<f:submit value="${%Restore file A configuration}" />
-                  		  </f:form>
-                  		</td>
-                  		<td>
-                  		  <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" name="forward">
-                      		<f:submit value="${%Restore file B configuration}" />
-                  		  </f:form>
-                  		</td>
-                      </tr>
-                    </table>
-                  </div>
-            </div>
+                              <td class="skipping"></td>
+                            </j:when>
+                            <j:otherwise>
+                              <th class="lineNum">${line.left.lineNumber}</th>
+                              <td class="${line.left.cssClass}"><pre>${line.left.text}</pre></td>
+                              <th class="lineNum">${line.right.lineNumber}</th>
+                              <td class="${line.right.cssClass}"><pre>${line.right.text}</pre></td>
+                            </j:otherwise>
+                          </j:choose>
+                        </tr>
+                      </j:forEach>
+                    </j:otherwise>
+                  </j:choose>
+                </tbody>
+              </table>
+              <div align="middle">
+                <table>
+                  <tr>
+                    <td>
+                      <j:if test="${prev1 != timestamp1}">
+                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${timestamp2}" name="prevEntry" >
+                          <f:submit value="&lt; ${%Expand Diff}" />
+                        </f:form>
+                      </j:if>
+                    </td>
+                    <td>
+                      <j:if test="${next1 != timestamp1}">
+                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${timestamp2}" name="nextEntry" >
+                          <f:submit value="${%Shrink Diff} &gt;" />
+                        </f:form>
+                      </j:if>
+                    </td>
+                    <td>
+                      <j:if test="${prev1 != prev2}">
+                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${prev2}" name="prevEntry" >
+                          <f:submit value="&lt; ${%Prev}" />
+                        </f:form>
+                      </j:if>
+                    </td>
+                    <td>
+                      <j:if test="${next1 != next2}">
+                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${next2}" name="nextEntry" >
+                          <f:submit value="${%Next} &gt;" />
+                        </f:form>
+                      </j:if>
+                    </td>
+                    <td>
+                      <j:if test="${prev2 != timestamp2}">
+                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${prev2}" name="prevEntry" >
+                          <f:submit value="&lt; ${%Shrink Diff}" />
+                        </f:form>
+                      </j:if>
+                    </td>
+                    <td>
+                      <j:if test="${next2 != timestamp2}">
+                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${next2}" name="nextEntry" >
+                          <f:submit value="${%Expand Diff} &gt;" />
+                        </f:form>
+                      </j:if>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>         
           </j:otherwise>
         </j:choose>
       </div>
