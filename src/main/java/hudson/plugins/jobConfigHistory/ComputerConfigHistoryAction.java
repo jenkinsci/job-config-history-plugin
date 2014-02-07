@@ -11,8 +11,6 @@ import hudson.model.Node;
 import hudson.model.Slave;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
-import hudson.util.MultipartFormDataParser;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,9 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.Map.Entry;
-
-import javax.servlet.ServletException;
-
 import jenkins.model.Jenkins;
 
 import org.kohsuke.stapler.StaplerRequest;
@@ -241,36 +236,6 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         final XmlFile xmlFile = getOldConfigXml(timestamp);
         return xmlFile.asString();
     }
-
-
-    /**
-     * Parses the incoming {@literal POST} request and redirects as
-     * {@literal GET showDiffFiles}.
-     *
-     * @param req
-     *            incoming request
-     * @param rsp
-     *            outgoing response
-     * @throws ServletException
-     *             when parsing the request as {@link MultipartFormDataParser}
-     *             does not succeed.
-     * @throws IOException
-     *             when the redirection does not succeed.
-     */
-    public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
-        throws ServletException, IOException {
-        final MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        String timestamp1 = parser.get("timestamp1");
-        String timestamp2 = parser.get("timestamp2");
-        
-        if (PluginUtils.parsedDate(timestamp1).after(PluginUtils.parsedDate(timestamp2))) {
-            timestamp1 = parser.get("timestamp2");
-            timestamp2 = parser.get("timestamp1");
-        }
-        rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
-                + "&timestamp2=" + timestamp2);
-    }
-   
 
     /**
      * Takes the two timestamp request parameters and returns the diff between the corresponding

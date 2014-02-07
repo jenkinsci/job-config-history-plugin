@@ -4,6 +4,7 @@ import hudson.model.Action;
 import hudson.model.Hudson;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
+import hudson.util.MultipartFormDataParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +18,8 @@ import difflib.Patch;
 import difflib.StringUtills;
 
 import java.util.Arrays;
+
+import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -158,6 +161,34 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         final List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(
                 file1.getPath(), file2.getPath(), Arrays.asList(file1Lines), patch, 3);
         return StringUtills.join(unifiedDiff, "\n") + "\n";
+    }
+    
+    /**
+     * Parses the incoming {@literal POST} request and redirects as
+     * {@literal GET showDiffFiles}.
+     *
+     * @param req
+     *            incoming request
+     * @param rsp
+     *            outgoing response
+     * @throws ServletException
+     *             when parsing the request as {@link MultipartFormDataParser}
+     *             does not succeed.
+     * @throws IOException
+     *             when the redirection does not succeed.
+     */
+    public void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
+        throws ServletException, IOException {
+        final MultipartFormDataParser parser = new MultipartFormDataParser(req);
+        String timestamp1 = parser.get("timestamp1");
+        String timestamp2 = parser.get("timestamp2");
+        
+        if (PluginUtils.parsedDate(timestamp1).after(PluginUtils.parsedDate(timestamp2))) {
+            timestamp1 = parser.get("timestamp2");
+            timestamp2 = parser.get("timestamp1");
+        }
+        rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
+                + "&timestamp2=" + timestamp2);
     }
     
     /**

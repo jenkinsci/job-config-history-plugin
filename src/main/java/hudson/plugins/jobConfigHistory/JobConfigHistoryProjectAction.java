@@ -7,7 +7,6 @@ import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
-import hudson.util.MultipartFormDataParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 
-import javax.servlet.ServletException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
@@ -157,35 +155,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         return getAccessControlledObject().hasPermission(AbstractProject.CONFIGURE);
     }
 
-    /**
-     * Parses the incoming {@literal POST} request and redirects as
-     * {@literal GET showDiffFiles}.
-     *
-     * @param req
-     *            incoming request
-     * @param rsp
-     *            outgoing response
-     * @throws ServletException
-     *             when parsing the request as {@link MultipartFormDataParser}
-     *             does not succeed.
-     * @throws IOException
-     *             when the redirection does not succeed.
-     */
-    public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
-        throws ServletException, IOException {
-        final MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        String timestamp1 = parser.get("timestamp1");
-        String timestamp2 = parser.get("timestamp2");
-        
-        if (PluginUtils.parsedDate(timestamp1).after(PluginUtils.parsedDate(timestamp2))) {
-            timestamp1 = parser.get("timestamp2");
-            timestamp2 = parser.get("timestamp1");
-        }
-        rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
-                + "&timestamp2=" + timestamp2);
-    }
-    
-   
     /**
      * Used in the Difference jelly only. Returns one of the two timestamps that
      * have been passed to the Difference page as parameter. timestampNumber

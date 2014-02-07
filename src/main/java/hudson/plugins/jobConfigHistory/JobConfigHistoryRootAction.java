@@ -249,6 +249,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         return getAccessControlledObject().hasPermission(Item.CONFIGURE);
     }
 
+    
     /**
      * Parses the incoming {@literal POST} request and redirects as
      * {@literal GET showDiffFiles}.
@@ -263,6 +264,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @throws IOException
      *             when the redirection does not succeed.
      */
+    @Override
     public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
         throws ServletException, IOException {
         final MultipartFormDataParser parser = new MultipartFormDataParser(req);
