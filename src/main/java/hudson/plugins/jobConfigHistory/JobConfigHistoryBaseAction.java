@@ -10,12 +10,14 @@ import java.io.IOException;
 import java.util.List;
 
 import org.kohsuke.stapler.Stapler;
-
+import org.kohsuke.stapler.StaplerResponse;
 
 import difflib.DiffUtils;
 import difflib.Patch;
 import difflib.StringUtills;
+
 import java.util.Arrays;
+
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -156,6 +158,22 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         final List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(
                 file1.getPath(), file2.getPath(), Arrays.asList(file1Lines), patch, 3);
         return StringUtills.join(unifiedDiff, "\n") + "\n";
+    }
+    
+    /**
+     * Action when 'Prev' or 'Next' button in showDiffFiles.jelly is pressed.
+     * Forwards to the previous or next diff.
+
+     * @param req StaplerRequest created by pressing the button
+     * @param rsp Outgoing StaplerResponse
+     * @throws IOException If XML file can't be read
+     */
+    public final void doDiffFilesPrevNext(StaplerRequest req, StaplerResponse rsp)
+        throws IOException {
+        final String timestamp1 = req.getParameter("timestamp1");
+        final String timestamp2 = req.getParameter("timestamp2");
+        rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
+               + "&timestamp2=" + timestamp2);
     }
 
     /**

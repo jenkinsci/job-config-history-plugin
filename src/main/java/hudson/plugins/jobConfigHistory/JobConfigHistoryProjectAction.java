@@ -185,24 +185,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
                 + "&timestamp2=" + timestamp2);
     }
     
-    
-    /**
-     * Action when 'Prev' or 'Next' button in showDiffFiles.jelly is pressed.
-     * Forwards to the previous or next diff.
-
-     * @param req StaplerRequest created by pressing the button
-     * @param rsp Outgoing StaplerResponse
-     * @throws IOException If XML file can't be read
-     */
-    public final void doDiffFilesPrevNext(StaplerRequest req, StaplerResponse rsp)
-        throws IOException {
-        final String timestamp1 = req.getParameter("timestamp1");
-        final String timestamp2 = req.getParameter("timestamp2");
-        rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
-               + "&timestamp2=" + timestamp2);
-    }
-      
-
+   
     /**
      * Used in the Difference jelly only. Returns one of the two timestamps that
      * have been passed to the Difference page as parameter. timestampNumber
