@@ -9,7 +9,7 @@
             ${%No permission to view config history}
           </j:when>
           <j:when test="${it.getJobConfigs().size() == 0}">
-              ${%No job configuration history available}
+            ${%No job configuration history available}
           </j:when>
           <j:otherwise>
             <div>
@@ -19,14 +19,14 @@
               <j:set var="next2" value="${it.getNextTimestamp(2)}"/>
               <j:set var="timestamp1" value="${it.getTimestamp(1)}"/>
               <j:set var="timestamp2" value="${it.getTimestamp(2)}"/>
-		      <table style="width:100%;">
-			    <thead>
-			      <tr>
+              <table style="width:100%;">
+                <thead>
+                  <tr>
                     <td colspan="2"> <font size="3"> Older Change </font></td>
                     <td colspan="2"> <font size="3"> Newer Change </font></td>
-	              </tr>
+                  </tr>
                   <tr>
-			        <td colspan="2"><b>Date:</b> ${timestamp1}</td>
+                    <td colspan="2"><b>Date:</b> ${timestamp1}</td>
                     <td colspan="2"><b>Date:</b> ${timestamp2}</td>
                   </tr>
                   <tr>
@@ -34,23 +34,35 @@
                     <td colspan="2"><b>Operation:</b> ${it.getOperation(2)}</td>
                   </tr>
                   <tr>
-                    <td><b>User:</b> <a href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
-                    <td align="right">
-                      <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
-                        <f:submit value="${%Restore this configuration}" />
-                      </f:form>
+                    <td colspan="2">
+                      <table style="width:100%; border-collapse: collapse;">
+                        <tr>
+                          <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
+                          <td align="right">
+                            <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
+                              <f:submit value="${%Restore this configuration}" />
+                            </f:form>
+                          </td>
+                        </tr>
+                      </table>
                     </td>
-                    <td><b>User:</b> <a href="${rootURL}/user/${it.getUser(1)}">${it.getUser(2)}</a> </td>
-                    <td align="right">
-                      <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" name="forward">
-                        <f:submit value="${%Restore this configuration}" />
-                      </f:form>
-                    </td>            
+                    <td colspan="2">  
+                      <table style="width:100%; border-collapse: collapse;">
+                        <tr>
+                          <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(1)}">${it.getUser(2)}</a> </td>
+                          <td align="right">
+                            <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" name="forward">
+                              <f:submit value="${%Restore this configuration}" />
+                            </f:form>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>             
                   </tr>
                 </thead>
-		        <tbody style="outline: 1pt solid #B2B2B2;">
-		          <j:choose>
-		            <j:when test="${it.getLines().size() == 0}">
+                <tbody style="outline: 1pt solid #B2B2B2;">
+              <j:choose>
+                <j:when test="${it.getLines().size() == 0}">
                       <tr>
                         <td colspan="4">
                           <p>${%No lines changed}</p>
@@ -58,7 +70,7 @@
                       </tr>
                     </j:when>
                   <j:otherwise>
-			        <j:forEach items="${it.getLines()}" var="line">
+              <j:forEach items="${it.getLines()}" var="line">
                       <tr>
                         <j:choose>
                           <j:when test="${line.skipping}">

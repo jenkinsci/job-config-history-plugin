@@ -34,18 +34,30 @@
                     <td colspan="2"><b>Operation:</b> ${it.getOperation(2)}</td>
                   </tr>
                   <tr>
-                    <td><b>User:</b> <a href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
-                    <td align="right">
-                      <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
-                        <f:submit value="${%Restore this configuration}" />
-                      </f:form>
+                    <td colspan="2">
+                      <table style="width:100%; border-collapse: collapse;">
+                      <tr>
+                        <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
+                          <td align="right">
+                            <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
+                              <f:submit value="${%Restore this configuration}" />
+                            </f:form>
+                          </td>
+                       </tr>
+                      </table>
                     </td>
-                    <td><b>User:</b> <a href="${rootURL}/user/${it.getUser(1)}">${it.getUser(2)}</a> </td>
-                    <td align="right">
-                      <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" name="forward">
-                        <f:submit value="${%Restore this configuration}" />
-                      </f:form>
-                    </td>            
+                    <td colspan="2">  
+                      <table style="width:100%; border-collapse: collapse;">
+                        <tr>
+                          <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(1)}">${it.getUser(2)}</a> </td>
+                          <td align="right">
+                            <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" name="forward">
+                              <f:submit value="${%Restore this configuration}" />
+                            </f:form>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>             
                   </tr>
                 </thead>
                 <tbody style="outline: 1pt solid #B2B2B2;">
