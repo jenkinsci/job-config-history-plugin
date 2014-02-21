@@ -5,7 +5,7 @@
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <!-- Do not use 1.509.4 because of SNAPSHOT-dependencies -->
-        <version>1.532.1</version>
+        <version>1.532.2</version>
     </parent>
 
     <artifactId>jobConfigHistory</artifactId>
