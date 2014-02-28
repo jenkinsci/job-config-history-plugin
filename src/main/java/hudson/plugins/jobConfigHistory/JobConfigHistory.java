@@ -9,7 +9,6 @@ import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.Saveable;
-import hudson.model.TopLevelItem;
 import hudson.util.FormValidation;
 import java.io.File;
 import java.io.IOException;
@@ -349,7 +348,7 @@ public class JobConfigHistory extends Plugin {
     boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
         boolean saveable = false;
         boolean group = item instanceof ItemGroup;
-        if (item instanceof TopLevelItem && !group) {
+        if (item instanceof Item && !group) {
             saveable = true;
         } else if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) {
             saveable = checkRegex(xmlFile);
