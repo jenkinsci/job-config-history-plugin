@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// TODO switch to TransientActionFactory in 1.548+ to support non-AbstractProject targets
+
 /**
  * Extends project actions for all jobs.
  *

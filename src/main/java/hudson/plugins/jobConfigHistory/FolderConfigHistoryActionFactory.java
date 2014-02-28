@@ -31,6 +31,8 @@ import hudson.model.Action;
 import java.util.Collection;
 import java.util.Collections;
 
+// TODO in 1.548+ can be superseded by JobConfigHistoryActionFactory
+
 @Extension(optional=true)
 public class FolderConfigHistoryActionFactory extends TransientFolderActionFactory {
 
