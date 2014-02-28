@@ -1,32 +1,30 @@
 package hudson.plugins.jobConfigHistory;
 
-import static java.util.logging.Level.*;
-
+import hudson.Extension;
+import hudson.XmlFile;
+import hudson.model.AbstractItem;
+import hudson.model.Item;
+import hudson.model.RootAction;
+import hudson.model.TopLevelItem;
+import hudson.plugins.jobConfigHistory.SideBySideView.Line;
+import hudson.security.AccessControlled;
+import hudson.security.Permission;
+import hudson.util.MultipartFormDataParser;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import static java.util.logging.Level.*;
+
 import java.util.logging.Logger;
-
 import javax.servlet.ServletException;
-
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-
-import hudson.Extension;
-import hudson.XmlFile;
-import hudson.model.Item;
-import hudson.model.RootAction;
-import hudson.model.AbstractProject;
-import hudson.plugins.jobConfigHistory.SideBySideView.Line;
-import hudson.security.AccessControlled;
-import hudson.security.Permission;
-import hudson.util.MultipartFormDataParser;
-import java.util.Collection;
 
 /**
  *
@@ -359,7 +357,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @throws IOException If something goes wrong
      */
     public final void doRestore(StaplerRequest req, StaplerResponse rsp) throws IOException {
-        getAccessControlledObject().checkPermission(AbstractProject.CONFIGURE);
+        getAccessControlledObject().checkPermission(Item.CONFIGURE);
 
         final String deletedName = req.getParameter("name");
         final String newName = deletedName.split("_deleted_") [0];
@@ -368,7 +366,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
         final InputStream is = new ByteArrayInputStream(configXml.asString().getBytes("UTF-8"));
         final String calculatedNewName = findNewName(newName);
-        final AbstractProject project = (AbstractProject) getHudson().createProjectFromXML(calculatedNewName, is);
+        final TopLevelItem project = getHudson().createProjectFromXML(calculatedNewName, is);
         getHistoryDao().copyHistoryAndDelete(deletedName, calculatedNewName);
 
         rsp.sendRedirect(getHudson().getRootUrl() + project.getUrl());
