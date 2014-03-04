@@ -347,7 +347,7 @@ public class JobConfigHistory extends Plugin {
      */
     boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
         boolean saveable = false;
-        boolean group = item instanceof ItemGroup;
+        final boolean group = item instanceof ItemGroup;
         if (item instanceof Item && !group) {
             saveable = true;
         } else if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) {

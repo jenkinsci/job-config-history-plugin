@@ -2,7 +2,6 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
 import hudson.XmlFile;
-import hudson.model.AbstractItem;
 import hudson.model.Item;
 import hudson.model.RootAction;
 import hudson.model.TopLevelItem;
