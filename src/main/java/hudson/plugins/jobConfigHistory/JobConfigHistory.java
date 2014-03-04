@@ -4,12 +4,12 @@ import hudson.Plugin;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractProject;
+import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
+import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.Saveable;
-import hudson.model.Descriptor.FormException;
 import hudson.util.FormValidation;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -17,13 +17,9 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import javax.servlet.ServletException;
-
 import jenkins.model.Jenkins;
-
 import net.sf.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -258,7 +254,7 @@ public class JobConfigHistory extends Plugin {
     boolean showBuildBadges(AbstractProject<?, ?> project) {
         if ("always".equals(showBuildBadges)) {
             return true;
-        } else if ("userWithConfigPermission".equals(showBuildBadges) && project.hasPermission(AbstractProject.CONFIGURE)) {
+        } else if ("userWithConfigPermission".equals(showBuildBadges) && project.hasPermission(Item.CONFIGURE)) {
             return true;
         } else if ("adminUser".equals(showBuildBadges) && getJenkins().hasPermission(Jenkins.ADMINISTER)) {
             return true;
@@ -351,11 +347,12 @@ public class JobConfigHistory extends Plugin {
      */
     boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
         boolean saveable = false;
-        if (item instanceof AbstractProject<?, ?>) {
+        boolean group = item instanceof ItemGroup;
+        if (item instanceof Item && !group) {
             saveable = true;
         } else if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) {
             saveable = checkRegex(xmlFile);
-        } else if (saveItemGroupConfiguration && item instanceof ItemGroup) {
+        } else if (saveItemGroupConfiguration && group) {
             saveable = true;
         }
         if (item instanceof MavenModule && !saveModuleConfiguration) {

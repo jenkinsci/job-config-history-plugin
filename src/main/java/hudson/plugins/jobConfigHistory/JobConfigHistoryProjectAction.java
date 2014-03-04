@@ -3,8 +3,8 @@ package hudson.plugins.jobConfigHistory;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
-import hudson.model.AbstractProject;
 import hudson.model.Hudson;
+import hudson.model.Item;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 
@@ -147,12 +147,12 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
     @Override
     protected void checkConfigurePermission() {
-        getAccessControlledObject().checkPermission(AbstractProject.CONFIGURE);
+        getAccessControlledObject().checkPermission(Item.CONFIGURE);
     }
 
     @Override
     public boolean hasConfigurePermission() {
-        return getAccessControlledObject().hasPermission(AbstractProject.CONFIGURE);
+        return getAccessControlledObject().hasPermission(Item.CONFIGURE);
     }
 
     /**

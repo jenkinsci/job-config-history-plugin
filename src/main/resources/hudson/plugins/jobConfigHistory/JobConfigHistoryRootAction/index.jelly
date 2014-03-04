@@ -80,7 +80,8 @@
                     <td>${config.date}</td>
                     <j:choose>
                       <j:when test="${config.getIsJob()}">
-                        <!-- XXX besides clumsiness with folders, this fails to URL-escape characters in job names -->
+                        <!-- TODO besides clumsiness with folders, this fails to URL-escape characters in job names -->
+                        <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
                         <td><a href="${rootURL}/job/${config.job.replace('/', '/job/')}/jobConfigHistory">${config.job.replace('/', ' » ')}</a></td>
                       </j:when>
                       <j:otherwise>
@@ -97,6 +98,7 @@
                     <td>${config.operation}</td>
                     <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
                     <td>
+                      <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
                       <a href="${it.createLinkToFiles(config,'xml')}">
                         <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
                       </a>
