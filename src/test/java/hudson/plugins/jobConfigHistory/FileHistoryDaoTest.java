@@ -33,11 +33,13 @@ import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
 import hudson.model.User;
+import hudson.remoting.Callable;
 import hudson.util.IOUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -648,8 +650,11 @@ public class FileHistoryDaoTest {
         assertTrue("File history.xml should be saved.", history.exists());
     }
     
-    @Test
-    public void testDeleteNode()throws Exception{
+    /**
+     * Runs a test, which renames or deletes a node.
+     * This method decouples the shared logic from {@link #testDeleteNode()} and {@link #testRenameNode()}.
+     */
+    private void printTestData(Callable<Void, Exception> func) throws Exception { 
         when(mockedNode.getNodeName()).thenReturn("slave1");
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
         File revisions = new File(file, "slave1");
@@ -657,34 +662,46 @@ public class FileHistoryDaoTest {
         revision.mkdirs();
         File config = new File(revision, "config.xml");
         File history = new File(revision, JobConfigHistoryConsts.HISTORY_FILE);
-        Jenkins.getInstance().XSTREAM2.toXMLUTF8(mockedNode, new PrintStream(config));
+        
         HistoryDescr descr = new HistoryDescr("User", "user", "created", "2014-01-20_10-12-34");
-        Jenkins.getInstance().XSTREAM2.toXMLUTF8(descr, new FileOutputStream(history));
-        sutWithUserAndNoDuplicateHistory.deleteNode(mockedNode);
+        OutputStream configsFile = new PrintStream(config);
+        OutputStream historyFile = new FileOutputStream(history);
+        try {
+            Jenkins.getInstance().XSTREAM2.toXMLUTF8(mockedNode, configsFile);         
+            Jenkins.getInstance().XSTREAM2.toXMLUTF8(descr, historyFile);        
+        } finally {
+            configsFile.close();
+            historyFile.close();
+        }
+        
+        // Call method an check that all files have been deleted
+        func.call();       
         assertFalse("File config.xml should be deleted.", config.exists());
         assertFalse("File history.xml should be deleted.", history.exists());
-        assertFalse("Revision directory should be deleted", revision.exists());
+        assertFalse("Previous revision directory should be deleted", revision.exists());
+    }
+    
+    @Test
+    public void testDeleteNode()throws Exception{
+        printTestData(new Callable<Void, Exception>() {
+            @Override
+            public Void call() throws Exception {
+                sutWithUserAndNoDuplicateHistory.deleteNode(mockedNode);
+                return null;
+            }
+        });
     }
     
     @Test
     public void testRenameNode() throws Exception{
-        when(mockedNode.getNodeName()).thenReturn("slave1");
-        File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
-        File revisions = new File(file, "slave1");
-        File revision = new File(revisions, "2014-01-20_10-12-34");
-        revision.mkdirs();
-        File config = new File(revision, "config.xml");
-        File history = new File(revision, JobConfigHistoryConsts.HISTORY_FILE);
-        Jenkins.getInstance().XSTREAM2.toXMLUTF8(mockedNode, new PrintStream(config));
-        HistoryDescr descr = new HistoryDescr("User", "user", "created", "2014-01-20_10-12-34");
-        Jenkins.getInstance().XSTREAM2.toXMLUTF8(descr, new FileOutputStream(history));
-        when(mockedNode.getNodeName()).thenReturn("slave2");
-        sutWithUserAndNoDuplicateHistory.renameNode(mockedNode, "slave1", "slave2");
-        config = new File(new File(file, "slave2"), revision.getName() + "/config.xml");
-        history = new File(new File(file, "slave2"), revision.getName() + "/" + JobConfigHistoryConsts.HISTORY_FILE);
-        assertTrue("File config.xml should be moved.", config.exists());
-        assertTrue("File history.xml should be moved.", history.exists());
-        assertFalse("Revision directory with old name should not exists", revisions.exists());
+        printTestData(new Callable<Void, Exception>() {
+            @Override
+            public Void call() throws Exception {
+                sutWithUserAndNoDuplicateHistory.renameNode(mockedNode, 
+                        mockedNode.getNodeName(), mockedNode.getNodeName()+"_renamed");
+                return null;
+            }
+        });
     }
     
     @Test
