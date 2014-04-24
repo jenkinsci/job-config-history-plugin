@@ -31,6 +31,14 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
      * We need the build in order to get the project name.
      */
     private transient AbstractBuild<?, ?> build;
+    
+    /**
+     * A transient field, which allows to workaround the JENKINS-20511 issue 
+     * (missing targetType field).
+     * @deprecated This field is not required in the config-history logic
+     * @see https://issues.jenkins-ci.org/browse/JENKINS-20511
+     */
+    private transient String targetType;
 
     /**
      * Creates a new JobConfigBadgeAction.
