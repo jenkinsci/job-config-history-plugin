@@ -30,6 +30,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import javax.servlet.ServletInputStream;
+import org.apache.commons.io.FilenameUtils;
+import org.hamcrest.Matcher;
+import org.hamcrest.Description;
 
 /**
  *
@@ -66,5 +69,52 @@ public class TUtils {
             stream.close();
         }
     }
+    
+    /**
+     * Checks if the path ends by the specified suffix.
+     * The method converts actual values to system path using {@link FilePathSuffixMatcher}.
+     * @param expectedSuffix The expected suffix
+     * @return A matcher for further comparison.
+     */
+    public static Matcher<String> pathEndsWith(String expectedSuffix) {
+        return new FilePathSuffixMatcher(expectedSuffix);
+    }
+    
+    /**
+     * A suffix {@link Matcher}, which automatically handles file separators.
+     * The method calls {@link #endsWith(java.lang.String)} method from CoreMatchers.
+     * @since TODO: define a version
+     */
+    public static class FilePathSuffixMatcher implements Matcher<String> {
+        
+        private final String expectedSuffix;
+        
+        public FilePathSuffixMatcher(String expectedSuffix) {
+            this.expectedSuffix = FilenameUtils.separatorsToSystem(expectedSuffix);
+        }
+        
+        @Override
+        public boolean matches(Object actual) {
+            if (actual instanceof String) {
+                String actualSystemPath = FilenameUtils.separatorsToSystem((String)actual);
+                return actualSystemPath.endsWith(expectedSuffix);
+            }
+            return false;
+        }
 
+        @Override
+        public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {
+            // nop
+        }
+
+        @Override
+        public void describeTo(Description d) {
+            d.appendText("path with suffix "+expectedSuffix);
+        }  
+        
+        @Override
+        public void describeMismatch(Object o, Description d) {
+            d.appendText("path "+ o + " has no such suffix");
+        }    
+    }
 }
