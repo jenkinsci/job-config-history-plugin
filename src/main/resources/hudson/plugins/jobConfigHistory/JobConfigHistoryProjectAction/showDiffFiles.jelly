@@ -49,7 +49,7 @@
                     <td colspan="2">  
                       <table style="width:100%; border-collapse: collapse;">
                         <tr>
-                          <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(1)}">${it.getUser(2)}</a> </td>
+                          <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(2)}">${it.getUser(2)}</a> </td>
                           <td align="right">
                             <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" name="forward">
                               <f:submit value="${%Restore this configuration}" />
