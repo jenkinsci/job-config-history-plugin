@@ -403,7 +403,7 @@ public class JobConfigHistoryRootActionTest {
         given(mockedACL.hasPermission(Permission.CONFIGURE)).willReturn(true);
         String name = "jobs/Test1";
         assertThat(createSut().getLastAvailableConfigXml(name).getFile().getPath(),
-                endsWith("Test1/2012-11-21_11-41-14/config.xml"));
+                TUtils.pathEndsWith("Test1/2012-11-21_11-41-14/config.xml"));
     }
 
     /**

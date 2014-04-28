@@ -319,7 +319,7 @@ public class JobConfigHistoryTest {
         File historyDir = unpackResourceZip.getResource(dirName);
         JobConfigHistory sut = createSut();
         File result = sut.getConfigFile(historyDir);
-        assertThat(result.getPath(), endsWith(dirName + "config.xml"));
+        assertThat(result.getPath(), TUtils.pathEndsWith(dirName + "config.xml"));
     }
 
     /**
