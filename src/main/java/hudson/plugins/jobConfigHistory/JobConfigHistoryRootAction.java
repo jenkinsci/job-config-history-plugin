@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
 import hudson.XmlFile;
+import hudson.model.Api;
 import hudson.model.Item;
 import hudson.model.RootAction;
 import hudson.model.TopLevelItem;
@@ -24,12 +25,15 @@ import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.export.ExportedBean;
+import org.kohsuke.stapler.export.Exported;
 
 /**
  *
  * @author Stefan Brausch, mfriedenhagen
  */
 
+@ExportedBean
 @Extension
 public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         implements RootAction {
@@ -79,6 +83,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @throws IOException
      *             if one of the history entries might not be read.
      */
+    @Exported
     public final List<ConfigInfo> getConfigs() throws IOException {
         final String filter = getRequestParameter("filter");
         List<ConfigInfo> configs = null;
@@ -446,5 +451,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      */
     OverviewHistoryDao getOverviewHistoryDao() {
         return PluginUtils.getHistoryDao();
+    }
+
+    public Api getApi() {
+        return new Api(this);
     }
 }

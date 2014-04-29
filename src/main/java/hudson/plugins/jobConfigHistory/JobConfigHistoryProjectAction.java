@@ -3,6 +3,7 @@ package hudson.plugins.jobConfigHistory;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
+import hudson.model.Api;
 import hudson.model.Hudson;
 import hudson.model.Item;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
@@ -24,10 +25,13 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.export.ExportedBean;
+import org.kohsuke.stapler.export.Exported;
 
 /**
  * @author Stefan Brausch
  */
+@ExportedBean
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
     /** The project. */
@@ -78,6 +82,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @throws IOException
      *             if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be read or the path might not be urlencoded.
      */
+    @Exported
     public final List<ConfigInfo> getJobConfigs() throws IOException {
         checkConfigurePermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
@@ -330,4 +335,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         return PluginUtils.getHistoryDao();
     }
 
+    public Api getApi() {
+        return new Api(this);
+    }
 }
