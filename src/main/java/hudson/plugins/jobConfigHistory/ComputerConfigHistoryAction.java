@@ -6,6 +6,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
 import hudson.model.Computer;
+import hudson.model.Api;
 import hudson.model.Hudson;
 import hudson.model.Node;
 import hudson.model.Slave;
@@ -23,12 +24,15 @@ import jenkins.model.Jenkins;
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.export.ExportedBean;
+import org.kohsuke.stapler.export.Exported;
 
 
 /**
  *
  * @author Lucie Votypkova
  */
+@ExportedBean
 public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     
     /**
@@ -101,6 +105,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * @throws IOException
      *             if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be read or the path might not be urlencoded.
      */
+    @Exported
     public final List<ConfigInfo> getSlaveConfigs() throws IOException {
         checkConfigurePermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
@@ -314,4 +319,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
     }
 
+    public Api getApi() {
+        return new Api(this);
+    }
 }
