@@ -23,6 +23,8 @@ import java.util.SortedMap;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import org.acegisecurity.AuthenticationException;
+
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.ExportedBean;
@@ -31,7 +33,7 @@ import org.kohsuke.stapler.export.Exported;
 /**
  * @author Stefan Brausch
  */
-@ExportedBean
+@ExportedBean(defaultVisibility = -1)
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
     /** The project. */
@@ -82,7 +84,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @throws IOException
      *             if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be read or the path might not be urlencoded.
      */
-    @Exported
     public final List<ConfigInfo> getJobConfigs() throws IOException {
         checkConfigurePermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
@@ -113,6 +114,24 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             }
         }
         Collections.sort(configs, ParsedDateComparator.DESCENDING);
+        return configs;
+    }
+
+    /**
+     * Returns the configuration history entries for one {@link AbstractItem} for the REST API.
+     *
+     * @return history list for one {@link AbstractItem}, or an empty list if not authorized.
+     * @throws IOException
+     *             if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be read or the path might not be urlencoded.
+     */
+    @Exported(name = "jobConfigHistory", visibility = 1)
+    public final List<ConfigInfo> getJobConfigsREST() throws IOException {
+        List<ConfigInfo> configs = null;
+        try {
+            configs = getJobConfigs();
+        } catch (org.acegisecurity.AccessDeniedException e) {
+            configs = new ArrayList<ConfigInfo>();
+        }
         return configs;
     }
 
