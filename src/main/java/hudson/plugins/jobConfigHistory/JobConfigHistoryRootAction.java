@@ -33,7 +33,7 @@ import org.kohsuke.stapler.export.Exported;
  * @author Stefan Brausch, mfriedenhagen
  */
 
-@ExportedBean
+@ExportedBean(defaultVisibility = -1)
 @Extension
 public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         implements RootAction {
@@ -83,7 +83,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @throws IOException
      *             if one of the history entries might not be read.
      */
-    @Exported
+    @Exported(visibility = 1)
     public final List<ConfigInfo> getConfigs() throws IOException {
         final String filter = getRequestParameter("filter");
         List<ConfigInfo> configs = null;

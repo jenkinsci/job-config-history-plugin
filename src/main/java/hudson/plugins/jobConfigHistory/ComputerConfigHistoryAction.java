@@ -6,6 +6,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
 import hudson.model.Computer;
+import hudson.model.Api;
 import hudson.model.Hudson;
 import hudson.model.Node;
 import hudson.model.Slave;
@@ -21,14 +22,19 @@ import java.util.SortedMap;
 import java.util.Map.Entry;
 import jenkins.model.Jenkins;
 
+import org.acegisecurity.AuthenticationException;
+
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.export.ExportedBean;
+import org.kohsuke.stapler.export.Exported;
 
 
 /**
  *
  * @author Lucie Votypkova
  */
+@ExportedBean(defaultVisibility = -1)
 public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     
     /**
@@ -127,6 +133,24 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         return configs;
     }
     
+    /**
+     * Returns the configuration history entries for one {@link Slave} for the REST API.
+     *
+     * @return history list for one {@link Slave}, or an empty list if not authorized.
+     * @throws IOException
+     *             if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be read or the path might not be urlencoded.
+     */
+    @Exported(name = "jobConfigHistory", visibility = 1)
+    public final List<ConfigInfo> getSlaveConfigsREST() throws IOException {
+      List<ConfigInfo> configs = null;
+      try {
+          configs = getSlaveConfigs();
+      } catch (org.acegisecurity.AccessDeniedException e) {
+          configs = new ArrayList<ConfigInfo>();
+      }
+      return configs;
+    }
+
     /**
      * Used in the Difference jelly only. Returns one of the two timestamps that
      * have been passed to the Difference page as parameter. timestampNumber
@@ -314,4 +338,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
     }
 
+    public Api getApi() {
+        return new Api(this);
+    }
 }
