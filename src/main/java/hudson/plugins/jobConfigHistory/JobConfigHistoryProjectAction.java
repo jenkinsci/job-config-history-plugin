@@ -23,7 +23,6 @@ import java.util.SortedMap;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
-import org.acegisecurity.AuthenticationException;
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;

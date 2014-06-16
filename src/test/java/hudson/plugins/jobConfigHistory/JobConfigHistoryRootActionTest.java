@@ -28,13 +28,14 @@ import hudson.model.Item;
 import hudson.model.TopLevelItem;
 import hudson.security.ACL;
 import hudson.security.Permission;
+
 import java.io.File;
 import java.util.List;
+
 import org.junit.Test;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.endsWith;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Ignore;

@@ -12,6 +12,7 @@ import hudson.model.Node;
 import hudson.model.Slave;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,9 +21,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.Map.Entry;
+
 import jenkins.model.Jenkins;
 
-import org.acegisecurity.AuthenticationException;
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
