@@ -3,6 +3,7 @@ package hudson.plugins.jobConfigHistory;
 import hudson.Plugin;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
+import hudson.maven.MavenModuleSet;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
@@ -353,6 +354,9 @@ public class JobConfigHistory extends Plugin {
         } else if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) {
             saveable = checkRegex(xmlFile);
         } else if (saveItemGroupConfiguration && group) {
+            saveable = true;
+        }
+        if (item instanceof MavenModuleSet) {
             saveable = true;
         }
         if (item instanceof MavenModule && !saveModuleConfiguration) {

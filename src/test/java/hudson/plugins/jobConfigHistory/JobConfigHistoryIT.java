@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import hudson.maven.MavenModuleSet;
 
 import org.xml.sax.SAXException;
 
@@ -78,7 +79,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         assertFalse("Verify false when testing if a file outside of HUDSON_ROOT is saveable.", jch.isSaveable(null, new XmlFile(new File("/tmp/config.xml"))));
     }
 
-    public void testJobConfigHistoryDefaults() {
+    public void testJobConfigHistoryDefaults() throws IOException {
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
 
         assertNull("Verify number of history entries to keep default setting.", jch.getMaxHistoryEntries());
@@ -89,6 +90,9 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
 
         final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertTrue("Verify a system level configuration is saveable.", jch.isSaveable(hudson, hudsonConfig));
+        // This would more naturally belong in JobConfigHistoryTest.testIsSaveable but Mockito chokes on MavenModuleSet.<clinit>:
+        MavenModuleSet mms = createMavenProject();
+        assertTrue("MavenModuleSet should be saved", jch.isSaveable(mms, mms.getConfigFile()));
 
         assertTrue("Verify system configuration history location", getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
         testCreateRenameDeleteProject(jch);
