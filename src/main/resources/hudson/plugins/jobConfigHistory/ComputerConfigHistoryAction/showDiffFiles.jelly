@@ -5,7 +5,7 @@
       <h1>${%Slave Configuration Difference}</h1>
       <div>
         <j:choose>
-          <j:when test="${!it.hasConfigurePermission()}">
+          <j:when test="${!it.hasReadPermission()}">
             ${%No permission to view config history}
           </j:when>
           <j:when test="${it.getSlaveConfigs().size() == 0}">

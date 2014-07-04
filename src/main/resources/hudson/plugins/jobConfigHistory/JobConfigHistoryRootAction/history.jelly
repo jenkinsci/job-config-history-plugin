@@ -30,7 +30,8 @@
       <j:set var="configs" value="${it.getSingleConfigs(name)}" />
       <div>
         <j:choose>
-          <j:when test="${!it.hasConfigurePermission() and !isDeleted}">
+          <j:when test="${!it.hasReadPermission() and !isDeleted}">
+            ${%history.jelly}
             ${%No permission to view system changes}
           </j:when>
           <j:when test="${!it.hasJobConfigurePermission()}">

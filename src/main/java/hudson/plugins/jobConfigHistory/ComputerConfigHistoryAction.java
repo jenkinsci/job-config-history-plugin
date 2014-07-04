@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 
 import jenkins.model.Jenkins;
 
-
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.ExportedBean;
@@ -92,10 +91,22 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     public boolean hasConfigurePermission() {
         return getAccessControlledObject().hasPermission(Computer.CONFIGURE);
     }
-    
+
+    @Override
+    protected void checkReadPermission() {
+        //no special permission for reading computer configurations available
+        checkConfigurePermission();
+    }
+
+    @Override
+    public boolean hasReadPermission() {
+        //no special permission for reading computer configurations available
+        return hasConfigurePermission();
+    }
+
     @Override
     public final String getIconFileName() {
-        if (!hasConfigurePermission()) {
+        if (!hasReadPermission()) {
             return null;
         }
         return JobConfigHistoryConsts.ICONFILENAME;
@@ -109,7 +120,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      *             if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be read or the path might not be urlencoded.
      */
     public final List<ConfigInfo> getSlaveConfigs() throws IOException {
-        checkConfigurePermission();
+        checkReadPermission();
         final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(
                 getHistoryDao().getRevisions(slave).values());
@@ -162,7 +173,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * @return the timestamp as String.
      */
     public final String getTimestamp(int timestampNumber) {
-        checkConfigurePermission();
+        checkReadPermission();
         return this.getRequestParameter("timestamp" + timestampNumber);
     }
 
@@ -176,7 +187,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * @return the user as String.
      */
     public final String getUser(int timestampNumber) {
-        checkConfigurePermission();
+        checkReadPermission();
         return getHistoryDao().getRevisions(this.slave)
                 .get(getTimestamp(timestampNumber)).getUser();
     }
@@ -190,7 +201,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * @return the operation as String.
      */
     public final String getOperation(int timestampNumber) {
-        checkConfigurePermission();
+        checkReadPermission();
         return getHistoryDao().getRevisions(this.slave)
                 .get(getTimestamp(timestampNumber)).getOperation();
     }
@@ -205,7 +216,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * @return the timestamp of the next entry as String.
      */
     public final String getNextTimestamp(int timestampNumber) {
-        checkConfigurePermission();
+        checkReadPermission();
         final String timestamp = this.getRequestParameter("timestamp" + timestampNumber);
         final SortedMap<String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.slave);
         final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet().iterator();
@@ -228,7 +239,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * @return the timestamp of the preious entry as String.
      */
     public final String getPrevTimestamp(int timestampNumber) {
-        checkConfigurePermission();
+        checkReadPermission();
         final String timestamp = this.getRequestParameter("timestamp" + timestampNumber);
         final SortedMap<String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.slave);
         final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet().iterator();
@@ -256,7 +267,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      *             string.
      */
     public final String getFile() throws IOException {
-        checkConfigurePermission();
+        checkReadPermission();
         final String timestamp = getRequestParameter("timestamp");
         final XmlFile xmlFile = getOldConfigXml(timestamp);
         return xmlFile.asString();
@@ -270,7 +281,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * @throws IOException If diff doesn't work or xml files can't be read.
      */
     public final List<Line> getLines() throws IOException {
-        checkConfigurePermission();
+        checkReadPermission();
         final String timestamp1 = getRequestParameter("timestamp1");
         final String timestamp2 = getRequestParameter("timestamp2");
 
@@ -293,7 +304,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * @return The config file as XmlFile.
      */
     private XmlFile getOldConfigXml(String timestamp) {
-        checkConfigurePermission();
+        checkReadPermission();
         final XmlFile oldRevision = getHistoryDao().getOldRevision(slave, timestamp);
         if (oldRevision.getFile() != null) {
             return oldRevision;

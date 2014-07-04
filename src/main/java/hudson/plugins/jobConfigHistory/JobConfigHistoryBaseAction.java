@@ -99,20 +99,36 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * See whether the current user may read configurations in the object
-     * returned by
+     * See whether the current user may read and write configurations in the
+     * object returned by
      * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
      */
     protected abstract void checkConfigurePermission();
 
     /**
-     * Returns whether the current user may read configurations in the object
-     * returned by
+     * Returns whether the current user may read and write configurations in
+     * the object returned by
      * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
      *
      * @return true if the current user may read configurations.
      */
     protected abstract boolean hasConfigurePermission();
+
+    /**
+     * See whether the current user may read only configurations in the object
+     * returned by
+     * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
+     */
+    protected abstract void checkReadPermission();
+
+    /**
+     * Returns whether the current user may read only configurations in the
+     * object returned by
+     * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
+     *
+     * @return true if the current user may read configurations.
+     */
+    protected abstract boolean hasReadPermission();
 
     /**
      * Returns the hudson instance.
