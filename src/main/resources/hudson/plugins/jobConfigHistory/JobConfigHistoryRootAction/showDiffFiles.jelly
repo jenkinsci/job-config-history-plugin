@@ -11,7 +11,7 @@
       <div>
       <j:set var="name" value="${request.getParameter('name')}"/>
         <j:choose>
-          <j:when test="${!it.hasConfigurePermission() and !name.contains('_deleted_')}">
+          <j:when test="${!it.hasReadPermission() and !name.contains('_deleted_')}">
             ${%No permission to view system changes}
           </j:when>
           <j:when test="${!it.hasJobConfigurePermission()}">

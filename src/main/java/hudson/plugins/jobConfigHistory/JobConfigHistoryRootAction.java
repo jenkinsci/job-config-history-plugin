@@ -10,6 +10,7 @@ import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
 import hudson.util.MultipartFormDataParser;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -19,10 +20,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
 import static java.util.logging.Level.*;
 
 import java.util.logging.Logger;
+
 import javax.servlet.ServletException;
+
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.ExportedBean;
@@ -68,7 +72,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * jobs.
      */
     public final String getIconFileName() {
-        if (hasConfigurePermission() || hasJobConfigurePermission()) {
+        if (hasReadPermission() || hasJobConfigurePermission()) {
             return JobConfigHistoryConsts.ICONFILENAME;
         } else {
             return null;
@@ -112,7 +116,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      */
     List<ConfigInfo> getSystemConfigs() throws IOException {
         final List<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        if (!hasConfigurePermission()) {
+        if (!hasReadPermission()) {
             return configs;
         }
 
@@ -181,7 +185,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     public final String getFile() throws IOException {
         final String name = getRequestParameter("name");
         if ((name.contains(JobConfigHistoryConsts.DELETED_MARKER) && hasJobConfigurePermission())
-                || hasConfigurePermission()) {
+                || hasReadPermission()) {
             final String timestamp = getRequestParameter("timestamp");
             final XmlFile xmlFile = getOldConfigXml(name, timestamp);
             return xmlFile.asString();
@@ -242,6 +246,16 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
     }
 
+    @Override
+    protected void checkReadPermission() {
+        getAccessControlledObject().checkPermission(Permission.READ);
+    }
+
+    @Override
+    public boolean hasReadPermission() {
+        return getAccessControlledObject().hasPermission(Permission.READ);
+    }
+
     /**
      * Returns whether the current user may configure jobs.
      *
@@ -287,7 +301,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     public final List<Line> getLines() throws IOException {
         final String name = getRequestParameter("name");
         if ((name.contains(JobConfigHistoryConsts.DELETED_MARKER) && hasJobConfigurePermission())
-                || hasConfigurePermission()) {
+                || hasReadPermission()) {
             final String timestamp1 = getRequestParameter("timestamp1");
             final String timestamp2 = getRequestParameter("timestamp2");
 
@@ -321,7 +335,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
             if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
                 return getHistoryDao().getOldRevision("jobs/" + name, timestamp);
             } else {
-                checkConfigurePermission();
+                checkReadPermission();
                 return getHistoryDao().getOldRevision(name, timestamp);
                 
             }

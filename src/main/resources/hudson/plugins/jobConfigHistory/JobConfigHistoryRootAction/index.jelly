@@ -41,7 +41,7 @@
       <div>
         <j:set var="configs" value="${it.getConfigs()}" />
         <j:choose>
-          <j:when test="${!it.hasConfigurePermission() and (filter == 'system' || filter == null)}">
+          <j:when test="${!it.hasReadPermission() and (filter == 'system' || filter == null)}">
             ${%No permission to view system changes}
           </j:when>
           <j:when test="${!it.hasJobConfigurePermission()}">
