@@ -31,7 +31,6 @@
       <div>
         <j:choose>
           <j:when test="${!it.hasReadPermission() and !isDeleted}">
-            ${%history.jelly}
             ${%No permission to view system changes}
           </j:when>
           <j:when test="${!it.hasJobConfigurePermission()}">
