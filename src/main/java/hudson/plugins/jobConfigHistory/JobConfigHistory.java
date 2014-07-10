@@ -73,7 +73,7 @@ public class JobConfigHistory extends Plugin {
     private transient Pattern excludeRegexpPattern;
 
     /** Flag to indicate if we should save the config history of Maven modules. */
-    private boolean saveModuleConfiguration = true;
+    private boolean saveModuleConfiguration = false;
 
     /**
      * Whether build badges should appear when the config of a job has changed since the last build.
