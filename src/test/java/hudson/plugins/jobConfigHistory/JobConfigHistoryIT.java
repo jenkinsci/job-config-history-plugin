@@ -83,7 +83,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         final JobConfigHistory jch = hudson.getPlugin(JobConfigHistory.class);
 
         assertNull("Verify number of history entries to keep default setting.", jch.getMaxHistoryEntries());
-        assertTrue("Verify Maven module configuration default setting.", jch.getSaveModuleConfiguration());
+        assertFalse("Verify Maven module configuration default setting.", jch.getSaveModuleConfiguration());
         assertTrue("Verify skip duplicate history default setting.", jch.getSkipDuplicateHistory());
         assertNull("Verify unconfigured exclude pattern.", jch.getExcludePattern());
         assertEquals("Verify build badges setting.", "always", jch.getShowBuildBadges());
