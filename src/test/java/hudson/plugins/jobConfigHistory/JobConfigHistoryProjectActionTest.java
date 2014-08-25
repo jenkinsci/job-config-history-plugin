@@ -1,20 +1,28 @@
 package hudson.plugins.jobConfigHistory;
 
+import hudson.matrix.MatrixConfiguration;
+import hudson.matrix.MatrixProject;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.model.Hudson;
 import hudson.model.ItemGroup;
+
 import java.io.IOException;
 import java.util.List;
+
 import org.acegisecurity.AccessDeniedException;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Rule;
+
 import static org.mockito.Mockito.*;
+
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -88,6 +96,24 @@ public class JobConfigHistoryProjectActionTest {
         when(mockedPlugin.getSaveModuleConfiguration()).thenReturn(false);
         JobConfigHistoryProjectAction sut = createActionForMavenModule();
         assertNull(sut.getIconFileName());
+    }
+
+    @Test
+    public void testGetIconFileNameMatrixProject() {
+        MatrixProject project = mock(MatrixProject.class);
+        when(project.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
+
+        JobConfigHistoryProjectActionImpl action = new JobConfigHistoryProjectActionImpl(mockedHudson, project);
+        assertEquals(JobConfigHistoryConsts.ICONFILENAME, action.getIconFileName());
+    }
+
+    @Test
+    public void testGetIconFileNameMatrixConfiguration() {
+        MatrixConfiguration configuration = mock(MatrixConfiguration.class);
+        when(configuration.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
+
+        JobConfigHistoryProjectActionImpl action = new JobConfigHistoryProjectActionImpl(mockedHudson, configuration);
+        assertNull(action.getIconFileName());
     }
 
     /**
