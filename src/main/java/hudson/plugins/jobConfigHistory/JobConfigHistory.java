@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Plugin;
 import hudson.XmlFile;
+import hudson.matrix.MatrixProject;
 import hudson.maven.MavenModule;
 import hudson.maven.MavenModuleSet;
 import hudson.model.AbstractProject;
@@ -11,6 +12,7 @@ import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.Saveable;
 import hudson.util.FormValidation;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -18,9 +20,12 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import javax.servlet.ServletException;
+
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -356,7 +361,7 @@ public class JobConfigHistory extends Plugin {
         } else if (saveItemGroupConfiguration && group) {
             saveable = true;
         }
-        if (item instanceof MavenModuleSet) {
+        if (item instanceof MavenModuleSet || item instanceof MatrixProject) {
             saveable = true;
         }
         if (item instanceof MavenModule && !saveModuleConfiguration) {
