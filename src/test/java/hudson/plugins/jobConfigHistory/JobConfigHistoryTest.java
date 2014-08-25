@@ -24,21 +24,29 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
+import hudson.matrix.MatrixConfiguration;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.ItemGroup;
 import hudson.model.User;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
+
 import javax.servlet.ServletException;
+
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+
 import org.junit.Rule;
+
 import static org.hamcrest.CoreMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -336,10 +344,12 @@ public class JobConfigHistoryTest {
         assertTrue(sut.isSaveable(null, new XmlFile(unpackResourceZip.getResource("config.xml"))));
         assertTrue(sut.isSaveable(mock(ItemGroup.class), xmlFile));
         assertFalse(sut.isSaveable(null, xmlFile));
+        assertFalse(sut.isSaveable(mock(MatrixConfiguration.class), xmlFile));
 
         formData.put("saveItemGroupConfiguration", false);
         sut.configure(null, formData);
         assertFalse(sut.isSaveable(mock(ItemGroup.class), xmlFile));
+        assertFalse(sut.isSaveable(mock(MatrixConfiguration.class), xmlFile));
     }
 
     /**

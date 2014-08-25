@@ -1,6 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
+import hudson.matrix.MatrixConfiguration;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.Api;
@@ -22,7 +23,6 @@ import java.util.SortedMap;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -70,6 +70,9 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             return null;
         }
         if (!getPlugin().getSaveModuleConfiguration() && project instanceof MavenModule) {
+            return null;
+        }
+        if (project instanceof MatrixConfiguration) {
             return null;
         }
 
