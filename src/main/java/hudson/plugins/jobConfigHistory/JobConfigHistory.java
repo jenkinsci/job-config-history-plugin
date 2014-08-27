@@ -7,7 +7,6 @@ import hudson.model.AbstractProject;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import hudson.model.Item;
-import hudson.model.ItemGroup;
 import hudson.model.Saveable;
 import hudson.model.TopLevelItem;
 import hudson.util.FormValidation;
@@ -61,7 +60,8 @@ public class JobConfigHistory extends Plugin {
     private transient boolean saveSystemConfiguration; //NOPMD
 
     /** Flag to indicate ItemGroups configuration is saved as well. */
-    private boolean saveItemGroupConfiguration;
+    @Deprecated
+    private transient boolean saveItemGroupConfiguration;
 
     /** Flag to indicate if we should save history when it
      *  is a duplication of the previous saved configuration.
@@ -102,7 +102,6 @@ public class JobConfigHistory extends Plugin {
         setMaxHistoryEntries(formData.getString("maxHistoryEntries").trim());
         setMaxDaysToKeepEntries(formData.getString("maxDaysToKeepEntries").trim());
         setMaxEntriesPerPage(formData.getString("maxEntriesPerPage").trim());
-        saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
         skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
         excludePattern = formData.getString("excludePattern");
         saveModuleConfiguration = formData.getBoolean("saveModuleConfiguration");
@@ -202,8 +201,9 @@ public class JobConfigHistory extends Plugin {
     /**
      * @return True if item group configurations should be saved.
      */
+    @Deprecated
     public boolean getSaveItemGroupConfiguration() {
-        return saveItemGroupConfiguration;
+        return true;
     }
 
     /**
@@ -351,9 +351,8 @@ public class JobConfigHistory extends Plugin {
      * @return true if the item configuration should be saved.
      */
     boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
-        if (item instanceof TopLevelItem) return true;
 
-        if (saveItemGroupConfiguration && item instanceof ItemGroup) return true;
+        if (item instanceof TopLevelItem) return true;
 
         if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) return checkRegex(xmlFile);
 
