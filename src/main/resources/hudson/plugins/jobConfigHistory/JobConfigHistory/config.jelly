@@ -17,9 +17,6 @@
         <f:textbox name="maxEntriesPerPage" value="${it.maxEntriesPerPage}"
            checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxEntriesPerPage?value='+escape(this.value)"/>
       </f:entry>
-      <f:entry title="${%Save folder configuration changes}" help="/plugin/jobConfigHistory/help/help-saveItemGroupConfiguration.html">
-        <f:checkbox name="saveItemGroupConfiguration" checked="${it.saveItemGroupConfiguration}"/>
-      </f:entry>
       <f:entry title="${%System configuration exclude file pattern}" help="/plugin/jobConfigHistory/help/help-excludePattern.html">
         <f:textbox name="excludePattern" value="${it.excludePattern}" default="${it.defaultExcludePattern}"
            checkUrl="'${rootURL}/plugin/jobConfigHistory/checkExcludePattern?value='+escape(this.value)"/>

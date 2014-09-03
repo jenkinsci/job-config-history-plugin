@@ -6,6 +6,7 @@ import hudson.model.AbstractItem;
 import hudson.model.Api;
 import hudson.model.Hudson;
 import hudson.model.Item;
+import hudson.model.TopLevelItem;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 
@@ -22,7 +23,6 @@ import java.util.SortedMap;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -69,11 +69,14 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         if (!hasConfigurePermission()) {
             return null;
         }
-        if (!getPlugin().getSaveModuleConfiguration() && project instanceof MavenModule) {
-            return null;
+        if (project instanceof TopLevelItem) {
+            return JobConfigHistoryConsts.ICONFILENAME;
+        }
+        if (getPlugin().getSaveModuleConfiguration() && project instanceof MavenModule) {
+            return JobConfigHistoryConsts.ICONFILENAME;
         }
 
-        return JobConfigHistoryConsts.ICONFILENAME;
+        return null;
     }
 
     /**

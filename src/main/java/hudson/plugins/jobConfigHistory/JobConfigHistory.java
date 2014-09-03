@@ -3,14 +3,14 @@ package hudson.plugins.jobConfigHistory;
 import hudson.Plugin;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
-import hudson.maven.MavenModuleSet;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import hudson.model.Item;
-import hudson.model.ItemGroup;
 import hudson.model.Saveable;
+import hudson.model.TopLevelItem;
 import hudson.util.FormValidation;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -18,9 +18,12 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import javax.servlet.ServletException;
+
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -57,7 +60,8 @@ public class JobConfigHistory extends Plugin {
     private transient boolean saveSystemConfiguration; //NOPMD
 
     /** Flag to indicate ItemGroups configuration is saved as well. */
-    private boolean saveItemGroupConfiguration;
+    @Deprecated
+    private transient boolean saveItemGroupConfiguration;
 
     /** Flag to indicate if we should save history when it
      *  is a duplication of the previous saved configuration.
@@ -98,7 +102,6 @@ public class JobConfigHistory extends Plugin {
         setMaxHistoryEntries(formData.getString("maxHistoryEntries").trim());
         setMaxDaysToKeepEntries(formData.getString("maxDaysToKeepEntries").trim());
         setMaxEntriesPerPage(formData.getString("maxEntriesPerPage").trim());
-        saveItemGroupConfiguration = formData.getBoolean("saveItemGroupConfiguration");
         skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
         excludePattern = formData.getString("excludePattern");
         saveModuleConfiguration = formData.getBoolean("saveModuleConfiguration");
@@ -198,8 +201,9 @@ public class JobConfigHistory extends Plugin {
     /**
      * @return True if item group configurations should be saved.
      */
+    @Deprecated
     public boolean getSaveItemGroupConfiguration() {
-        return saveItemGroupConfiguration;
+        return true;
     }
 
     /**
@@ -347,22 +351,14 @@ public class JobConfigHistory extends Plugin {
      * @return true if the item configuration should be saved.
      */
     boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
-        boolean saveable = false;
-        final boolean group = item instanceof ItemGroup;
-        if (item instanceof Item && !group) {
-            saveable = true;
-        } else if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) {
-            saveable = checkRegex(xmlFile);
-        } else if (saveItemGroupConfiguration && group) {
-            saveable = true;
-        }
-        if (item instanceof MavenModuleSet) {
-            saveable = true;
-        }
-        if (item instanceof MavenModule && !saveModuleConfiguration) {
-            saveable = false;
-        }
-        return saveable;
+
+        if (item instanceof TopLevelItem) return true;
+
+        if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) return checkRegex(xmlFile);
+
+        if (item instanceof MavenModule && saveModuleConfiguration) return true;
+
+        return false;
     }
 
     /**

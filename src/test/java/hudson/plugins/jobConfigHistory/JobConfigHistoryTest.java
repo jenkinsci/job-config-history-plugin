@@ -24,21 +24,31 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
+import hudson.matrix.MatrixConfiguration;
+import hudson.matrix.MatrixProject;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
-import hudson.model.ItemGroup;
+import hudson.model.TopLevelItem;
 import hudson.model.User;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
+
 import javax.servlet.ServletException;
+
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+
 import org.junit.Rule;
+import org.jvnet.hudson.test.MockFolder;
+
 import static org.hamcrest.CoreMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -174,17 +184,6 @@ public class JobConfigHistoryTest {
         assertTrue(sut.isPositiveInteger("0"));
         assertTrue(sut.isPositiveInteger("1"));
 
-    }
-
-    /**
-     * Test of getSaveItemGroupConfiguration method, of class JobConfigHistory.
-     */
-    @Test
-    public void testGetSaveItemGroupConfiguration() {
-        JobConfigHistory sut = createSut();
-        boolean expResult = false;
-        boolean result = sut.getSaveItemGroupConfiguration();
-        assertEquals(expResult, result);
     }
 
     /**
@@ -332,14 +331,12 @@ public class JobConfigHistoryTest {
         final JSONObject formData = createFormData();
 
         sut.configure(null, formData);
-        assertTrue(sut.isSaveable(mock(AbstractProject.class), xmlFile));
+        assertTrue(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
+        assertTrue(sut.isSaveable(mock(MatrixProject.class), xmlFile));
+        assertTrue(sut.isSaveable(mock(MockFolder.class), xmlFile));
         assertTrue(sut.isSaveable(null, new XmlFile(unpackResourceZip.getResource("config.xml"))));
-        assertTrue(sut.isSaveable(mock(ItemGroup.class), xmlFile));
         assertFalse(sut.isSaveable(null, xmlFile));
-
-        formData.put("saveItemGroupConfiguration", false);
-        sut.configure(null, formData);
-        assertFalse(sut.isSaveable(mock(ItemGroup.class), xmlFile));
+        assertFalse(sut.isSaveable(mock(MatrixConfiguration.class), xmlFile));
     }
 
     /**
@@ -415,7 +412,6 @@ public class JobConfigHistoryTest {
                 "\"maxHistoryEntries\": \"5\"," +
                 "\"maxDaysToKeepEntries\": \"5\"," +
                 "\"maxEntriesPerPage\": \"50\"," +
-                "\"saveItemGroupConfiguration\": true," +
                 "\"skipDuplicateHistory\": true," +
                 "\"excludePattern\": \"5\"," +
                 "\"saveModuleConfiguration\": true," +
