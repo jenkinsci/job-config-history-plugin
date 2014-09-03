@@ -59,9 +59,11 @@ public class JobConfigHistory extends Plugin {
     @Deprecated
     private transient boolean saveSystemConfiguration; //NOPMD
 
-    /** Flag to indicate ItemGroups configuration is saved as well. */
+    /** Flag to indicate ItemGroups configuration is saved as well. 
+     * @deprecated since version 2.9
+     */
     @Deprecated
-    private transient boolean saveItemGroupConfiguration;
+    private transient boolean saveItemGroupConfiguration; //NOPMD
 
     /** Flag to indicate if we should save history when it
      *  is a duplication of the previous saved configuration.
@@ -77,7 +79,7 @@ public class JobConfigHistory extends Plugin {
     private transient Pattern excludeRegexpPattern;
 
     /** Flag to indicate if we should save the config history of Maven modules. */
-    private boolean saveModuleConfiguration = false;
+    private boolean saveModuleConfiguration;
 
     /**
      * Whether build badges should appear when the config of a job has changed since the last build.
@@ -200,6 +202,7 @@ public class JobConfigHistory extends Plugin {
 
     /**
      * @return True if item group configurations should be saved.
+     * @deprecated since version 2.9
      */
     @Deprecated
     public boolean getSaveItemGroupConfiguration() {
@@ -352,11 +355,17 @@ public class JobConfigHistory extends Plugin {
      */
     boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
 
-        if (item instanceof TopLevelItem) return true;
+        if (item instanceof TopLevelItem) {
+            return true;
+        }
 
-        if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) return checkRegex(xmlFile);
+        if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) {
+            return checkRegex(xmlFile);
+        }
 
-        if (item instanceof MavenModule && saveModuleConfiguration) return true;
+        if (item instanceof MavenModule && saveModuleConfiguration) {
+            return true;
+        }
 
         return false;
     }
