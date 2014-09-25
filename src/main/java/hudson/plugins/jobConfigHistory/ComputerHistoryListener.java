@@ -5,6 +5,8 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
+import hudson.slaves.EphemeralNode;
+import hudson.slaves.AbstractCloudSlave;
 import hudson.slaves.ComputerListener;
 import hudson.model.Node;
 import hudson.model.Slave;
@@ -49,11 +51,20 @@ public class ComputerHistoryListener extends ComputerListener {
      */
     private void onAdd() {
         for (Node node : Jenkins.getInstance().getNodes()) {
-            if (!nodes.contains(node)) {
+            if (!nodes.contains(node) && isTracked(node)) {
                 switchHistoryDao(node).createNewNode(node);
                 return;
             }
         }
+    }
+
+    /**
+     * Is this node likely to be important to the user?
+     * @param node
+     */
+    private boolean isTracked(Node node) {
+        return node != null &&
+                ! (node instanceof AbstractCloudSlave || node instanceof EphemeralNode);
     }
     
     /**
@@ -61,7 +72,7 @@ public class ComputerHistoryListener extends ComputerListener {
      */
     private void onRemove() {
         for (Node node : nodes) {
-            if (!Jenkins.getInstance().getNodes().contains(node)) {
+            if (!Jenkins.getInstance().getNodes().contains(node) && isTracked(node)) {
                 switchHistoryDao(node).deleteNode(node);
                 return;
             }
@@ -87,7 +98,7 @@ public class ComputerHistoryListener extends ComputerListener {
     private void onRename() {
         Node originalNode = null;
         for (Node node : nodes) {
-            if (!Jenkins.getInstance().getNodes().contains(node)) {
+            if (!Jenkins.getInstance().getNodes().contains(node) && isTracked(node)) {
                 originalNode = node;
             }
         }
@@ -97,7 +108,7 @@ public class ComputerHistoryListener extends ComputerListener {
         } 
         Node newNode = null;
         for (Node node : Jenkins.getInstance().getNodes()) {
-            if (!nodes.contains(node)) {
+            if (!nodes.contains(node)  && isTracked(node)) {
                 newNode = node; 
             }
         }
