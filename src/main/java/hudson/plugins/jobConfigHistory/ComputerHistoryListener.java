@@ -28,6 +28,12 @@ public class ComputerHistoryListener extends ComputerListener {
     
     @Override
     public void onConfigurationChange() {
+    	// Ensure nodes is configured as getNodes() may return null
+    	// during class initialization. NodeList will surely be defined
+    	// on the first run of this method.
+    	if (nodes == null) {
+    		nodes = Jenkins.getInstance().getNodes();
+    	}
         if (nodes.size() < Jenkins.getInstance().getNodes().size()) {
             onAdd();
             nodes = Jenkins.getInstance().getNodes();
