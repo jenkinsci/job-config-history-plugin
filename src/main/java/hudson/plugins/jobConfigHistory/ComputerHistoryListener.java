@@ -91,7 +91,7 @@ public class ComputerHistoryListener extends ComputerListener {
     private void onChange() {
         final FileHistoryDao hdao = PluginUtils.getHistoryDao();
         for (Node node : Jenkins.getInstance().getNodes()) {
-            if (!hdao.hasDuplicateHistory(node)) {
+            if (isTracked(node) && !hdao.hasDuplicateHistory(node)) {
                 PluginUtils.getHistoryDao().saveNode(node);
                 return;
             }
