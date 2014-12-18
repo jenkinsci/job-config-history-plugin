@@ -33,7 +33,6 @@ import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
 import hudson.model.User;
-import hudson.remoting.Callable;
 import hudson.util.IOUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,6 +46,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.io.FileUtils;
 import static org.hamcrest.Matchers.*;
@@ -654,7 +654,7 @@ public class FileHistoryDaoTest {
      * Runs a test, which renames or deletes a node.
      * This method decouples the shared logic from {@link #testDeleteNode()} and {@link #testRenameNode()}.
      */
-    private void printTestData(Callable<Void, Exception> func) throws Exception { 
+    private void printTestData(Callable<Void> func) throws Exception { 
         when(mockedNode.getNodeName()).thenReturn("slave1");
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
         File revisions = new File(file, "slave1");
@@ -683,7 +683,7 @@ public class FileHistoryDaoTest {
     
     @Test
     public void testDeleteNode()throws Exception{
-        printTestData(new Callable<Void, Exception>() {
+        printTestData(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 sutWithUserAndNoDuplicateHistory.deleteNode(mockedNode);
@@ -694,7 +694,7 @@ public class FileHistoryDaoTest {
     
     @Test
     public void testRenameNode() throws Exception{
-        printTestData(new Callable<Void, Exception>() {
+        printTestData(new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 sutWithUserAndNoDuplicateHistory.renameNode(mockedNode, 
