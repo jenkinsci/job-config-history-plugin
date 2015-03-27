@@ -45,7 +45,7 @@ public class JobConfigHistorySaveableListenerTest {
         }
 
         @Override
-        HistoryDao getHistoryDao() {
+        HistoryDao getHistoryDao(JobConfigHistory plugin) {
             return mockedConfigHistoryListenerHelper;
         }
     }

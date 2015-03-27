@@ -1,8 +1,10 @@
 package hudson.plugins.jobConfigHistory;
 
+import static hudson.init.InitMilestone.COMPLETED;
 import static java.util.logging.Level.FINEST;
 import hudson.Extension;
 import hudson.XmlFile;
+import hudson.model.Hudson;
 import hudson.model.Saveable;
 import hudson.model.listeners.SaveableListener;
 
@@ -25,7 +27,7 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
         final JobConfigHistory plugin = getPlugin();
         LOG.log(FINEST, "In onChange for {0}", o);
         if (plugin.isSaveable(o, file)) {
-            final HistoryDao configHistoryListenerHelper = getHistoryDao();
+            final HistoryDao configHistoryListenerHelper = getHistoryDao(plugin);
             configHistoryListenerHelper.saveItem(file);
         }
         LOG.log(FINEST, "onChange for {0} done.", o);
@@ -45,8 +47,19 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
      *
      * @return helper.
      */
+    @Deprecated
     HistoryDao getHistoryDao() {
-        return PluginUtils.getHistoryDao();
+        return getHistoryDao(PluginUtils.getPlugin());
     }
 
+    /**
+     * Return the helper, making sure its anonymous while Jenkins is still
+     * initializing.
+     * @return helper
+     */
+    HistoryDao getHistoryDao(JobConfigHistory plugin) {
+        return (COMPLETED == Hudson.getInstance().getInitLevel())
+                ? PluginUtils.getHistoryDao(plugin)
+                : PluginUtils.getAnonymousHistoryDao(plugin);
+    }
 }
