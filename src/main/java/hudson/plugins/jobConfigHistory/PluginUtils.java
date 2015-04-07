@@ -63,12 +63,32 @@ final class PluginUtils {
     }
 
     /**
+     * Like {@link #getHistoryDao()}, but without a user.
+     * Avoids calling {@link User#current()}.
+     * @return historyDao
+     */
+    public static FileHistoryDao getAnonymousHistoryDao() {
+        final JobConfigHistory plugin = getPlugin();
+        return getAnonymousHistoryDao(plugin);
+    }
+
+    /**
      * For tests.
      * @param plugin the plugin.
      * @return historyDao
      */
     public static FileHistoryDao getHistoryDao(final JobConfigHistory plugin) {
         return getHistoryDao(plugin, User.current());
+    }
+
+    /**
+     * Like {@link #getHistoryDao(JobConfigHistory)}, but without a user.
+     * Avoids calling {@link User#current()}.
+     * @param plugin the plugin.
+     * @return historyDao
+     */
+    public static FileHistoryDao getAnonymousHistoryDao(final JobConfigHistory plugin) {
+        return getHistoryDao(plugin, null);
     }
 
     static FileHistoryDao getHistoryDao(final JobConfigHistory plugin, final User user) {
