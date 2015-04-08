@@ -9,7 +9,7 @@
 
     <artifactId>jobConfigHistory</artifactId>
     <packaging>hpi</packaging>
-    <version>2.12-SNAPSHOT</version>
+    <version>2.11-SNAPSHOT</version>
     <name>Jenkins Job Configuration History Plugin</name>
     <description>Saves copies of job and system configurations.</description>
     <url>http://wiki.jenkins-ci.org/display/JENKINS/JobConfigHistory+Plugin</url>
@@ -254,7 +254,6 @@
                     <show>private</show>
                     <quiet>true</quiet>
                     <aggregate>false</aggregate>
-                    <additionalparam>-Xdoclint:none</additionalparam>
                     <links>
                         <link>http://docs.oracle.com/javase/6/docs/api/</link>
                         <link>http://javadoc.jenkins-ci.org/</link>
