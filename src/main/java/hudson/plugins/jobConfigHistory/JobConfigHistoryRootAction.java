@@ -68,7 +68,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * jobs.
      */
     public final String getIconFileName() {
-        if (hasConfigurePermission() || hasJobConfigurePermission()) {
+        if (hasConfigurePermission() || hasJobConfigurePermission() || hasReadExtensionPermission()) {
             return JobConfigHistoryConsts.ICONFILENAME;
         } else {
             return null;
@@ -138,7 +138,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      *             if one of the history entries might not be read.
      */
     List<ConfigInfo> getJobConfigs(String type) throws IOException {
-        if (!hasJobConfigurePermission()) {
+        if (!hasJobConfigurePermission()  && !hasReadExtensionPermission()) {
             return Collections.EMPTY_LIST;
         } else {
             return new ConfigInfoCollector(type, getOverviewHistoryDao()).collect("");
@@ -251,7 +251,15 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         return getAccessControlledObject().hasPermission(Item.CONFIGURE);
     }
 
-    
+    /**
+     * Returns whether the current user may read configure jobs.
+     *
+     * @return true if the current user may read configure jobs.
+     */
+    public boolean hasReadExtensionPermission() {
+        return getAccessControlledObject().hasPermission(Item.EXTENDED_READ);
+    }
+
     /**
      * Parses the incoming {@literal POST} request and redirects as
      * {@literal GET showDiffFiles}.
@@ -321,9 +329,11 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
             if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
                 return getHistoryDao().getOldRevision("jobs/" + name, timestamp);
             } else {
-                checkConfigurePermission();
+                if(!hasConfigurePermission() && !hasReadExtensionPermission() && !hasJobConfigurePermission()) {
+                    checkConfigurePermission();
+                    return null;
+                }
                 return getHistoryDao().getOldRevision(name, timestamp);
-                
             }
         } else {
             throw new IllegalArgumentException("Unable to get history from: "

@@ -44,7 +44,7 @@
           <j:when test="${!it.hasConfigurePermission() and (filter == 'system' || filter == null)}">
             ${%No permission to view system changes}
           </j:when>
-          <j:when test="${!it.hasJobConfigurePermission()}">
+          <j:when test="${!it.hasJobConfigurePermission() and !it.hasReadExtensionPermission()}">
             ${%No permission to view config history}
           </j:when>
           <j:when test="${configs.size() == 0}">
@@ -67,7 +67,9 @@
                     </j:otherwise>
                   </j:choose>
                   <td class="pane-header" align="left">${%Operation}</td>
-                  <td class="pane-header" align="left">${%User}</td>
+                  <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                    <td class="pane-header" align="left">${%User}</td>
+                  </j:if>
                   <td class="pane-header" align="left">${%File(raw)}</td>
                   <j:if test="${filter == 'deleted'}">
                     <td class="pane-header" align="left">${%Restore project}</td>
@@ -96,7 +98,9 @@
                       </j:otherwise>
                     </j:choose>
                     <td>${config.operation}</td>
-                    <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                    <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                      <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                    </j:if>
                     <td>
                       <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
                       <a href="${it.createLinkToFiles(config,'xml')}">
@@ -110,9 +114,11 @@
                     <j:if test="${filter == 'deleted'}">
                       <td>
                         <j:if test="${it.getLastAvailableConfigXml(config.getJob()) != null}">
-						  <a id="restore" href="restoreQuestion?name=${config.getJob()}">
+                          <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                            <a id="restore" href="restoreQuestion?name=${config.getJob()}">
 							<img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
-						  </a>
+						    </a>
+                          </j:if>
 						</j:if>
                       </td>
                     </j:if>
