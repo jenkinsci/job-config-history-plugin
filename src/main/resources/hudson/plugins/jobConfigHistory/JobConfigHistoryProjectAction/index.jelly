@@ -23,9 +23,13 @@
                   <tr>
                     <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
                     <td class="pane-header" align="left">${%Operation}</td>
-                    <td class="pane-header" align="left">${%User}</td>
+                    <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                      <td class="pane-header" align="left">${%User}</td>
+                    </j:if>
                     <td class="pane-header" align="left">${%Show File}</td>
-                    <td class="pane-header" align="left">${%Restore old config}</td>
+                    <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                      <td class="pane-header" align="left">${%Restore old config}</td>
+                    </j:if>
                     <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
                     <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
                   </tr>
@@ -35,7 +39,9 @@
                     <tr>
                       <td>${config.date}</td>
                       <td>${config.operation}</td>
-                      <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                      <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                        <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                      </j:if>
                       <td>
                         <j:set var="fileMissing" value="${!config.hasConfig()}"/>
                         <j:if test="${!fileMissing}">
@@ -48,12 +54,14 @@
                           </a>
                         </j:if>
                       </td>
-                      <td><j:if test="${configNr > 1 and !fileMissing}">
-							<a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
-								<img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
-							</a>
-                          </j:if>
-                      </td>
+                      <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                          <td><j:if test="${configNr > 1 and !fileMissing}">
+                                <a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
+                                    <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
+                                </a>
+                              </j:if>
+                          </td>
+                      </j:if>
                       <j:if test="${configNr == 2 and fileMissing}">
                         <j:set var="offsetIfFileMissing" value="1"/>
                       </j:if>

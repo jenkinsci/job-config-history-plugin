@@ -5,7 +5,7 @@
       <h1>${%Job Configuration Difference}</h1>
       <div>
         <j:choose>
-          <j:when test="${!it.hasConfigurePermission()}">
+          <j:when test="${!it.hasConfigurePermission() and !it.hasReadExtensionPermission()}">
             ${%No permission to view config history}
           </j:when>
           <j:when test="${it.getJobConfigs().size() == 0}">
@@ -37,27 +37,35 @@
                     <td colspan="2">
                       <table style="width:100%; border-collapse: collapse;">
                         <tr>
-                          <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
-                          <td align="right">
-                            <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
-                              <f:submit value="${%Restore this configuration}" />
-                            </f:form>
-                          </td>
+                          <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                            <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
+                          </j:if>
+                          <j:if test="${it.hasConfigurePermission()}">
+                            <td align="right">
+                              <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
+                                <f:submit value="${%Restore this configuration}" />
+                              </f:form>
+                            </td>
+                          </j:if>
                         </tr>
                       </table>
                     </td>
-                    <td colspan="2">  
+                    <td colspan="2">
                       <table style="width:100%; border-collapse: collapse;">
                         <tr>
-                          <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(2)}">${it.getUser(2)}</a> </td>
-                          <td align="right">
-                            <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" name="forward">
-                              <f:submit value="${%Restore this configuration}" />
-                            </f:form>
-                          </td>
+                          <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                            <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(2)}">${it.getUser(2)}</a> </td>
+                          </j:if>
+                          <j:if test="${it.hasConfigurePermission()}">
+                            <td align="right">
+                              <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" name="forward">
+                                <f:submit value="${%Restore this configuration}" />
+                              </f:form>
+                            </td>
+                          </j:if>
                         </tr>
                       </table>
-                    </td>             
+                    </td>
                   </tr>
                 </thead>
                 <tbody style="outline: 1pt solid #B2B2B2;">
