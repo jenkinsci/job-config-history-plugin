@@ -1,6 +1,6 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="Slave Configuration History">
-    <st:include it="${app}" page="sidepanel.jelly" />
+    <st:include it="${it.slave.toComputer()}" page="sidepanel.jelly" />
     <l:main-panel>
       <h1>${%Slave Configuration History}</h1>
       <h2>${it.getSlave().getNodeName()}</h2>
