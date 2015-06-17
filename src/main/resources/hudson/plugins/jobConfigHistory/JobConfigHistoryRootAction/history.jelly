@@ -48,7 +48,8 @@
                     <f:submit value="${%Show Diffs}" />
                   </div>
        			</j:if>
-                <table class="pane sortable" style="width:100%">
+                <st:adjunct includes="hudson.plugins.jobConfigHistory.table" />
+                <table id="confighistory" class="pane sortable">
                   <tr>
                     <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
                     <td class="pane-header" align="left">${%Operation}</td>
@@ -67,7 +68,7 @@
                       <td>
                         <j:if test="${config.operation != 'Deleted'}">
                           <a href="configOutput?type=xml&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
-                            <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
+                            <img src="${imagesURL}/24x24/document.png" alt="" />${%View as XML}
                           </a>
                           <st:nbsp />
                           <a href="configOutput?type=raw&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
