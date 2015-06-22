@@ -19,7 +19,8 @@
                     <f:submit value="${%Show Diffs}" />
                   </div>
       		    </j:if>
-                <table class="pane sortable" style="width:100%">
+                <st:adjunct includes="hudson.plugins.jobConfigHistory.table" />
+                <table id="confighistory" class="pane sortable">
                   <tr>
                     <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
                     <td class="pane-header" align="left">${%Operation}</td>
@@ -46,7 +47,7 @@
                         <j:set var="fileMissing" value="${!config.hasConfig()}"/>
                         <j:if test="${!fileMissing}">
                           <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}">
-                            <img src="${imagesURL}/24x24/document.gif" alt="" />${%View as XML}
+                            <img src="${imagesURL}/24x24/document.png" alt="" />${%View as XML}
                           </a>
                           <st:nbsp />
                           <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}">
