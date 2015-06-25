@@ -1,5 +1,14 @@
 package hudson.plugins.jobConfigHistory;
 
+import javax.servlet.ServletException;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import hudson.Plugin;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
@@ -10,20 +19,8 @@ import hudson.model.Item;
 import hudson.model.Saveable;
 import hudson.model.TopLevelItem;
 import hudson.util.FormValidation;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import javax.servlet.ServletException;
-
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -79,7 +76,7 @@ public class JobConfigHistory extends Plugin {
     private transient Pattern excludeRegexpPattern;
 
     /** Flag to indicate if we should save the config history of Maven modules. */
-    private boolean saveModuleConfiguration;
+    private boolean saveModuleConfiguration = false;
 
     /**
      * Whether build badges should appear when the config of a job has changed since the last build.
