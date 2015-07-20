@@ -65,6 +65,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * {@literal null} to hide the icon if the user is not allowed to configure
      * jobs.
      */
+    @Override
     public final String getIconFileName() {
         if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
             return null;

@@ -105,7 +105,7 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
      */
     public void testJobHistoryPurger() throws Exception {
         final String name = "TestJob";
-        final File historyDir = new File(new File(jch.getConfiguredHistoryRootDir(), "jobs"), name);
+        final File historyDir = new File(new File(jch.getConfiguredHistoryRootDir().getPath(), "jobs"), name);
         createDirectories(historyDir);
         assertEquals("Verify 3 original project history entries.", 3,  historyDir.listFiles().length);
 

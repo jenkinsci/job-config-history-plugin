@@ -21,15 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.plugins.jobConfigHistory;
 
 import hudson.model.Hudson;
 import hudson.model.User;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Helper class.
@@ -47,6 +52,7 @@ final class PluginUtils {
 
     /**
      * Returns the plugin for tests.
+     *
      * @return plugin
      */
     public static JobConfigHistory getPlugin() {
@@ -55,68 +61,110 @@ final class PluginUtils {
 
     /**
      * For tests.
+     *
      * @return historyDao
      */
-    public static FileHistoryDao getHistoryDao() {
+    public static HistoryDaoBackend getHistoryDao() {
         final JobConfigHistory plugin = getPlugin();
         return getHistoryDao(plugin);
     }
 
     /**
-     * Like {@link #getHistoryDao()}, but without a user.
-     * Avoids calling {@link User#current()}.
+     * Like {@link #getHistoryDao()}, but without a user. Avoids calling
+     * {@link User#current()}.
+     *
      * @return historyDao
      */
-    public static FileHistoryDao getAnonymousHistoryDao() {
+    public static HistoryDaoBackend getAnonymousHistoryDao() {
         final JobConfigHistory plugin = getPlugin();
         return getAnonymousHistoryDao(plugin);
     }
 
     /**
      * For tests.
+     *
      * @param plugin the plugin.
      * @return historyDao
      */
-    public static FileHistoryDao getHistoryDao(final JobConfigHistory plugin) {
+    public static HistoryDaoBackend getHistoryDao(final JobConfigHistory plugin) {
         return getHistoryDao(plugin, User.current());
     }
 
     /**
-     * Like {@link #getHistoryDao(JobConfigHistory)}, but without a user.
-     * Avoids calling {@link User#current()}.
+     * Like {@link #getHistoryDao(JobConfigHistory)}, but without a user. Avoids
+     * calling {@link User#current()}.
+     *
      * @param plugin the plugin.
      * @return historyDao
      */
-    public static FileHistoryDao getAnonymousHistoryDao(final JobConfigHistory plugin) {
+    public static HistoryDaoBackend getAnonymousHistoryDao(final JobConfigHistory plugin) {
         return getHistoryDao(plugin, null);
     }
 
-    static FileHistoryDao getHistoryDao(final JobConfigHistory plugin, final User user) {
-        final String maxHistoryEntriesAsString = plugin.getMaxHistoryEntries();
-        int maxHistoryEntries = 0;
+    private static int valueOfStringOrDefault(String s, int x) {
         try {
-            maxHistoryEntries = Integer.valueOf(maxHistoryEntriesAsString);
+            return Integer.valueOf(s);
         } catch (NumberFormatException e) {
-            maxHistoryEntries = 0;
+            return x;
         }
-        return new FileHistoryDao(
-                plugin.getConfiguredHistoryRootDir(),
-                new File(Hudson.getInstance().root.getPath()),
-                user,
-                maxHistoryEntries,
-                !plugin.getSkipDuplicateHistory());
     }
-    /**
-     * Returns a {@link Date}.
-     *
-     * @param timeStamp date as string.
-     * @return The parsed date as a java.util.Date.
-     */
-    public static Date parsedDate(final String timeStamp) {
+
+    private static File getFileFromURL(URL url) {
+        try {
+            return new File(url.toURI());
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(PluginUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return new File(url.getPath());
+        }
+    }
+
+    static HistoryDaoBackend getHistoryDao(final JobConfigHistory plugin, final User user) {
+        int maxHistoryEntries = valueOfStringOrDefault(plugin.getMaxHistoryEntries(), 0);
+        URL url;
+        try {
+            url = plugin.getConfiguredHistoryRootDir();
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(PluginUtils.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IllegalStateException(ex);
+        }
+        List<HistoryDaoBackend> backends = HistoryDaoBackend.all();
+        for (HistoryDaoBackend backend : backends) {
+            if (backend.isUrlSupported(url)) {
+                if (backend instanceof FileHistoryDao) {
+                    final File file;
+                    try {
+                        file = getFileFromURL(plugin.getConfiguredHistoryRootDir());
+                    } catch (MalformedURLException ex) {
+                        throw new IllegalStateException("Failed to initialize file from url: " + url);
+                    }
+                    // TODO: hack... need to create uniform instantiators as per: 
+                    // https://wiki.jenkins-ci.org/display/JENKINS/Defining+a+new+extension+point
+                    return new FileHistoryDao(
+                        file,
+                        new File(Hudson.getInstance().root.getPath()),
+                        user,
+                        maxHistoryEntries,
+                        !plugin.getSkipDuplicateHistory());
+                } else {
+                    backend.setUrl(url);
+                    return backend;
+                }
+            }
+        }
+        throw new IllegalStateException("Backend for " + url + " not supported.");
+    }
+
+/**
+ * Returns a {@link Date}.
+ *
+ * @param timeStamp date as string.
+ * @return The parsed date as a java.util.Date.
+ */
+public static Date parsedDate(final String timeStamp) {
         try {
             return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timeStamp);
         } catch (ParseException ex) {
             throw new IllegalArgumentException("Could not parse Date" + timeStamp, ex);
-        }        
+        }
     }
 }

@@ -19,6 +19,9 @@ import hudson.model.Item;
 import hudson.model.Saveable;
 import hudson.model.TopLevelItem;
 import hudson.util.FormValidation;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -304,22 +307,24 @@ public class JobConfigHistory extends Plugin {
      * Returns the File object representing the configured root history directory.
      *
      * @return The configured root history File object.
+     * @throws java.net.MalformedURLException thrown when a URL could not be created
+     *     from the URI.
      */
-    protected File getConfiguredHistoryRootDir() {
-        File rootDir;
+    protected URL getConfiguredHistoryRootDir() throws MalformedURLException {
         final File jenkinsHome = getJenkinsHome();
+        if (historyRootDir == null || historyRootDir.isEmpty())
+            return new File(jenkinsHome, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR).toURI().toURL();
 
-        if (historyRootDir == null || historyRootDir.isEmpty()) {
-            rootDir = new File(jenkinsHome, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
-        } else {
-            if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*")) {
-                rootDir = new File(historyRootDir + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
-            } else {
-                rootDir = new File(jenkinsHome, historyRootDir + "/"
-                            + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
-            }
-        }
-        return rootDir;
+        try {
+            final URL url = new URL(historyRootDir);
+            if (! url.getProtocol().equals("file"))
+                return url;
+        } catch (MalformedURLException e) {}
+
+        if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*"))
+            return new File(historyRootDir + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR).toURI().toURL();
+        return new File(jenkinsHome, historyRootDir + "/"
+                    + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR).toURI().toURL();
     }
 
     /**
@@ -330,6 +335,7 @@ public class JobConfigHistory extends Plugin {
      * @return The configuration file or null if no file is found.
      */
     protected File getConfigFile(final File historyDir) {
+        // TODO: refactor away from 'File'
         return FileHistoryDao.getConfigFile(historyDir);
     }
 

@@ -24,6 +24,7 @@
 
 package hudson.plugins.jobConfigHistory;
 
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.Util;
 import hudson.XmlFile;
@@ -40,6 +41,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +65,8 @@ import org.apache.commons.io.FileUtils;
  *
  * @author mfriedenhagen
  */
-public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, OverviewHistoryDao, NodeListenerHistoryDao {
+@Extension
+public class FileHistoryDao extends HistoryDaoBackend {
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(FileHistoryDao.class.getName());
@@ -84,6 +88,10 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
 
     /** Should we save duplicate entries? */
     private final boolean saveDuplicates;
+
+    public FileHistoryDao() {
+        this(null, null, null, 0, false);
+    }
 
     /**
      * @param historyRootDir where to store history
@@ -543,6 +551,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
         return configFile;
     }
 
+
     /**
      * Determines if the {@link XmlFile} contains a duplicate of
      * the last saved information, if there is previous history.
@@ -551,7 +560,7 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
      *           The {@link XmlFile} configuration file under consideration.
      * @return true if previous history is accessible, and the file duplicates the previously saved information.
      */
-    boolean hasDuplicateHistory(XmlFile xmlFile) {
+    public boolean hasDuplicateHistory(XmlFile xmlFile) {
         boolean isDuplicated = false;
         final ArrayList<String> timeStamps = new ArrayList<String>(getRevisions(xmlFile).keySet());
         if (!timeStamps.isEmpty()) {
@@ -798,7 +807,9 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
         return new File(historyRootDir, "/" + JobConfigHistoryConsts.NODES_HISTORY_DIR);
     }
     
-    boolean hasDuplicateHistory(Node node) {
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasDuplicateHistory(final Node node) {
         final String content = Jenkins.XSTREAM2.toXML(node);
         boolean isDuplicated = false;
         final ArrayList<String> timeStamps = new ArrayList<String>(getRevisions(node).keySet());
@@ -880,5 +891,24 @@ public class FileHistoryDao implements HistoryDao, ItemListenerHistoryDao, Overv
     public SortedMap<String, HistoryDescr> getNodeHistory(String nodeName) {
         return getRevisions(new File(getNodeHistoryRootDir(), nodeName), new File(nodeName));
     }
- 
+
+    /** {@inheritDoc} */
+    @Override
+    public URL getHistoryUrl(File configFile) {
+        try {
+            return getHistoryDir(configFile).toURI().toURL();
+        } catch (MalformedURLException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    public boolean isUrlSupported(URL url) {
+        return url.getProtocol().equals("file");
+    }
+
+    @Override
+    void setUrl(URL url) {
+        throw new UnsupportedOperationException("See TODO in PluginUtils.");
+    }
 }
