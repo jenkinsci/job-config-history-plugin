@@ -551,7 +551,6 @@ public class FileHistoryDao extends HistoryDaoBackend {
         return configFile;
     }
 
-
     /**
      * Determines if the {@link XmlFile} contains a duplicate of
      * the last saved information, if there is previous history.
@@ -898,7 +897,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
         try {
             return getHistoryDir(configFile).toURI().toURL();
         } catch (MalformedURLException ex) {
-            return null;
+            throw new IllegalStateException("Could not get history url for configFile: " + configFile + " " + ex.getMessage()); 
         }
     }
 

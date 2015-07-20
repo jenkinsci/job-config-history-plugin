@@ -120,7 +120,7 @@ final class PluginUtils {
 
     static HistoryDaoBackend getHistoryDao(final JobConfigHistory plugin, final User user) {
         int maxHistoryEntries = valueOfStringOrDefault(plugin.getMaxHistoryEntries(), 0);
-        URL url;
+        final URL url;
         try {
             url = plugin.getConfiguredHistoryRootDir();
         } catch (MalformedURLException ex) {

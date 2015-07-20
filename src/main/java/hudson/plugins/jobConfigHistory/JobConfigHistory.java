@@ -319,7 +319,9 @@ public class JobConfigHistory extends Plugin {
             final URL url = new URL(historyRootDir);
             if (! url.getProtocol().equals("file"))
                 return url;
-        } catch (MalformedURLException e) {}
+        } catch (MalformedURLException e) {
+            LOG.log(Level.WARNING, "Malformed url: {0}", e.getMessage());
+        }
 
         if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*"))
             return new File(historyRootDir + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR).toURI().toURL();
