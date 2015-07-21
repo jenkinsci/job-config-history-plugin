@@ -907,7 +907,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
     }
 
     @Override
-    void setUrl(URL url) {
+    public void setUrl(URL url) {
         throw new UnsupportedOperationException("See TODO in PluginUtils.");
     }
 }
