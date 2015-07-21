@@ -16,9 +16,9 @@ public abstract class HistoryDaoBackend implements ExtensionPoint, HistoryDao, I
      * @return true if this dao supports the given url,
      *         false otherwise.
      */
-    abstract boolean isUrlSupported(final URL url);
+    public abstract boolean isUrlSupported(final URL url);
 
-    abstract void setUrl(final URL url);
+    public abstract void setUrl(final URL url);
 
     /**
      * Determines whether the given node has already been recorded 
@@ -28,7 +28,7 @@ public abstract class HistoryDaoBackend implements ExtensionPoint, HistoryDao, I
      *        the node to check for duplicate history.
      * @return true if the node is a duplicate, false otherwise.
      */
-    abstract boolean hasDuplicateHistory(final Node node);
+    public abstract boolean hasDuplicateHistory(final Node node);
 
     /**
      * Returns the configuration URL directory for the given configuration file.
@@ -38,7 +38,7 @@ public abstract class HistoryDaoBackend implements ExtensionPoint, HistoryDao, I
      * @return The base URL to store the history,
      *         or null if the file is not a valid Hudson configuration file.
      */
-    abstract URL getHistoryUrl(final File configFile);
+    public abstract URL getHistoryUrl(final File configFile);
 
     /**
      * All registered {@link HistoryDaoBackend}s.
