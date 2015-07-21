@@ -35,8 +35,8 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     /**The maximum allowed age of history entries in days.*/
     private int maxAge;
     
-    /** The dao. */
-    private HistoryDao historyDao;
+    /**The purgeable object*/
+    private Purgeable purgeable;
 
     /** The overviewDao. */
     private final OverviewHistoryDao overviewHistoryDao;
@@ -59,9 +59,9 @@ public class JobConfigHistoryPurger extends PeriodicWork {
      * @param historyDao injected HistoryDao
      * @param overviewHistoryDao the value of overviewHistoryDao
      */
-    JobConfigHistoryPurger(JobConfigHistory plugin, HistoryDao historyDao, OverviewHistoryDao overviewHistoryDao) {
+    JobConfigHistoryPurger(JobConfigHistory plugin, Purgeable purgeable, OverviewHistoryDao overviewHistoryDao) {
         this.plugin = plugin;
-        this.historyDao = historyDao;
+        this.purgeable = purgeable;
         this.overviewHistoryDao = overviewHistoryDao;
     }
 
@@ -110,7 +110,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
                     for (File historyDir : historyDirs) {
                         //historyDir: e.g. 2013-01-18_17-33-51
                         if (isTooOld(historyDir)) {
-                            if (!historyDao.isCreatedEntry(historyDir)) {
+                            if (!purgeable.isCreatedEntry(historyDir)) {
                                 LOG.log(FINEST, "Should delete: {0}", historyDir);
                                 deleteDirectory(historyDir);
                             }

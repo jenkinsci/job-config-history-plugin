@@ -147,7 +147,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
         final HistoryDao historyDao = getHistoryDao();
         final AbstractProject<?, ?> project = build.getProject();
         for (String timestamp : configDates) {
-            if (!historyDao.hasOldRevision(project, timestamp)) {
+            if (!historyDao.hasOldRevision(project.getConfigFile(), timestamp)) {
                 return false;
             }
         }

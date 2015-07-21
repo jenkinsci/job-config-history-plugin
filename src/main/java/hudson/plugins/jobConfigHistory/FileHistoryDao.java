@@ -252,18 +252,13 @@ public class FileHistoryDao extends HistoryDaoBackend {
      * @param configFile to copy.
      * @param operation operation
      */
-    void createNewHistoryEntryAndCopyConfig(final XmlFile configFile, final String operation) {
+    private void createNewHistoryEntryAndCopyConfig(final XmlFile configFile, final String operation) {
         final File timestampedDir = createNewHistoryEntry(configFile, operation);
         try {
             copyConfigFile(configFile.getFile(), timestampedDir);
         } catch (IOException ex) {
             throw new RuntimeException("Unable to copy " + configFile, ex);
         }
-    }
-
-    @Override
-    public void saveItem(AbstractItem item) {
-        saveItem(item.getConfigFile());
     }
 
     @Override
@@ -322,8 +317,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
         return getRevisions(xmlFile.getFile());
     }
 
-    @Override
-    public SortedMap<String, HistoryDescr> getRevisions(File configFile) {
+    private SortedMap<String, HistoryDescr> getRevisions(File configFile) {
         final File historiesDir = getHistoryDir(configFile);
         return getRevisions(historiesDir, configFile);
     }
@@ -368,8 +362,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
         return getOldRevision(configFile, identifier);
     }
 
-    @Override
-    public XmlFile getOldRevision(File configFile, String identifier) {
+    private XmlFile getOldRevision(File configFile, String identifier) {
         final File historyDir = new File(getHistoryDir(configFile), identifier);
         return new XmlFile(getConfigFile(historyDir));
     }
@@ -385,17 +378,8 @@ public class FileHistoryDao extends HistoryDaoBackend {
     }
 
     @Override
-    public boolean hasOldRevision(AbstractItem item, String identifier) {
-        return hasOldRevision(item.getConfigFile(), identifier);
-    }
-
-    @Override
     public boolean hasOldRevision(XmlFile xmlFile, String identifier) {
-        return hasOldRevision(xmlFile.getFile(), identifier);
-    }
-
-    @Override
-    public boolean hasOldRevision(File configFile, String identifier) {
+        final File configFile = xmlFile.getFile();
         final XmlFile oldRevision = getOldRevision(configFile, identifier);
         return oldRevision.getFile() != null && oldRevision.getFile().exists();
     }
@@ -490,7 +474,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
     }
 
     @Override
-    public boolean isCreatedEntry(File historyDir) {
+    public boolean isCreatedEntry(final File historyDir) {
         final XmlFile historyXml = getHistoryXmlFile(historyDir);
         try {
             final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
@@ -559,13 +543,13 @@ public class FileHistoryDao extends HistoryDaoBackend {
      *           The {@link XmlFile} configuration file under consideration.
      * @return true if previous history is accessible, and the file duplicates the previously saved information.
      */
-    public boolean hasDuplicateHistory(XmlFile xmlFile) {
+    boolean hasDuplicateHistory(XmlFile xmlFile) {
         boolean isDuplicated = false;
         final ArrayList<String> timeStamps = new ArrayList<String>(getRevisions(xmlFile).keySet());
         if (!timeStamps.isEmpty()) {
             Collections.sort(timeStamps, Collections.reverseOrder());
             final XmlFile lastRevision = getOldRevision(xmlFile, timeStamps.get(0));
-            try {
+           try {
                 if (xmlFile.asString().equals(lastRevision.asString())) {
                     isDuplicated = true;
                 }
@@ -655,7 +639,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
         return getRevisions(new File(historyRootDir, name), new File(name));
     }
 
-    @Override
+    @Deprecated
     public void copyHistoryAndDelete(String oldName, String newName) {
         final File oldFile = new File(getJobHistoryRootDir(), oldName);
         final File newFile = new File(getJobHistoryRootDir(), newName);
@@ -679,7 +663,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
      * @param content content.
      * @param operation operation.
      */
-    void createNewHistoryEntryAndSaveConfig(Node node, String content, final String operation) {
+    private void createNewHistoryEntryAndSaveConfig(Node node, String content, final String operation) {
         final File timestampedDir = createNewHistoryEntry(node, operation);
         final File nodeConfigHistoryFile = new File(timestampedDir, "config.xml");
         PrintStream stream = null;
@@ -761,7 +745,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
         }
     }
     
-    File getRootDir(Node node, final AtomicReference<Calendar> timestampHolder) {
+    private File getRootDir(Node node, final AtomicReference<Calendar> timestampHolder) {
         final File itemHistoryDir = getHistoryDirForNode(node);
         // perform check for purge here, when we are actually going to create
         // a new directory, rather than just when we scan it in above method.
@@ -770,7 +754,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
     }
 
     
-    File createNewHistoryEntry(Node node, final String operation) {
+    private File createNewHistoryEntry(Node node, final String operation) {
         try {
             final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
             final File timestampedDir = getRootDir(node, timestampHolder);
@@ -795,7 +779,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
      * @return The base directory where to store the history,
      *         or null if the file is not a valid Hudson configuration file.
      */
-    File getHistoryDirForNode(Node node) {
+    private File getHistoryDirForNode(Node node) {
         final String name = node.getNodeName();
         final File configHistoryDir = getNodeHistoryRootDir();
         final File configHistoryNodeDir = new File(configHistoryDir, name);
@@ -833,7 +817,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
      * @param node node
      * @return true if it is a duplicate
      */
-    boolean checkDuplicate(Node node) {
+    private boolean checkDuplicate(Node node) {
         if (!saveDuplicates && hasDuplicateHistory(node)) {
             LOG.log(Level.FINE, "found duplicate history, skipping save of {0}", node.getDisplayName());
             return false;
@@ -842,8 +826,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
         }
     }
 
-    @Override
-    public void copyNodeHistoryAndDelete(String oldName, String newName) {
+    private void copyNodeHistoryAndDelete(String oldName, String newName) {
         final File oldFile = new File(getNodeHistoryRootDir(), oldName);
         final File newFile = new File(getNodeHistoryRootDir(), newName);
         try {
@@ -872,33 +855,6 @@ public class FileHistoryDao extends HistoryDaoBackend {
     public boolean hasOldRevision(Node node, String identifier) {
         final XmlFile oldRevision = getOldRevision(node, identifier);
         return oldRevision.getFile() != null && oldRevision.getFile().exists();
-    }
-
-    @Override
-    public File[] getDeletedNodes(String folderName) {
-        return returnEmptyFileArrayForNull(
-                getNodeDirectoryIncludingFolder(folderName).listFiles(DeletedFileFilter.INSTANCE));
-    }
-
-    @Override
-    public File[] getNodes(String folderName) {
-        return returnEmptyFileArrayForNull(
-                getNodeDirectoryIncludingFolder(folderName).listFiles(NonDeletedFileFilter.INSTANCE));
-    }
-
-    @Override
-    public SortedMap<String, HistoryDescr> getNodeHistory(String nodeName) {
-        return getRevisions(new File(getNodeHistoryRootDir(), nodeName), new File(nodeName));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public URL getHistoryUrl(File configFile) {
-        try {
-            return getHistoryDir(configFile).toURI().toURL();
-        } catch (MalformedURLException ex) {
-            throw new IllegalStateException("Could not get history url for configFile: " + configFile + " " + ex.getMessage()); 
-        }
     }
 
     @Override

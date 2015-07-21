@@ -23,11 +23,13 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import hudson.XmlFile;
 import hudson.model.AbstractProject;
 import hudson.model.Build;
 import hudson.model.ItemGroup;
 import hudson.model.Project;
 import hudson.model.TaskListener;
+import java.io.File;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -90,8 +92,8 @@ public class JobConfigBadgeActionTest {
      */
     @Test
     public void testOldConfigsExist() {
-        when(mockedHistoryDao.hasOldRevision(mockedProject, configDates[0])).thenReturn(true);
-        when(mockedHistoryDao.hasOldRevision(mockedProject, configDates[1])).thenReturn(true);
+        when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(), configDates[0])).thenReturn(true);
+        when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(), configDates[1])).thenReturn(true);
         boolean expResult = true;
         sut.onAttached(mockedBuild);
         boolean result = sut.oldConfigsExist();
@@ -100,8 +102,8 @@ public class JobConfigBadgeActionTest {
 
     @Test
     public void testOldConfigsExistFalse() {
-        when(mockedHistoryDao.hasOldRevision(mockedProject, configDates[0])).thenReturn(true);
-        when(mockedHistoryDao.hasOldRevision(mockedProject, configDates[1])).thenReturn(false);
+        when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(), configDates[0])).thenReturn(true);
+        when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(), configDates[1])).thenReturn(false);
         boolean expResult = false;
         sut.onAttached(mockedBuild);
         boolean result = sut.oldConfigsExist();
