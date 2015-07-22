@@ -23,43 +23,45 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import hudson.ExtensionList;
+import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
-import hudson.model.Node;
-import java.io.File;
-import java.net.URL;
+import hudson.model.Describable;
+import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Master class for adding new backends to the history plugin.
  *
  * @author Brandon Koepke
  */
-public abstract class HistoryDaoBackend
-    implements ExtensionPoint, HistoryDao, ItemListenerHistoryDao,
-        OverviewHistoryDao, NodeListenerHistoryDao, Purgeable {
+public abstract class JobConfigHistoryStrategy
+    implements  ExtensionPoint, Describable<JobConfigHistoryStrategy>,
+                HistoryDao, ItemListenerHistoryDao, OverviewHistoryDao,
+                NodeListenerHistoryDao {
     /**
-     * Determines whether this history dao supports the
-     * given URL type.
-     *
-     * @param url the url to check support for.
-     * @return true if this dao supports the given url,
-     *         false otherwise.
+     * Data bound constructors need a public empty constructor.
      */
-    public abstract boolean isUrlSupported(final URL url);
+    @DataBoundConstructor
+    public JobConfigHistoryStrategy() {
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @SuppressWarnings("unchecked")
+    public final Descriptor<JobConfigHistoryStrategy> getDescriptor() {
+        return Jenkins.getInstance().getDescriptorOrDie(getClass());
+    }
 
     /**
-     * Sets the url for this backend to the specified url.
-     * @param url the url to set this backend to.
-     */
-    public abstract void setUrl(final URL url);
-
-    /**
-     * All registered {@link HistoryDaoBackend}s.
+     * Gets the extension point list for the JobConfigHistoryStrategy.
      *
-     * @return all registered backends.
+     * @return the extension point list.
      */
-    public static ExtensionList<HistoryDaoBackend> all() {
-        return Jenkins.getInstance().getExtensionList(HistoryDaoBackend.class);
+    public static DescriptorExtensionList<JobConfigHistoryStrategy,
+    JobConfigHistoryDescriptor<JobConfigHistoryStrategy>> all() {
+        return Jenkins.getInstance().<JobConfigHistoryStrategy,
+            JobConfigHistoryDescriptor<JobConfigHistoryStrategy>>
+            getDescriptorList(JobConfigHistoryStrategy.class);
     }
 }

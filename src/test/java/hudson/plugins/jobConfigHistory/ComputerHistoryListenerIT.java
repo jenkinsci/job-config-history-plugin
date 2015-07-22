@@ -25,7 +25,7 @@ public class ComputerHistoryListenerIT {
     @Test
     public void testOnConfigurationChange_create() throws Exception{
        Slave slave1 = rule.createOnlineSlave();
-       HistoryDaoBackend dao = PluginUtils.getHistoryDao();
+       JobConfigHistoryStrategy dao = PluginUtils.getHistoryDao();
        SortedMap<String, HistoryDescr> revisions = dao.getRevisions(slave1);
        assertNotNull("Revisions should exists.", revisions);
        assertFalse("Revisions should not be empty.", revisions.isEmpty());
@@ -45,7 +45,7 @@ public class ComputerHistoryListenerIT {
         element.setValueAttribute("newSlaveName");
         rule.submit(form);
         slave2 = (Slave) rule.jenkins.getNode("newSlaveName");
-        HistoryDaoBackend dao = PluginUtils.getHistoryDao();
+        JobConfigHistoryStrategy dao = PluginUtils.getHistoryDao();
         assertEquals("Revisions of " + slave1.getNodeName() + " should contains 1 revision.", 1, dao.getRevisions(slave1).size());
         assertEquals("Revisions of " + slave2.getNodeName() + " should contains 2 revision.", 2, dao.getRevisions(slave2).size());
         assertEquals("Revisions of " + slave3.getNodeName() + " should contains 1 revision.", 1, dao.getRevisions(slave3).size());
@@ -59,7 +59,7 @@ public class ComputerHistoryListenerIT {
         Slave slave2 = rule.createOnlineSlave();
         Slave slave3 = rule.createOnlineSlave();
         rule.jenkins.removeNode(slave2);
-        HistoryDaoBackend dao = PluginUtils.getHistoryDao();
+        JobConfigHistoryStrategy dao = PluginUtils.getHistoryDao();
         assertEquals("Revisions of " + slave1.getNodeName() + " should contains 1 revision.", 1, dao.getRevisions(slave1).size());
         assertEquals(slave2.getNodeName() + " should have anyrevision.", 0, dao.getRevisions(slave2).size());
         assertEquals("Revisions of " + slave3.getNodeName() + " should contains 1 revision.", 1, dao.getRevisions(slave3).size());
@@ -74,7 +74,7 @@ public class ComputerHistoryListenerIT {
         HtmlInput element = form.getInputByName("_.nodeDescription");
         element.setValueAttribute("Node description");
         rule.submit(form);
-        HistoryDaoBackend dao = PluginUtils.getHistoryDao();
+        JobConfigHistoryStrategy dao = PluginUtils.getHistoryDao();
         assertEquals("Revisions of " + slave1.getNodeName() + " should contains 1 revision.", 1, dao.getRevisions(slave1).size());
         assertEquals("Revisions of " + slave2.getNodeName() + " should contains 2 revision.", 2, dao.getRevisions(slave2).size());
         assertEquals("Revisions of " + slave3.getNodeName() + " should contains 1 revision.", 1, dao.getRevisions(slave3).size());

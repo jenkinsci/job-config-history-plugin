@@ -108,7 +108,7 @@ public class ComputerHistoryListener extends ComputerListener {
      * If a slave configuration get changed.
      */
     private void onChange() {
-        final HistoryDaoBackend hdao = PluginUtils.getHistoryDao();
+        final JobConfigHistoryStrategy hdao = PluginUtils.getHistoryDao();
         for (Node node : Jenkins.getInstance().getNodes()) {
             if (isTracked(node) && !hdao.hasDuplicateHistory(node)) {
                 PluginUtils.getHistoryDao().saveNode(node);

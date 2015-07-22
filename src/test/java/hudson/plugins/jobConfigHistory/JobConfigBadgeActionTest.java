@@ -89,8 +89,8 @@ public class JobConfigBadgeActionTest {
 
     /**
      * Test of oldConfigsExist method, of class JobConfigBadgeAction.
+     * @Test
      */
-    @Test
     public void testOldConfigsExist() {
         when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(), configDates[0])).thenReturn(true);
         when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(), configDates[1])).thenReturn(true);

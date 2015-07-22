@@ -72,7 +72,11 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     }
 
     private JobConfigHistoryPurger(JobConfigHistory plugin) {
-        this(plugin, PluginUtils.getHistoryDao(plugin, null), PluginUtils.getHistoryDao(plugin, null));
+        this(plugin,
+            (PluginUtils.getHistoryDao(plugin, null) instanceof Purgeable
+                ? (Purgeable)PluginUtils.getHistoryDao(plugin, null)
+                : null),
+            PluginUtils.getHistoryDao(plugin, null));
     }
 
     /**

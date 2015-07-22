@@ -64,7 +64,7 @@ final class PluginUtils {
      *
      * @return historyDao
      */
-    public static HistoryDaoBackend getHistoryDao() {
+    public static JobConfigHistoryStrategy getHistoryDao() {
         final JobConfigHistory plugin = getPlugin();
         return getHistoryDao(plugin);
     }
@@ -75,7 +75,7 @@ final class PluginUtils {
      *
      * @return historyDao
      */
-    public static HistoryDaoBackend getAnonymousHistoryDao() {
+    public static JobConfigHistoryStrategy getAnonymousHistoryDao() {
         final JobConfigHistory plugin = getPlugin();
         return getAnonymousHistoryDao(plugin);
     }
@@ -86,7 +86,7 @@ final class PluginUtils {
      * @param plugin the plugin.
      * @return historyDao
      */
-    public static HistoryDaoBackend getHistoryDao(final JobConfigHistory plugin) {
+    public static JobConfigHistoryStrategy getHistoryDao(final JobConfigHistory plugin) {
         return getHistoryDao(plugin, User.current());
     }
 
@@ -97,7 +97,7 @@ final class PluginUtils {
      * @param plugin the plugin.
      * @return historyDao
      */
-    public static HistoryDaoBackend getAnonymousHistoryDao(final JobConfigHistory plugin) {
+    public static JobConfigHistoryStrategy getAnonymousHistoryDao(final JobConfigHistory plugin) {
         return getHistoryDao(plugin, null);
     }
 
@@ -118,40 +118,20 @@ final class PluginUtils {
         }
     }
 
-    static HistoryDaoBackend getHistoryDao(final JobConfigHistory plugin, final User user) {
-        int maxHistoryEntries = valueOfStringOrDefault(plugin.getMaxHistoryEntries(), 0);
-        final URL url;
+    static JobConfigHistoryStrategy getHistoryDao(final JobConfigHistory plugin, final User user) {
+        final String maxHistoryEntriesAsString = plugin.getMaxHistoryEntries();
+        int maxHistoryEntries = 0;
         try {
-            url = plugin.getConfiguredHistoryRootDir();
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(PluginUtils.class.getName()).log(Level.SEVERE, null, ex);
-            throw new IllegalStateException(ex);
+            maxHistoryEntries = Integer.valueOf(maxHistoryEntriesAsString);
+        } catch (NumberFormatException e) {
+            maxHistoryEntries = 0;
         }
-        List<HistoryDaoBackend> backends = HistoryDaoBackend.all();
-        for (HistoryDaoBackend backend : backends) {
-            if (backend.isUrlSupported(url)) {
-                if (backend instanceof FileHistoryDao) {
-                    final File file;
-                    try {
-                        file = getFileFromURL(plugin.getConfiguredHistoryRootDir());
-                    } catch (MalformedURLException ex) {
-                        throw new IllegalStateException("Failed to initialize file from url: " + url);
-                    }
-                    // TODO: hack... need to create uniform instantiators as per: 
-                    // https://wiki.jenkins-ci.org/display/JENKINS/Defining+a+new+extension+point
-                    return new FileHistoryDao(
-                        file,
-                        new File(Hudson.getInstance().root.getPath()),
-                        user,
-                        maxHistoryEntries,
-                        !plugin.getSkipDuplicateHistory());
-                } else {
-                    backend.setUrl(url);
-                    return backend;
-                }
-            }
-        }
-        throw new IllegalStateException("Backend for " + url + " not supported.");
+        return new FileHistoryDao(
+                plugin.getConfiguredHistoryRootDir(),
+                new File(Hudson.getInstance().root.getPath()),
+                user,
+                maxHistoryEntries,
+                !plugin.getSkipDuplicateHistory());
     }
 
 /**

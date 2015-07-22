@@ -140,7 +140,7 @@ public class JobConfigHistoryRootActionTest {
      */
     @Test
     public void testGetSingleConfigs() throws Exception {
-        given(mockedPlugin.getConfiguredHistoryRootDir()).willReturn(configHistory.toURI().toURL());
+        given(mockedPlugin.getConfiguredHistoryRootDir()).willReturn(configHistory);
         assertEquals(5, createSut().getSingleConfigs("config").size());
         assertEquals(3, createSut().getSingleConfigs("Foo_deleted_20130830_223932_071").size());
     }
@@ -163,7 +163,7 @@ public class JobConfigHistoryRootActionTest {
     public void testGetFile() throws Exception {
         given(mockedStaplerRequest.getParameter("name")).willReturn("jobs/Test1");
         given(mockedStaplerRequest.getParameter("timestamp")).willReturn("2012-11-21_11-42-05");
-        given(mockedPlugin.getConfiguredHistoryRootDir()).willReturn(configHistory.toURI().toURL());
+        given(mockedPlugin.getConfiguredHistoryRootDir()).willReturn(configHistory);
         given(mockedPlugin.getConfigFile(any(File.class))).willReturn(
                 UNPACK_RESOURCE_ZIP.getResource("config-history/jobs/Test1/2012-11-21_11-42-05/config.xml"));
         given(mockedACL.hasPermission(Permission.CONFIGURE)).willReturn(true);
@@ -325,7 +325,7 @@ public class JobConfigHistoryRootActionTest {
 
         final File jobHistory = new File(configHistory, name);
         given(mockedACL.hasPermission(Permission.CONFIGURE)).willReturn(true, true);
-        given(mockedPlugin.getConfiguredHistoryRootDir()).willReturn(configHistory.toURI().toURL());
+        given(mockedPlugin.getConfiguredHistoryRootDir()).willReturn(configHistory);
         given(mockedPlugin.getConfigFile(any(File.class))).willReturn(
                 new File(jobHistory, "2012-11-21_11-29-12/config.xml"),
                 new File(jobHistory, "2012-11-21_11-35-12/config.xml"));

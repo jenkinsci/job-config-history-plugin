@@ -13,11 +13,6 @@ import java.util.Collections;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import hudson.maven.MavenModuleSet;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.xml.sax.SAXException;
 
@@ -66,11 +61,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         assertEquals("Verify history entries to keep setting.", "10", jch.getMaxHistoryEntries());
         assertFalse("Verify Maven module configuration setting.", jch.getSaveModuleConfiguration());
         assertFalse("Verify skip duplicate history setting.", jch.getSkipDuplicateHistory());
-        try {
-            assertEquals("Verify configured history root directory.", new File(hudson.root, "/jobConfigHistory/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR).toURI().toURL(), jch.getConfiguredHistoryRootDir());
-        } catch (MalformedURLException ex) {
-            fail("Unable to construct url: " + ex.getMessage());
-        }
+        assertEquals("Verify configured history root directory.", new File(hudson.root, "/jobConfigHistory/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
         assertEquals("Verify exclude pattern setting.", JobConfigHistoryConsts.DEFAULT_EXCLUDE, jch.getExcludePattern());
         assertEquals("Verify build badges setting.", "never", jch.getShowBuildBadges());
 
@@ -79,13 +70,11 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
 
         testCreateRenameDeleteProject(jch);
         try {
-            assertTrue("Verify system configuration history location", getHistoryDir(hudsonConfig).getParentFile().toURI().toURL().equals(jch.getConfiguredHistoryRootDir()));
+            assertTrue("Verify system configuration history location", getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
             getHistoryDir(new XmlFile(new File("/tmp")));
             fail("Verify IAE when attempting to get history dir for a file outside of HUDSON_ROOT.");
         } catch (IllegalArgumentException e) {
             assertNotNull("Expected IAE", e);
-        } catch (MalformedURLException ex) {
-            fail("URL not well formed: " + ex.getMessage());
         }
         assertFalse("Verify false when testing if a file outside of HUDSON_ROOT is saveable.", jch.isSaveable(null, new XmlFile(new File("/tmp/config.xml"))));
     }
@@ -105,7 +94,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         MavenModuleSet mms = createMavenProject();
         assertTrue("MavenModuleSet should be saved", jch.isSaveable(mms, mms.getConfigFile()));
 
-        assertTrue("Verify system configuration history location", getHistoryDir(hudsonConfig).getParentFile().toURI().toURL().equals(jch.getConfiguredHistoryRootDir()));
+        assertTrue("Verify system configuration history location", getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
         testCreateRenameDeleteProject(jch);
     }
 
@@ -225,7 +214,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         final HtmlForm form = webClient.goTo("configure").getFormByName("config");
         form.getInputByName("historyRootDir").setValueAttribute(absolutePath);
         submit(form);
-        assertEquals("Verify history root configured at absolute path.", new File(root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR).toURI().toURL(), jch.getConfiguredHistoryRootDir());
+        assertEquals("Verify history root configured at absolute path.", new File(root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
 
         // save something
         createFreeStyleProject();

@@ -40,7 +40,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,7 +64,8 @@ import org.apache.commons.io.FileUtils;
  * @author Mirko Friedenhagen
  */
 @Extension
-public class FileHistoryDao extends HistoryDaoBackend {
+public class FileHistoryDao extends JobConfigHistoryStrategy
+    implements Purgeable {
 
     /** Our logger. */
     private static final Logger LOG = Logger.getLogger(FileHistoryDao.class.getName());
@@ -548,7 +548,7 @@ public class FileHistoryDao extends HistoryDaoBackend {
         if (!timeStamps.isEmpty()) {
             Collections.sort(timeStamps, Collections.reverseOrder());
             final XmlFile lastRevision = getOldRevision(xmlFile, timeStamps.get(0));
-           try {
+            try {
                 if (xmlFile.asString().equals(lastRevision.asString())) {
                     isDuplicated = true;
                 }
@@ -854,15 +854,5 @@ public class FileHistoryDao extends HistoryDaoBackend {
     public boolean hasOldRevision(Node node, String identifier) {
         final XmlFile oldRevision = getOldRevision(node, identifier);
         return oldRevision.getFile() != null && oldRevision.getFile().exists();
-    }
-
-    @Override
-    public boolean isUrlSupported(URL url) {
-        return url.getProtocol().equals("file");
-    }
-
-    @Override
-    public void setUrl(URL url) {
-        throw new UnsupportedOperationException("See TODO in PluginUtils.");
     }
 }

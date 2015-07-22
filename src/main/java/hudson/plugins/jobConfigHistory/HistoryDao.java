@@ -26,7 +26,6 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.Node;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
-import java.io.File;
 import java.util.SortedMap;
 
 /**
