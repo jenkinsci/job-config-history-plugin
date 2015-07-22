@@ -61,7 +61,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         assertEquals("Verify history entries to keep setting.", "10", jch.getMaxHistoryEntries());
         assertFalse("Verify Maven module configuration setting.", jch.getSaveModuleConfiguration());
         assertFalse("Verify skip duplicate history setting.", jch.getSkipDuplicateHistory());
-        assertEquals("Verify configured history root directory.", new File(hudson.root, "/jobConfigHistory/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
+        assertEquals("Verify configured history root directory.", new File(hudson.root + "/jobConfigHistory/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR), jch.getConfiguredHistoryRootDir());
         assertEquals("Verify exclude pattern setting.", JobConfigHistoryConsts.DEFAULT_EXCLUDE, jch.getExcludePattern());
         assertEquals("Verify build badges setting.", "never", jch.getShowBuildBadges());
 
