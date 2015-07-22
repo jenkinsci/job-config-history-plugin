@@ -23,13 +23,11 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import hudson.XmlFile;
 import hudson.model.AbstractProject;
 import hudson.model.Build;
 import hudson.model.ItemGroup;
 import hudson.model.Project;
 import hudson.model.TaskListener;
-import java.io.File;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;

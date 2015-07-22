@@ -405,6 +405,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         final InputStream is = new ByteArrayInputStream(configXml.asString().getBytes("UTF-8"));
         final String calculatedNewName = findNewName(newName);
         final TopLevelItem project = getHudson().createProjectFromXML(calculatedNewName, is);
+        // TODO: Casting here should be removed.
         ((FileHistoryDao) getHistoryDao()).copyHistoryAndDelete(deletedName, calculatedNewName);
 
         rsp.sendRedirect(getHudson().getRootUrl() + project.getUrl());

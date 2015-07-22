@@ -34,7 +34,7 @@ public class JobConfigHistoryJobListenerIT extends AbstractHudsonTestCaseDeletin
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        rootDir = new File(hudson.getPlugin(JobConfigHistory.class).getConfiguredHistoryRootDir().toURI());
+        rootDir = hudson.getPlugin(JobConfigHistory.class).getConfiguredHistoryRootDir();
         jobHistoryDir = new File(rootDir, JobConfigHistoryConsts.JOBS_HISTORY_DIR);
         hudson.setSecurityRealm(new HudsonPrivateSecurityRealm(true, false, null));
         webClient = new WebClient();

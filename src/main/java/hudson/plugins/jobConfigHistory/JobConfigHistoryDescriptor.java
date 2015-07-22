@@ -33,5 +33,3 @@ public abstract class JobConfigHistoryDescriptor
     <T extends JobConfigHistoryStrategy>
     extends Descriptor<JobConfigHistoryStrategy> {
 }
-
-

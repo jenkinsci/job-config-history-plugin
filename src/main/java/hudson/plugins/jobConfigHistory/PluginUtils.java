@@ -26,13 +26,11 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.Hudson;
 import hudson.model.User;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,7 +50,6 @@ final class PluginUtils {
 
     /**
      * Returns the plugin for tests.
-     *
      * @return plugin
      */
     public static JobConfigHistory getPlugin() {
@@ -61,7 +58,6 @@ final class PluginUtils {
 
     /**
      * For tests.
-     *
      * @return historyDao
      */
     public static JobConfigHistoryStrategy getHistoryDao() {
@@ -82,7 +78,6 @@ final class PluginUtils {
 
     /**
      * For tests.
-     *
      * @param plugin the plugin.
      * @return historyDao
      */
@@ -91,9 +86,8 @@ final class PluginUtils {
     }
 
     /**
-     * Like {@link #getHistoryDao(JobConfigHistory)}, but without a user. Avoids
-     * calling {@link User#current()}.
-     *
+     * Like {@link #getHistoryDao(JobConfigHistory)}, but without a user.
+     * Avoids calling {@link User#current()}.
      * @param plugin the plugin.
      * @return historyDao
      */

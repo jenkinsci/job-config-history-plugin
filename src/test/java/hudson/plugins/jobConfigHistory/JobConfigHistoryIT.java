@@ -68,9 +68,9 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         final XmlFile hudsonConfig = new XmlFile(new File(hudson.getRootDir(), "config.xml"));
         assertTrue("Verify a system level configuration is saveable.", jch.isSaveable(hudson, hudsonConfig));
 
+        assertTrue("Verify system configuration history location", getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
         testCreateRenameDeleteProject(jch);
         try {
-            assertTrue("Verify system configuration history location", getHistoryDir(hudsonConfig).getParentFile().equals(jch.getConfiguredHistoryRootDir()));
             getHistoryDir(new XmlFile(new File("/tmp")));
             fail("Verify IAE when attempting to get history dir for a file outside of HUDSON_ROOT.");
         } catch (IllegalArgumentException e) {
@@ -230,7 +230,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
     private void testCreateRenameDeleteProject(final JobConfigHistory jch) {
         try {
             final FreeStyleProject project = createFreeStyleProject("testproject");
-            final File jobHistoryRootFile = new File(jch.getConfiguredHistoryRootDir().getPath(), "jobs");
+            final File jobHistoryRootFile = new File(jch.getConfiguredHistoryRootDir(), "jobs");
 
             final File expectedConfigDir = new File(jobHistoryRootFile, "testproject");
             assertEquals("Verify history dir configured as expected.", expectedConfigDir, getHistoryDir(project.getConfigFile()));

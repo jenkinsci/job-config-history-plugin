@@ -335,6 +335,7 @@ public class JobConfigHistory extends Plugin {
     protected File getConfiguredHistoryRootDir() {
         File rootDir;
         final File jenkinsHome = getJenkinsHome();
+
         if (historyRootDir == null || historyRootDir.isEmpty()) {
             rootDir = new File(jenkinsHome, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
         } else {
@@ -345,7 +346,6 @@ public class JobConfigHistory extends Plugin {
                             + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
             }
         }
-
         return rootDir;
     }
 

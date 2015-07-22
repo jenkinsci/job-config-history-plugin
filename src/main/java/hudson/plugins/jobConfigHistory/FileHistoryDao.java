@@ -40,7 +40,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,7 +98,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param maxHistoryEntries max number of history entries
      * @param saveDuplicates should we save duplicate entries?
      */
-    FileHistoryDao(final File historyRootDir, File jenkinsHome, User currentUser, int maxHistoryEntries, boolean saveDuplicates) {
+    FileHistoryDao(final File historyRootDir, final File jenkinsHome, final User currentUser, final int maxHistoryEntries, final boolean saveDuplicates) {
         this.historyRootDir = historyRootDir;
         this.jenkinsHome = jenkinsHome;
         this.currentUser = currentUser;
@@ -238,9 +237,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         return f;
     }
 
-
     @Override
-    public void createNewItem(Item item) {
+    public void createNewItem(final Item item) {
         final AbstractItem aItem = (AbstractItem) item;
         createNewHistoryEntryAndCopyConfig(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED());
     }
@@ -261,14 +259,14 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public void saveItem(XmlFile file) {
+    public void saveItem(final XmlFile file) {
         if (checkDuplicate(file)) {
             createNewHistoryEntryAndCopyConfig(file, Messages.ConfigHistoryListenerHelper_CHANGED());
         }
     }
 
     @Override
-    public void deleteItem(Item item) {
+    public void deleteItem(final Item item) {
         final AbstractItem aItem = (AbstractItem) item;
         createNewHistoryEntry(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_DELETED());
         final File configFile = aItem.getConfigFile().getFile();
@@ -283,7 +281,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public void renameItem(Item item, String oldName, String newName) {
+    public void renameItem(final Item item, final String oldName, final String newName) {
         final AbstractItem aItem = (AbstractItem) item;
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         if (historyRootDir != null) {
@@ -312,11 +310,11 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public SortedMap<String, HistoryDescr> getRevisions(XmlFile xmlFile) {
+    public SortedMap<String, HistoryDescr> getRevisions(final XmlFile xmlFile) {
         return getRevisions(xmlFile.getFile());
     }
 
-    private SortedMap<String, HistoryDescr> getRevisions(File configFile) {
+    private SortedMap<String, HistoryDescr> getRevisions(final File configFile) {
         final File historiesDir = getHistoryDir(configFile);
         return getRevisions(historiesDir, configFile);
     }
@@ -327,7 +325,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param configFile for exception
      * @return sorted map
      */
-    private SortedMap<String, HistoryDescr> getRevisions(final File historiesDir, File configFile) {
+    private SortedMap<String, HistoryDescr> getRevisions(final File historiesDir, final File configFile) {
         final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
         final TreeMap<String, HistoryDescr> map = new TreeMap<String, HistoryDescr>();
         if (historyDirsOfItem == null) {
@@ -343,7 +341,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public XmlFile getOldRevision(AbstractItem item, String identifier) {
+    public XmlFile getOldRevision(final AbstractItem item, final String identifier) {
         final File configFile = item.getConfigFile().getFile();
         final File historyDir = new File(getHistoryDir(configFile), identifier);
         if (item instanceof MavenModule) {
@@ -356,18 +354,18 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public XmlFile getOldRevision(XmlFile xmlFile, String identifier) {
+    public XmlFile getOldRevision(final XmlFile xmlFile, final String identifier) {
         final File configFile = xmlFile.getFile();
         return getOldRevision(configFile, identifier);
     }
 
-    private XmlFile getOldRevision(File configFile, String identifier) {
+    private XmlFile getOldRevision(final File configFile, final String identifier) {
         final File historyDir = new File(getHistoryDir(configFile), identifier);
         return new XmlFile(getConfigFile(historyDir));
     }
 
     @Override
-    public XmlFile getOldRevision(String configFileName, String identifier) {
+    public XmlFile getOldRevision(final String configFileName, final String identifier) {
         final File historyDir = new File(new File(historyRootDir, configFileName), identifier);
         final File configFile = getConfigFile(historyDir);
         if (configFile == null) {
@@ -377,7 +375,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public boolean hasOldRevision(XmlFile xmlFile, String identifier) {
+    public boolean hasOldRevision(final XmlFile xmlFile, final String identifier) {
         final File configFile = xmlFile.getFile();
         final XmlFile oldRevision = getOldRevision(configFile, identifier);
         return oldRevision.getFile() != null && oldRevision.getFile().exists();
@@ -493,7 +491,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * first deleting the files it contains.
      * @param dir The directory which should be deleted.
      */
-    private void deleteDirectory(File dir) {
+    private void deleteDirectory(final File dir) {
         for (File file : dir.listFiles()) {
             if (!file.delete()) {
                 LOG.log(Level.WARNING, "problem deleting history file: {0}", file);
@@ -542,7 +540,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      *           The {@link XmlFile} configuration file under consideration.
      * @return true if previous history is accessible, and the file duplicates the previously saved information.
      */
-    boolean hasDuplicateHistory(XmlFile xmlFile) {
+    boolean hasDuplicateHistory(final XmlFile xmlFile) {
         boolean isDuplicated = false;
         final ArrayList<String> timeStamps = new ArrayList<String>(getRevisions(xmlFile).keySet());
         if (!timeStamps.isEmpty()) {
@@ -575,13 +573,13 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public File[] getDeletedJobs(String folderName) {
+    public File[] getDeletedJobs(final String folderName) {
         return returnEmptyFileArrayForNull(
                 getJobDirectoryIncludingFolder(folderName).listFiles(DeletedFileFilter.INSTANCE));
     }
 
     @Override
-    public File[] getJobs(String folderName) {
+    public File[] getJobs(final String folderName) {
         return returnEmptyFileArrayForNull(
                 getJobDirectoryIncludingFolder(folderName).listFiles(NonDeletedFileFilter.INSTANCE));
     }
@@ -592,7 +590,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param folderName name of the folder.
      * @return history directory for a job in a folder.
      */
-    private File getJobDirectoryIncludingFolder(String folderName) {
+    private File getJobDirectoryIncludingFolder(final String folderName) {
         final String realFolderName = folderName.isEmpty() ? folderName : folderName + "/jobs";
         return new File(getJobHistoryRootDir(), realFolderName);
     }
@@ -603,7 +601,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param folderName name of the folder.
      * @return history directory for a node in a folder.
      */
-    private File getNodeDirectoryIncludingFolder(String folderName) {
+    private File getNodeDirectoryIncludingFolder(final String folderName) {
         final String realFolderName = folderName.isEmpty() ? folderName : folderName + "/nodes";
         return new File(getNodeHistoryRootDir(), realFolderName);
     }
@@ -634,12 +632,12 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public SortedMap<String, HistoryDescr> getSystemHistory(String name) {
+    public SortedMap<String, HistoryDescr> getSystemHistory(final String name) {
         return getRevisions(new File(historyRootDir, name), new File(name));
     }
 
     @Deprecated
-    public void copyHistoryAndDelete(String oldName, String newName) {
+    public void copyHistoryAndDelete(final String oldName, final String newName) {
         final File oldFile = new File(getJobHistoryRootDir(), oldName);
         final File newFile = new File(getJobHistoryRootDir(), newName);
         try {
@@ -651,10 +649,11 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
     
     @Override
-    public void createNewNode(Node node) {
+    public void createNewNode(final Node node) {
         final String content = Jenkins.XSTREAM2.toXML(node);
         createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_CREATED());
     }
+
     /**
      * Creates a new history entry and saves the slave configuration.
      *
@@ -662,7 +661,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param content content.
      * @param operation operation.
      */
-    private void createNewHistoryEntryAndSaveConfig(Node node, String content, final String operation) {
+    private void createNewHistoryEntryAndSaveConfig(final Node node, final String content, final String operation) {
         final File timestampedDir = createNewHistoryEntry(node, operation);
         final File nodeConfigHistoryFile = new File(timestampedDir, "config.xml");
         PrintStream stream = null;
@@ -680,7 +679,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public void deleteNode(Node node) {
+    public void deleteNode(final Node node) {
         createNewHistoryEntry(node, Messages.ConfigHistoryListenerHelper_DELETED());
        // final File configFile = aItem.getConfigFile().getFile();
         final File currentHistoryDir = getHistoryDirForNode(node);
@@ -694,7 +693,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public void renameNode(Node node, String oldName, String newName) {
+    public void renameNode(final Node node, final String oldName, final String newName) {
         final String onRenameDesc = " old name: " + oldName + ", new name: " + newName;
         if (historyRootDir != null) {
             //final File configFile = aItem.getConfigFile().getSlaveFile();
@@ -723,7 +722,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
     
     @Override
-    public SortedMap<String, HistoryDescr> getRevisions(Node node) {
+    public SortedMap<String, HistoryDescr> getRevisions(final Node node) {
         final File historiesDir = getHistoryDirForNode(node);
         final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
         final TreeMap<String, HistoryDescr> map = new TreeMap<String, HistoryDescr>();
@@ -744,7 +743,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         }
     }
     
-    private File getRootDir(Node node, final AtomicReference<Calendar> timestampHolder) {
+    private File getRootDir(final Node node, final AtomicReference<Calendar> timestampHolder) {
         final File itemHistoryDir = getHistoryDirForNode(node);
         // perform check for purge here, when we are actually going to create
         // a new directory, rather than just when we scan it in above method.
@@ -753,7 +752,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     
-    private File createNewHistoryEntry(Node node, final String operation) {
+    private File createNewHistoryEntry(final Node node, final String operation) {
         try {
             final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
             final File timestampedDir = getRootDir(node, timestampHolder);
@@ -778,7 +777,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @return The base directory where to store the history,
      *         or null if the file is not a valid Hudson configuration file.
      */
-    private File getHistoryDirForNode(Node node) {
+    private File getHistoryDirForNode(final Node node) {
         final String name = node.getNodeName();
         final File configHistoryDir = getNodeHistoryRootDir();
         final File configHistoryNodeDir = new File(configHistoryDir, name);
@@ -816,7 +815,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param node node
      * @return true if it is a duplicate
      */
-    private boolean checkDuplicate(Node node) {
+    private boolean checkDuplicate(final Node node) {
         if (!saveDuplicates && hasDuplicateHistory(node)) {
             LOG.log(Level.FINE, "found duplicate history, skipping save of {0}", node.getDisplayName());
             return false;
@@ -825,7 +824,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         }
     }
 
-    private void copyNodeHistoryAndDelete(String oldName, String newName) {
+    private void copyNodeHistoryAndDelete(final String oldName, final String newName) {
         final File oldFile = new File(getNodeHistoryRootDir(), oldName);
         final File newFile = new File(getNodeHistoryRootDir(), newName);
         try {
@@ -837,7 +836,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public void saveNode(Node node) {
+    public void saveNode(final Node node) {
         final String content = Jenkins.XSTREAM2.toXML(node);
         if (checkDuplicate(node)) {
             createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_CHANGED());
@@ -845,13 +844,13 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
-    public XmlFile getOldRevision(Node node, String identifier) {
+    public XmlFile getOldRevision(final Node node, final String identifier) {
         final File historyDir = new File(getHistoryDirForNode(node), identifier);
         return new XmlFile(getConfigFile(historyDir));
     }
 
     @Override
-    public boolean hasOldRevision(Node node, String identifier) {
+    public boolean hasOldRevision(final Node node, final String identifier) {
         final XmlFile oldRevision = getOldRevision(node, identifier);
         return oldRevision.getFile() != null && oldRevision.getFile().exists();
     }
