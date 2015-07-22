@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
@@ -38,7 +37,7 @@ import org.apache.commons.lang.ArrayUtils;
  *
  * Extracted from {@link JobConfigHistoryRootAction} for easier testability.
  *
- * @author Mirko Friedenhagen.
+ * @author Mirko Friedenhagen
  */
 final class ConfigInfoCollector {
 

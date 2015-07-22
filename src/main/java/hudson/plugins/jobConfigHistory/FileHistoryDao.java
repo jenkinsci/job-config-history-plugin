@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
@@ -63,7 +62,7 @@ import org.apache.commons.io.FileUtils;
  * Defines some helper functions needed by {@link JobConfigHistoryJobListener} and
  * {@link JobConfigHistorySaveableListener}.
  *
- * @author mfriedenhagen
+ * @author Mirko Friedenhagen
  */
 @Extension
 public class FileHistoryDao extends HistoryDaoBackend {
