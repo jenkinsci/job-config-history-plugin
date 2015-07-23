@@ -10,6 +10,4 @@ Links
 
 Continous builds
 ----------------
-* Unittests only: [![Build Status](https://huschteguzzel.de/hudson/job/jenkinsci-jobConfigHistory-plugin-test-only/badge/icon)](https://huschteguzzel.de/hudson/job/jenkinsci-jobConfigHistory-plugin-test-only/)
-* Complete Maven-Build: [![Build Status](https://huschteguzzel.de/hudson/job/jenkinsci-jobConfigHistory-plugin/badge/icon)](https://huschteguzzel.de/hudson/job/jenkinsci-jobConfigHistory-plugin/)
 * Cloudbees: [![Build Status](https://jenkins.ci.cloudbees.com/job/plugins/job/jobConfigHistory-plugin/badge/icon)](https://jenkins.ci.cloudbees.com/job/plugins/job/jobConfigHistory-plugin/)
