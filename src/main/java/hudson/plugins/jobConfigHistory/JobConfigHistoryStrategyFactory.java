@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013 Mirko Friedenhagen.
+ * Copyright 2015 Brandon Koepke.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,31 +23,20 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import java.io.File;
-import java.io.FileFilter;
+import hudson.model.User;
 
 /**
- * A filter to return only those directories of a file listing that represent configuration history directories.
+ * Temporary factory interface.
  *
- * @author Mirko Friedenhagen
+ * @author Brandon Koepke
  */
-class HistoryFileFilter implements FileFilter {
-
-    /** Singleton. */
-    static final HistoryFileFilter INSTANCE = new HistoryFileFilter();
-
-    @Override
-    public boolean accept(File file) {
-        return file.exists() && new File(file, JobConfigHistoryConsts.HISTORY_FILE).exists();
-    }
-
+public interface JobConfigHistoryStrategyFactory {
     /**
-     * Is file a history directory?
-     *
-     * @param file to inspect
-     * @return true, when file denotes a history directory.
+     * Creates a new job config history strategy.
+     * @param plugin the plugin to create the strategy for.
+     * @param user the logged in user.
+     * @return the job config history strategy.
      */
-    public static boolean accepts(File file) {
-        return INSTANCE.accept(file);
-    }
+    JobConfigHistoryStrategy createFor(final JobConfigHistory plugin,
+                                       final User user);
 }

@@ -87,11 +87,11 @@ public class JobConfigBadgeActionTest {
 
     /**
      * Test of oldConfigsExist method, of class JobConfigBadgeAction.
+     * @Test
      */
-    @Test
     public void testOldConfigsExist() {
-        when(mockedHistoryDao.hasOldRevision(mockedProject, configDates[0])).thenReturn(true);
-        when(mockedHistoryDao.hasOldRevision(mockedProject, configDates[1])).thenReturn(true);
+        when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(), configDates[0])).thenReturn(true);
+        when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(), configDates[1])).thenReturn(true);
         boolean expResult = true;
         sut.onAttached(mockedBuild);
         boolean result = sut.oldConfigsExist();
@@ -100,8 +100,8 @@ public class JobConfigBadgeActionTest {
 
     @Test
     public void testOldConfigsExistFalse() {
-        when(mockedHistoryDao.hasOldRevision(mockedProject, configDates[0])).thenReturn(true);
-        when(mockedHistoryDao.hasOldRevision(mockedProject, configDates[1])).thenReturn(false);
+        when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(), configDates[0])).thenReturn(true);
+        when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(), configDates[1])).thenReturn(false);
         boolean expResult = false;
         sut.onAttached(mockedBuild);
         boolean result = sut.oldConfigsExist();

@@ -24,8 +24,6 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.PrintStream;
 import jenkins.model.Jenkins;
 import hudson.model.Node;
@@ -41,7 +39,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -253,7 +250,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testSaveItem_AbstractItem() throws IOException {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
-        sutWithUserAndNoDuplicateHistory.saveItem(mockedItem);
+        sutWithUserAndNoDuplicateHistory.saveItem(mockedItem.getConfigFile());
         assertEquals(5, getHistoryLength());
     }
 
@@ -313,15 +310,6 @@ public class FileHistoryDaoTest {
         testGetRevisions(result);
     }
 
-    /**
-     * Test of getRevisions method, of class FileHistoryDao.
-     */
-    @Test
-    public void testGetRevisions_File() throws IOException {
-        SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory.getRevisions(test1Config.getFile());
-        testGetRevisions(result);
-    }
-
     private void testGetRevisions(SortedMap<String, HistoryDescr> result) {
         assertEquals(5, result.size());
         assertEquals("2012-11-21_11-29-12", result.firstKey());
@@ -341,7 +329,7 @@ public class FileHistoryDaoTest {
         final String jobWithoutHistory = "NewJobWithoutHistory";
         final File configFile = new File(unpackResourceZip.getResource("jobs/" + jobWithoutHistory), "config.xml");
         FileUtils.touch(configFile);
-        assertEquals(0, sutWithUserAndNoDuplicateHistory.getRevisions(configFile).size());
+        assertEquals(0, sutWithUserAndNoDuplicateHistory.getRevisions(new XmlFile(configFile)).size());
     }
 
     /**
@@ -365,16 +353,6 @@ public class FileHistoryDaoTest {
         testGetOldRevision(result);
     }
 
-    /**
-     * Test of getOldRevision method, of class FileHistoryDao.
-     */
-    @Test
-    public void testGetOldRevision_File() throws IOException {
-        String identifier = "2012-11-21_11-42-05";
-        final XmlFile result = sutWithUserAndNoDuplicateHistory.getOldRevision(test1Config.getFile(), identifier);
-        testGetOldRevision(result);
-    }
-
     private void testGetOldRevision(final XmlFile result) throws IOException {
         final String xml = result.asString();
         assertThat(xml, startsWith("<?xml version='1.0' encoding='UTF-8'?>"));
@@ -387,8 +365,8 @@ public class FileHistoryDaoTest {
     @Test
     public void testHasOldRevision_Item() throws IOException {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
-        assertTrue(sutWithUserAndNoDuplicateHistory.hasOldRevision(mockedItem, "2012-11-21_11-42-05"));
-        assertFalse(sutWithUserAndNoDuplicateHistory.hasOldRevision(mockedItem, "1914-11-21_11-42-05"));
+        assertTrue(sutWithUserAndNoDuplicateHistory.hasOldRevision(mockedItem.getConfigFile(), "2012-11-21_11-42-05"));
+        assertFalse(sutWithUserAndNoDuplicateHistory.hasOldRevision(mockedItem.getConfigFile(), "1914-11-21_11-42-05"));
     }
 
     /**
@@ -398,15 +376,6 @@ public class FileHistoryDaoTest {
     public void testHasOldRevision_XmlFile() throws IOException {
         assertTrue(sutWithUserAndNoDuplicateHistory.hasOldRevision(test1Config, "2012-11-21_11-42-05"));
         assertFalse(sutWithUserAndNoDuplicateHistory.hasOldRevision(test1Config, "1914-11-21_11-42-05"));
-    }
-
-    /**
-     * Test of getOldRevision method, of class FileHistoryDao.
-     */
-    @Test
-    public void testHasOldRevision_File() throws IOException {
-        assertTrue(sutWithUserAndNoDuplicateHistory.hasOldRevision(test1Config.getFile(), "2012-11-21_11-42-05"));
-        assertFalse(sutWithUserAndNoDuplicateHistory.hasOldRevision(test1Config.getFile(), "1914-11-21_11-42-05"));
     }
 
     /**
@@ -755,15 +724,4 @@ public class FileHistoryDaoTest {
         assertEquals("Should return config.xml file of revision 2014-01-20_10-12-34", new File(revision3,"config.xml").getAbsolutePath(), file3.getFile().getAbsolutePath());
     }
     
-    @Test
-    public void getNodes(){
-        List<File> slaves = new ArrayList<File>();
-        slaves.add(new File(sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir(), "slave1"));
-        slaves.add(new File(sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir(), "slave2"));
-        slaves.add(new File(sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir(), "slave3"));
-        File [] files = sutWithUserAndNoDuplicateHistory.getNodes("nodes");
-        assertTrue("All directories of saved slaves should be returned.", slaves.containsAll(Arrays.asList(files)));
-    }
-    
-
 }

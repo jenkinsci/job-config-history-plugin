@@ -297,16 +297,16 @@ public class JobConfigHistoryTest {
     @Test
     public void testGetConfiguredHistoryRootDir() throws IOException, ServletException, Descriptor.FormException {
         JobConfigHistory sut = createSut();
-        assertThat(sut.getConfiguredHistoryRootDir().getPath(), endsWith("config-history"));
+        assertEquals(new File(sut.getConfiguredHistoryRootDir().getPath()).getName(), "config-history");
         final JSONObject formData = createFormData();
         sut.configure(null, formData);
-        assertThat(sut.getConfiguredHistoryRootDir().getPath(), endsWith("config-history"));
+        assertEquals(new File(sut.getConfiguredHistoryRootDir().getPath()).getName(), "config-history");
         formData.put("historyRootDir", "");
         sut.configure(null, formData);
-        assertThat(sut.getConfiguredHistoryRootDir().getPath(), endsWith("config-history"));
+        assertEquals(new File(sut.getConfiguredHistoryRootDir().getPath()).getName(), "config-history");
         formData.put("historyRootDir", "/tmp/");
         sut.configure(null, formData);
-        assertThat(sut.getConfiguredHistoryRootDir().getPath(), endsWith("config-history"));
+        assertEquals(new File(sut.getConfiguredHistoryRootDir().getPath()).getName(), "config-history");
     }
 
     /**

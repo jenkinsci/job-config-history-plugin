@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013 Mirko Friedenhagen.
+ * Copyright 2015 Brandon Koepke.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,30 +24,34 @@
 package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
-import java.io.FileFilter;
 
 /**
- * A filter to return only those directories of a file listing that represent configuration history directories.
+ * Implementors support periodic purging of history entries.
  *
- * @author Mirko Friedenhagen
+ * @author Brandon Koepke
  */
-class HistoryFileFilter implements FileFilter {
-
-    /** Singleton. */
-    static final HistoryFileFilter INSTANCE = new HistoryFileFilter();
-
-    @Override
-    public boolean accept(File file) {
-        return file.exists() && new File(file, JobConfigHistoryConsts.HISTORY_FILE).exists();
-    }
+public interface Purgeable {
+    /**
+     * Purges entries when there are more entries than specified
+     * by max entries.
+     *
+     * The purge will drop old entries according to:
+     *
+     * sort(entries, e.timestamp());
+     * for (int i = maxEntries; i &lt; entries.length(); i++)
+     *     drop(entries[i]);
+     *
+     * @param itemHistoryRoot the history root to drop entries from.
+     * @param maxEntries the maximum number of entries to retain.
+     */
+    void purgeOldEntries(final File itemHistoryRoot, final int maxEntries);
 
     /**
-     * Is file a history directory?
+     * Determines whether the specified directory should be dropped
+     * or not.
      *
-     * @param file to inspect
-     * @return true, when file denotes a history directory.
+     * @param historyDir the directory to check against.
+     * @return true if it can be deleted, false otherwise.
      */
-    public static boolean accepts(File file) {
-        return INSTANCE.accept(file);
-    }
+    boolean isCreatedEntry(final File historyDir);
 }

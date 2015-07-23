@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class JobConfigHistoryPurgerTest {
 
     final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
-    final HistoryDao mockedDao = mock(HistoryDao.class);
+    final Purgeable mockedDao = mock(Purgeable.class);
     final OverviewHistoryDao mockedOverviewDao = mock(OverviewHistoryDao.class);
 
     @Rule
@@ -210,8 +210,8 @@ public class JobConfigHistoryPurgerTest {
 
         boolean purgeCalled = false;
 
-        public JobConfigHistoryPurgerWithoutPurging(JobConfigHistory plugin, HistoryDao historyDao, OverviewHistoryDao overviewHistoryDao) {
-            super(plugin, historyDao, overviewHistoryDao);
+        public JobConfigHistoryPurgerWithoutPurging(JobConfigHistory plugin, Purgeable purgeable, OverviewHistoryDao overviewHistoryDao) {
+            super(plugin, purgeable, overviewHistoryDao);
         }
 
         @Override

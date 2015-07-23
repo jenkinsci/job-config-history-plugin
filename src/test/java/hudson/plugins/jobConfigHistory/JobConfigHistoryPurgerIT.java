@@ -32,7 +32,7 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
     public void testSystemHistoryPurger() throws Exception {
         final String message = "Some nice message";
         final HistoryDao historyDao = purger.getHistoryDao();
-        final File configXml = new File(hudson.root, "config.xml");
+        final XmlFile configXml = new XmlFile(new File(hudson.root, "config.xml"));
         final int historyEntries = historyDao.getRevisions(configXml).size();
         assertTrue("Verify at least 5 original system config history entries, got " + historyEntries, historyEntries > 4);
 
@@ -60,7 +60,7 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
     @LocalData
     public void testHistoryPurgerWhenMaxDaysSetToZero() throws Exception {
         final HistoryDao historyDao = purger.getHistoryDao();
-        final File configXml = new File(hudson.root, "config.xml");
+        final XmlFile configXml = new XmlFile(new File(hudson.root, "config.xml"));
         final int historyEntries = historyDao.getRevisions(configXml).size();
         assertTrue("Verify at least 5 original system config history entries.", historyEntries > 4);
 
@@ -90,7 +90,7 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
 
     private void testWithWrongMaxAge(String maxAge) throws Exception {
         final HistoryDao historyDao = purger.getHistoryDao();
-        final File configXml = new File(hudson.root, "config.xml");
+        final XmlFile configXml = new XmlFile(new File(hudson.root, "config.xml"));
         final int historyEntries = historyDao.getRevisions(configXml).size();
         assertTrue("Verify at least 5 original system config history entries.", historyEntries > 4);
 
@@ -145,7 +145,7 @@ public class JobConfigHistoryPurgerIT extends AbstractHudsonTestCaseDeletingInst
     @LocalData
     public void testJobHistoryPurgerWithCreatedEntries() throws Exception {
         final HistoryDao historyDao = purger.getHistoryDao();
-        final File configXml = new File(hudson.root, "jobs/Test1/config.xml");
+        final XmlFile configXml = new XmlFile(new File(hudson.root, "jobs/Test1/config.xml"));
         assertEquals("Verify 5 original project history entries.", 5, historyDao.getRevisions(configXml).size());
 
         jch.setMaxDaysToKeepEntries("1");

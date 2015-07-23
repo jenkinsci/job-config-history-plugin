@@ -1,9 +1,31 @@
+/*
+ * The MIT License
+ *
+ * Copyright 2013 Mirko Friedenhagen.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package hudson.plugins.jobConfigHistory;
 
 import hudson.model.Node;
 import hudson.XmlFile;
 import hudson.model.AbstractItem;
-import java.io.File;
 import java.util.SortedMap;
 
 /**
@@ -12,13 +34,6 @@ import java.util.SortedMap;
  * @author Mirko Friedenhagen
  */
 public interface HistoryDao {
-
-    /**
-     * Saves the current configuration of an item.
-     *
-     * @param item project
-     */
-    void saveItem(AbstractItem item);
     
     /**
      * Saves the current configuration of an node.
@@ -44,17 +59,6 @@ public interface HistoryDao {
      * @return old revisions mapped to the identifier.
      */
     SortedMap<String, HistoryDescr> getRevisions(XmlFile xmlFile);
-
-    /**
-     * Returns a sorted map of all revisions for this configFile.
-     *
-     * The key is an identifier which may be used in
-     * {@link HistoryDao#getOldRevision(hudson.model.AbstractItem, java.lang.String)}
-     *
-     * @param configFile file
-     * @return old revisions mapped to the identifier.
-     */
-    SortedMap<String, HistoryDescr> getRevisions(File configFile);
     
     /**
      * Returns a sorted map of all revisions for this node.
@@ -97,29 +101,11 @@ public interface HistoryDao {
     /**
      * Returns one old configuration of file.
      *
-     * @param configFile file
-     * @param identifier timestamp or hash
-     * @return old configuration.
-     */
-    XmlFile getOldRevision(File configFile, String identifier);
-
-    /**
-     * Returns one old configuration of file.
-     *
      * @param configFileName file
      * @param identifier timestamp or hash
      * @return old configuration.
      */
     XmlFile getOldRevision(String configFileName, String identifier);
-
-    /**
-     * Returns whether the revision exists.
-     *
-     * @param item project
-     * @param identifier timestamp or hash
-     * @return old configuration.
-     */
-    boolean hasOldRevision(AbstractItem item, String identifier);
     
     /**
      * Returns whether the revision exists.
@@ -140,46 +126,13 @@ public interface HistoryDao {
     boolean hasOldRevision(XmlFile xmlFile, String identifier);
 
     /**
-     * Returns whether the revision exists.
+     * Determines whether the given node has already been recorded
+     * in the history.
      *
-     * @param configFile file
-     * @param identifier timestamp or hash
-     * @return old configuration.
+     * @param node
+     *        the node to check for duplicate history.
+     * @return true if the node is a duplicate, false otherwise.
      */
-    boolean hasOldRevision(File configFile, String identifier);
-
-   /**
-     * Purges old entries for the given history root to maxEntries.
-     *
-     * @param itemHistoryRoot directory to inspect.
-     * @param maxEntries maximum number of entries.
-     */
-    void purgeOldEntries(final File itemHistoryRoot, final int maxEntries);
-
-    /**
-     * Checks whether the respective history entry is a 'Created' entry.
-     *
-     * @param historyDir The directory, e.g. 2013-01-18_17-33-51
-     * @return True if the directory contains a 'Created' entry.
-     */
-    boolean isCreatedEntry(File historyDir);
-
-    /**
-     * Copies the history files of a restored project from the old location (_deleted_) to a directory with the new name and
-     * deletes the old entries.
-     *
-     * @param oldName The old name of the project (containing "_deleted_")
-     * @param newName The new name of the project
-     */
-    void copyHistoryAndDelete(String oldName, String newName);
-    
-    /**
-     * Copies the history files of a restored node from the old location (_deleted_) to a directory with the new name and
-     * deletes the old entries.
-     *
-     * @param oldName The old name of the node (containing "_deleted_")
-     * @param newName The new name of the node
-     */
-    void copyNodeHistoryAndDelete(String oldName, String newName);
+    boolean hasDuplicateHistory(final Node node);
 }
 

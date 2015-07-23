@@ -21,15 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package hudson.plugins.jobConfigHistory;
 
 import hudson.model.Hudson;
 import hudson.model.User;
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Helper class.
@@ -57,17 +60,18 @@ final class PluginUtils {
      * For tests.
      * @return historyDao
      */
-    public static FileHistoryDao getHistoryDao() {
+    public static JobConfigHistoryStrategy getHistoryDao() {
         final JobConfigHistory plugin = getPlugin();
         return getHistoryDao(plugin);
     }
 
     /**
-     * Like {@link #getHistoryDao()}, but without a user.
-     * Avoids calling {@link User#current()}.
+     * Like {@link #getHistoryDao()}, but without a user. Avoids calling
+     * {@link User#current()}.
+     *
      * @return historyDao
      */
-    public static FileHistoryDao getAnonymousHistoryDao() {
+    public static JobConfigHistoryStrategy getAnonymousHistoryDao() {
         final JobConfigHistory plugin = getPlugin();
         return getAnonymousHistoryDao(plugin);
     }
@@ -77,7 +81,7 @@ final class PluginUtils {
      * @param plugin the plugin.
      * @return historyDao
      */
-    public static FileHistoryDao getHistoryDao(final JobConfigHistory plugin) {
+    public static JobConfigHistoryStrategy getHistoryDao(final JobConfigHistory plugin) {
         return getHistoryDao(plugin, User.current());
     }
 
@@ -87,36 +91,76 @@ final class PluginUtils {
      * @param plugin the plugin.
      * @return historyDao
      */
-    public static FileHistoryDao getAnonymousHistoryDao(final JobConfigHistory plugin) {
+    public static JobConfigHistoryStrategy getAnonymousHistoryDao(final JobConfigHistory plugin) {
         return getHistoryDao(plugin, null);
     }
 
-    static FileHistoryDao getHistoryDao(final JobConfigHistory plugin, final User user) {
-        final String maxHistoryEntriesAsString = plugin.getMaxHistoryEntries();
-        int maxHistoryEntries = 0;
+    private static int valueOfStringOrDefault(String s, int x) {
         try {
-            maxHistoryEntries = Integer.valueOf(maxHistoryEntriesAsString);
+            return Integer.valueOf(s);
         } catch (NumberFormatException e) {
-            maxHistoryEntries = 0;
+            return x;
         }
-        return new FileHistoryDao(
-                plugin.getConfiguredHistoryRootDir(),
-                new File(Hudson.getInstance().root.getPath()),
-                user,
-                maxHistoryEntries,
-                !plugin.getSkipDuplicateHistory());
     }
-    /**
-     * Returns a {@link Date}.
-     *
-     * @param timeStamp date as string.
-     * @return The parsed date as a java.util.Date.
-     */
-    public static Date parsedDate(final String timeStamp) {
+
+    private static File getFileFromURL(URL url) {
+        try {
+            return new File(url.toURI());
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(PluginUtils.class.getName()).log(Level.SEVERE, null, ex);
+            return new File(url.getPath());
+        }
+    }
+
+    private static JobConfigHistoryStrategyFactory shouldBeReplacedByExtensionPoint;
+
+    static {
+        shouldBeReplacedByExtensionPoint
+            = new JobConfigHistoryStrategyFactory() {
+                @Override
+                public JobConfigHistoryStrategy createFor(
+                    final JobConfigHistory plugin,
+                    final User user) {
+                    final String maxHistoryEntriesAsString =
+                        plugin.getMaxHistoryEntries();
+                    int maxHistoryEntries = 0;
+                    try {
+                        maxHistoryEntries = Integer.valueOf(
+                            maxHistoryEntriesAsString);
+                    } catch (NumberFormatException e) {
+                        maxHistoryEntries = 0;
+                    }
+                    return new FileHistoryDao(
+                        plugin.getConfiguredHistoryRootDir(),
+                        new File(Hudson.getInstance().root.getPath()),
+                        user,
+                        maxHistoryEntries,
+                        !plugin.getSkipDuplicateHistory());
+                }
+            };
+    }
+
+    @Deprecated
+    public static void setJobConfigHistoryStrategyFactory(
+        final JobConfigHistoryStrategyFactory factory) {
+        shouldBeReplacedByExtensionPoint = factory;
+    }
+
+    static JobConfigHistoryStrategy getHistoryDao(final JobConfigHistory plugin, final User user) {
+        return shouldBeReplacedByExtensionPoint.createFor(plugin, user);
+    }
+
+/**
+ * Returns a {@link Date}.
+ *
+ * @param timeStamp date as string.
+ * @return The parsed date as a java.util.Date.
+ */
+public static Date parsedDate(final String timeStamp) {
         try {
             return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timeStamp);
         } catch (ParseException ex) {
             throw new IllegalArgumentException("Could not parse Date" + timeStamp, ex);
-        }        
+        }
     }
 }

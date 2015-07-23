@@ -1,3 +1,26 @@
+/*
+ * The MIT License
+ *
+ * Copyright 2013 Kathi Stutz.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.*;
@@ -21,7 +44,7 @@ import hudson.model.PeriodicWork;
 
 /**
  *
- * @author kstutz
+ * @author Kathi Stutz
  *
  */
 @Extension
@@ -35,8 +58,8 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     /**The maximum allowed age of history entries in days.*/
     private int maxAge;
     
-    /** The dao. */
-    private HistoryDao historyDao;
+    /**The purgeable object*/
+    private Purgeable purgeable;
 
     /** The overviewDao. */
     private final OverviewHistoryDao overviewHistoryDao;
@@ -49,7 +72,11 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     }
 
     private JobConfigHistoryPurger(JobConfigHistory plugin) {
-        this(plugin, PluginUtils.getHistoryDao(plugin, null), PluginUtils.getHistoryDao(plugin, null));
+        this(plugin,
+            (PluginUtils.getHistoryDao(plugin, null) instanceof Purgeable
+                ? (Purgeable)PluginUtils.getHistoryDao(plugin, null)
+                : null),
+            PluginUtils.getHistoryDao(plugin, null));
     }
 
     /**
@@ -59,9 +86,9 @@ public class JobConfigHistoryPurger extends PeriodicWork {
      * @param historyDao injected HistoryDao
      * @param overviewHistoryDao the value of overviewHistoryDao
      */
-    JobConfigHistoryPurger(JobConfigHistory plugin, HistoryDao historyDao, OverviewHistoryDao overviewHistoryDao) {
+    JobConfigHistoryPurger(JobConfigHistory plugin, Purgeable purgeable, OverviewHistoryDao overviewHistoryDao) {
         this.plugin = plugin;
-        this.historyDao = historyDao;
+        this.purgeable = purgeable;
         this.overviewHistoryDao = overviewHistoryDao;
     }
 
@@ -110,7 +137,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
                     for (File historyDir : historyDirs) {
                         //historyDir: e.g. 2013-01-18_17-33-51
                         if (isTooOld(historyDir)) {
-                            if (!historyDao.isCreatedEntry(historyDir)) {
+                            if (!purgeable.isCreatedEntry(historyDir)) {
                                 LOG.log(FINEST, "Should delete: {0}", historyDir);
                                 deleteDirectory(historyDir);
                             }
