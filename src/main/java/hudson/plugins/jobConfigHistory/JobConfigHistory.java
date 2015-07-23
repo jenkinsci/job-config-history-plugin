@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013 Jessica Borghi.
+ * Copyright 2013 John Borghi.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * Class supporting global configuration settings, along with methods
  * associated with the plugin itself.
  *
- * @author Jessica Borghi
+ * @author John Borghi
  *
  */
 public class JobConfigHistory extends Plugin {
