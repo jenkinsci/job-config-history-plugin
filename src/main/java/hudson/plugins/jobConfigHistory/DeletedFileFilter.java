@@ -32,10 +32,13 @@ import java.io.FileFilter;
  *
  * @author Mirko Friedenhagen
  */
-class DeletedFileFilter implements FileFilter {
+public class DeletedFileFilter implements FileFilter {
+
+    /** name of history xml file. */
+    public static final String DELETED_MARKER = "_deleted_";
 
     /** Only one instance needed. */
-    static final DeletedFileFilter INSTANCE = new DeletedFileFilter();
+    public static final DeletedFileFilter INSTANCE = new DeletedFileFilter();
 
     @Override
     public boolean accept(File file) {
@@ -49,7 +52,7 @@ class DeletedFileFilter implements FileFilter {
      * @return true when fileName has the special deleted mark.
      */
     private boolean accept(final String fileName) {
-        return fileName.contains(JobConfigHistoryConsts.DELETED_MARKER);
+        return fileName.contains(DELETED_MARKER);
     }
 
     /**

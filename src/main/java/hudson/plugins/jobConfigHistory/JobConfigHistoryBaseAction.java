@@ -235,7 +235,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *
      * @return current request
      */
-    StaplerRequest getCurrentRequest() {
+    protected StaplerRequest getCurrentRequest() {
         return Stapler.getCurrentRequest();
     }
 
@@ -244,7 +244,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *
      * @return plugin
      */
-    JobConfigHistory getPlugin() {
+    protected JobConfigHistory getPlugin() {
         return PluginUtils.getPlugin();
     }
 
@@ -253,7 +253,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *
      * @return historyDao
      */
-    HistoryDao getHistoryDao() {
+    protected HistoryDao getHistoryDao() {
         return PluginUtils.getHistoryDao();
     }
 

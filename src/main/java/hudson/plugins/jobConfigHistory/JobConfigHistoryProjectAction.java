@@ -77,7 +77,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @param project
      *            for which configurations should be returned.
      */
-    JobConfigHistoryProjectAction(Hudson hudson, AbstractItem project) {
+    public JobConfigHistoryProjectAction(Hudson hudson, AbstractItem project) {
         super(hudson);
         this.project = project;
     }
@@ -197,12 +197,12 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * {@inheritDoc} Returns the project.
      */
     @Override
-    protected AccessControlled getAccessControlledObject() {
+    public AccessControlled getAccessControlledObject() {
         return project;
     }
 
     @Override
-    protected void checkConfigurePermission() {
+    public void checkConfigurePermission() {
         getAccessControlledObject().checkPermission(Item.CONFIGURE);
     }
 
@@ -404,7 +404,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      *
      * @return historyDao
      */
-    HistoryDao getHistoryDao() {
+    protected HistoryDao getHistoryDao() {
         return PluginUtils.getHistoryDao();
     }
 

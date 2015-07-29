@@ -40,7 +40,7 @@ import org.hamcrest.Description;
  */
 public class TUtils {
 
-    static ServletInputStream createServletInputStreamFromMultiPartFormData(final String boundary) {
+    public static ServletInputStream createServletInputStreamFromMultiPartFormData(final String boundary) {
         final String body =
                 "--" + boundary + "\r\n" +
                 "Content-Disposition: form-data; name=\"timestamp1\"\r\n\r\n" +

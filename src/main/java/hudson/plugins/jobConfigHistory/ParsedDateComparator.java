@@ -34,7 +34,7 @@ import java.util.Comparator;
  * @author Mirko Friedenhagen
  */
 @SuppressWarnings("serial")
-final class ParsedDateComparator implements Comparator<ParsedDate>, Serializable {
+final public class ParsedDateComparator implements Comparator<ParsedDate>, Serializable {
 
     /**
      * No need to create more than one instance for descending.

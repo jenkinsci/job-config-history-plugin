@@ -70,7 +70,7 @@ public class JobConfigHistoryRootActionTest {
     @Test
     public void testGetUrlName() {
         JobConfigHistoryRootAction sut = createSut();
-        String expResult = "/jobConfigHistory";
+        String expResult = "/" + JobConfigHistoryConsts.URLNAME;
         String result = sut.getUrlName();
         assertEquals(expResult, result);
     }
@@ -432,7 +432,7 @@ public class JobConfigHistoryRootActionTest {
     JobConfigHistoryRootAction createSut() {
         return new JobConfigHistoryRootAction() {
             @Override
-            JobConfigHistory getPlugin() {
+            protected JobConfigHistory getPlugin() {
                 return mockedPlugin;
             }
 
@@ -442,12 +442,12 @@ public class JobConfigHistoryRootActionTest {
             }
 
             @Override
-            StaplerRequest getCurrentRequest() {
+            protected StaplerRequest getCurrentRequest() {
                 return mockedStaplerRequest;
             }
 
             @Override
-            OverviewHistoryDao getOverviewHistoryDao() {
+            protected OverviewHistoryDao getOverviewHistoryDao() {
                 return new FileHistoryDao(
                         UNPACK_RESOURCE_ZIP.getResource("config-history"),
                         UNPACK_RESOURCE_ZIP.getRoot(),
@@ -457,7 +457,7 @@ public class JobConfigHistoryRootActionTest {
             }
 
             @Override
-            HistoryDao getHistoryDao() {
+            protected HistoryDao getHistoryDao() {
                 return new FileHistoryDao(
                         UNPACK_RESOURCE_ZIP.getResource("config-history"),
                         UNPACK_RESOURCE_ZIP.getRoot(),

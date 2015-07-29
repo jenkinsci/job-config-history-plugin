@@ -325,17 +325,17 @@ public class JobConfigHistoryProjectActionTest {
         }
 
         @Override
-        JobConfigHistory getPlugin() {
+        protected JobConfigHistory getPlugin() {
             return mockedPlugin;
         }
 
         @Override
-        StaplerRequest getCurrentRequest() {
+        protected StaplerRequest getCurrentRequest() {
             return mockedRequest;
         }
 
         @Override
-        HistoryDao getHistoryDao() {
+        protected HistoryDao getHistoryDao() {
             return historyDao;
         }
     }

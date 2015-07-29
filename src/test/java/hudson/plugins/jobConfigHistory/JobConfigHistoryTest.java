@@ -310,18 +310,6 @@ public class JobConfigHistoryTest {
     }
 
     /**
-     * Test of getConfigFile method, of class JobConfigHistory.
-     */
-    @Test
-    public void testGetConfigFile() {
-        final String dirName = "config-history/config/2013-01-18_17-34-22/";
-        File historyDir = unpackResourceZip.getResource(dirName);
-        JobConfigHistory sut = createSut();
-        File result = sut.getConfigFile(historyDir);
-        assertThat(result.getPath(), TUtils.pathEndsWith(dirName + "config.xml"));
-    }
-
-    /**
      * Test of isSaveable method, of class JobConfigHistory.
      */
     @Test
@@ -382,18 +370,18 @@ public class JobConfigHistoryTest {
             final Jenkins mockedJenkins = mock(Jenkins.class);
 
             @Override
-            HistoryDao getHistoryDao() {
+            protected HistoryDao getHistoryDao() {
                 return new FileHistoryDao(
                         unpackResourceZip.getResource("config-history"), getJenkinsHome(), mockedUser, 0, false);
             }
 
             @Override
-            File getJenkinsHome() {
+            protected File getJenkinsHome() {
                 return unpackResourceZip.getRoot();
             }
 
             @Override
-            Jenkins getJenkins() {
+            public Jenkins getJenkins() {
                 return mockedJenkins;
             }
 

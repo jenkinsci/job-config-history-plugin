@@ -42,9 +42,6 @@ import hudson.model.Item;
 import hudson.model.Saveable;
 import hudson.model.TopLevelItem;
 import hudson.util.FormValidation;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -161,7 +158,7 @@ public class JobConfigHistory extends Plugin {
      * @param maxEntryInput
      *        The maximum number of history entries to keep
      */
-    protected void setMaxHistoryEntries(String maxEntryInput) {
+    public void setMaxHistoryEntries(String maxEntryInput) {
         if (maxEntryInput.isEmpty() || isPositiveInteger(maxEntryInput)) {
             maxHistoryEntries = maxEntryInput;
         }
@@ -179,7 +176,7 @@ public class JobConfigHistory extends Plugin {
      * @param maxEntryInput
      *        The maximum number of history entries to show per site
      */
-    protected void setMaxEntriesPerPage(String maxEntryInput) {
+    public void setMaxEntriesPerPage(String maxEntryInput) {
         if (maxEntryInput.isEmpty() || isPositiveInteger(maxEntryInput)) {
             maxEntriesPerPage = maxEntryInput;
         }
@@ -197,7 +194,7 @@ public class JobConfigHistory extends Plugin {
      * @param maxDaysInput
      *        For how long history entries should be kept (in days)
      */
-    void setMaxDaysToKeepEntries(final String maxDaysInput) {
+    public void setMaxDaysToKeepEntries(final String maxDaysInput) {
         if (maxDaysInput.isEmpty() || isPositiveInteger(maxDaysInput)) {
             maxDaysToKeepEntries = maxDaysInput;
         }
@@ -210,7 +207,7 @@ public class JobConfigHistory extends Plugin {
      * @return Whether the number is a positive integer
      *
      */
-    boolean isPositiveInteger(String numberString) {
+    public boolean isPositiveInteger(String numberString) {
         try {
             final int number = Integer.parseInt(numberString);
             if (number < 0) {
@@ -282,7 +279,7 @@ public class JobConfigHistory extends Plugin {
      * @param project The project to which the build history belongs.
      * @return False if the option is set to 'never' or the user doesn't have the required permissions.
      */
-    boolean showBuildBadges(AbstractProject<?, ?> project) {
+    public boolean showBuildBadges(AbstractProject<?, ?> project) {
         if ("always".equals(showBuildBadges)) {
             return true;
         } else if ("userWithConfigPermission".equals(showBuildBadges) && project.hasPermission(Item.CONFIGURE)) {
@@ -297,7 +294,7 @@ public class JobConfigHistory extends Plugin {
      * Used for testing to verify invalid pattern not loaded.
      * @return The loaded regexp pattern, or null if pattern was invalid.
      */
-    protected Pattern getExcludeRegexpPattern() {
+    public Pattern getExcludeRegexpPattern() {
         return excludeRegexpPattern;
     }
 
@@ -332,7 +329,7 @@ public class JobConfigHistory extends Plugin {
      * @return The configured root history File object.
      *     from the URI.
      */
-    protected File getConfiguredHistoryRootDir() {
+    public File getConfiguredHistoryRootDir() {
         File rootDir;
         final File jenkinsHome = getJenkinsHome();
 
@@ -356,7 +353,7 @@ public class JobConfigHistory extends Plugin {
      *            The history directory to look under.
      * @return The configuration file or null if no file is found.
      */
-    protected File getConfigFile(final File historyDir) {
+    public File getConfigFile(final File historyDir) {
         // TODO: refactor away from 'File'
         return FileHistoryDao.getConfigFile(historyDir);
     }
@@ -378,7 +375,7 @@ public class JobConfigHistory extends Plugin {
      *            The configuration file for the above item.
      * @return true if the item configuration should be saved.
      */
-    boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
+    public boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
 
         if (item instanceof TopLevelItem) {
             return true;
@@ -485,7 +482,7 @@ public class JobConfigHistory extends Plugin {
      * For tests.
      * @return the historyDao
      */
-    HistoryDao getHistoryDao() {
+    protected HistoryDao getHistoryDao() {
         return PluginUtils.getHistoryDao(this);
     }
 
@@ -493,7 +490,7 @@ public class JobConfigHistory extends Plugin {
      * For tests.
      * @return JENKINS_HOME
      */
-    File getJenkinsHome() {
+    protected File getJenkinsHome() {
         return Hudson.getInstance().root;
     }
 
@@ -501,7 +498,8 @@ public class JobConfigHistory extends Plugin {
      * For tests.
      * @return Jenkins instance.
      */
-    Jenkins getJenkins() {
+    @Deprecated
+    public Jenkins getJenkins() {
         return Hudson.getInstance();
     }
 

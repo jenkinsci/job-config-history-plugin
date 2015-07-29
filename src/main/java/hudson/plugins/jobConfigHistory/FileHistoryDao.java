@@ -98,7 +98,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param maxHistoryEntries max number of history entries
      * @param saveDuplicates should we save duplicate entries?
      */
-    FileHistoryDao(final File historyRootDir, final File jenkinsHome, final User currentUser, final int maxHistoryEntries, final boolean saveDuplicates) {
+    public FileHistoryDao(final File historyRootDir, final File jenkinsHome, final User currentUser, final int maxHistoryEntries, final boolean saveDuplicates) {
         this.historyRootDir = historyRootDir;
         this.jenkinsHome = jenkinsHome;
         this.currentUser = currentUser;
@@ -273,7 +273,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         final File currentHistoryDir = getHistoryDir(configFile);
         final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
         final String timestamp = buildDateFormat.format(new Date());
-        final String deletedHistoryName = item.getName() + JobConfigHistoryConsts.DELETED_MARKER + timestamp;
+        final String deletedHistoryName = item.getName() + DeletedFileFilter.DELETED_MARKER + timestamp;
         final File deletedHistoryDir = new File(currentHistoryDir.getParentFile(), deletedHistoryName);
         if (!currentHistoryDir.renameTo(deletedHistoryDir)) {
             LOG.log(Level.WARNING, "unable to rename deleted history dir to: {0}", deletedHistoryDir);
@@ -415,7 +415,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @return The base directory where to store the history,
      *         or null if the file is not a valid Hudson configuration file.
      */
-    File getHistoryDir(final File configFile) {
+    public File getHistoryDir(final File configFile) {
         final String configRootDir = configFile.getParent();
         final String hudsonRootDir = jenkinsHome.getPath();
         if (!configRootDir.startsWith(hudsonRootDir)) {
@@ -517,7 +517,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      *            The history directory to look under.
      * @return The configuration file or null if no file is found.
      */
-    static File getConfigFile(final File historyDir) {
+    public static File getConfigFile(final File historyDir) {
         File configFile = null;
         if (HistoryFileFilter.accepts(historyDir)) {
             // get the *.xml file that is not the JobConfigHistoryConsts.HISTORY_FILE
@@ -685,7 +685,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         final File currentHistoryDir = getHistoryDirForNode(node);
         final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
         final String timestamp = buildDateFormat.format(new Date());
-        final String deletedHistoryName = node.getNodeName() + JobConfigHistoryConsts.DELETED_MARKER + timestamp;
+        final String deletedHistoryName = node.getNodeName() + DeletedFileFilter.DELETED_MARKER + timestamp;
         final File deletedHistoryDir = new File(currentHistoryDir.getParentFile(), deletedHistoryName);
         if (!currentHistoryDir.renameTo(deletedHistoryDir)) {
             LOG.log(Level.WARNING, "unable to rename deleted history dir to: {0}", deletedHistoryDir);

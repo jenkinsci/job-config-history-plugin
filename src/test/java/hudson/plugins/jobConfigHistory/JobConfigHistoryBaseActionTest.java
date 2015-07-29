@@ -196,7 +196,7 @@ public class JobConfigHistoryBaseActionTest {
         }
 
         @Override
-        StaplerRequest getCurrentRequest() {
+        protected StaplerRequest getCurrentRequest() {
             return staplerRequestMock;
         }
     }

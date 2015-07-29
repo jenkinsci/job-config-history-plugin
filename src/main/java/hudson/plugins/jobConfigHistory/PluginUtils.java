@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  *
  * @author Mirko Friedenhagen
  */
-final class PluginUtils {
+final public class PluginUtils {
 
     /**
      * Do not instantiate.
@@ -112,51 +112,30 @@ final class PluginUtils {
         }
     }
 
-    private static JobConfigHistoryStrategyFactory shouldBeReplacedByExtensionPoint;
-
-    static {
-        shouldBeReplacedByExtensionPoint
-            = new JobConfigHistoryStrategyFactory() {
-                @Override
-                public JobConfigHistoryStrategy createFor(
-                    final JobConfigHistory plugin,
-                    final User user) {
-                    final String maxHistoryEntriesAsString =
-                        plugin.getMaxHistoryEntries();
-                    int maxHistoryEntries = 0;
-                    try {
-                        maxHistoryEntries = Integer.valueOf(
-                            maxHistoryEntriesAsString);
-                    } catch (NumberFormatException e) {
-                        maxHistoryEntries = 0;
-                    }
-                    return new FileHistoryDao(
-                        plugin.getConfiguredHistoryRootDir(),
-                        new File(Hudson.getInstance().root.getPath()),
-                        user,
-                        maxHistoryEntries,
-                        !plugin.getSkipDuplicateHistory());
-                }
-            };
+    public static JobConfigHistoryStrategy getHistoryDao(final JobConfigHistory plugin, final User user) {
+        final String maxHistoryEntriesAsString
+            = plugin.getMaxHistoryEntries();
+        int maxHistoryEntries = 0;
+        try {
+            maxHistoryEntries = Integer.valueOf(
+                maxHistoryEntriesAsString);
+        } catch (NumberFormatException e) {
+            maxHistoryEntries = 0;
+        }
+        return new FileHistoryDao(
+            plugin.getConfiguredHistoryRootDir(),
+            new File(Hudson.getInstance().root.getPath()),
+            user,
+            maxHistoryEntries,
+            !plugin.getSkipDuplicateHistory());
     }
 
-    @Deprecated
-    public static void setJobConfigHistoryStrategyFactory(
-        final JobConfigHistoryStrategyFactory factory) {
-        shouldBeReplacedByExtensionPoint = factory;
-    }
-
-    static JobConfigHistoryStrategy getHistoryDao(final JobConfigHistory plugin, final User user) {
-        return shouldBeReplacedByExtensionPoint.createFor(plugin, user);
-    }
-
-/**
- * Returns a {@link Date}.
- *
- * @param timeStamp date as string.
- * @return The parsed date as a java.util.Date.
- */
-public static Date parsedDate(final String timeStamp) {
+    /**
+     * Returns a {@link Date}.
+     * @param timeStamp date as string.
+     * @return The parsed date as a java.util.Date.
+     */
+    public static Date parsedDate(final String timeStamp) {
         try {
             return new SimpleDateFormat(JobConfigHistoryConsts.ID_FORMATTER).parse(timeStamp);
         } catch (ParseException ex) {
