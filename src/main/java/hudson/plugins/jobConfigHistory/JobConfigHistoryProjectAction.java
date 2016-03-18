@@ -36,6 +36,8 @@ import hudson.security.AccessControlled;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -229,10 +231,21 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
             checkConfigurePermission();
             return null;
         }
-        return this.getRequestParameter("timestamp" + timestampNumber);
-    }
+        String timeStamp = this.getRequestParameter("timestamp" + timestampNumber);
+        SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 
-    /**
+        try{
+            format.setLenient(false);
+            format.parse(timeStamp);
+            return timeStamp;
+        }
+        catch(ParseException e) {
+            return null;
+        }
+       
+    }
+    
+   /**
      * Used in the Difference jelly only. Returns the user that made the change
      * in one of the Files shown in the Difference view(A or B). timestampNumber
      * decides between File A and File B.

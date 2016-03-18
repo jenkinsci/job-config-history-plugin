@@ -239,9 +239,8 @@ public class JobConfigHistoryProjectActionTest {
      */
     @Test
     public void testDoDiffFiles() throws Exception {
-        final String boundary = "AAAA";
-        when(mockedRequest.getContentType()).thenReturn("multipart/form-data; boundary=" + boundary);
-        when(mockedRequest.getInputStream()).thenReturn(TUtils.createServletInputStreamFromMultiPartFormData(boundary));
+        when(mockedRequest.getParameter("timestamp1")).thenReturn("2014-02-05_10-42-37");
+        when(mockedRequest.getParameter("timestamp2")).thenReturn("2014-03-12_11-02-12");
         JobConfigHistoryProjectAction sut = createAction();
         sut.doDiffFiles(mockedRequest, mockedResponse);
         verify(mockedResponse).sendRedirect("showDiffFiles?timestamp1=2014-02-05_10-42-37&timestamp2=2014-03-12_11-02-12");

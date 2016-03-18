@@ -13,7 +13,7 @@
           <j:otherwise>
             <br/>
             <div>
-              <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
+              <f:form method="post" action="diffFiles" name="diffFiles" >
 	            <j:if test="${configs.size() > 1}">
                   <div align="right">
                     <f:submit value="${%Show Diffs}" />
