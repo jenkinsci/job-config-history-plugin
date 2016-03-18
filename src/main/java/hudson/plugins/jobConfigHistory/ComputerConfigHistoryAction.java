@@ -14,6 +14,8 @@ import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,7 +25,6 @@ import java.util.SortedMap;
 import java.util.Map.Entry;
 
 import jenkins.model.Jenkins;
-
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -163,7 +164,18 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      */
     public final String getTimestamp(int timestampNumber) {
         checkConfigurePermission();
-        return this.getRequestParameter("timestamp" + timestampNumber);
+        String timeStamp = this.getRequestParameter("timestamp" + timestampNumber);
+        SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+
+        try{
+            format.setLenient(false);
+            format.parse(timeStamp);
+            return timeStamp;
+        }
+        catch(ParseException e) {
+            return null;
+        }
+        
     }
 
     /**

@@ -26,8 +26,8 @@
                     <td colspan="2"> <font size="3"> Newer Change </font></td>
                   </tr>
                   <tr>
-                    <td colspan="2"><b>Date:</b> ${timestamp1}</td>
-                    <td colspan="2"><b>Date:</b> ${timestamp2}</td>
+                    <td colspan="2"><b>Date:</b> ${it.getTimestamp(1)}</td>
+                    <td colspan="2"><b>Date:</b> ${it.getTimestamp(2)}</td>
                   </tr>
                   <tr>
                     <td colspan="2"><b>Operation:</b> ${it.getOperation(1)}</td>
