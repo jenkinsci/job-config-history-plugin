@@ -179,13 +179,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     public void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
         throws ServletException, IOException {
-        final MultipartFormDataParser parser = new MultipartFormDataParser(req);
-        String timestamp1 = parser.get("timestamp1");
-        String timestamp2 = parser.get("timestamp2");
+        String timestamp1 = req.getParameter("timestamp1");
+        String timestamp2 = req.getParameter("timestamp2");
         
         if (PluginUtils.parsedDate(timestamp1).after(PluginUtils.parsedDate(timestamp2))) {
-            timestamp1 = parser.get("timestamp2");
-            timestamp2 = parser.get("timestamp1");
+            timestamp1 = req.getParameter("timestamp2");
+            timestamp2 = req.getParameter("timestamp1");
         }
         rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
                 + "&timestamp2=" + timestamp2);
