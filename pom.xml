@@ -21,7 +21,7 @@
         <connection>scm:git:git://github.com/jenkinsci/jobConfigHistory-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/jobConfigHistory-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/jobConfigHistory-plugin</url>
-      <tag>HEAD</tag>
+      <tag>SECURITY-140</tag>
   </scm>
     <ciManagement>
         <system>Jenkins</system>
