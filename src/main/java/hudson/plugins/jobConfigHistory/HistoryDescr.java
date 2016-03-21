@@ -32,7 +32,7 @@ import java.util.Date;
  */
 public class HistoryDescr implements ParsedDate {
 
-    static final HistoryDescr EMPTY_HISTORY_DESCR = new HistoryDescr(null, null, null, null);
+    static final HistoryDescr EMPTY_HISTORY_DESCR = new HistoryDescr(null, null, null, null, null, null);
 
     /** Display name of the user doing the operation. */
     private final String user;
@@ -45,6 +45,12 @@ public class HistoryDescr implements ParsedDate {
 
     /** Timestamp of the operation, see {@link JobConfigHistoryConsts#ID_FORMATTER}. */
     private final String timestamp;
+    
+    /** Current name of the job after renaming. */
+    private final String currentJobName;
+    
+    /** Old name of the job before renaming.*/
+    private final String oldJobName;
 
     /**
      * @param user
@@ -56,12 +62,13 @@ public class HistoryDescr implements ParsedDate {
      * @param timestamp
      *            timestamp of the operation
      */
-    public HistoryDescr(String user, String userId, String operation, String timestamp) {
+    public HistoryDescr(String user, String userId, String operation, String timestamp, String currentJobName, String oldJobName) {
         this.user = user;
         this.userId = userId;
         this.operation = operation;
         this.timestamp = timestamp;
-
+        this.currentJobName = currentJobName;
+        this.oldJobName = oldJobName;
     }
 
     /**
@@ -108,5 +115,19 @@ public class HistoryDescr implements ParsedDate {
     @Override
     public Date parsedDate() {
         return PluginUtils.parsedDate(getTimestamp());
+    }
+
+    /**
+     * Returns the current job name after renaming.
+     */
+    public String getCurrentJobName() {
+        return currentJobName;
+    }
+
+    /**
+     * Returns the old job name before renaming.
+     */
+    public String getOldJobName() {
+        return oldJobName;
     }
 }

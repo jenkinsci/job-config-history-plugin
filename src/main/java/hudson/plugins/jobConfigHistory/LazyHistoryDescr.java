@@ -42,7 +42,7 @@ public class LazyHistoryDescr extends HistoryDescr {
      * @param historyDescriptionFile
      */
     public LazyHistoryDescr(XmlFile historyDescriptionFile) {
-        super(null, null, null, null);
+        super(null, null, null, null, null, null);
         this.historyDescriptionFile = historyDescriptionFile;
     }
 
@@ -70,6 +70,28 @@ public class LazyHistoryDescr extends HistoryDescr {
         return loadAndGetHistory().getOperation();
     }
 
+    
+    
+    /**
+     * {@inheritDoc}.
+     */
+    @Override
+    public String getCurrentJobName() {
+        return loadAndGetHistory().getCurrentJobName();
+    }
+    
+    
+    
+    /**
+     * {@inheritDoc}.
+     */
+    @Override
+    public String getOldJobName() {
+        return loadAndGetHistory().getOldJobName();
+    }
+    
+    
+    
     /**
      * {@inheritDoc}.
      */
