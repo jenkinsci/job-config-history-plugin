@@ -204,8 +204,8 @@ public class JobConfigBadgeActionTest {
             @Override
             List<HistoryDescr> getRevisions(AbstractProject<?, ?> project) {
                 return Arrays.asList(
-                        new HistoryDescr("user", "userId", "changed", "2013-10-30_23-00-06"),
-                        new HistoryDescr("user", "userId", "changed", "2013-10-30_23-00-07"));
+                        new HistoryDescr("user", "userId", "changed", "2013-10-30_23-00-06", null, null),
+                        new HistoryDescr("user", "userId", "changed", "2013-10-30_23-00-07", null, null));
             }
 
         };

@@ -109,7 +109,7 @@ public class FileHistoryDaoTest {
      */
     @Test
     public void testCreateNewHistoryEntry() throws IOException {
-        sutWithoutUserAndDuplicateHistory.createNewHistoryEntry(test1Config, "foo");
+        sutWithoutUserAndDuplicateHistory.createNewHistoryEntry(test1Config, "foo", null, null);
         final int newLength = getHistoryLength();
         assertEquals(6, newLength);
     }
@@ -128,7 +128,7 @@ public class FileHistoryDaoTest {
             }
         };
         try {
-            sut.createNewHistoryEntry(xmlFile, "foo");
+            sut.createNewHistoryEntry(xmlFile, "foo", null, null);
             fail("Should throw RTE");
         } catch (RuntimeException e) {
             final int newLength = getHistoryLength();
@@ -191,7 +191,7 @@ public class FileHistoryDaoTest {
     private void testCreateHistoryXmlFile(FileHistoryDao sut, final String fullName) throws IOException {
         Calendar timestamp = new GregorianCalendar();
         File timestampedDir = new File(historyRoot, "timestampedDir");
-        sut.createHistoryXmlFile(timestamp, timestampedDir, "foo");
+        sut.createHistoryXmlFile(timestamp, timestampedDir, "foo", null, null);
         final File historyFile = new File(timestampedDir, JobConfigHistoryConsts.HISTORY_FILE);
         assertTrue(historyFile.exists());
         final String historyContent = Util.loadFile(historyFile, Charset.forName("utf-8"));
@@ -295,6 +295,7 @@ public class FileHistoryDaoTest {
         // Rename of Job is already done in Listener.
         FileUtils.touch(new File(newJobDir, "config.xml"));
         when(mockedItem.getRootDir()).thenReturn(newJobDir);
+        when(mockedItem.getName()).thenReturn("Test1");
         sutWithUserAndNoDuplicateHistory.renameItem(mockedItem, "Test1", "NewName");
         final File newHistoryDir = new File(historyRoot, "jobs/" + newName);
         assertTrue(newHistoryDir.exists());
@@ -632,7 +633,7 @@ public class FileHistoryDaoTest {
         File config = new File(revision, "config.xml");
         File history = new File(revision, JobConfigHistoryConsts.HISTORY_FILE);
         
-        HistoryDescr descr = new HistoryDescr("User", "user", "created", "2014-01-20_10-12-34");
+        HistoryDescr descr = new HistoryDescr("User", "user", "created", "2014-01-20_10-12-34", null, null);
         OutputStream configsFile = new PrintStream(config);
         OutputStream historyFile = new FileOutputStream(history);
         try {
@@ -693,7 +694,7 @@ public class FileHistoryDaoTest {
         File revision = new File(revisions, timestamp);
         revision.mkdirs();
         Jenkins.getInstance().XSTREAM2.toXMLUTF8(mockedNode, new PrintStream(new File(revision,"config.xml")));
-        HistoryDescr descr = new HistoryDescr("User", "user", "created", timestamp);
+        HistoryDescr descr = new HistoryDescr("User", "user", "created", timestamp, null, null);
         Jenkins.getInstance().XSTREAM2.toXMLUTF8(descr, new FileOutputStream(new File(revision, JobConfigHistoryConsts.HISTORY_FILE)));
         return revision;
     }

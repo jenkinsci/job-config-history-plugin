@@ -22,7 +22,7 @@ public class ConfigInfoTest {
     private static final String DATE = "2012-11-21_11-29-12";
 
     private final HistoryDescr historyDescr = new HistoryDescr(
-            "Firstname Lastname", "userId", "operation", DATE);
+            "Firstname Lastname", "userId", "operation", DATE, null, null);
 
     public ConfigInfoTest() {
         when(itemGroupMock.getFullName()).thenReturn("does not matter parent");

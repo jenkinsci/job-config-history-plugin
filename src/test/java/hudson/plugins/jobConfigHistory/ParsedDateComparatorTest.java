@@ -16,13 +16,13 @@ public class ParsedDateComparatorTest {
     private static final String DATE_NEWER = "2012-11-21_11-29-14";
 
     private final HistoryDescr historyDescr = new HistoryDescr(
-            "Firstname Lastname", "userId", "operation", DATE);
+            "Firstname Lastname", "userId", "operation", DATE, null, null);
 
     private final HistoryDescr historyDescrClone = new HistoryDescr(
-            "Firstname Lastname", "userId", "operation", DATE);
+            "Firstname Lastname", "userId", "operation", DATE, null, null);
 
     private final HistoryDescr historyDescrNewer = new HistoryDescr(
-            "Firstname Lastname", "userId", "operation", DATE_NEWER);
+            "Firstname Lastname", "userId", "operation", DATE_NEWER, null, null);
 
     /**
      * Test of compare method, of class ParsedDateComparator.
