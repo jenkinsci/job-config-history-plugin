@@ -295,6 +295,7 @@ public class FileHistoryDaoTest {
         // Rename of Job is already done in Listener.
         FileUtils.touch(new File(newJobDir, "config.xml"));
         when(mockedItem.getRootDir()).thenReturn(newJobDir);
+        when(mockedItem.getName()).thenReturn("Test1");
         sutWithUserAndNoDuplicateHistory.renameItem(mockedItem, "Test1", "NewName");
         final File newHistoryDir = new File(historyRoot, "jobs/" + newName);
         assertTrue(newHistoryDir.exists());
