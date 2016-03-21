@@ -136,7 +136,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @throws IOException
      *             if writing the history fails.
      */
-    void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir, final String operation) throws IOException {
+    void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir, final String operation, final AbstractItem item, String oldName) throws IOException {
+        oldName = ((oldName == null) ? "" : oldName);
         final String user;
         final String userId;
         if (currentUser != null) {
@@ -146,10 +147,10 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
             user = "Anonym";
             userId = Messages.ConfigHistoryListenerHelper_anonymous();
         }
-
+        
         final XmlFile historyDescription = getHistoryXmlFile(timestampedDir);
         final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, getIdFormatter().format(
-                timestamp.getTime()));
+                timestamp.getTime()), (item==null)? "":item.getName(), (item==null) ? "": ((item.getName().equals(oldName)) ? "" : oldName));
         historyDescription.write(myDescr);
     }
 
@@ -240,7 +241,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     @Override
     public void createNewItem(final Item item) {
         final AbstractItem aItem = (AbstractItem) item;
-        createNewHistoryEntryAndCopyConfig(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED());
+        createNewHistoryEntryAndCopyConfig(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_CREATED(), null, null);
     }
 
     /**
@@ -249,8 +250,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param configFile to copy.
      * @param operation operation
      */
-    private void createNewHistoryEntryAndCopyConfig(final XmlFile configFile, final String operation) {
-        final File timestampedDir = createNewHistoryEntry(configFile, operation);
+    private void createNewHistoryEntryAndCopyConfig(final XmlFile configFile, final String operation, final AbstractItem item, final String oldName) {
+        final File timestampedDir = createNewHistoryEntry(configFile, operation, item, oldName);
         try {
             copyConfigFile(configFile.getFile(), timestampedDir);
         } catch (IOException ex) {
@@ -261,14 +262,14 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     @Override
     public void saveItem(final XmlFile file) {
         if (checkDuplicate(file)) {
-            createNewHistoryEntryAndCopyConfig(file, Messages.ConfigHistoryListenerHelper_CHANGED());
+            createNewHistoryEntryAndCopyConfig(file, Messages.ConfigHistoryListenerHelper_CHANGED(), null, null);
         }
     }
 
     @Override
     public void deleteItem(final Item item) {
         final AbstractItem aItem = (AbstractItem) item;
-        createNewHistoryEntry(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_DELETED());
+        createNewHistoryEntry(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_DELETED(), null, null);
         final File configFile = aItem.getConfigFile().getFile();
         final File currentHistoryDir = getHistoryDir(configFile);
         final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
@@ -306,7 +307,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
             }
 
         }
-        createNewHistoryEntryAndCopyConfig(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_RENAMED());
+        createNewHistoryEntryAndCopyConfig(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_RENAMED(), aItem, oldName);
     }
 
     @Override
@@ -389,12 +390,12 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      *
      * @return timestampedDir
      */
-    File createNewHistoryEntry(final XmlFile xmlFile, final String operation) {
+    File createNewHistoryEntry(final XmlFile xmlFile, final String operation, final AbstractItem item, final String oldName) {
         try {
             final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
             final File timestampedDir = getRootDir(xmlFile, timestampHolder);
             LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
-            createHistoryXmlFile(timestampHolder.get(), timestampedDir, operation);
+            createHistoryXmlFile(timestampHolder.get(), timestampedDir, operation, item, oldName);
             assert timestampHolder.get() != null;
             return timestampedDir;
         } catch (IOException e) {
@@ -662,7 +663,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param operation operation.
      */
     private void createNewHistoryEntryAndSaveConfig(final Node node, final String content, final String operation) {
-        final File timestampedDir = createNewHistoryEntry(node, operation);
+        final File timestampedDir = createNewHistoryEntry(node, operation, null, null);
         final File nodeConfigHistoryFile = new File(timestampedDir, "config.xml");
         PrintStream stream = null;
         try {
@@ -680,7 +681,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
     @Override
     public void deleteNode(final Node node) {
-        createNewHistoryEntry(node, Messages.ConfigHistoryListenerHelper_DELETED());
+        createNewHistoryEntry(node, Messages.ConfigHistoryListenerHelper_DELETED(), null, null);
        // final File configFile = aItem.getConfigFile().getFile();
         final File currentHistoryDir = getHistoryDirForNode(node);
         final SimpleDateFormat buildDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
@@ -752,12 +753,12 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     
-    private File createNewHistoryEntry(final Node node, final String operation) {
+    private File createNewHistoryEntry(final Node node, final String operation, final AbstractItem item, final String oldName) {
         try {
             final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
             final File timestampedDir = getRootDir(node, timestampHolder);
             LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
-            createHistoryXmlFile(timestampHolder.get(), timestampedDir, operation);
+            createHistoryXmlFile(timestampHolder.get(), timestampedDir, operation, item, oldName);
             assert timestampHolder.get() != null;
             return timestampedDir;
         } catch (IOException e) {

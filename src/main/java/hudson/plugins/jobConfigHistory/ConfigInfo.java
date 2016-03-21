@@ -61,6 +61,16 @@ public class ConfigInfo implements ParsedDate {
     private boolean isJob;
 
     /**
+     * The current job name after the renaming.
+     */
+    private final String currentJobName;
+
+    /**
+     * The old job name before renaming.
+     */
+    private final String oldJobName;
+
+    /**
      * Returns a new ConfigInfo object for a system configuration file.
      * @param name
      *            Name of the configuration entity we are saving.
@@ -81,7 +91,9 @@ public class ConfigInfo implements ParsedDate {
                 histDescr.getUser(),
                 histDescr.getOperation(),
                 histDescr.getUserID(),
-                isJob);
+                isJob,
+                histDescr.getCurrentJobName(),
+                histDescr.getOldJobName());
     }
 
     /**
@@ -93,7 +105,7 @@ public class ConfigInfo implements ParsedDate {
      * @param userID see {@link ConfigInfo#userID}
      * @param isJob see {@link ConfigInfo#isJob}
      */
-    ConfigInfo(String job, boolean configExists, String date, String user, String operation, String userID, boolean isJob) {
+    ConfigInfo(String job, boolean configExists, String date, String user, String operation, String userID, boolean isJob, String currentJobName, String oldJobName) {
         this.job = job;
         this.configExists = configExists;
         this.date = date;
@@ -101,7 +113,8 @@ public class ConfigInfo implements ParsedDate {
         this.operation = operation;
         this.userID = userID;
         this.isJob = isJob;
-
+        this.currentJobName = currentJobName;
+        this.oldJobName = oldJobName;
     }
 
     /**
@@ -187,4 +200,22 @@ public class ConfigInfo implements ParsedDate {
     public Date parsedDate() {
         return PluginUtils.parsedDate(getDate());
     }
+
+    /**
+     * Returns the current job name after renaming.
+     */
+    @Exported
+    public String getCurrentJobName() {
+        return currentJobName;
+    }
+
+    /**
+     * Returns the old job name before renaming.
+     */
+    @Exported
+    public String getOldJobName() {
+        return oldJobName;
+    }
+
+
 }
