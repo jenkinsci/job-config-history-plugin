@@ -47,10 +47,10 @@ public class HistoryDescr implements ParsedDate {
     private final String timestamp;
     
     /** Current name of the job after renaming. */
-    private final String currentJobName;
+    private final String currentName;
     
     /** Old name of the job before renaming.*/
-    private final String oldJobName;
+    private final String oldName;
 
     /**
      * @param user
@@ -62,13 +62,13 @@ public class HistoryDescr implements ParsedDate {
      * @param timestamp
      *            timestamp of the operation
      */
-    public HistoryDescr(String user, String userId, String operation, String timestamp, String currentJobName, String oldJobName) {
+    public HistoryDescr(String user, String userId, String operation, String timestamp, String currentName, String oldName) {
         this.user = user;
         this.userId = userId;
         this.operation = operation;
         this.timestamp = timestamp;
-        this.currentJobName = currentJobName;
-        this.oldJobName = oldJobName;
+        this.currentName = currentName;
+        this.oldName = oldName;
     }
 
     /**
@@ -120,14 +120,14 @@ public class HistoryDescr implements ParsedDate {
     /**
      * Returns the current job name after renaming.
      */
-    public String getCurrentJobName() {
-        return currentJobName;
+    public String getCurrentName() {
+        return currentName;
     }
 
     /**
      * Returns the old job name before renaming.
      */
-    public String getOldJobName() {
-        return oldJobName;
+    public String getOldName() {
+        return oldName;
     }
 }
