@@ -76,8 +76,8 @@ public class LazyHistoryDescr extends HistoryDescr {
      * {@inheritDoc}.
      */
     @Override
-    public String getCurrentJobName() {
-        return loadAndGetHistory().getCurrentJobName();
+    public String getCurrentName() {
+        return loadAndGetHistory().getCurrentName();
     }
     
     
@@ -86,8 +86,8 @@ public class LazyHistoryDescr extends HistoryDescr {
      * {@inheritDoc}.
      */
     @Override
-    public String getOldJobName() {
-        return loadAndGetHistory().getOldJobName();
+    public String getOldName() {
+        return loadAndGetHistory().getOldName();
     }
     
     

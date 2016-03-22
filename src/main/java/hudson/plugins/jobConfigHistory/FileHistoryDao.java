@@ -32,8 +32,8 @@ import hudson.model.AbstractItem;
 import hudson.model.Item;
 import hudson.model.Node;
 import hudson.model.User;
-import java.io.BufferedOutputStream;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -51,10 +51,15 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
+
 import static java.util.logging.Level.FINEST;
+
 import java.util.logging.Logger;
+
 import jenkins.model.Jenkins;
+
 import org.apache.commons.io.FileUtils;
+import org.dom4j.tree.AbstractNode;
 
 /**
  * Defines some helper functions needed by {@link JobConfigHistoryJobListener} and
@@ -136,7 +141,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @throws IOException
      *             if writing the history fails.
      */
-    void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir, final String operation, final AbstractItem item, String oldName) throws IOException {
+    void createHistoryXmlFile(final Calendar timestamp, final File timestampedDir, final String operation, final String newName, String oldName) throws IOException {
         oldName = ((oldName == null) ? "" : oldName);
         final String user;
         final String userId;
@@ -150,7 +155,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         
         final XmlFile historyDescription = getHistoryXmlFile(timestampedDir);
         final HistoryDescr myDescr = new HistoryDescr(user, userId, operation, getIdFormatter().format(
-                timestamp.getTime()), (item==null)? "":item.getName(), (item==null) ? "": ((item.getName().equals(oldName)) ? "" : oldName));
+                timestamp.getTime()), (newName==null)? "": newName, (newName==null) ? "": ((newName.equals(oldName)) ? "" : oldName));
         historyDescription.write(myDescr);
     }
 
@@ -250,8 +255,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param configFile to copy.
      * @param operation operation
      */
-    private void createNewHistoryEntryAndCopyConfig(final XmlFile configFile, final String operation, final AbstractItem item, final String oldName) {
-        final File timestampedDir = createNewHistoryEntry(configFile, operation, item, oldName);
+    private void createNewHistoryEntryAndCopyConfig(final XmlFile configFile, final String operation, final String newName, final String oldName) {
+        final File timestampedDir = createNewHistoryEntry(configFile, operation, newName, oldName);
         try {
             copyConfigFile(configFile.getFile(), timestampedDir);
         } catch (IOException ex) {
@@ -307,7 +312,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
             }
 
         }
-        createNewHistoryEntryAndCopyConfig(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_RENAMED(), aItem, oldName);
+        createNewHistoryEntryAndCopyConfig(aItem.getConfigFile(), Messages.ConfigHistoryListenerHelper_RENAMED(), newName, oldName);
     }
 
     @Override
@@ -390,12 +395,12 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      *
      * @return timestampedDir
      */
-    File createNewHistoryEntry(final XmlFile xmlFile, final String operation, final AbstractItem item, final String oldName) {
+    File createNewHistoryEntry(final XmlFile xmlFile, final String operation, final String newName, final String oldName) {
         try {
             final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
             final File timestampedDir = getRootDir(xmlFile, timestampHolder);
             LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
-            createHistoryXmlFile(timestampHolder.get(), timestampedDir, operation, item, oldName);
+            createHistoryXmlFile(timestampHolder.get(), timestampedDir, operation, newName, oldName);
             assert timestampHolder.get() != null;
             return timestampedDir;
         } catch (IOException e) {
@@ -652,7 +657,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     @Override
     public void createNewNode(final Node node) {
         final String content = Jenkins.XSTREAM2.toXML(node);
-        createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_CREATED());
+        createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_CREATED(), null, null);
     }
 
     /**
@@ -662,8 +667,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param content content.
      * @param operation operation.
      */
-    private void createNewHistoryEntryAndSaveConfig(final Node node, final String content, final String operation) {
-        final File timestampedDir = createNewHistoryEntry(node, operation, null, null);
+    private void createNewHistoryEntryAndSaveConfig(final Node node, final String content, final String operation, final String newName, final String oldName) {
+        // TODO: 
+        final File timestampedDir = createNewHistoryEntry(node, operation, newName, oldName);
         final File nodeConfigHistoryFile = new File(timestampedDir, "config.xml");
         PrintStream stream = null;
         try {
@@ -719,7 +725,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
         }
         final String content = Jenkins.XSTREAM2.toXML(node);
-        createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_RENAMED());
+        //TODO:
+        createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_RENAMED(), newName, oldName);
     }
     
     @Override
@@ -753,12 +760,12 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     
-    private File createNewHistoryEntry(final Node node, final String operation, final AbstractItem item, final String oldName) {
+    private File createNewHistoryEntry(final Node node, final String operation, final String newName, final String oldName) {
         try {
             final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
             final File timestampedDir = getRootDir(node, timestampHolder);
             LOG.log(Level.FINE, "{0} on {1}", new Object[] {this, timestampedDir});
-            createHistoryXmlFile(timestampHolder.get(), timestampedDir, operation, item, oldName);
+            createHistoryXmlFile(timestampHolder.get(), timestampedDir, operation, newName, oldName);
             assert timestampHolder.get() != null;
             return timestampedDir;
         } catch (IOException e) {
@@ -840,7 +847,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     public void saveNode(final Node node) {
         final String content = Jenkins.XSTREAM2.toXML(node);
         if (checkDuplicate(node)) {
-            createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_CHANGED());
+            createNewHistoryEntryAndSaveConfig(node, content, Messages.ConfigHistoryListenerHelper_CHANGED(), null, null);
         }
     }
 

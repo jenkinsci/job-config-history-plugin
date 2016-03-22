@@ -7,11 +7,9 @@
       <div>
       <script type="text/javascript">
 		   function showTooltip(nr) {
-		       console.log(document.getElementById('tooltip' + nr));
 		       document.getElementById('tooltip' + nr).style.visibility = 'visible';
 		   };
 		   function hideTooltip(nr) {
-		       console.log(document.getElementById('tooltip' + nr));
 		       document.getElementById('tooltip' + nr).style.visibility = 'hidden';
 		   };
 		</script>
@@ -50,12 +48,12 @@
                     <tr>
                       <td>${config.date}</td>
                       <td>
-                      <j:if test="${(config.currentJobName!=null) and (! config.currentJobName.isEmpty())}">
+                      <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
  	                       <span>${config.operation}</span>
  	                       <img onmouseOver="showTooltip(${configNr})" onmouseLeave="hideTooltip(${configNr})" style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.png" alt="${%Info}" />
- 	                       <div style="margin-top: 15px;visibility: hidden; position: absolute; background-color: beige; padding: 3px; border: 1px solid black;" id="tooltip${configNr}">${%Old name}: ${config.oldJobName}<br />${%New name}: ${config.currentJobName}</div>
+ 	                       <div style="margin-top: 15px;visibility: hidden; position: absolute; background-color: beige; padding: 3px; border: 1px solid black;" id="tooltip${configNr}">${%Old name}: ${config.oldName}<br />${%New name}: ${config.currentName}</div>
                       	</j:if>
-                      	<j:if test="${(config.currentJobName==null) || (config.currentJobName.isEmpty())}">
+                      	<j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">
 	                      	${config.operation}
                       	</j:if>
                       </td>
