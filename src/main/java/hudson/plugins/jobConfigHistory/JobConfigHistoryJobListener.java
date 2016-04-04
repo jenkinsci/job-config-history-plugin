@@ -80,6 +80,17 @@ public class JobConfigHistoryJobListener extends ItemListener {
         switchHistoryDao(item).deleteItem(item);
         LOG.log(FINEST, "onDeleted for {0} done.", item);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onLocationChanged(Item item, String oldFullName, String newFullName) {
+        final String onRenameDesc = " old name: " + oldFullName + ", new name: " + newFullName;
+        LOG.log(FINEST, "In onLocationChanged for {0}{1}", new Object[]{item, onRenameDesc});
+        switchHistoryDao(item).relocateItem(item, oldFullName, newFullName);
+        LOG.log(FINEST, "Completed onLocationChanged for {0} done.", item);
+    }
 
     /**
      * Returns ItemListenerHistoryDao depending on the item type.
