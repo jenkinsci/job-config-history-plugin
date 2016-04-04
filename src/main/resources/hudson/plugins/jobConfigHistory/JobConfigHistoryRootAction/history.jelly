@@ -102,7 +102,7 @@
 		       	</j:if>
               </f:form>
             </div>
-            <j:if test="${isDeleted}">
+            <j:if test="${isDeleted and configs.size() > 1}">
               <f:form method="post" action="forwardToRestoreQuestion?name=${name}" name="forward">
                 <div align="right">
                   <f:submit value="${%Restore project}" />
