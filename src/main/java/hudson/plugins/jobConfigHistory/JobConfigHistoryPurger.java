@@ -211,7 +211,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
      *
      * @return the historyDao
      */
-    HistoryDao getHistoryDao() {
+    public HistoryDao getHistoryDao() {
         return PluginUtils.getHistoryDao();
     }
 }

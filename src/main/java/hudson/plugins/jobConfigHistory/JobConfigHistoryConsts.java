@@ -55,9 +55,6 @@ public final class JobConfigHistoryConsts {
     /** name of history xml file. */
     public static final String HISTORY_FILE = "history.xml";
 
-    /** name of history xml file. */
-    public static final String DELETED_MARKER = "_deleted_";
-
     /** Default regexp pattern of configuration files not to save. */
     public static final String DEFAULT_EXCLUDE = "queue\\.xml|nodeMonitors\\.xml|UpdateCenter\\.xml|global-build-stats";
 

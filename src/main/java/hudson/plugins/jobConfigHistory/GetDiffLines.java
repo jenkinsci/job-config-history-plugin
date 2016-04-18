@@ -38,7 +38,7 @@ import org.apache.commons.lang.StringUtils;
  * @author Mirko Friedenhagen
  * @author Kojima Takanori
  */
-class GetDiffLines {
+public class GetDiffLines {
 
     /**
      * Lines.
