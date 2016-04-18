@@ -28,10 +28,9 @@ import java.util.Collections;
 import java.util.Date;
 
 import hudson.Extension;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.model.BuildBadgeAction;
 import hudson.model.Hudson;
+import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
@@ -53,7 +52,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
     /**
      * We need the build in order to get the project name.
      */
-    private transient AbstractBuild<?, ?> build;
+    private transient Run<?, ?> build;
     
     /**
      * A transient field, which allows to workaround the JENKINS-20511 issue 
@@ -75,31 +74,31 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 
     @Override
     public void onAttached(Run<?, ?> r) {
-        build = (AbstractBuild<?, ?>) r;
+        build = r;
 
     }
 
     @Override
     public void onLoad(Run<?, ?> r) {
-        build = (AbstractBuild<?, ?>) r;
+        build = r;
     }
 
     /**
      * Listener.
      */
     @Extension
-    public static class Listener extends RunListener<AbstractBuild<?, ?>> {
+    public static class Listener extends RunListener<Run <?, ?>> {
 
         @Override
-        public void onStarted(AbstractBuild<?, ?> build, TaskListener listener) {
-            final AbstractProject<?, ?> project = build.getProject();
+        public void onStarted(Run<?, ?> build, TaskListener listener) {
+            final Job<?, ?> project = build.getParent();
             if (project.getNextBuildNumber() <= 2) {
                 super.onStarted(build, listener);
                 return;
             }
 
             Date lastBuildDate = null;
-            final AbstractBuild lastBuild = project.getLastBuild();
+            final Run<?,?> lastBuild = project.getLastBuild();
             if (lastBuild != null && lastBuild.getPreviousBuild() != null) {
                 lastBuildDate = lastBuild.getPreviousBuild().getTime();
             }
@@ -124,7 +123,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
          * @param project to inspect.
          * @return list of revisions
          */
-        List<HistoryDescr> getRevisions(final AbstractProject<?, ?> project) {
+        List<HistoryDescr> getRevisions(final Job<?, ?> project) {
             final HistoryDao historyDao = PluginUtils.getHistoryDao();
             final ArrayList<HistoryDescr> historyDescriptions = new ArrayList<HistoryDescr>(
                     historyDao.getRevisions(project.getConfigFile()).values());
@@ -158,7 +157,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
      * @return True if badges should appear.
      */
     public boolean showBadge() {
-        return getPlugin().showBuildBadges(build.getProject());
+        return getPlugin().showBuildBadges(build.getParent());
     }
 
     /**
@@ -168,7 +167,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
      */
     public boolean oldConfigsExist() {
         final HistoryDao historyDao = getHistoryDao();
-        final AbstractProject<?, ?> project = build.getProject();
+        final Job<?, ?> project = build.getParent();
         for (String timestamp : configDates) {
             if (!historyDao.hasOldRevision(project.getConfigFile(), timestamp)) {
                 return false;
@@ -183,7 +182,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
      * @return Link target as String.
      */
     public String createLink() {
-        return getRootUrl() + build.getProject().getUrl()
+        return getRootUrl() + build.getParent().getUrl()
                 + JobConfigHistoryConsts.URLNAME + "/showDiffFiles?timestamp1=" + configDates[1]
                 + "&timestamp2=" + configDates[0];
     }

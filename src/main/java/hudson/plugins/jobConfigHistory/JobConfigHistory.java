@@ -39,6 +39,7 @@ import hudson.model.AbstractProject;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import hudson.model.Item;
+import hudson.model.Job;
 import hudson.model.Saveable;
 import hudson.model.TopLevelItem;
 import hudson.util.FormValidation;
@@ -279,7 +280,7 @@ public class JobConfigHistory extends Plugin {
      * @param project The project to which the build history belongs.
      * @return False if the option is set to 'never' or the user doesn't have the required permissions.
      */
-    public boolean showBuildBadges(AbstractProject<?, ?> project) {
+    public boolean showBuildBadges(Job<?, ?> project) {
         if ("always".equals(showBuildBadges)) {
             return true;
         } else if ("userWithConfigPermission".equals(showBuildBadges) && project.hasPermission(Item.CONFIGURE)) {
