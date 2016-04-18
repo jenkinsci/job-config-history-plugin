@@ -350,7 +350,15 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     public XmlFile getOldRevision(final AbstractItem item, final String identifier) {
         final File configFile = item.getConfigFile().getFile();
         final File historyDir = new File(getHistoryDir(configFile), identifier);
-        if (item instanceof MavenModule) {
+        boolean isMavenModuleAvailable = false;
+        try {
+            Class.forName("hudson.maven.MavenModule");
+            isMavenModuleAvailable = true;
+        } catch (ClassNotFoundException ex) {
+            LOG.log(Level.FINEST, "MavenModule not available. JobConfigHistory needs MavenModule. ", ex);
+            isMavenModuleAvailable = false;
+        }
+        if (isMavenModuleAvailable && item instanceof MavenModule) {
             final String path = historyDir + ((MavenModule) item).getParent().getFullName().replace("/", "/jobs/") + "/modules/"
                     + ((MavenModule) item).getModuleName().toFileSystemName() + "/" + identifier;
             return new XmlFile(getConfigFile(new File(path)));
