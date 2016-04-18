@@ -65,7 +65,7 @@ public class JobConfigHistoryRootActionIT extends
         final HtmlPage htmlPageJobs = webClient.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=jobs");
         assertTrue("Verify history entry for job is listed.", htmlPageJobs.getAnchorByText("Test1") != null);
         final String htmlPageJobsBody = htmlPageJobs.asXml();
-        assertTrue("Verify history entry for deleted job is listed.", htmlPageJobsBody.contains(JobConfigHistoryConsts.DELETED_MARKER));
+        assertTrue("Verify history entry for deleted job is listed.", htmlPageJobsBody.contains(DeletedFileFilter.DELETED_MARKER));
         assertFalse("Verify that no history entry for system change is listed.", htmlPageJobsBody.contains("config (system)"));
         assertTrue("Check link to job page.", htmlPageJobsBody.contains("job/Test1/" + JobConfigHistoryConsts.URLNAME));
 
@@ -73,7 +73,7 @@ public class JobConfigHistoryRootActionIT extends
         final HtmlPage htmlPageCreated = webClient.goTo("jobConfigHistory/?filter=created");
         assertTrue("Verify history entry for job is listed.", htmlPageCreated.getAnchorByText("Test1") != null);
         assertFalse("Verify history entry for deleted job is not listed.",
-                htmlPageCreated.asText().contains(JobConfigHistoryConsts.DELETED_MARKER));
+                htmlPageCreated.asText().contains(DeletedFileFilter.DELETED_MARKER));
         assertFalse("Verify that no history entry for system change is listed.",
                 htmlPageCreated.asText().contains("config (system)"));
         assertTrue("Check link to job page exists.", htmlPageJobs.asXml().contains("job/Test1/" + JobConfigHistoryConsts.URLNAME));
@@ -84,7 +84,7 @@ public class JobConfigHistoryRootActionIT extends
         final HtmlPage htmlPageDeleted = webClient.goTo("jobConfigHistory/?filter=deleted");
         final String page = htmlPageDeleted.asXml();
         System.out.println(page);
-        assertTrue("Verify history entry for deleted job is listed.", page.contains(JobConfigHistoryConsts.DELETED_MARKER));
+        assertTrue("Verify history entry for deleted job is listed.", page.contains(DeletedFileFilter.DELETED_MARKER));
         assertFalse("Verify no history entry for existing job is listed.", page.contains("Test1"));
         assertFalse("Verify no history entry for system change is listed.", page.contains("(system)"));
         assertTrue("Check link to historypage exists.", page.contains("history?name"));
@@ -102,7 +102,7 @@ public class JobConfigHistoryRootActionIT extends
         System.out.println(page);
         assertTrue("Verify history entry for system change is listed.", htmlPage.getAnchorByText("config") != null);
         assertFalse("Verify no job history entry is listed.", page.contains("Test1"));
-        assertFalse("Verify history entry for deleted job is listed.", page.contains(JobConfigHistoryConsts.DELETED_MARKER));
+        assertFalse("Verify history entry for deleted job is listed.", page.contains(DeletedFileFilter.DELETED_MARKER));
         assertTrue("Check link to historypage exists.", page.contains("history?name"));
     }
 

@@ -134,7 +134,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @throws IOException
      *             if one of the history entries might not be read.
      */
-    List<ConfigInfo> getSystemConfigs() throws IOException {
+    public List<ConfigInfo> getSystemConfigs() throws IOException {
         final List<ConfigInfo> configs = new ArrayList<ConfigInfo>();
         if (!hasConfigurePermission()) {
             return configs;
@@ -161,7 +161,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @throws IOException
      *             if one of the history entries might not be read.
      */
-    List<ConfigInfo> getJobConfigs(String type) throws IOException {
+    public List<ConfigInfo> getJobConfigs(String type) throws IOException {
         if (!hasJobConfigurePermission()  && !hasReadExtensionPermission()) {
             return Collections.EMPTY_LIST;
         } else {
@@ -182,7 +182,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     public final List<ConfigInfo> getSingleConfigs(String name)
         throws IOException {
         final Collection<HistoryDescr> historyDescriptions;
-        if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+        if (name.contains(DeletedFileFilter.DELETED_MARKER)) {
             historyDescriptions = getOverviewHistoryDao().getJobHistory(name).values();
         } else {
             historyDescriptions = getOverviewHistoryDao().getSystemHistory(name).values();
@@ -204,7 +204,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      */
     public final String getFile() throws IOException {
         final String name = getRequestParameter("name");
-        if ((name.contains(JobConfigHistoryConsts.DELETED_MARKER) && hasJobConfigurePermission())
+        if ((name.contains(DeletedFileFilter.DELETED_MARKER) && hasJobConfigurePermission())
                 || hasConfigurePermission()) {
             final String timestamp = getRequestParameter("timestamp");
             final XmlFile xmlFile = getOldConfigXml(name, timestamp);
@@ -229,7 +229,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         final String name = config.getJob();
         String timestamp = config.getDate();
 
-        if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+        if (name.contains(DeletedFileFilter.DELETED_MARKER)) {
             // last config.xml for deleted job usually doesn't exist
             try {
                 if (getSingleConfigs(name).size() > 1) {
@@ -252,12 +252,12 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     }
 
     @Override
-    protected AccessControlled getAccessControlledObject() {
+    public AccessControlled getAccessControlledObject() {
         return getHudson();
     }
 
     @Override
-    protected void checkConfigurePermission() {
+    public void checkConfigurePermission() {
         getAccessControlledObject().checkPermission(Permission.CONFIGURE);
     }
 
@@ -318,7 +318,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      */
     public final List<Line> getLines() throws IOException {
         final String name = getRequestParameter("name");
-        if ((name.contains(JobConfigHistoryConsts.DELETED_MARKER) && hasJobConfigurePermission())
+        if ((name.contains(DeletedFileFilter.DELETED_MARKER) && hasJobConfigurePermission())
                 || hasConfigurePermission()) {
             final String timestamp1 = getRequestParameter("timestamp1");
             final String timestamp2 = getRequestParameter("timestamp2");
@@ -348,9 +348,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      *            The timestamp as String.
      * @return The config file as XmlFile.
      */
-    protected XmlFile getOldConfigXml(String name, String timestamp) {
+    public XmlFile getOldConfigXml(String name, String timestamp) {
         if (checkParameters(name, timestamp)) {
-            if (name.contains(JobConfigHistoryConsts.DELETED_MARKER)) {
+            if (name.contains(DeletedFileFilter.DELETED_MARKER)) {
                 return getHistoryDao().getOldRevision("jobs/" + name, timestamp);
             } else {
                 if(!hasConfigurePermission() && !hasReadExtensionPermission() && !hasJobConfigurePermission()) {
@@ -375,7 +375,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      *            Timestamp of config change.
      * @return True if parameters are okay.
      */
-    boolean checkParameters(String name, String timestamp) {
+    public boolean checkParameters(String name, String timestamp) {
         checkTimestamp(timestamp);
         if (name == null || "null".equals(name)) {
             return false;
@@ -447,7 +447,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @param name The old name as String.
      * @return the new name as String.
      */
-    String findNewName(String name) {
+    public String findNewName(String name) {
         String newName = name;
         int i = 1;
         while (getHudson().getItem(newName) != null) {
@@ -476,7 +476,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      *
      * @return historyDao
      */
-    HistoryDao getHistoryDao() {
+    protected HistoryDao getHistoryDao() {
         return PluginUtils.getHistoryDao();
     }
     /**
@@ -484,7 +484,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      *
      * @return historyDao
      */
-    OverviewHistoryDao getOverviewHistoryDao() {
+    protected OverviewHistoryDao getOverviewHistoryDao() {
         return PluginUtils.getHistoryDao();
     }
 

@@ -59,8 +59,9 @@ public abstract class JobConfigHistoryStrategy
      * @return the extension point list.
      */
     public static DescriptorExtensionList<JobConfigHistoryStrategy,
-    JobConfigHistoryDescriptor<JobConfigHistoryStrategy>> all() {
-        return Jenkins.getInstance().<JobConfigHistoryStrategy,
+        JobConfigHistoryDescriptor<JobConfigHistoryStrategy>> all() {
+        return Jenkins.getInstance().<
+            JobConfigHistoryStrategy,
             JobConfigHistoryDescriptor<JobConfigHistoryStrategy>>
             getDescriptorList(JobConfigHistoryStrategy.class);
     }

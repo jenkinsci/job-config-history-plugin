@@ -31,10 +31,10 @@ import java.io.FileFilter;
  *
  * @author Mirko Friedenhagen
  */
-class HistoryFileFilter implements FileFilter {
+public class HistoryFileFilter implements FileFilter {
 
     /** Singleton. */
-    static final HistoryFileFilter INSTANCE = new HistoryFileFilter();
+    public static final HistoryFileFilter INSTANCE = new HistoryFileFilter();
 
     @Override
     public boolean accept(File file) {
