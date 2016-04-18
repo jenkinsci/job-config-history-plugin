@@ -141,7 +141,6 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
         final File[] historyDirs = getHistoryDir(project.getConfigFile()).listFiles(HistoryFileFilter.INSTANCE);
         Arrays.sort(historyDirs, Collections.reverseOrder());
         (new File(historyDirs[0], "config.xml")).renameTo(new File(historyDirs[0], "config"));
-        assertNull("Verify history dir is corrupted.", jch.getConfigFile(historyDirs[0]));
         assertTrue("Verify configuration is saveable when history is corrupted.", jch.isSaveable(project, project.getConfigFile()));
 
         // reconfigure to allow saving duplicate history
@@ -264,7 +263,7 @@ public class JobConfigHistoryIT extends AbstractHudsonTestCaseDeletingInstanceDi
 
             String deletedDir = null;
             for (File file : expectedConfigDir.getParentFile().listFiles()) {
-                if (file.getName().contains("renamed_testproject" + JobConfigHistoryConsts.DELETED_MARKER)) {
+                if (file.getName().contains("renamed_testproject" + DeletedFileFilter.DELETED_MARKER)) {
                     deletedDir = file.getPath();
                     break;
                 }
