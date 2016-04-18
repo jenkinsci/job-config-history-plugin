@@ -58,6 +58,12 @@
             <email>iordan.boev@gmail.com</email>
             <timezone>+1</timezone>
         </developer>
+        <developer>
+            <id>Jochen-A-Fuerbacher</id>
+            <name>Jochen A. Fuerbacher</name>
+            <email>jochen.fuerbacher@1und1.de</email>
+            <timezone>+1</timezone>
+        </developer>
     </developers>
 
 

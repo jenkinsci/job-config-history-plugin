@@ -23,9 +23,9 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import hudson.model.AbstractProject;
 import hudson.model.Build;
 import hudson.model.ItemGroup;
+import hudson.model.Job;
 import hudson.model.Project;
 import hudson.model.TaskListener;
 import java.util.Arrays;
@@ -202,7 +202,7 @@ public class JobConfigBadgeActionTest {
         return new JobConfigBadgeAction.Listener() {
 
             @Override
-            List<HistoryDescr> getRevisions(AbstractProject<?, ?> project) {
+            List<HistoryDescr> getRevisions(Job<?, ?> project) {
                 return Arrays.asList(
                         new HistoryDescr("user", "userId", "changed", "2013-10-30_23-00-06", null, null),
                         new HistoryDescr("user", "userId", "changed", "2013-10-30_23-00-07", null, null));
