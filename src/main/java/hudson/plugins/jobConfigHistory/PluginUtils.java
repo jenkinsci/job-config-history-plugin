@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * Helper class.
@@ -123,11 +124,27 @@ final public class PluginUtils {
             maxHistoryEntries = 0;
         }
         return new FileHistoryDao(
-            plugin.getConfiguredHistoryRootDir(),
-            new File(Hudson.getInstance().root.getPath()),
-            user,
-            maxHistoryEntries,
-            !plugin.getSkipDuplicateHistory());
+                plugin.getConfiguredHistoryRootDir(),
+                new File(Hudson.getInstance().root.getPath()),
+                user,
+                maxHistoryEntries,
+                !plugin.getSkipDuplicateHistory());
+    }
+    
+    public static boolean isUserExcluded(final JobConfigHistory plugin){
+        
+        final User user = User.current();
+
+        if(plugin.getExcludedUsers()!= null){
+            String excludedUsers = plugin.getExcludedUsers().trim();
+            String[] segs = excludedUsers.split(Pattern.quote(","));
+            for(String seg : segs){
+                if(user != null && user.getId() != null && seg.trim().equals(user.getId())){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

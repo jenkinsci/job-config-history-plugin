@@ -49,7 +49,7 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
     public void onChange(final Saveable o, final XmlFile file) {
         final JobConfigHistory plugin = getPlugin();
         LOG.log(FINEST, "In onChange for {0}", o);
-        if (plugin.isSaveable(o, file)) {
+        if (plugin.isSaveable(o, file) && !PluginUtils.isUserExcluded(plugin)) {
             final HistoryDao configHistoryListenerHelper = getHistoryDao(plugin);
             configHistoryListenerHelper.saveItem(file);
         }

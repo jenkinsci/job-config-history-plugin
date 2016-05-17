@@ -403,7 +403,8 @@ public class JobConfigHistoryTest {
                 "\"skipDuplicateHistory\": true," +
                 "\"excludePattern\": \"5\"," +
                 "\"saveModuleConfiguration\": true," +
-                "\"showBuildBadges\": \"5\"" +
+                "\"showBuildBadges\": \"5\"," +
+                "\"excludedUsers\": \"\"" +
         "}");
     }
 }

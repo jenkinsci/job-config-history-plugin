@@ -53,7 +53,6 @@ public class JobConfigHistoryJobListener extends ItemListener {
         LOG.log(FINEST, "In onCreated for {0}", item);
         switchHistoryDao(item).createNewItem((item));
         LOG.log(FINEST, "onCreated for {0} done.", item);
-        //        new Exception("STACKTRACE for double invocation").printStackTrace();
     }
 
     /**

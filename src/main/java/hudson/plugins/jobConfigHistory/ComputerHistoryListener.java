@@ -110,7 +110,7 @@ public class ComputerHistoryListener extends ComputerListener {
     private void onChange() {
         final JobConfigHistoryStrategy hdao = PluginUtils.getHistoryDao();
         for (Node node : Jenkins.getInstance().getNodes()) {
-            if (isTracked(node) && !hdao.hasDuplicateHistory(node)) {
+            if (!PluginUtils.isUserExcluded(PluginUtils.getPlugin()) && isTracked(node) && !hdao.hasDuplicateHistory(node)) {
                 PluginUtils.getHistoryDao().saveNode(node);
                 return;
             }

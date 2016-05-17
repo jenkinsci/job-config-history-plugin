@@ -69,6 +69,8 @@ public class JobConfigHistory extends Plugin {
     
     /** Maximum number of days to keep entries. */
     private String maxDaysToKeepEntries;
+    
+    private String excludedUsers;
 
     /**
      * Flag to indicate we should save 'system' level configurations. A 'system' level configuration is defined as one stored
@@ -129,6 +131,7 @@ public class JobConfigHistory extends Plugin {
         excludePattern = formData.getString("excludePattern");
         saveModuleConfiguration = formData.getBoolean("saveModuleConfiguration");
         showBuildBadges = formData.getString("showBuildBadges");
+        excludedUsers = formData.getString("excludedUsers");
         save();
         loadRegexpPatterns();
     }
@@ -357,6 +360,14 @@ public class JobConfigHistory extends Plugin {
     public File getConfigFile(final File historyDir) {
         // TODO: refactor away from 'File'
         return FileHistoryDao.getConfigFile(historyDir);
+    }
+    
+    /**
+     * 
+     * @return comma separated list of usernames, whose changes should not get detected.
+     */
+    public String getExcludedUsers(){
+        return excludedUsers;
     }
 
     /**
