@@ -1,5 +1,5 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-  <l:layout title="Slave Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
+  <l:layout title="Agent Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
     <st:include it="${it.slave.toComputer()}" page="sidepanel.jelly" />
     <l:main-panel>
     <j:set var="timestamp" value="${request.getParameter('timestamp')}" />
