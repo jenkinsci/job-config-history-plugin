@@ -80,7 +80,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 
     @Override
     public final String getDisplayName() {
-        return Messages.slaveDisplayName();
+        return Messages.agentDisplayName();
     }
 
     @Override

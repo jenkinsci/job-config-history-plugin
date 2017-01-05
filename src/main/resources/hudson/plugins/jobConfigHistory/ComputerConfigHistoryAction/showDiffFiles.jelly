@@ -2,14 +2,14 @@
   <l:layout title="Job Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
     <st:include it="${app}" page="sidepanel.jelly" />
     <l:main-panel>
-      <h1>${%Slave Configuration Difference}</h1>
+      <h1>${%Agent Configuration Difference}</h1>
       <div>
         <j:choose>
           <j:when test="${!it.hasConfigurePermission()}">
             ${%No permission to view config history}
           </j:when>
           <j:when test="${it.getSlaveConfigs().size() == 0}">
-              ${%No slave configuration history available}
+              ${%No agent configuration history available}
           </j:when>
           <j:otherwise>
             <div>
