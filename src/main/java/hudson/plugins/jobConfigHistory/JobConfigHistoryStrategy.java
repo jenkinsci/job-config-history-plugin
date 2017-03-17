@@ -23,12 +23,13 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import org.kohsuke.stapler.DataBoundConstructor;
+
 import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
-import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Master class for adding new backends to the history plugin.
@@ -36,33 +37,35 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author Brandon Koepke
  */
 public abstract class JobConfigHistoryStrategy
-    implements  ExtensionPoint, Describable<JobConfigHistoryStrategy>,
-                HistoryDao, ItemListenerHistoryDao, OverviewHistoryDao,
-                NodeListenerHistoryDao {
-    /**
-     * Data bound constructors need a public empty constructor.
-     */
-    @DataBoundConstructor
-    public JobConfigHistoryStrategy() {
-    }
+		implements
+			ExtensionPoint,
+			Describable<JobConfigHistoryStrategy>,
+			HistoryDao,
+			ItemListenerHistoryDao,
+			OverviewHistoryDao,
+			NodeListenerHistoryDao {
+	/**
+	 * Data bound constructors need a public empty constructor.
+	 */
+	@DataBoundConstructor
+	public JobConfigHistoryStrategy() {
+	}
 
-    /** {@inheritDoc} */
-    @Override
-    @SuppressWarnings("unchecked")
-    public final Descriptor<JobConfigHistoryStrategy> getDescriptor() {
-        return Jenkins.getInstance().getDescriptorOrDie(getClass());
-    }
+	/** {@inheritDoc} */
+	@Override
+	@SuppressWarnings("unchecked")
+	public final Descriptor<JobConfigHistoryStrategy> getDescriptor() {
+		return Jenkins.getInstance().getDescriptorOrDie(getClass());
+	}
 
-    /**
-     * Gets the extension point list for the JobConfigHistoryStrategy.
-     *
-     * @return the extension point list.
-     */
-    public static DescriptorExtensionList<JobConfigHistoryStrategy,
-        JobConfigHistoryDescriptor<JobConfigHistoryStrategy>> all() {
-        return Jenkins.getInstance().<
-            JobConfigHistoryStrategy,
-            JobConfigHistoryDescriptor<JobConfigHistoryStrategy>>
-            getDescriptorList(JobConfigHistoryStrategy.class);
-    }
+	/**
+	 * Gets the extension point list for the JobConfigHistoryStrategy.
+	 *
+	 * @return the extension point list.
+	 */
+	public static DescriptorExtensionList<JobConfigHistoryStrategy, JobConfigHistoryDescriptor<JobConfigHistoryStrategy>> all() {
+		return Jenkins.getInstance()
+				.<JobConfigHistoryStrategy, JobConfigHistoryDescriptor<JobConfigHistoryStrategy>>getDescriptorList(
+						JobConfigHistoryStrategy.class);
+	}
 }

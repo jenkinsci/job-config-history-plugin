@@ -33,40 +33,49 @@ import java.util.SortedMap;
  */
 public interface OverviewHistoryDao {
 
-    /**
-     * Returns a list of deleted jobs with a history.
-     *
-     * @param folderName name of folder.
-     * @return list of deleted jobs with a history, emtpy when no history exists.
-     */
-    File[] getDeletedJobs(String folderName);
+	/**
+	 * Returns a list of deleted jobs with a history.
+	 *
+	 * @param folderName
+	 *            name of folder.
+	 * @return list of deleted jobs with a history, emtpy when no history
+	 *         exists.
+	 */
+	File[] getDeletedJobs(String folderName);
 
-    /**
-     * Returns a list of jobs with a history.
-     *
-     * @param folderName name of folder
-     * @return list of jobs with a history, empty when no history exists.
-     */
-    File[] getJobs(String folderName);
-    
-    /**
-     * Returns a list of all system configuration files with a history.
-     *
-     * @return list of all system configuration files with a history, empty when no history exists.
-     */
-    File[] getSystemConfigs();
+	/**
+	 * Returns a list of jobs with a history.
+	 *
+	 * @param folderName
+	 *            name of folder
+	 * @return list of jobs with a history, empty when no history exists.
+	 */
+	File[] getJobs(String folderName);
 
-    /**
-     * Returns a sorted map of all HistoryDescr for a given job.
-     * @param jobName of the job
-     * @return sorted map.
-     */
-    SortedMap<String, HistoryDescr> getJobHistory(final String jobName);
+	/**
+	 * Returns a list of all system configuration files with a history.
+	 *
+	 * @return list of all system configuration files with a history, empty when
+	 *         no history exists.
+	 */
+	File[] getSystemConfigs();
 
-    /**
-     * Returns a sorted map of all HistoryDescr for a given system configuration.
-     * @param name of the configuration
-     * @return sorted map.
-     */
-    SortedMap<String, HistoryDescr> getSystemHistory(final String name);
+	/**
+	 * Returns a sorted map of all HistoryDescr for a given job.
+	 * 
+	 * @param jobName
+	 *            of the job
+	 * @return sorted map.
+	 */
+	SortedMap<String, HistoryDescr> getJobHistory(final String jobName);
+
+	/**
+	 * Returns a sorted map of all HistoryDescr for a given system
+	 * configuration.
+	 * 
+	 * @param name
+	 *            of the configuration
+	 * @return sorted map.
+	 */
+	SortedMap<String, HistoryDescr> getSystemHistory(final String name);
 }

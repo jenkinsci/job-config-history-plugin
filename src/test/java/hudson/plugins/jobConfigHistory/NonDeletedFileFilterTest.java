@@ -24,9 +24,11 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import java.io.File;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+
 import org.junit.Test;
 
 /**
@@ -35,22 +37,22 @@ import org.junit.Test;
  */
 public class NonDeletedFileFilterTest {
 
-    /**
-     * Test of accept method, of class DeletedFileFilter.
-     */
-    @Test
-    public void testAcceptNoDeletedFile() {
-        File file = new File("123");
-        assertTrue(NonDeletedFileFilter.accepts(file));
-    }
+	/**
+	 * Test of accept method, of class DeletedFileFilter.
+	 */
+	@Test
+	public void testAcceptNoDeletedFile() {
+		File file = new File("123");
+		assertTrue(NonDeletedFileFilter.accepts(file));
+	}
 
-    /**
-     * Test of accept method, of class DeletedFileFilter.
-     */
-    @Test
-    public void testAcceptDeletedFile() {
-        File file = new File("_deleted_");
-        assertFalse(NonDeletedFileFilter.accepts(file));
-    }
+	/**
+	 * Test of accept method, of class DeletedFileFilter.
+	 */
+	@Test
+	public void testAcceptDeletedFile() {
+		File file = new File("_deleted_");
+		assertFalse(NonDeletedFileFilter.accepts(file));
+	}
 
 }

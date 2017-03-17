@@ -27,15 +27,16 @@ import java.util.Date;
 
 /**
  * Returns the parsed Date.
+ * 
  * @author Mirko Friedenhagen
  */
 public interface ParsedDate {
 
-    /**
-     * Returns a {@link Date}.
-     *
-     * @return The parsed date as a java.util.Date.
-     */
-    Date parsedDate();
-    
+	/**
+	 * Returns a {@link Date}.
+	 *
+	 * @return The parsed date as a java.util.Date.
+	 */
+	Date parsedDate();
+
 }

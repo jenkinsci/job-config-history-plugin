@@ -24,8 +24,10 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import java.io.File;
 import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+
 import org.junit.Test;
 
 /**
@@ -34,30 +36,30 @@ import org.junit.Test;
  */
 public class DeletedFileFilterTest {
 
-    /**
-     * Test of accept method, of class DeletedFileFilter.
-     */
-    @Test
-    public void testAcceptNoDeletedFile() {
-        File file = new File("123");
-        assertEquals(false, DeletedFileFilter.accepts(file));
-    }
+	/**
+	 * Test of accept method, of class DeletedFileFilter.
+	 */
+	@Test
+	public void testAcceptNoDeletedFile() {
+		File file = new File("123");
+		assertEquals(false, DeletedFileFilter.accepts(file));
+	}
 
-    /**
-     * Test of accept method, of class DeletedFileFilter.
-     */
-    @Test
-    public void testAcceptDeletedFile() {
-        File file = new File("_deleted_");
-        assertEquals(true, DeletedFileFilter.accepts(file));
-    }
+	/**
+	 * Test of accept method, of class DeletedFileFilter.
+	 */
+	@Test
+	public void testAcceptDeletedFile() {
+		File file = new File("_deleted_");
+		assertEquals(true, DeletedFileFilter.accepts(file));
+	}
 
-    /**
-     * Test of accept method, of class DeletedFileFilter.
-     */
-    @Test
-    public void testAcceptDeletedFileName() {
-        assertEquals(true, DeletedFileFilter.accepts("_deleted_"));
-    }
+	/**
+	 * Test of accept method, of class DeletedFileFilter.
+	 */
+	@Test
+	public void testAcceptDeletedFileName() {
+		assertEquals(true, DeletedFileFilter.accepts("_deleted_"));
+	}
 
 }
