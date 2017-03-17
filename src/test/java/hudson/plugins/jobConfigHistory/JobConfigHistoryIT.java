@@ -64,7 +64,7 @@ public class JobConfigHistoryIT
 			form.getInputByValue("never").setChecked(true);
 			submit(form);
 		} catch (Exception e) {
-			Assert.fail("unable to configure Hudson instance " + e);
+			Assert.fail("unable to configure Jenkins instance " + e);
 		}
 		Assert.assertEquals("Verify history entries to keep setting.", "10",
 				jch.getMaxHistoryEntries());
@@ -82,24 +82,24 @@ public class JobConfigHistoryIT
 		Assert.assertEquals("Verify build badges setting.", "never",
 				jch.getShowBuildBadges());
 
-		final XmlFile hudsonConfig = new XmlFile(
+		final XmlFile jenkinsConfig = new XmlFile(
 				new File(jenkins.getRootDir(), "config.xml"));
 		Assert.assertTrue("Verify a system level configuration is saveable.",
-				jch.isSaveable(jenkins, hudsonConfig));
+				jch.isSaveable(jenkins, jenkinsConfig));
 
 		Assert.assertTrue("Verify system configuration history location",
-				getHistoryDir(hudsonConfig).getParentFile()
+				getHistoryDir(jenkinsConfig).getParentFile()
 						.equals(jch.getConfiguredHistoryRootDir()));
 		testCreateRenameDeleteProject(jch);
 		try {
 			getHistoryDir(new XmlFile(new File("/tmp")));
 			Assert.fail(
-					"Verify IAE when attempting to get history dir for a file outside of HUDSON_ROOT.");
+					"Verify IAE when attempting to get history dir for a file outside of JENKINS_ROOT.");
 		} catch (IllegalArgumentException e) {
 			Assert.assertNotNull("Expected IAE", e);
 		}
 		Assert.assertFalse(
-				"Verify false when testing if a file outside of HUDSON_ROOT is saveable.",
+				"Verify false when testing if a file outside of JENKINS_ROOT is saveable.",
 				jch.isSaveable(null, new XmlFile(new File("/tmp/config.xml"))));
 	}
 
@@ -118,10 +118,10 @@ public class JobConfigHistoryIT
 		Assert.assertEquals("Verify build badges setting.", "always",
 				jch.getShowBuildBadges());
 
-		final XmlFile hudsonConfig = new XmlFile(
+		final XmlFile jenkinsConfig = new XmlFile(
 				new File(jenkins.getRootDir(), "config.xml"));
 		Assert.assertTrue("Verify a system level configuration is saveable.",
-				jch.isSaveable(jenkins, hudsonConfig));
+				jch.isSaveable(jenkins, jenkinsConfig));
 		// This would more naturally belong in
 		// JobConfigHistoryTest.testIsSaveable but Mockito chokes on
 		// MavenModuleSet.<clinit>:
@@ -130,7 +130,7 @@ public class JobConfigHistoryIT
 				jch.isSaveable(mms, mms.getConfigFile()));
 
 		Assert.assertTrue("Verify system configuration history location",
-				getHistoryDir(hudsonConfig).getParentFile()
+				getHistoryDir(jenkinsConfig).getParentFile()
 						.equals(jch.getConfiguredHistoryRootDir()));
 		testCreateRenameDeleteProject(jch);
 	}
@@ -165,11 +165,11 @@ public class JobConfigHistoryIT
 				"Verify 2 project history entry after 5 duplicate saves.",
 				jobLengthBeforeSave, projectAction.getJobConfigs().size());
 
-		// system history test - skip duplicate history -hardcode path to Hudson
+		// system history test - skip duplicate history -hardcode path to Jenkins
 		// config
-		final File hudsonConfigDir = new File(jenkins.root,
+		final File jenkinsConfigDir = new File(jenkins.root,
 				JobConfigHistoryConsts.DEFAULT_HISTORY_DIR + "/config");
-		final int configLengthBeforeSave = hudsonConfigDir
+		final int configLengthBeforeSave = jenkinsConfigDir
 				.listFiles(HistoryFileFilter.INSTANCE).length;
 		for (int i = 0; i < 5; i++) {
 			Thread.sleep(SLEEP_TIME);
@@ -178,7 +178,7 @@ public class JobConfigHistoryIT
 		Assert.assertEquals(
 				"Verify system history has still only previous entries after 5 duplicate saves.",
 				configLengthBeforeSave,
-				hudsonConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
+				jenkinsConfigDir.listFiles(HistoryFileFilter.INSTANCE).length);
 
 		// verify non-duplicate history is saved
 		project.setDescription("new description");
@@ -209,7 +209,7 @@ public class JobConfigHistoryIT
 		Assert.assertTrue("Verify duplicate project history entries.",
 				projectAction.getJobConfigs().size() >= 2);
 		Assert.assertTrue("Verify duplicate system history entries.",
-				hudsonConfigDir
+				jenkinsConfigDir
 						.listFiles(HistoryFileFilter.INSTANCE).length > 1);
 	}
 
@@ -300,7 +300,7 @@ public class JobConfigHistoryIT
 		createFreeStyleProject();
 		Assert.assertTrue("Verify history root exists.", root.exists());
 
-		// cleanup - Hudson doesn't know about these files we created
+		// cleanup - Jenkins doesn't know about these files we created
 		root.listFiles(DELETE_FILTER);
 		root.delete();
 		// not really needed, but helpful so we don't clutter the test host with

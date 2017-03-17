@@ -75,7 +75,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	/**
 	 * For testing only.
 	 *
-	 * @param hudson
+	 * @param jenkins
 	 *            instance
 	 * @param project
 	 *            for which configurations should be returned.

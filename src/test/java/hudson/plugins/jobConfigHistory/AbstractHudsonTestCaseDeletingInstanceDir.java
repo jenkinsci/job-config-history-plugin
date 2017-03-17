@@ -12,7 +12,7 @@ import org.apache.commons.io.FileUtils;
 import org.jvnet.hudson.test.JenkinsRule;
 
 /**
- * This class will delete the instance dir of hudson after tearDown to avoid an
+ * This class will delete the instance dir of Jenkins after tearDown to avoid an
  * overflowing tmpdir.
  *
  * @author mfriedenhagen

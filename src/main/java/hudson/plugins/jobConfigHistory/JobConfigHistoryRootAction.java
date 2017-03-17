@@ -134,7 +134,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
 	/**
 	 * Returns the configuration history entries for all system files in this
-	 * Hudson instance.
+	 * Jenkins instance.
 	 *
 	 * @return List of config infos.
 	 * @throws IOException
@@ -159,7 +159,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
 	/**
 	 * Returns the configuration history entries for all jobs or deleted jobs in
-	 * this Hudson instance.
+	 * this Jenkins instance.
 	 *
 	 * @param type
 	 *            Whether we want to see all jobs or just the deleted jobs.
