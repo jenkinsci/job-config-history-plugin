@@ -26,15 +26,15 @@ package hudson.plugins.jobConfigHistory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import hudson.Extension;
 import hudson.model.BuildBadgeAction;
-import hudson.model.Hudson;
 import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
-import java.util.List;
+import jenkins.model.Jenkins;
 import jenkins.model.RunAction2;
 
 /**
@@ -188,12 +188,12 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
     }
 
     /**
-     * For tests.
-     *
+     * Returns the root URL.
+     * 
      * @return root-URL of Jenkins.
      */
     String getRootUrl() {
-        return Hudson.getInstance().getRootUrl();
+        return Jenkins.getInstance().getRootUrlFromRequest();
     }
 
     /**
