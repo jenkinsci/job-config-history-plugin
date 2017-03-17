@@ -56,7 +56,7 @@ public class ConfigInfo implements ParsedDate {
 	private final String operation;
 
 	/**
-	 * true if this information is for a Hudson job, as opposed to information
+	 * true if this information is for a Jenkins job, as opposed to information
 	 * for a system configuration file.
 	 */
 	private boolean isJob;
@@ -185,10 +185,10 @@ public class ConfigInfo implements ParsedDate {
 	}
 
 	/**
-	 * Returns true if this object represents a Hudson job as opposed to
+	 * Returns true if this object represents a Jenkins job as opposed to
 	 * representing a system configuration.
 	 * 
-	 * @return true if this object stores a Hudson job configuration
+	 * @return true if this object stores a Jenkins job configuration
 	 */
 	public boolean getIsJob() {
 		return isJob;

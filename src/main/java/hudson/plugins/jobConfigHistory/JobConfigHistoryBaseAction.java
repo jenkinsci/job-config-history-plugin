@@ -66,7 +66,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 	/**
 	 * For tests only.
 	 *
-	 * @param hudson
+	 * @param jenkins
 	 *            injected jenkins
 	 */
 	JobConfigHistoryBaseAction(Jenkins jenkins) {

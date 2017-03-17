@@ -230,7 +230,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 			jenkins.setSystemMessage(secondDescription);
 			Thread.sleep(sleepTime);
 		} catch (Exception ex) {
-			Assert.fail("Unable to prepare Hudson instance: " + ex);
+			Assert.fail("Unable to prepare Jenkins instance: " + ex);
 		}
 
 		try {

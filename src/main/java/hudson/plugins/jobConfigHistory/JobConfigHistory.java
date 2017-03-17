@@ -390,7 +390,7 @@ public class JobConfigHistory extends Plugin {
 	 *
 	 * <p>
 	 * If the item is an instance of {@link AbstractProject} or the
-	 * configuration file is stored directly in HUDSON_ROOT, it is considered
+	 * configuration file is stored directly in JENKINS_ROOT, it is considered
 	 * for saving.
 	 *
 	 * If the plugin is configured to skip saving duplicated history, we also

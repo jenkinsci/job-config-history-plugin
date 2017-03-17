@@ -167,7 +167,7 @@ public class JobConfigHistoryRootActionIT
 			jenkins.setSystemMessage(secondMessage);
 			Thread.sleep(SLEEP_TIME);
 		} catch (Exception ex) {
-			Assert.fail("Unable to prepare Hudson instance: " + ex);
+			Assert.fail("Unable to prepare Jenkins instance: " + ex);
 		}
 
 		try {
@@ -203,7 +203,7 @@ public class JobConfigHistoryRootActionIT
 			Thread.sleep(SLEEP_TIME);
 			project.delete();
 		} catch (Exception ex) {
-			Assert.fail("Unable to prepare Hudson instance: " + ex);
+			Assert.fail("Unable to prepare Jenkins instance: " + ex);
 		}
 		try {
 			final HtmlPage htmlPage = webClient

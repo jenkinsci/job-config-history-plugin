@@ -338,7 +338,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			final File oldHistoryDir = new File(historyParentDir, oldName);
 			if (oldHistoryDir.exists()) {
 				final FilePath fp = new FilePath(oldHistoryDir);
-				// catch all exceptions so Hudson can continue with other rename
+				// catch all exceptions so Jenkins can continue with other rename
 				// tasks.
 				try {
 					fp.copyRecursiveTo(new FilePath(currentHistoryDir));
@@ -486,7 +486,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		} catch (IOException e) {
 			// If not able to create the history entry, log, but continue
 			// without it.
-			// A known issue is where Hudson core fails to move the folders on
+			// A known issue is where Jenkins core fails to move the folders on
 			// rename,
 			// but continues as if it did.
 			// Reference https://issues.jenkins-ci.org/browse/JENKINS-8318
@@ -504,28 +504,28 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 * @param configFile
 	 *            The configuration file whose content we are saving.
 	 * @return The base directory where to store the history, or null if the
-	 *         file is not a valid Hudson configuration file.
+	 *         file is not a valid Jenkins configuration file.
 	 */
 	public File getHistoryDir(final File configFile) {
 		final String configRootDir = configFile.getParent();
-		final String hudsonRootDir = jenkinsHome.getPath();
-		if (!configRootDir.startsWith(hudsonRootDir)) {
+		final String jenkinsRootDir = jenkinsHome.getPath();
+		if (!configRootDir.startsWith(jenkinsRootDir)) {
 			throw new IllegalArgumentException(
-					"Trying to get history dir for object outside of HUDSON: "
+					"Trying to get history dir for object outside of Jenkins: "
 							+ configFile);
 		}
-		// if the file is stored directly under HUDSON_ROOT, it's a system
+		// if the file is stored directly under JENKINS_ROOT, it's a system
 		// config
 		// so create a distinct directory
 		String underRootDir = null;
-		if (configRootDir.equals(hudsonRootDir)) {
+		if (configRootDir.equals(jenkinsRootDir)) {
 			final String fileName = configFile.getName();
 			underRootDir = fileName.substring(0, fileName.lastIndexOf('.'));
 		}
 		final File historyDir;
 		if (underRootDir == null) {
 			final String remainingPath = configRootDir
-					.substring(hudsonRootDir.length()
+					.substring(jenkinsRootDir.length()
 							+ JobConfigHistoryConsts.JOBS_HISTORY_DIR.length()
 							+ 1);
 			historyDir = new File(getJobHistoryRootDir(), remainingPath);
@@ -837,7 +837,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			final File oldHistoryDir = new File(historyParentDir, oldName);
 			if (oldHistoryDir.exists()) {
 				final FilePath fp = new FilePath(oldHistoryDir);
-				// catch all exceptions so Hudson can continue with other rename
+				// catch all exceptions so Jenkins can continue with other rename
 				// tasks.
 				try {
 					fp.copyRecursiveTo(new FilePath(currentHistoryDir));
@@ -911,7 +911,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		} catch (IOException e) {
 			// If not able to create the history entry, log, but continue
 			// without it.
-			// A known issue is where Hudson core fails to move the folders on
+			// A known issue is where Jenkins core fails to move the folders on
 			// rename,
 			// but continues as if it did.
 			// Reference https://issues.jenkins-ci.org/browse/JENKINS-8318
@@ -929,7 +929,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 * @param node
 	 *            node
 	 * @return The base directory where to store the history, or null if the
-	 *         file is not a valid Hudson configuration file.
+	 *         file is not a valid Jenkins configuration file.
 	 */
 	private File getHistoryDirForNode(final Node node) {
 		final String name = node.getNodeName();
