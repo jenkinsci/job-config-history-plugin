@@ -27,30 +27,31 @@ import java.io.File;
 import java.io.FileFilter;
 
 /**
- * A filter to return only those directories of a file listing that do not represent deleted jobs history directories,
- * the names of which do not contain {@link JobConfigHistoryConsts#DELETED_MARKER}.
+ * A filter to return only those directories of a file listing that do not
+ * represent deleted jobs history directories, the names of which do not contain
+ * {@link JobConfigHistoryConsts#DELETED_MARKER}.
  *
  * @author Mirko Friedenhagen
  */
 class NonDeletedFileFilter implements FileFilter {
 
-    /** Only one instance needed. */
-    static final  NonDeletedFileFilter INSTANCE = new NonDeletedFileFilter();
+	/** Only one instance needed. */
+	static final NonDeletedFileFilter INSTANCE = new NonDeletedFileFilter();
 
-    @Override
-    public boolean accept(File pathname) {
-        return !DeletedFileFilter.accepts(pathname);
-    }
+	@Override
+	public boolean accept(File pathname) {
+		return !DeletedFileFilter.accepts(pathname);
+	}
 
-    /**
-     * Is this item not deleted?
-     *
-     * @param file to inspect
-     * @return true when file does not have the special deleted mark.
-     */
-    public static boolean accepts(File file) {
-        return INSTANCE.accept(file);
-    }
-
+	/**
+	 * Is this item not deleted?
+	 *
+	 * @param file
+	 *            to inspect
+	 * @return true when file does not have the special deleted mark.
+	 */
+	public static boolean accepts(File file) {
+		return INSTANCE.accept(file);
+	}
 
 }

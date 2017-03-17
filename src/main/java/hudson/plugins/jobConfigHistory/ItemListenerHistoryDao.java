@@ -26,32 +26,38 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.Item;
 
 /**
- * Operations for historization of config files suitable for the {@link ItemListener}.
+ * Operations for historization of config files suitable for the
+ * {@link ItemListener}.
  *
  * @author Mirko Friedenhagen
  */
 public interface ItemListenerHistoryDao {
 
-    /**
-     * Adds and saves the initial configuration of an item.
-     *
-     * @param item project
-     */
-    void createNewItem(Item item);
+	/**
+	 * Adds and saves the initial configuration of an item.
+	 *
+	 * @param item
+	 *            project
+	 */
+	void createNewItem(Item item);
 
-    /**
-     * Save and renames the item.
-     *
-     * @param item project
-     * @param oldName old project name
-     * @param newName new name
-     */
-    void renameItem(Item item, String oldName, String newName);
+	/**
+	 * Save and renames the item.
+	 *
+	 * @param item
+	 *            project
+	 * @param oldName
+	 *            old project name
+	 * @param newName
+	 *            new name
+	 */
+	void renameItem(Item item, String oldName, String newName);
 
-    /**
-     * Deletes the history of an item.
-     *
-     * @param item project
-     */
-    void deleteItem(Item item);
+	/**
+	 * Deletes the history of an item.
+	 *
+	 * @param item
+	 *            project
+	 */
+	void deleteItem(Item item);
 }

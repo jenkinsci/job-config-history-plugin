@@ -27,9 +27,10 @@ import hudson.model.Descriptor;
 
 /**
  * @author Brandon Koepke
- * @param <T> the class that this descriptor describes.
+ * @param <T>
+ *            the class that this descriptor describes.
  */
-public abstract class JobConfigHistoryDescriptor
-    <T extends JobConfigHistoryStrategy>
-    extends Descriptor<JobConfigHistoryStrategy> {
+public abstract class JobConfigHistoryDescriptor<T extends JobConfigHistoryStrategy>
+		extends
+			Descriptor<JobConfigHistoryStrategy> {
 }

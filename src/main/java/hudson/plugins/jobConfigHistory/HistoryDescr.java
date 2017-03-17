@@ -26,108 +26,114 @@ package hudson.plugins.jobConfigHistory;
 import java.util.Date;
 
 /**
- * Holder for information about an altering operation saved to {@link JobConfigHistoryConsts#HISTORY_FILE}.
+ * Holder for information about an altering operation saved to
+ * {@link JobConfigHistoryConsts#HISTORY_FILE}.
  *
  * @author Stefan Brausch
  */
 public class HistoryDescr implements ParsedDate {
 
-    public static final HistoryDescr EMPTY_HISTORY_DESCR = new HistoryDescr(null, null, null, null, null, null);
+	public static final HistoryDescr EMPTY_HISTORY_DESCR = new HistoryDescr(
+			null, null, null, null, null, null);
 
-    /** Display name of the user doing the operation. */
-    private final String user;
+	/** Display name of the user doing the operation. */
+	private final String user;
 
-    /** Id of the user doing the operation. */
-    private final String userId;
+	/** Id of the user doing the operation. */
+	private final String userId;
 
-    /** Name of the operation. */
-    private final String operation;
+	/** Name of the operation. */
+	private final String operation;
 
-    /** Timestamp of the operation, see {@link JobConfigHistoryConsts#ID_FORMATTER}. */
-    private final String timestamp;
-    
-    /** Current name of the job after renaming. */
-    private final String currentName;
-    
-    /** Old name of the job before renaming.*/
-    private final String oldName;
+	/**
+	 * Timestamp of the operation, see
+	 * {@link JobConfigHistoryConsts#ID_FORMATTER}.
+	 */
+	private final String timestamp;
 
-    /**
-     * @param user
-     *            display name of the user doing the operation
-     * @param userId
-     *            id of the user doing the operation
-     * @param operation
-     *            name of the operation
-     * @param timestamp
-     *            timestamp of the operation
-     */
-    public HistoryDescr(String user, String userId, String operation, String timestamp, String currentName, String oldName) {
-        this.user = user;
-        this.userId = userId;
-        this.operation = operation;
-        this.timestamp = timestamp;
-        this.currentName = currentName;
-        this.oldName = oldName;
-    }
+	/** Current name of the job after renaming. */
+	private final String currentName;
 
-    /**
-     * Returns display name of the user doing the operation.
-     *
-     * @return display name of the user
-     */
-    public String getUser() {
-        return user;
-    }
+	/** Old name of the job before renaming. */
+	private final String oldName;
 
-    /**
-     * Returns id of the user doing the operation.
-     *
-     * @return id of the user
-     */
-    public String getUserID() {
-        return userId;
-    }
+	/**
+	 * @param user
+	 *            display name of the user doing the operation
+	 * @param userId
+	 *            id of the user doing the operation
+	 * @param operation
+	 *            name of the operation
+	 * @param timestamp
+	 *            timestamp of the operation
+	 */
+	public HistoryDescr(String user, String userId, String operation,
+			String timestamp, String currentName, String oldName) {
+		this.user = user;
+		this.userId = userId;
+		this.operation = operation;
+		this.timestamp = timestamp;
+		this.currentName = currentName;
+		this.oldName = oldName;
+	}
 
-    /**
-     * Returns name of the operation.
-     *
-     * @return name of the operation
-     */
-    public String getOperation() {
-        return operation;
-    }
+	/**
+	 * Returns display name of the user doing the operation.
+	 *
+	 * @return display name of the user
+	 */
+	public String getUser() {
+		return user;
+	}
 
-    /**
-     * Returns timestamp of the operation.
-     *
-     * @return timestamp
-     */
-    public String getTimestamp() {
-        return timestamp;
-    }
+	/**
+	 * Returns id of the user doing the operation.
+	 *
+	 * @return id of the user
+	 */
+	public String getUserID() {
+		return userId;
+	}
 
-    /**
-     * Returns a {@link Date}.
-     *
-     * @return The parsed date as a java.util.Date.
-     */
-    @Override
-    public Date parsedDate() {
-        return PluginUtils.parsedDate(getTimestamp());
-    }
+	/**
+	 * Returns name of the operation.
+	 *
+	 * @return name of the operation
+	 */
+	public String getOperation() {
+		return operation;
+	}
 
-    /**
-     * Returns the current job name after renaming.
-     */
-    public String getCurrentName() {
-        return currentName;
-    }
+	/**
+	 * Returns timestamp of the operation.
+	 *
+	 * @return timestamp
+	 */
+	public String getTimestamp() {
+		return timestamp;
+	}
 
-    /**
-     * Returns the old job name before renaming.
-     */
-    public String getOldName() {
-        return oldName;
-    }
+	/**
+	 * Returns a {@link Date}.
+	 *
+	 * @return The parsed date as a java.util.Date.
+	 */
+	@Override
+	public Date parsedDate() {
+		return PluginUtils.parsedDate(getTimestamp());
+	}
+
+	/**
+	 * Returns the current job name after renaming.
+	 */
+	public String getCurrentName() {
+		return currentName;
+	}
+
+	/**
+	 * Returns the old job name before renaming.
+	 */
+	public String getOldName() {
+		return oldName;
+	}
 }

@@ -83,7 +83,7 @@ public class JobConfigHistoryBaseActionIT extends AbstractHudsonTestCaseDeleting
             
             @Override
             protected AccessControlled getAccessControlledObject() {
-                return getHudson();
+                return getJenkins();
             }
             @Override
             protected void checkConfigurePermission() {

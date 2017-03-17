@@ -28,6 +28,7 @@ import hudson.model.Item;
 import hudson.model.TopLevelItem;
 import hudson.security.ACL;
 import hudson.security.Permission;
+import jenkins.model.Jenkins;
 
 import java.io.File;
 import java.util.List;
@@ -437,7 +438,7 @@ public class JobConfigHistoryRootActionTest {
             }
 
             @Override
-            protected Hudson getHudson() {
+            protected Jenkins getJenkins() {
                 return mockedHudson;
             }
 

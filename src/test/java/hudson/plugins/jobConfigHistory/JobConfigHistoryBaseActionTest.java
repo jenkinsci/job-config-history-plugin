@@ -2,6 +2,8 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.model.Hudson;
 import hudson.security.AccessControlled;
+import jenkins.model.Jenkins;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -117,7 +119,7 @@ public class JobConfigHistoryBaseActionTest {
     public void testGetHudson() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         Hudson expResult = hudsonMock;
-        Hudson result = sut.getHudson();
+        Jenkins result = sut.getJenkins();
         assertEquals(expResult, result);
     }
 
