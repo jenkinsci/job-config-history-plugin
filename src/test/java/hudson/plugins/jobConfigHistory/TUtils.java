@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
 import org.apache.commons.io.FilenameUtils;
@@ -57,6 +58,24 @@ public class TUtils {
 			@Override
 			public int read() throws IOException {
 				return bodyByteStream.read();
+			}
+
+			@Override
+			public boolean isFinished() {
+				// Not needed.
+				return false;
+			}
+
+			@Override
+			public boolean isReady() {
+				// Not needed.
+				return false;
+			}
+
+			@Override
+			public void setReadListener(ReadListener readListener) {
+				// Not needed.
+
 			}
 		};
 	}
