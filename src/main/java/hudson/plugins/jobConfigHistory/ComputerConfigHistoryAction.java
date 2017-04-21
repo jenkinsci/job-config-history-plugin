@@ -32,6 +32,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.SortedMap;
 
 import org.kohsuke.stapler.StaplerRequest;
@@ -54,6 +56,10 @@ import jenkins.model.Jenkins;
  */
 @ExportedBean(defaultVisibility = -1)
 public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
+
+	/** The logger. */
+	private static final Logger LOG = Logger
+			.getLogger(ComputerConfigHistoryAction.class.getName());
 
 	/**
 	 * The slave.
@@ -367,8 +373,12 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		nodes.add(newSlave);
 		slave = newSlave;
 		jenkins.setNodes(nodes);
-		rsp.sendRedirect(
-				getJenkins().getRootUrl() + slave.toComputer().getUrl());
+		try {
+			rsp.sendRedirect(
+					jenkins.getRootUrl() + slave.toComputer().getUrl());
+		} catch (NullPointerException e) {
+			LOG.log(Level.WARNING, "Failed to redirect to agent url. ", e);
+		}
 	}
 
 	/**

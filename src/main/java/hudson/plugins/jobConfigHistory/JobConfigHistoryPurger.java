@@ -202,15 +202,19 @@ public class JobConfigHistoryPurger extends PeriodicWork {
 	 *            The directory which should be deleted.
 	 */
 	void deleteDirectory(File dir) {
-		for (File file : dir.listFiles()) {
-			if (!file.delete()) {
-				LOG.log(Level.WARNING, "problem deleting history file: {0}",
-						file);
+		try {
+			for (File file : dir.listFiles()) {
+				if (!file.delete()) {
+					LOG.log(Level.WARNING, "problem deleting history file: {0}",
+							file);
+				}
 			}
-		}
-		if (!dir.delete()) {
-			LOG.log(Level.WARNING, "problem deleting history directory: {0}",
-					dir);
+			if (!dir.delete()) {
+				LOG.log(Level.WARNING,
+						"problem deleting history directory: {0}", dir);
+			}
+		} catch (NullPointerException e) {
+			LOG.log(Level.WARNING, "Directory already deleted or null. ", e);
 		}
 	}
 

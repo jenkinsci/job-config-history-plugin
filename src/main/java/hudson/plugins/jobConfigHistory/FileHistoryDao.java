@@ -338,7 +338,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			final File oldHistoryDir = new File(historyParentDir, oldName);
 			if (oldHistoryDir.exists()) {
 				final FilePath fp = new FilePath(oldHistoryDir);
-				// catch all exceptions so Jenkins can continue with other rename
+				// catch all exceptions so Jenkins can continue with other
+				// rename
 				// tasks.
 				try {
 					fp.copyRecursiveTo(new FilePath(currentHistoryDir));
@@ -599,15 +600,19 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 *            The directory which should be deleted.
 	 */
 	private void deleteDirectory(final File dir) {
-		for (File file : dir.listFiles()) {
-			if (!file.delete()) {
-				LOG.log(Level.WARNING, "problem deleting history file: {0}",
-						file);
+		try {
+			for (File file : dir.listFiles()) {
+				if (!file.delete()) {
+					LOG.log(Level.WARNING, "problem deleting history file: {0}",
+							file);
+				}
 			}
-		}
-		if (!dir.delete()) {
-			LOG.log(Level.WARNING, "problem deleting history directory: {0}",
-					dir);
+			if (!dir.delete()) {
+				LOG.log(Level.WARNING,
+						"problem deleting history directory: {0}", dir);
+			}
+		} catch (NullPointerException e) {
+			LOG.log(Level.WARNING, "Directory already deleted or null. ", e);
 		}
 	}
 
@@ -632,12 +637,17 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			// get the *.xml file that is not the
 			// JobConfigHistoryConsts.HISTORY_FILE
 			// assumes random .xml files won't appear in the history directory
-			final File[] listing = historyDir.listFiles();
-			for (final File file : listing) {
-				if (!file.getName().equals(JobConfigHistoryConsts.HISTORY_FILE)
-						&& file.getName().matches(".*\\.xml$")) {
-					configFile = file;
+			try {
+				final File[] listing = historyDir.listFiles();
+				for (final File file : listing) {
+					if (!file.getName()
+							.equals(JobConfigHistoryConsts.HISTORY_FILE)
+							&& file.getName().matches(".*\\.xml$")) {
+						configFile = file;
+					}
 				}
+			} catch (NullPointerException e) {
+				LOG.log(Level.WARNING, "History dir is null. ", e);
 			}
 		}
 		return configFile;
@@ -837,7 +847,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			final File oldHistoryDir = new File(historyParentDir, oldName);
 			if (oldHistoryDir.exists()) {
 				final FilePath fp = new FilePath(oldHistoryDir);
-				// catch all exceptions so Jenkins can continue with other rename
+				// catch all exceptions so Jenkins can continue with other
+				// rename
 				// tasks.
 				try {
 					fp.copyRecursiveTo(new FilePath(currentHistoryDir));
