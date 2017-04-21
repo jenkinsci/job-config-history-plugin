@@ -106,7 +106,7 @@ final public class PluginUtils {
 		final String maxHistoryEntriesAsString = plugin.getMaxHistoryEntries();
 		int maxHistoryEntries = 0;
 		try {
-			maxHistoryEntries = Integer.valueOf(maxHistoryEntriesAsString);
+			maxHistoryEntries = Integer.parseInt(maxHistoryEntriesAsString);
 		} catch (NumberFormatException e) {
 			maxHistoryEntries = 0;
 		}

@@ -802,7 +802,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				"config.xml");
 		PrintStream stream = null;
 		try {
-			stream = new PrintStream(nodeConfigHistoryFile);
+			stream = new PrintStream(nodeConfigHistoryFile, "UTF-8");
 			stream.print(content);
 		} catch (IOException ex) {
 			throw new RuntimeException(
