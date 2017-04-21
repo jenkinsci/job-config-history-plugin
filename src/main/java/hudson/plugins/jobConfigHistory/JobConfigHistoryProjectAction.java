@@ -101,10 +101,10 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 			return JobConfigHistoryConsts.ICONFILENAME;
 		}
 		if (getPlugin().getSaveModuleConfiguration()
+				&& PluginUtils.isMavenPluginAvailable()
 				&& project instanceof MavenModule) {
 			return JobConfigHistoryConsts.ICONFILENAME;
 		}
-
 		return null;
 	}
 

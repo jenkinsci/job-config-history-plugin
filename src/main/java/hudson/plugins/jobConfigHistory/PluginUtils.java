@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+import hudson.Plugin;
 import hudson.model.User;
 import jenkins.model.Jenkins;
 
@@ -146,6 +147,18 @@ final public class PluginUtils {
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException(
 					"Could not parse Date" + timeStamp, ex);
+		}
+	}
+
+	/**
+	 * @return true, if Maven integration plugin is available and active.
+	 */
+	public static boolean isMavenPluginAvailable() {
+		try {
+			Plugin plugin = Jenkins.getInstance().getPlugin("maven-plugin");
+			return plugin.getWrapper().isActive();
+		} catch (Exception e) {
+			return false;
 		}
 	}
 }

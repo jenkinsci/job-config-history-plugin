@@ -407,17 +407,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			final String identifier) {
 		final File configFile = item.getConfigFile().getFile();
 		final File historyDir = new File(getHistoryDir(configFile), identifier);
-		boolean isMavenModuleAvailable = false;
-		try {
-			Class.forName("hudson.maven.MavenModule");
-			isMavenModuleAvailable = true;
-		} catch (ClassNotFoundException ex) {
-			LOG.log(Level.FINEST,
-					"MavenModule not available. JobConfigHistory needs MavenModule. ",
-					ex);
-			isMavenModuleAvailable = false;
-		}
-		if (isMavenModuleAvailable && item instanceof MavenModule) {
+		if (PluginUtils.isMavenPluginAvailable()
+				&& item instanceof MavenModule) {
 			final String path = historyDir
 					+ ((MavenModule) item).getParent().getFullName()
 							.replace("/", "/jobs/")

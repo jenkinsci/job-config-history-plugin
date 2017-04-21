@@ -20,6 +20,8 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.recipes.WithPlugin;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -37,6 +39,9 @@ import jenkins.model.Jenkins;
  * @author Mirko Friedenhagen
  */
 public class JobConfigHistoryProjectActionTest {
+
+	@Rule
+	public JenkinsRule j = new JenkinsRule();
 
 	@Rule
 	public UnpackResourceZip testConfigs = UnpackResourceZip.create();
@@ -90,6 +95,7 @@ public class JobConfigHistoryProjectActionTest {
 	/**
 	 * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
 	 */
+	@WithPlugin("maven-plugin.hpi")
 	@Test
 	public void testGetIconFileNameSaveMavenModules() {
 		when(mockedMavenModule.hasPermission(AbstractProject.CONFIGURE))

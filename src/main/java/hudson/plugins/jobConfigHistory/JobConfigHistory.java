@@ -404,7 +404,6 @@ public class JobConfigHistory extends Plugin {
 	 * @return true if the item configuration should be saved.
 	 */
 	public boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
-
 		if (item instanceof TopLevelItem) {
 			return true;
 		}
@@ -413,7 +412,8 @@ public class JobConfigHistory extends Plugin {
 			return checkRegex(xmlFile);
 		}
 
-		if (item instanceof MavenModule && saveModuleConfiguration) {
+		if (PluginUtils.isMavenPluginAvailable() && item instanceof MavenModule
+				&& saveModuleConfiguration) {
 			return true;
 		}
 
