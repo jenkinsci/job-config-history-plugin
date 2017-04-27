@@ -48,22 +48,28 @@
             <timezone>+1</timezone>
         </developer>
         <developer>
+            <id>jochenafuerbacher</id>
+            <name>Jochen A. Fuerbacher</name>
+            <email>jochen.fuerbacher@1und1.de</email>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
             <id>kstutz</id>
             <name>Kathi Stutz</name>
             <email>kathi.stutz@1und1.de</email>
             <timezone>+1</timezone>
+            <roles>
+                <role>inactive</role>
+            </roles>
         </developer>
         <developer>
             <id>boev</id>
             <name>Yordan Boev</name>
             <email>iordan.boev@gmail.com</email>
             <timezone>+1</timezone>
-        </developer>
-        <developer>
-            <id>jochenafuerbacher</id>
-            <name>Jochen A. Fuerbacher</name>
-            <email>jochen.fuerbacher@1und1.de</email>
-            <timezone>+1</timezone>
+            <roles>
+                <role>inactive</role>
+            </roles>
         </developer>
     </developers>
 
