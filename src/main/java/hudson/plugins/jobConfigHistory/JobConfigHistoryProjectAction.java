@@ -44,6 +44,8 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
+import com.thoughtworks.xstream.io.binary.Token.Value;
+
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
@@ -134,8 +136,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		} else {
 			maxEntriesPerPage = values.size();
 		}
-		for (final HistoryDescr historyDescr : values.subList(0,
-				maxEntriesPerPage)) {
+		for (final HistoryDescr historyDescr : values
+				.subList(values.size() - maxEntriesPerPage, values.size())) {
 			final String timestamp = historyDescr.getTimestamp();
 			final XmlFile oldRevision = getHistoryDao().getOldRevision(project,
 					timestamp);
