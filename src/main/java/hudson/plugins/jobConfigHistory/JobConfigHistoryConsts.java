@@ -56,7 +56,7 @@ public final class JobConfigHistoryConsts {
 	public static final String HISTORY_FILE = "history.xml";
 
 	/** Default regexp pattern of configuration files not to save. */
-	public static final String DEFAULT_EXCLUDE = "queue\\.xml|nodeMonitors\\.xml|UpdateCenter\\.xml|global-build-stats";
+	public static final String DEFAULT_EXCLUDE = "queue\\.xml|nodeMonitors\\.xml|UpdateCenter\\.xml|global-build-stats|LockableResourcesManager\\.xml";
 
 	/** Format for timestamped dirs. */
 	public static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
