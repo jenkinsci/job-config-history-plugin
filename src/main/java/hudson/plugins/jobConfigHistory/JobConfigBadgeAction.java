@@ -201,7 +201,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 	 * @return root-URL of Jenkins.
 	 */
 	String getRootUrl() {
-		return Jenkins.getInstance().getRootUrlFromRequest();
+		return Jenkins.getInstance().getRootUrl();
 	}
 
 	/**
