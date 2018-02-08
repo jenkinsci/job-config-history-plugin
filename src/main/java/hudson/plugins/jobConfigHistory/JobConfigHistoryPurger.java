@@ -55,7 +55,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
 			.getLogger(JobConfigHistoryPurger.class.getName());
 
 	/** Our plugin. */
-	private final JobConfigHistory plugin;
+	private JobConfigHistory plugin;
 
 	/** The maximum allowed age of history entries in days. */
 	private int maxAge;
@@ -64,20 +64,20 @@ public class JobConfigHistoryPurger extends PeriodicWork {
 	private Purgeable purgeable;
 
 	/** The overviewDao. */
-	private final OverviewHistoryDao overviewHistoryDao;
+	private OverviewHistoryDao overviewHistoryDao;
 
 	/**
 	 * Standard constructor using instance.
 	 */
 	public JobConfigHistoryPurger() {
-		this(Jenkins.getInstance().getPlugin(JobConfigHistory.class));
-	}
-
-	private JobConfigHistoryPurger(JobConfigHistory plugin) {
-		this(plugin,
+		Jenkins jenkins = Jenkins.getInstance();
+		if(jenkins == null)
+			return;
+		JobConfigHistory plugin = jenkins.getPlugin(JobConfigHistory.class);
+		assignValue(plugin, 
 				(PluginUtils.getHistoryDao(plugin, null) instanceof Purgeable
-						? (Purgeable) PluginUtils.getHistoryDao(plugin, null)
-						: null),
+				? (Purgeable) PluginUtils.getHistoryDao(plugin, null)
+				: null), 
 				PluginUtils.getHistoryDao(plugin, null));
 	}
 
@@ -92,6 +92,11 @@ public class JobConfigHistoryPurger extends PeriodicWork {
 	 *            the value of overviewHistoryDao
 	 */
 	JobConfigHistoryPurger(JobConfigHistory plugin, Purgeable purgeable,
+			OverviewHistoryDao overviewHistoryDao) {
+		assignValue(plugin, purgeable, overviewHistoryDao);
+	}
+	
+	private void assignValue(JobConfigHistory plugin, Purgeable purgeable,
 			OverviewHistoryDao overviewHistoryDao) {
 		this.plugin = plugin;
 		this.purgeable = purgeable;

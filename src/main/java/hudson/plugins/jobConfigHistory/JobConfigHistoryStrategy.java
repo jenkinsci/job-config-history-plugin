@@ -44,18 +44,13 @@ public abstract class JobConfigHistoryStrategy
 			ItemListenerHistoryDao,
 			OverviewHistoryDao,
 			NodeListenerHistoryDao {
-	/**
-	 * Data bound constructors need a public empty constructor.
-	 */
-	@DataBoundConstructor
-	public JobConfigHistoryStrategy() {
-	}
 
 	/** {@inheritDoc} */
 	@Override
 	@SuppressWarnings("unchecked")
 	public final Descriptor<JobConfigHistoryStrategy> getDescriptor() {
-		return Jenkins.getInstance().getDescriptorOrDie(getClass());
+		Jenkins jenkins = Jenkins.getInstance();
+		return jenkins != null ? jenkins.getDescriptorOrDie(getClass()) : null;
 	}
 
 	/**
@@ -64,7 +59,10 @@ public abstract class JobConfigHistoryStrategy
 	 * @return the extension point list.
 	 */
 	public static DescriptorExtensionList<JobConfigHistoryStrategy, JobConfigHistoryDescriptor<JobConfigHistoryStrategy>> all() {
-		return Jenkins.getInstance()
+		Jenkins jenkins = Jenkins.getInstance();
+		if(jenkins == null)
+			return null;
+		return jenkins
 				.<JobConfigHistoryStrategy, JobConfigHistoryDescriptor<JobConfigHistoryStrategy>>getDescriptorList(
 						JobConfigHistoryStrategy.class);
 	}

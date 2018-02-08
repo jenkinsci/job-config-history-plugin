@@ -93,8 +93,10 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 
 			Date lastBuildDate = null;
 			final Run<?, ?> lastBuild = project.getLastBuild();
-			if (lastBuild != null && lastBuild.getPreviousBuild() != null) {
-				lastBuildDate = lastBuild.getPreviousBuild().getTime();
+			if (lastBuild != null) {
+				Run<?, ?> previousBuild = lastBuild.getPreviousBuild();
+				if(previousBuild != null)
+					lastBuildDate = previousBuild.getTime();
 			}
 			final List<HistoryDescr> historyDescriptions = getRevisions(
 					project);
@@ -201,7 +203,8 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 	 * @return root-URL of Jenkins.
 	 */
 	String getRootUrl() {
-		return Jenkins.getInstance().getRootUrl();
+		Jenkins jenkins = Jenkins.getInstance();
+		return jenkins != null ? jenkins.getRootUrl() : null;
 	}
 
 	/**
