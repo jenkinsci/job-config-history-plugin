@@ -42,34 +42,42 @@ import jenkins.model.Jenkins;
 @Extension
 public class ComputerHistoryListener extends ComputerListener {
 
-	List<Node> nodes = Jenkins.getInstance().getNodes();
+	List<Node> nodes;
 
 	private static final Logger LOG = Logger
 			.getLogger(ComputerHistoryListener.class.getName());
+	
+	public ComputerHistoryListener() {
+		Jenkins jenkins = Jenkins.getInstance();
+		nodes = jenkins != null ? jenkins.getNodes() : null;
+	}
 
 	@Override
 	public void onConfigurationChange() {
 		// Ensure nodes is configured as getNodes() may return null
 		// during class initialization. NodeList will surely be defined
 		// on the first run of this method.
+		Jenkins jenkins = Jenkins.getInstance();
+		if(jenkins == null)
+			return;
 		if (nodes == null) {
-			nodes = Jenkins.getInstance().getNodes();
+			nodes = jenkins.getNodes();
 		}
-		if (nodes.size() < Jenkins.getInstance().getNodes().size()) {
+		if (nodes.size() < jenkins.getNodes().size()) {
 			onAdd();
-			nodes = Jenkins.getInstance().getNodes();
+			nodes = jenkins.getNodes();
 			return;
 		}
-		if (nodes.size() > Jenkins.getInstance().getNodes().size()) {
+		if (nodes.size() > jenkins.getNodes().size()) {
 			onRemove();
-			nodes = Jenkins.getInstance().getNodes();
+			nodes = jenkins.getNodes();
 			return;
 		}
-		if (!nodes.equals(Jenkins.getInstance().getNodes())) {
+		if (!nodes.equals(jenkins.getNodes())) {
 			onRename();
-			nodes = Jenkins.getInstance().getNodes();
+			nodes = jenkins.getNodes();
 		}
-		if (nodes.size() == Jenkins.getInstance().getNodes().size()) {
+		if (nodes.size() == jenkins.getNodes().size()) {
 			onChange();
 		}
 	}
@@ -77,7 +85,10 @@ public class ComputerHistoryListener extends ComputerListener {
 	 * If a new slave get added.
 	 */
 	private void onAdd() {
-		for (Node node : Jenkins.getInstance().getNodes()) {
+		Jenkins jenkins = Jenkins.getInstance();
+		if(jenkins == null)
+			return;
+		for (Node node : jenkins.getNodes()) {
 			if (!nodes.contains(node) && isTracked(node)) {
 				switchHistoryDao(node).createNewNode(node);
 				return;
@@ -99,8 +110,11 @@ public class ComputerHistoryListener extends ComputerListener {
 	 * If a slave get removed.
 	 */
 	private void onRemove() {
+		Jenkins jenkins = Jenkins.getInstance();
+		if(jenkins == null)
+			return;
 		for (Node node : nodes) {
-			if (!Jenkins.getInstance().getNodes().contains(node)
+			if (!jenkins.getNodes().contains(node)
 					&& isTracked(node)) {
 				switchHistoryDao(node).deleteNode(node);
 				return;
@@ -112,8 +126,11 @@ public class ComputerHistoryListener extends ComputerListener {
 	 * If a slave configuration get changed.
 	 */
 	private void onChange() {
+		Jenkins jenkins = Jenkins.getInstance();
+		if(jenkins == null)
+			return;
 		final JobConfigHistoryStrategy hdao = PluginUtils.getHistoryDao();
-		for (Node node : Jenkins.getInstance().getNodes()) {
+		for (Node node : jenkins.getNodes()) {
 			if (!PluginUtils.isUserExcluded(PluginUtils.getPlugin())
 					&& isTracked(node) && !hdao.hasDuplicateHistory(node)) {
 				PluginUtils.getHistoryDao().saveNode(node);
@@ -127,8 +144,11 @@ public class ComputerHistoryListener extends ComputerListener {
 	 */
 	private void onRename() {
 		Node originalNode = null;
+		Jenkins jenkins = Jenkins.getInstance();
+		if(jenkins == null)
+			return;
 		for (Node node : nodes) {
-			if (!Jenkins.getInstance().getNodes().contains(node)
+			if (!jenkins.getNodes().contains(node)
 					&& isTracked(node)) {
 				originalNode = node;
 			}
@@ -138,7 +158,7 @@ public class ComputerHistoryListener extends ComputerListener {
 			return;
 		}
 		Node newNode = null;
-		for (Node node : Jenkins.getInstance().getNodes()) {
+		for (Node node : jenkins.getNodes()) {
 			if (!nodes.contains(node) && isTracked(node)) {
 				newNode = node;
 			}

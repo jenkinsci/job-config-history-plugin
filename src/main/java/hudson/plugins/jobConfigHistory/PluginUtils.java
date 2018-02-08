@@ -53,7 +53,8 @@ final public class PluginUtils {
 	 * @return plugin
 	 */
 	public static JobConfigHistory getPlugin() {
-		return Jenkins.getInstance().getPlugin(JobConfigHistory.class);
+		Jenkins jenkins = Jenkins.getInstance();
+		return jenkins != null ? jenkins.getPlugin(JobConfigHistory.class) : null;
 	}
 
 	/**
@@ -111,8 +112,11 @@ final public class PluginUtils {
 		} catch (NumberFormatException e) {
 			maxHistoryEntries = 0;
 		}
+		Jenkins jenkins = Jenkins.getInstance();
+		if(jenkins == null)
+			return null;
 		return new FileHistoryDao(plugin.getConfiguredHistoryRootDir(),
-				new File(Jenkins.getInstance().root.getPath()), user,
+				new File(jenkins.root.getPath()), user,
 				maxHistoryEntries, !plugin.getSkipDuplicateHistory());
 	}
 
@@ -154,8 +158,11 @@ final public class PluginUtils {
 	 * @return true, if Maven integration plugin is available and active.
 	 */
 	public static boolean isMavenPluginAvailable() {
+		Jenkins jenkins = Jenkins.getInstance();
+		if(jenkins == null)
+			return false;
 		try {
-			Plugin plugin = Jenkins.getInstance().getPlugin("maven-plugin");
+			Plugin plugin = jenkins.getPlugin("maven-plugin");
 			return plugin.getWrapper().isActive();
 		} catch (Exception e) {
 			return false;
