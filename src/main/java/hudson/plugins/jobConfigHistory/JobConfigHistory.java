@@ -364,7 +364,7 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * @see FileHistoryDao#getConfigFile(java.io.File).
+	 * @see FileHistoryDao#getConfigFile(java.io.File)
 	 *
 	 * @param historyDir
 	 *            The history directory to look under.

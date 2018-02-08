@@ -26,8 +26,7 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.Item;
 
 /**
- * Operations for historization of config files suitable for the
- * {@link ItemListener}.
+ * Operations for historization of config files.
  *
  * @author Mirko Friedenhagen
  */

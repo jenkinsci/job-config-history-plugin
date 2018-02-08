@@ -74,7 +74,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	/**
 	 * Standard constructor using instance.
 	 * 
-	 * * @param slave Slave.
+	 * @param slave Slave.
 	 */
 	public ComputerConfigHistoryAction(Slave slave) {
 		this.slave = slave;
@@ -287,7 +287,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	}
 
 	/**
-	 * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as
+	 * Returns {@link ComputerConfigHistoryAction#getOldConfigXml(String)} as
 	 * String.
 	 *
 	 * @return content of the {@literal config.xml} found in directory given by

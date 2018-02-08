@@ -66,6 +66,10 @@ public class HistoryDescr implements ParsedDate {
 	 *            name of the operation
 	 * @param timestamp
 	 *            timestamp of the operation
+	 * @param currentName
+	 *            the current name after renaming
+	 * @param oldName
+	 *            the name before renaming
 	 */
 	public HistoryDescr(String user, String userId, String operation,
 			String timestamp, String currentName, String oldName) {
@@ -125,6 +129,8 @@ public class HistoryDescr implements ParsedDate {
 
 	/**
 	 * Returns the current job name after renaming.
+	 * 
+	 * @return the current job name
 	 */
 	public String getCurrentName() {
 		return currentName;
@@ -132,6 +138,8 @@ public class HistoryDescr implements ParsedDate {
 
 	/**
 	 * Returns the old job name before renaming.
+	 * 
+	 * @return the old job name
 	 */
 	public String getOldName() {
 		return oldName;

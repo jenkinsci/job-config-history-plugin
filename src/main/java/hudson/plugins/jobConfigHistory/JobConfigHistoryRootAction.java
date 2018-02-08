@@ -203,7 +203,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	}
 
 	/**
-	 * Returns {@link JobConfigHistoryBaseAction#getConfigXml(String)} as
+	 * Returns {@link JobConfigHistoryRootAction#getOldConfigXml(String, String)} as
 	 * String.
 	 *
 	 * @return content of the {@literal config.xml} found in directory given by

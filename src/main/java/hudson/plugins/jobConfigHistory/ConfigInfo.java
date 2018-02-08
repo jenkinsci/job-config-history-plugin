@@ -211,6 +211,8 @@ public class ConfigInfo implements ParsedDate {
 
 	/**
 	 * Returns the current job name after renaming.
+	 * 
+	 * @return current job name
 	 */
 	@Exported
 	public String getCurrentName() {
@@ -219,6 +221,8 @@ public class ConfigInfo implements ParsedDate {
 
 	/**
 	 * Returns the old job name before renaming.
+	 * 
+	 * @return old job name before renaming
 	 */
 	@Exported
 	public String getOldName() {
