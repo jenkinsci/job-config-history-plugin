@@ -202,7 +202,7 @@ public class FileHistoryDaoTest {
 	 */
 	@Test
 	public void testCreateHistoryXmlFileAnonym() throws Exception {
-		testCreateHistoryXmlFile(sutWithoutUserAndDuplicateHistory, "Anonym");
+		testCreateHistoryXmlFile(sutWithoutUserAndDuplicateHistory, "unknown");
 	}
 
 	private void testCreateHistoryXmlFile(FileHistoryDao sut,
