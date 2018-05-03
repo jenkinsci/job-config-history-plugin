@@ -153,15 +153,10 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			final File timestampedDir, final String operation,
 			final String newName, String oldName) throws IOException {
 		oldName = ((oldName == null) ? "" : oldName);
-		final String user;
-		final String userId;
-		if (currentUser != null) {
-			user = currentUser.getFullName();
-			userId = currentUser.getId();
-		} else {
-			user = "Anonym";
-			userId = Messages.ConfigHistoryListenerHelper_anonymous();
-		}
+
+		// Mimicking User.getUnknown() that can not be instantiated here as a lot of tests are run without Jenkins
+		final String user = currentUser != null ? currentUser.getFullName() : "unknown";
+		final String userId = currentUser != null ? currentUser.getId() : "unknown";
 
 		final XmlFile historyDescription = getHistoryXmlFile(timestampedDir);
 		final HistoryDescr myDescr = new HistoryDescr(user, userId, operation,
