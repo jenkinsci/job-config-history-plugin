@@ -1,6 +1,7 @@
 <!--
   Displays the config output as plain text or xml
 -->
+<?jelly escape-by-default='true'?>
 <st:compress xmlns:j="jelly:core" xmlns:st="jelly:stapler">
   <j:choose>
     <j:when test="${request.getParameter('type').equals('xml')}">
