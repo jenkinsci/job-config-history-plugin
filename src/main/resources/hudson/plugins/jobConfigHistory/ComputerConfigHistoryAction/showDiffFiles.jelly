@@ -82,9 +82,9 @@
                             </j:when>
                             <j:otherwise>
                               <th class="lineNum">${line.left.lineNumber}</th>
-                              <td class="${line.left.cssClass}"><pre>${line.left.text}</pre></td>
+                              <td class="${line.left.cssClass}"><pre><j:out value="${line.left.text}"/></pre></td>
                               <th class="lineNum">${line.right.lineNumber}</th>
-                              <td class="${line.right.cssClass}"><pre>${line.right.text}</pre></td>
+                              <td class="${line.right.cssClass}"><pre><j:out value="${line.right.text}"/></pre></td>
                             </j:otherwise>
                           </j:choose>
                         </tr>
