@@ -5,10 +5,10 @@
 <st:compress xmlns:j="jelly:core" xmlns:st="jelly:stapler">
   <j:choose>
     <j:when test="${request.getParameter('type').equals('xml')}">
-      <st:contentType value="text/xml;charset=UTF-8" />${it.getFile()}
+      <st:contentType value="text/xml;charset=UTF-8" /><j:out value="${it.getFile()}"/>
     </j:when>
     <j:otherwise>
-      <st:contentType value="text/plain;charset=UTF-8" />${it.getFile()}
+      <st:contentType value="text/plain;charset=UTF-8" /><j:out value="${it.getFile()}"/>
     </j:otherwise>
   </j:choose>    
 </st:compress>
