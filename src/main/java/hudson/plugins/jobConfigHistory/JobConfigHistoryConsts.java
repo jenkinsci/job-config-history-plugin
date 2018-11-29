@@ -60,4 +60,13 @@ public final class JobConfigHistoryConsts {
 
 	/** Format for timestamped dirs. */
 	public static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
+
+	/** Default maximum number of configuration history entries to keep. */
+	public static final String DEFAULT_MAX_HISTORY_ENTRIES = "1000";
+
+	/** Default maximum number of history entries per site to show. */
+	public static final String DEFAULT_MAX_ENTRIES_PER_PAGE = "30";
+
+	/** Default maximum number of days to keep entries. */
+	public static final String DEFAULT_MAX_DAYS_TO_KEEP_ENTRIES = "20";
 }

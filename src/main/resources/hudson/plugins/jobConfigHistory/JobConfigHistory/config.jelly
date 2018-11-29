@@ -7,15 +7,15 @@
 	</f:entry>
     <f:advanced>
       <f:entry title="${%Max number of history entries to keep}" help="/plugin/jobConfigHistory/help/help-maxHistoryEntries.html">
-        <f:textbox name="maxHistoryEntries" value="${it.maxHistoryEntries}"
+        <f:textbox name="maxHistoryEntries" value="${it.maxHistoryEntries}" default="${it.defaultMaxHistoryEntries}"
            checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxHistoryEntries?value='+escape(this.value)"/>
       </f:entry>
       <f:entry title="${%Max number of days to keep history entries}" help="/plugin/jobConfigHistory/help/help-maxDaysToKeepEntries.html">
-        <f:textbox name="maxDaysToKeepEntries" value="${it.maxDaysToKeepEntries}"
+        <f:textbox name="maxDaysToKeepEntries" value="${it.maxDaysToKeepEntries}" default="${it.defaultMaxDaysToKeepEntries}"
            checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxDaysToKeepEntries?value='+escape(this.value)"/>
       </f:entry>
       <f:entry title="${%Max number of history entries to show per page}" help="/plugin/jobConfigHistory/help/help-maxEntriesPerPage.html">
-        <f:textbox name="maxEntriesPerPage" value="${it.maxEntriesPerPage}"
+        <f:textbox name="maxEntriesPerPage" value="${it.maxEntriesPerPage}" default="${it.defaultMaxEntriesPerPage}"
            checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxEntriesPerPage?value='+escape(this.value)"/>
       </f:entry>
       <f:entry title="${%System configuration exclude file pattern}" help="/plugin/jobConfigHistory/help/help-excludePattern.html">
