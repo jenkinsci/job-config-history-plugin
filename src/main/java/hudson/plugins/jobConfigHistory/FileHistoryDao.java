@@ -24,6 +24,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.FINEST;
+import static org.kohsuke.stapler.Facet.LOGGER;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -45,6 +46,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import hudson.model.TaskListener;
+import hudson.util.LogTaskListener;
 import org.apache.commons.io.FileUtils;
 
 import hudson.Extension;
@@ -243,6 +246,12 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			timestamp = new GregorianCalendar();
 			f = new File(itemHistoryDir,
 					getIdFormatter().format(timestamp.getTime()));
+			// Create a symlink pointing to the last change
+			try {
+				Util.createSymlink(itemHistoryDir, f.toPath().toString(), "lastHistory", TaskListener.NULL);
+			} catch (InterruptedException e) {
+				LOGGER.log(Level.WARNING, String.format("Could not create symblink for %s",  itemHistoryDir.toPath()), e);
+			}
 			if (f.isDirectory()) {
 				LOG.log(Level.FINE, "clash on {0}, will wait a moment", f);
 				try {
