@@ -62,6 +62,9 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	/** The project. */
 	private final transient AbstractItem project;
 
+	/**	Determines, whether diffs, where only the version changed, shall be shown or not. */
+	private boolean showVersionDiffs;
+
 	/**
 	 * @param project
 	 *            for which configurations should be returned.
@@ -69,6 +72,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	public JobConfigHistoryProjectAction(AbstractItem project) {
 		super();
 		this.project = project;
+		showVersionDiffs = true;
 	}
 
 	/**
@@ -83,6 +87,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 			AbstractItem project) {
 		super(jenkins);
 		this.project = project;
+		showVersionDiffs = true;
 	}
 	/**
 	 * {@inheritDoc}
@@ -356,6 +361,53 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 *             If diff doesn't work or xml files can't be read.
 	 */
 	public final List<Line> getLines() throws IOException {
+		//return getLines(false, "");
+		//TODO if implementation works, this needs to be done next: change buttonPressed to final field and access it via jelly somehow.
+
+		//mustn't end with dot.
+		String whitespacePattern = 				"\\s*";
+		String namePatternWithDotPattern = 		"[[\\w]+[\\.]?]*[\\w]+";
+		String scmClassPattern = 				"scm class=\"" + namePatternWithDotPattern + "\"";
+		String namePatternWithHyphenPattern = 	"[[\\w]+[-]?]*[\\w]+";
+		//mustn't end with dot.
+		String versionPattern = 				"[[\\d]+(\\.|)]*[\\d]+(-SNAPSHOT|)";
+		String pluginNameVersionPattern = 		"plugin=\"" + namePatternWithHyphenPattern + "@" + versionPattern;
+		String ignoredLinesPattern = 			whitespacePattern + "<" +
+												"(" + namePatternWithDotPattern + "|" + scmClassPattern + ")" + " " + pluginNameVersionPattern +
+												"\"" + "(/|)" + ">";
+
+
+
+
+		return showVersionDiffs ? getLines(false, "") : getLines(true, ignoredLinesPattern);
+
+
+		/*if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
+			checkConfigurePermission();
+			return null;
+		}
+		final String timestamp1 = getRequestParameter("timestamp1");
+		final String timestamp2 = getRequestParameter("timestamp2");
+
+		final XmlFile configXml1 = getOldConfigXml(timestamp1);
+		final String[] configXml1Lines = configXml1.asString().split("\\n");
+		final XmlFile configXml2 = getOldConfigXml(timestamp2);
+		final String[] configXml2Lines = configXml2.asString().split("\\n");
+
+		final String diffAsString = getDiffAsString(configXml1.getFile(),
+				configXml2.getFile(), configXml1Lines, configXml2Lines);
+
+		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
+		return getDiffLines(diffLines);*/
+	}
+
+	/**
+	 *
+	 * @param useRegex whether lines that fulfill [requirement] shall be hidden or not.
+	 * @return
+	 * @throws IOException
+	 */
+	public final List<Line> getLines(boolean useRegex, String ignoredLinesPattern) throws IOException {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
 			checkConfigurePermission();
 			return null;
@@ -428,6 +480,27 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 			StaplerResponse rsp) throws IOException {
 		final String timestamp = req.getParameter("timestamp");
 		rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
+	}
+
+	/**
+	 * Test Button to understand jelly and this whole stuff.
+	 * This button reloads the diff page. Hopefully...
+	 *
+	 * @param req
+	 * @param rsp
+	 * @throws IOException
+	 */
+	public final void doToggleShowHideVersionDiffs(StaplerRequest req,
+			StaplerResponse rsp) throws IOException {
+		System.out.println("-------------------------------------------------TESTBUTTON BEFORE: " + showVersionDiffs);
+		// toggle Test Button
+		showVersionDiffs = !showVersionDiffs;
+		System.out.println("-------------------------------------------------TESTBUTTON AFTER: " + showVersionDiffs);
+		//simply reload current page.
+		final String timestamp1 = req.getParameter("timestamp1");
+		final String timestamp2 = req.getParameter("timestamp2");
+		rsp.sendRedirect("showDiffFiles?" + "timestamp1=" + timestamp1
+				+ "&timestamp2=" + timestamp2 + "&showVersionDiffs=" + showVersionDiffs);
 	}
 
 	/**
