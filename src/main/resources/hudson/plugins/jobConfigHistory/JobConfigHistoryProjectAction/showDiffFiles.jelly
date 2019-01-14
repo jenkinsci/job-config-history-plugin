@@ -20,6 +20,10 @@
               <j:set var="next2" value="${it.getNextTimestamp(2)}"/>
               <j:set var="timestamp1" value="${it.getTimestamp(1)}"/>
               <j:set var="timestamp2" value="${it.getTimestamp(2)}"/>
+              <j:set var="showVersionDiffs" value="${it.getShowVersionDiffs()}"/>
+              <f:form method="post" action="toggleShowHideVersionDiffs?timestamp1=${prev1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}" name="showHideVersionDiffs" >
+                          <f:submit value="${%Show / Hide Version Changes}" />
+                        </f:form>
               <table style="width:100%;">
                 <thead>
                   <tr>
@@ -115,8 +119,8 @@
                     <!-- Test Button:-->
                     <td>
                       
-                        <f:form method="post" action="toggleShowHideVersionDiffs?timestamp1=${prev1}&amp;timestamp2=${timestamp2}" name="prevEntry" >
-                          <f:submit value="${%Show/ Hide Version Changes}" />
+                        <f:form method="post" action="toggleShowHideVersionDiffs?timestamp1=${prev1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}" name="showHideVersionDiffs" >
+                          <f:submit value="${%Show / Hide Version Changes}" />
                         </f:form>
                       
                     </td>
