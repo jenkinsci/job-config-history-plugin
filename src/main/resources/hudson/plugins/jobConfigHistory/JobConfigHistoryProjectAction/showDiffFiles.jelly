@@ -21,11 +21,38 @@
               <j:set var="timestamp1" value="${it.getTimestamp(1)}"/>
               <j:set var="timestamp2" value="${it.getTimestamp(2)}"/>
               <j:set var="showVersionDiffs" value="${it.getShowVersionDiffs()}"/>
-              <f:form method="post" action="toggleShowHideVersionDiffs?timestamp1=${prev1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}" name="showHideVersionDiffs" >
-                          <f:submit value="${%Show / Hide Version Changes}" />
-                        </f:form>
+              
+              <j:choose>
+              	<j:when test="${showVersionDiffs}">
+               		<f:form method="post" 
+               			action="toggleShowHideVersionDiffs?timestamp1=${prev1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}" 
+               			name="showHideVersionDiffs" 
+               		>
+              			<f:submit value="${%Hide Version Changes}" />
+              		</f:form>
+              	</j:when>
+              	<j:otherwise>
+              		<f:form method="post" 
+              			action="toggleShowHideVersionDiffs?timestamp1=${prev1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}" 
+              			name="showHideVersionDiffs" 
+              		>
+              			<f:submit value="${%Show Version Changes}" />
+              		</f:form>
+              	</j:otherwise>
+              </j:choose>
+              
               <table style="width:100%;">
                 <thead>
+                  <!--
+                  <tr>
+                  	<f:checkbox name="hideVersionChangesCheckbox" title="Hide Version Changes (use the button above...)" 
+                  		tooltip="Hide the diff-lines which only consist of version changes."
+                  		onclick="toggleShowHideVersionDiffs?timestamp1=${prev1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}"
+                  		checked="${showVersionDiffs}"
+                  		readonly="true"
+                  	/>
+                  </tr>
+                  -->
                   <tr>
                     <td colspan="2"> <font size="3"> Older Change </font></td>
                     <td colspan="2"> <font size="3"> Newer Change </font></td>

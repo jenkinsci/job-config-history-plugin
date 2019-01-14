@@ -372,8 +372,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 												"(" + namePatternWithDotPattern + "|" + scmClassPattern + ")" 		// (test.test)
 												+ " " + pluginNameVersionPattern 									//  plugin="test-test-test@1.2.3
 												+ "(/|)" + ">";														// />
-
-		return getLines(Boolean.parseBoolean(getShowVersionDiffs()), ignoredLinesPattern);
+		boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
+		return getLines(hideVersionDiffs, ignoredLinesPattern);
 	}
 	
 	/**

@@ -217,16 +217,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 			final String[] file2Lines, boolean useRegex, final String ignoredLinesPattern) {
 		final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
 
-		/*
-		 * patch.getDeltas().stream().filter( new Predicate<Delta>() {
-		 *
-		 * @Override public boolean test(Delta t) { return whether one of the lines
-		 * matches the regex. return !(t.getOriginal().toString().matches(ignoreRegex)
-		 * || t.getRevised().toString().matches(ignoreRegex)); }
-		 *
-		 * });
-		 */
-
 		//TODO figure out something better than the bool-solution
 		if (useRegex) {
 			//bug in library: empty deltas are shown, too.
@@ -240,12 +230,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 				System.out.println("Original Lines: " + originalLines);
 				System.out.println("Revised Lines: " +revisedLines);
 				//--------------------------------------------------------------------------------------------------------------\DEBUG
-				/*
-				 * if (originalLines.size() != revisedLines.size()) { //TODO: find better
-				 * exception. throw new
-				 * IOException("Delta line numbers differ (original vs revised. This should not be possible."
-				 * ); }
-				 */
 				for (int line = 0; line < Math.max(originalLines.size(), revisedLines.size()); ++line) {
 					// TODO: this is crappy, O(n) if not ArrayList, change that.
 					int oriLinesSize = originalLines.size();
