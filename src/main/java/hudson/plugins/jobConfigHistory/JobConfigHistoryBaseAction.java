@@ -225,42 +225,42 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 			for (Delta delta : patch.getDeltas()) {
 				List<String> originalLines = Lists.newArrayList((List<String>) delta.getOriginal().getLines());
 				List<String> revisedLines = Lists.newArrayList((List<String>) delta.getRevised().getLines());
-				//---------------------------------------------------------------------------------------------------------------DEBUG
-				System.out.println("---BEFORE:");
-				System.out.println("Original Lines: " + originalLines);
-				System.out.println("Revised Lines: " +revisedLines);
-				//--------------------------------------------------------------------------------------------------------------\DEBUG
+				//------------------------------------------------------------------------------------------------------DEBUG
+				//System.out.println("---BEFORE:");
+				//System.out.println("Original Lines: " + originalLines);
+				//System.out.println("Revised Lines: " +revisedLines);
+				//------------------------------------------------------------------------------------------------------\DEBUG
 				for (int line = 0; line < Math.max(originalLines.size(), revisedLines.size()); ++line) {
-					// TODO: this is crappy, O(n) if not ArrayList, change that.
+					// One iteration is O(n), if originalLines or revisedLines aren't ArrayLists!
 					int oriLinesSize = originalLines.size();
 					int revLinesSize = revisedLines.size();
-					//---------------------------------------------------------------------------------------------------------------DEBUG
-					System.out.println("---MID:");
-					//--------------------------------------------------------------------------------------------------------------\DEBUG
+					//--------------------------------------------------------------------------------------------------DEBUG
+					//System.out.println("---MID:");
+					//--------------------------------------------------------------------------------------------------\DEBUG
 					if (line > oriLinesSize - 1) {
 						// line <= revLinesSize-1, because of loop invariant.
 						// ori line is empty.
-						//---------------------------------------------------------------------------------------------------------------DEBUG
-						System.out.println("Line Pair: [" + "EMPTYY" + ", " + revisedLines.get(line) + "]");
-						//--------------------------------------------------------------------------------------------------------------\DEBUG
+						//----------------------------------------------------------------------------------------------DEBUG
+						//System.out.println("Line Pair: [" + "EMPTYY" + ", " + revisedLines.get(line) + "]");
+						//----------------------------------------------------------------------------------------------\DEBUG
 						if (revisedLines.get(line).matches(ignoredLinesPattern)) {
 							revisedLines.remove(line);
 						}
 					} else if (line > revLinesSize - 1) {
 						// line <= oriLinesSize-1, because of loop invariant.
 						// rev line is empty.
-						//---------------------------------------------------------------------------------------------------------------DEBUG
-						System.out.println("Line Pair: [" + originalLines.get(line) + ", " + "EMPTYY" + "]");
-						//--------------------------------------------------------------------------------------------------------------\DEBUG
+						//----------------------------------------------------------------------------------------------DEBUG
+						//System.out.println("Line Pair: [" + originalLines.get(line) + ", " + "EMPTYY" + "]");
+						//----------------------------------------------------------------------------------------------\DEBUG
 						if (originalLines.get(line).matches(ignoredLinesPattern)) {
 							originalLines.remove(line);
 						}
 					} else {
 						// both lines are non-empty
-						//---------------------------------------------------------------------------------------------------------------DEBUG
-						System.out.println(
-								"Line Pair: [" + originalLines.get(line) + ", " + revisedLines.get(line) + "]");
-						//--------------------------------------------------------------------------------------------------------------\DEBUG
+						//----------------------------------------------------------------------------------------------DEBUG
+						//System.out.println(
+						//		"Line Pair: [" + originalLines.get(line) + ", " + revisedLines.get(line) + "]");
+						//----------------------------------------------------------------------------------------------\DEBUG
 						if ((originalLines.get(line).matches(ignoredLinesPattern))
 								&& (revisedLines.get(line).matches(ignoredLinesPattern))) {
 							originalLines.remove(line);
@@ -273,9 +273,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 					deltasToBeRemovedAfterTheMainLoop.add(delta);
 				}
 				//---------------------------------------------------------------------------------------------------------------DEBUG
-				System.out.println("---AFTER:");
-				System.out.println("Original Lines: " + originalLines);
-				System.out.println("Revised Lines: " +revisedLines);
+				//System.out.println("---AFTER:");
+				//System.out.println("Original Lines: " + originalLines);
+				//System.out.println("Revised Lines: " +revisedLines);
 				//--------------------------------------------------------------------------------------------------------------\DEBUG
 				delta.getOriginal().setLines(originalLines);
 				delta.getRevised().setLines(revisedLines);
