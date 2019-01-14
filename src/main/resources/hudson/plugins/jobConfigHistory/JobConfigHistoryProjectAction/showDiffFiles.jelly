@@ -142,15 +142,6 @@
                         </f:form>
                       </j:if>
                     </td>
-                    Das ist kein Kommentar.
-                    <!-- Test Button:-->
-                    <td>
-                      
-                        <f:form method="post" action="toggleShowHideVersionDiffs?timestamp1=${prev1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}" name="showHideVersionDiffs" >
-                          <f:submit value="${%Show / Hide Version Changes}" />
-                        </f:form>
-                      
-                    </td>
                     <td>
                       <j:if test="${next1 != timestamp1}">
                         <f:form method="post" action="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${timestamp2}" name="nextEntry" >
