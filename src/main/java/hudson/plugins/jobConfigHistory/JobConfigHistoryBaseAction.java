@@ -220,7 +220,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return unified diff
      */
 	protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
-			final String[] file2Lines, boolean useRegex, final String ignoredLinesPattern, final String ignoredDiffPattern) {
+			final String[] file2Lines, final boolean useRegex, final String ignoredLinesPattern, final String ignoredDiffPattern) {
 		final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
 		//TODO figure out something better than the bool-solution
 

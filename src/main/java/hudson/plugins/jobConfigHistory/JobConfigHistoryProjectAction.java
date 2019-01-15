@@ -354,10 +354,12 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 *
 	 * @return Differences between two config versions as list of lines.
 	 * @throws IOException
+	 *
 	 *             If diff doesn't work or xml files can't be read.
 	 */
 	public final List<Line> getLines() throws IOException {
 
+		//TODO perhaps make this more general
 		//mustn't end with dot.
 		String whitespacePattern = 				"\\s*";
 		String namePatternWithDotPattern = 		"[[\\w]+[\\.]?]*[\\w]+";
@@ -368,14 +370,15 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		String pluginNameVersionPattern = 		"plugin=\"" + namePatternWithHyphenPattern + "@" + versionPattern +"\"";
 
 		// example:    <(test.test) plugin="test-test-test@1.2.3"/>
-		String ignoredLinesPattern = 			whitespacePattern + "<" + 											// <
+		final String ignoredLinesPattern = 			whitespacePattern + "<" + 										// <
 												"(" + namePatternWithDotPattern + "|" + scmClassPattern + ")" 		// (test.test)
 												+ " " + pluginNameVersionPattern 									//  plugin="test-test-test@1.2.3
-												+ "(/|)" + ">";														// />
-		//TODO find a good pattern.
+												+ "(/|)" + ">"														// />
+												+ whitespacePattern;
+
 		//pattern slightly differs from versionPattern
-		String ignoredDiffPattern = "[[\\d]*(\\.|)]*[\\d]*(-SNAPSHOT|)" + "\"" + "(/|)" + ">";
-		boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
+		final String ignoredDiffPattern = "[[\\d]*(\\.|)]*[\\d]*(-SNAPSHOT|)" + "\"" + "(/|)" + ">";
+		final boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
 		return getLines(hideVersionDiffs, ignoredLinesPattern, ignoredDiffPattern);
 	}
 	
