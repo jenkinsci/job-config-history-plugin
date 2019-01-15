@@ -385,15 +385,16 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 * Filters lines that match the <i>ignoredLinesPattern</i> if wanted.
 	 * 
 	 * @param useRegex determines whether lines that match the
-	 * 		<i>ignoredLinesPattern</i> shall be hidden or not.
-	 * @param ignoredLinesPattern the regular expression 
-	 * 		which the lines are matched against.
+	 *                 <i>ignoredLinesPattern</i> shall be hidden or not.
+	 * @param ignoredLinesPattern the regular expression
+	 *                            which the lines are matched against.
 	 * @param ignoredDiffPattern the regular expression which
-	 *                              the difference of two lines are matched against.
+	 *                           the difference of two lines are matched against.
 	 * @return Differences between two config versions as list of lines.
 	 * @throws IOException If diff doesn't work or xml files can't be read.
 	 */
-	public final List<Line> getLines(boolean useRegex, String ignoredLinesPattern, String ignoredDiffPattern) throws IOException {
+	public final List<Line> getLines(boolean useRegex, String ignoredLinesPattern,
+									 String ignoredDiffPattern) throws IOException {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
 			checkConfigurePermission();
 			return null;

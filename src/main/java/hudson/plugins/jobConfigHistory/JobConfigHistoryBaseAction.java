@@ -214,7 +214,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @param file2Lines the lines of the second file.
      * @param useRegex determines whether <b>ignoredLinesPattern</b> shall be used.
      * @param ignoredLinesPattern line pairs in which both lines
-     *                           match this pattern are deleted.
+     *                            match this pattern are deleted.
      * @param ignoredDiffPattern the diff between two lines must
      *                           match this pattern for the line to be deleted.
      * @return unified diff
@@ -223,11 +223,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 			final String[] file2Lines, boolean useRegex, final String ignoredLinesPattern, final String ignoredDiffPattern) {
 		final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
 		//TODO figure out something better than the bool-solution
-        //TODO problem: if hide version changes results in "no diffs found", an older change is loaded automatically. That is unwanted behaviour.
 
 		if (useRegex) {
 			//bug/ feature in library: empty deltas are shown, too.
-			//TODO probably need to adjust the non-empty deltas also...
 			List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
 			for (Delta delta : patch.getDeltas()) {
 			    // Modify both deltas and save the changes.
