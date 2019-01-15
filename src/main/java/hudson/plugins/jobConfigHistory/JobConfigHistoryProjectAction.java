@@ -375,7 +375,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		//TODO find a good pattern.
 		//pattern slightly differs from versionPattern
 		String ignoredDiffPattern = "[[\\d]*(\\.|)]*[\\d]*(-SNAPSHOT|)" + "\"" + "(/|)" + ">";
-		System.out.println();
 		boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
 		return getLines(hideVersionDiffs, ignoredLinesPattern, ignoredDiffPattern);
 	}
