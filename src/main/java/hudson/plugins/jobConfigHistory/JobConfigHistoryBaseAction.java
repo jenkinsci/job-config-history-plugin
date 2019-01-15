@@ -218,49 +218,44 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 		final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
 
 		//TODO figure out something better than the bool-solution
+        //TODO problem: need to check if diff matches some "versionregex". Otherwise, whole plugin changes are hidden, too!
+        //TODO problem: if hide version changes results in "no diffs found", an older change is loaded automatically. That is unwanted behaviour.
+
 		if (useRegex) {
-			//bug in library: empty deltas are shown, too.
+			//bug/ feature in library: empty deltas are shown, too.
 			//TODO probably need to adjust the non-empty deltas also...
 			List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
 			for (Delta delta : patch.getDeltas()) {
+			    // Modify both deltas and save the changes.
+
 				List<String> originalLines = Lists.newArrayList((List<String>) delta.getOriginal().getLines());
 				List<String> revisedLines = Lists.newArrayList((List<String>) delta.getRevised().getLines());
-				//------------------------------------------------------------------------------------------------------DEBUG
-				//System.out.println("---BEFORE:");
-				//System.out.println("Original Lines: " + originalLines);
-				//System.out.println("Revised Lines: " +revisedLines);
-				//------------------------------------------------------------------------------------------------------\DEBUG
+
 				for (int line = 0; line < Math.max(originalLines.size(), revisedLines.size()); ++line) {
-					// One iteration is O(n), if originalLines or revisedLines aren't ArrayLists!
-					int oriLinesSize = originalLines.size();
-					int revLinesSize = revisedLines.size();
-					//--------------------------------------------------------------------------------------------------DEBUG
-					//System.out.println("---MID:");
-					//--------------------------------------------------------------------------------------------------\DEBUG
+				    // Delete lines which match the regex from both deltas.
+
+                    //These must be calculated IN the loop because it changes in some iterations.
+                    int oriLinesSize = originalLines.size();
+                    int revLinesSize = revisedLines.size();
+
 					if (line > oriLinesSize - 1) {
 						// line <= revLinesSize-1, because of loop invariant.
 						// ori line is empty.
-						//----------------------------------------------------------------------------------------------DEBUG
-						//System.out.println("Line Pair: [" + "EMPTYY" + ", " + revisedLines.get(line) + "]");
-						//----------------------------------------------------------------------------------------------\DEBUG
 						if (revisedLines.get(line).matches(ignoredLinesPattern)) {
-							revisedLines.remove(line);
+                            //TODO this should be decided by method call
+							//this line is needed if a deleted or added line that matches the pattern should be hidden.
+							//revisedLines.remove(line);
 						}
 					} else if (line > revLinesSize - 1) {
 						// line <= oriLinesSize-1, because of loop invariant.
 						// rev line is empty.
-						//----------------------------------------------------------------------------------------------DEBUG
-						//System.out.println("Line Pair: [" + originalLines.get(line) + ", " + "EMPTYY" + "]");
-						//----------------------------------------------------------------------------------------------\DEBUG
 						if (originalLines.get(line).matches(ignoredLinesPattern)) {
-							originalLines.remove(line);
+							//this line is needed if a deleted or added line that matches the pattern should be hidden.
+                            //TODO this should be decided by method call
+							//originalLines.remove(line);
 						}
 					} else {
 						// both lines are non-empty
-						//----------------------------------------------------------------------------------------------DEBUG
-						//System.out.println(
-						//		"Line Pair: [" + originalLines.get(line) + ", " + revisedLines.get(line) + "]");
-						//----------------------------------------------------------------------------------------------\DEBUG
 						if ((originalLines.get(line).matches(ignoredLinesPattern))
 								&& (revisedLines.get(line).matches(ignoredLinesPattern))) {
 							originalLines.remove(line);
@@ -272,16 +267,10 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 					//remove the delta from the list.
 					deltasToBeRemovedAfterTheMainLoop.add(delta);
 				}
-				//---------------------------------------------------------------------------------------------------------------DEBUG
-				//System.out.println("---AFTER:");
-				//System.out.println("Original Lines: " + originalLines);
-				//System.out.println("Revised Lines: " +revisedLines);
-				//--------------------------------------------------------------------------------------------------------------\DEBUG
 				delta.getOriginal().setLines(originalLines);
 				delta.getRevised().setLines(revisedLines);
 			}
 			patch.getDeltas().removeAll(deltasToBeRemovedAfterTheMainLoop);
-			//patch.
 		}
 
 		final List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(file1.getPath(), file2.getPath(),
