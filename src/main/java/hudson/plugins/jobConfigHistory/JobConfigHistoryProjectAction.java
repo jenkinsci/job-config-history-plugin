@@ -351,29 +351,29 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	/**
 	 * Takes the two timestamp request parameters and returns the diff between
 	 * the corresponding config files of this project as a list of single lines.
+	 * Filters lines that match the pattern described in the code if wanted.
 	 *
 	 * @return Differences between two config versions as list of lines.
 	 * @throws IOException
-	 *
 	 *             If diff doesn't work or xml files can't be read.
 	 */
 	public final List<Line> getLines() throws IOException {
 
-		//TODO perhaps make this more general
+		//TODO perhaps make this more general? especially the name patterns..
 		//mustn't end with dot.
 		String whitespacePattern = 				"\\s*";
-		String namePatternWithDotPattern = 		"[[\\w]+[\\.]?]*[\\w]+";
-		String scmClassPattern = 				"scm class=\"" + namePatternWithDotPattern + "\"";
-		String namePatternWithHyphenPattern = 	"[[\\w]+[-]?]*[\\w]+";
+		String nameWithDotPattern = 			"[[\\w]+[\\.]?]*[\\w]+";
+		String scmClassPattern = 				"scm class=\"" + nameWithDotPattern + "\"";
+		String nameWithHyphenPattern = 			"[[\\w]+[-]?]*[\\w]+";
 		//mustn't end with dot.
 		String versionPattern = 				"[[\\d]+(\\.|)]*[\\d]+(-SNAPSHOT|)";
-		String pluginNameVersionPattern = 		"plugin=\"" + namePatternWithHyphenPattern + "@" + versionPattern +"\"";
-
+		String pluginNameVersionPattern = 		"plugin=\"" + nameWithHyphenPattern + "@" + versionPattern +"\"";
+		
 		// example:    <(test.test) plugin="test-test-test@1.2.3"/>
-		final String ignoredLinesPattern = 			whitespacePattern + "<" + 										// <
-												"(" + namePatternWithDotPattern + "|" + scmClassPattern + ")" 		// (test.test)
-												+ " " + pluginNameVersionPattern 									//  plugin="test-test-test@1.2.3
-												+ "(/|)" + ">"														// />
+		final String ignoredLinesPattern = 		whitespacePattern + "<" + 									// <
+												"(" + nameWithDotPattern + "|" + scmClassPattern + ")" 		// (test.test)
+												+ " " + pluginNameVersionPattern 							//  plugin="test-test-test@1.2.3
+												+ "(/|)" + ">"												// />
 												+ whitespacePattern;
 
 		//pattern slightly differs from versionPattern
