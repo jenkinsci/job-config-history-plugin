@@ -380,15 +380,15 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 * Takes the two timestamp request parameters and returns the diff between
 	 * the corresponding config files of this project as a list of single lines.
 	 * Filters lines that match the <i>ignoredLinesPattern</i> if wanted.
-	 *
-	 * @param usePattern determines whether lines that match the
+	 * 
+	 * @param useRegex determines whether lines that match the
 	 * 		<i>ignoredLinesPattern</i> shall be hidden or not.
-	 * @param ignoredLinesPattern the regular expression
+	 * @param ignoredLinesPattern the regular expression 
 	 * 		which the lines are matched against.
 	 * @return Differences between two config versions as list of lines.
 	 * @throws IOException If diff doesn't work or xml files can't be read.
 	 */
-	public final List<Line> getLines(boolean usePattern, String ignoredLinesPattern) throws IOException {
+	public final List<Line> getLines(boolean useRegex, String ignoredLinesPattern) throws IOException {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
 			checkConfigurePermission();
 			return null;
@@ -400,15 +400,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		final String[] configXml1Lines = configXml1.asString().split("\\n");
 		final XmlFile configXml2 = getOldConfigXml(timestamp2);
 		final String[] configXml2Lines = configXml2.asString().split("\\n");
-		
-		//check if the regex shall be used
-		final String diffAsString = 
-				usePattern
-				? getDiffAsString(configXml1.getFile(),
-				//configXml2.getFile(), configXml1Lines, configXml2Lines, true, "[.*]") 
-				configXml2.getFile(), configXml1Lines, configXml2Lines, true, ignoredLinesPattern)
-				: getDiffAsString(configXml1.getFile(),
-						configXml2.getFile(), configXml1Lines, configXml2Lines);
+
+		//compute the diff with respect to ignoredLinesPattern if useRegex == true
+		final String diffAsString =
+				getDiffAsString(configXml1.getFile(), configXml2.getFile(), configXml1Lines,
+				configXml2Lines, useRegex, ignoredLinesPattern);
 
 		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
 		return getDiffLines(diffLines);
@@ -499,11 +495,11 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		final String showVersionDiffs = Boolean.toString(!Boolean.parseBoolean(req.getParameter("showVersionDiffs")));
 		//System.out.println("---- OLD REQUEST PARAM: " + req.getParameter("showVersionDiffs")+ ", NEW REQUEST param: " + showVersionDiffs);
 		//System.out.println("---- old param: " + Boolean.getBoolean(getShowVersionDiffs()) +", NEW parameter: " + !Boolean.getBoolean(getShowVersionDiffs()));
-		rsp.sendRedirect("showDiffFiles?" + "timestamp1=" + timestamp1
+		rsp.sendRedirect("showDiffFiles?" + "timestamp1=" + timestamp1 
 				+ "&timestamp2=" + timestamp2 + "&showVersionDiffs=" + showVersionDiffs);		
 	}
-
-	/**
+	
+	/** 
 	 * Get the current request's 'showVersionDiffs'-parameter. If there is none, "True" is returned.
 	 * 
 	 * @return 
@@ -515,7 +511,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		String showVersionDiffs = (String) (this.getRequestParameter("showVersionDiffs"));
 		return (showVersionDiffs  == null) ? "True" : showVersionDiffs;
 	}
-
+	
 	/**
 	 * For tests.
 	 *

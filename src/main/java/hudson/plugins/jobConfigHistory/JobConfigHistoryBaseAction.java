@@ -201,15 +201,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 	 */
 	protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
 			final String[] file2Lines) {
-		/*
-		 * final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines),
-		 * Arrays.asList(file2Lines)); final List<String> unifiedDiff =
-		 * DiffUtils.generateUnifiedDiff( file1.getPath(), file2.getPath(),
-		 * Arrays.asList(file1Lines), patch, 3); return StringUtills.join(unifiedDiff,
-		 * "\n") + "\n";
-		 */
-		// return getDiffAsString(file1, file2,
-		// file1Lines, file2Lines, "");
 		return getDiffAsString(file1, file2, file1Lines, file2Lines, false, "");
 	}
 
