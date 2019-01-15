@@ -50,6 +50,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -201,15 +202,27 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 	 */
 	protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
 			final String[] file2Lines) {
-		return getDiffAsString(file1, file2, file1Lines, file2Lines, false, "");
+		return getDiffAsString(file1, file2, file1Lines, file2Lines, false, "", "");
 	}
 
+    /**
+     * Returns a unified diff between two string arrays.
+     *
+     * @param file1      first config file.
+     * @param file2      second config file.
+     * @param file1Lines the lines of the first file.
+     * @param file2Lines the lines of the second file.
+     * @param useRegex determines whether <b>ignoredLinesPattern</b> shall be used.
+     * @param ignoredLinesPattern line pairs in which both lines
+     *                           match this pattern are deleted.
+     * @param ignoredDiffPattern the diff between two lines must
+     *                           match this pattern for the line to be deleted.
+     * @return unified diff
+     */
 	protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
-			final String[] file2Lines, boolean useRegex, final String ignoredLinesPattern) {
+			final String[] file2Lines, boolean useRegex, final String ignoredLinesPattern, final String ignoredDiffPattern) {
 		final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
-
 		//TODO figure out something better than the bool-solution
-        //TODO problem: need to check if diff matches some "versionregex". Otherwise, whole plugin changes are hidden, too!
         //TODO problem: if hide version changes results in "no diffs found", an older change is loaded automatically. That is unwanted behaviour.
 
 		if (useRegex) {
@@ -218,7 +231,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 			List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
 			for (Delta delta : patch.getDeltas()) {
 			    // Modify both deltas and save the changes.
-
+                System.out.println("-----delta" + delta);
 				List<String> originalLines = Lists.newArrayList((List<String>) delta.getOriginal().getLines());
 				List<String> revisedLines = Lists.newArrayList((List<String>) delta.getRevised().getLines());
 
@@ -229,11 +242,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                     int oriLinesSize = originalLines.size();
                     int revLinesSize = revisedLines.size();
 
+
 					if (line > oriLinesSize - 1) {
 						// line <= revLinesSize-1, because of loop invariant.
 						// ori line is empty.
 						if (revisedLines.get(line).matches(ignoredLinesPattern)) {
-                            //TODO this should be decided by method call
+                            //TODO this should be decided by method call, if the functionality is needed
 							//this line is needed if a deleted or added line that matches the pattern should be hidden.
 							//revisedLines.remove(line);
 						}
@@ -242,15 +256,21 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 						// rev line is empty.
 						if (originalLines.get(line).matches(ignoredLinesPattern)) {
 							//this line is needed if a deleted or added line that matches the pattern should be hidden.
-                            //TODO this should be decided by method call
+                            //TODO this should be decided by method call, if the functionality is needed
 							//originalLines.remove(line);
 						}
 					} else {
+					    String originalLine = originalLines.get(line);
+					    String revisedLine = revisedLines.get(line);
+                        String diff = StringUtils.difference(originalLine, revisedLine);
+                        System.out.println("--Diff: " + diff + " matches? " + diff.matches(ignoredDiffPattern));
 						// both lines are non-empty
-						if ((originalLines.get(line).matches(ignoredLinesPattern))
-								&& (revisedLines.get(line).matches(ignoredLinesPattern))) {
+						if (originalLine.matches(ignoredLinesPattern)
+								&& revisedLine.matches(ignoredLinesPattern)
+                                && diff.matches(ignoredDiffPattern)) {
 							originalLines.remove(line);
 							revisedLines.remove(line);
+
 						}
 					}
 				}

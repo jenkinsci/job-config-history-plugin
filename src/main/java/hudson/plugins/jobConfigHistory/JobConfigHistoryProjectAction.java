@@ -372,8 +372,12 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 												"(" + namePatternWithDotPattern + "|" + scmClassPattern + ")" 		// (test.test)
 												+ " " + pluginNameVersionPattern 									//  plugin="test-test-test@1.2.3
 												+ "(/|)" + ">";														// />
+		//TODO find a good pattern.
+		//pattern slightly differs from versionPattern
+		String ignoredDiffPattern = "[[\\d]*(\\.|)]*[\\d]*(-SNAPSHOT|)" + "\"" + "(/|)" + ">";
+		System.out.println();
 		boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
-		return getLines(hideVersionDiffs, ignoredLinesPattern);
+		return getLines(hideVersionDiffs, ignoredLinesPattern, ignoredDiffPattern);
 	}
 	
 	/**
@@ -385,10 +389,12 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 * 		<i>ignoredLinesPattern</i> shall be hidden or not.
 	 * @param ignoredLinesPattern the regular expression 
 	 * 		which the lines are matched against.
+	 * @param ignoredDiffPattern the regular expression which
+	 *                              the difference of two lines are matched against.
 	 * @return Differences between two config versions as list of lines.
 	 * @throws IOException If diff doesn't work or xml files can't be read.
 	 */
-	public final List<Line> getLines(boolean useRegex, String ignoredLinesPattern) throws IOException {
+	public final List<Line> getLines(boolean useRegex, String ignoredLinesPattern, String ignoredDiffPattern) throws IOException {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
 			checkConfigurePermission();
 			return null;
@@ -404,7 +410,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		//compute the diff with respect to ignoredLinesPattern if useRegex == true
 		final String diffAsString =
 				getDiffAsString(configXml1.getFile(), configXml2.getFile(), configXml1Lines,
-				configXml2Lines, useRegex, ignoredLinesPattern);
+				configXml2Lines, useRegex, ignoredLinesPattern, ignoredDiffPattern);
 
 		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
 		return getDiffLines(diffLines);
