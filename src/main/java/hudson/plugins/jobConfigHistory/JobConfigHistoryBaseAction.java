@@ -213,26 +213,10 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
                                            final String[] file2Lines) {
-        return getDiffAsString(file1, file2, file1Lines, file2Lines, false, "", "");
+        return getDiffAsString(file1, file2, file1Lines, file2Lines, false);
     }
 
-    /**
-     * Returns a unified diff between two string arrays.
-     *
-     * @param file1               first config file.
-     * @param file2               second config file.
-     * @param file1Lines          the lines of the first file.
-     * @param file2Lines          the lines of the second file.
-     * @param useRegex            determines whether <b>ignoredLinesPattern</b> shall be used.
-     * @param ignoredLinesPattern line pairs in which both lines
-     *                            match this pattern are deleted.
-     * @param ignoredDiffPattern  the diff between two lines must
-     *                            match this pattern for the line to be deleted.
-     * @return unified diff
-     */
-    protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
-                                           final String[] file2Lines, final boolean useRegex, final String ignoredLinesPattern, final String ignoredDiffPattern) {
-
+    private Diff getVersionDiffsOnly(final File file1, final File file2) {
         //TODO implement this, this is the way.
         DifferenceEvaluator versionDifferenceEvaluator = new DifferenceEvaluator() {
             //takes the comparison and the result that a possible previous DifferenceEvaluator created for this node
@@ -245,7 +229,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 //System.out.println("++++++++++++Test4++++++++++++: " + comparisonResult + " compType: " + comparison.getType());
                 try {
 
-                    if (comparison.getControlDetails().getValue().toString().contains("git@")) {
+                    if (comparison.getControlDetails().getValue().toString().contains("periodic-reincarnation@")) {
                         System.out.println("comparison with periodic stuff: " + comparison.getControlDetails().getValue().toString()
                                 + "Type: " + comparison.getType());
                     }
@@ -254,7 +238,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                     //only want to compare attribute values!
 
 
-                    //TODO wieder zurückändern!
+                    //TODO wieder zurückändern, falls XML-Unit für alle diffs genutzt werden soll.
                     //return comparisonResult;
                     return ComparisonResult.EQUAL;
                 }
@@ -263,12 +247,13 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 Node testNode = comparison.getTestDetails().getTarget();
                 if (controlNode == null || testNode == null) {
 
-                    //TODO wieder zurückändern
+                    //TODO wieder zurückändern, falls XML-Unit für alle diffs genutzt werden soll.
                     //return comparisonResult;
                     return ComparisonResult.EQUAL;
                 }
-                System.out.println("Value:" + comparison.getControlDetails().getValue());
-                System.out.println("  Control Node: " + controlNode.getNodeName() + ", Test Node: " + testNode.getNodeName());
+                System.out.println(
+                        "  Control Node: " + controlNode.getNodeName() + ", " + controlNode.getNodeValue()
+                                + ", Test Node: " + testNode.getNodeName() + ", " + testNode.getNodeValue());
 
                 String[] controlValue = controlNode.getNodeValue().split("@");
                 String[] testValue = testNode.getNodeValue().split("@");
@@ -277,12 +262,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 if (!controlValue[0].equals(testValue[0])
                         || controlValue.length != 2 || testValue.length != 2) {
                     //different plugins or misformatted plugin attribute: version number not determinable
-                    //TODO wieder zurückändern
+                    //TODO wieder zurückändern, falls XML-Unit für alle diffs genutzt werden soll.
                     //return comparisonResult;
                     return ComparisonResult.EQUAL;
                 }
                 System.out.println("  found as equal: " + controlValue[1] + ", " + testValue[1]);
-                //TODO wieder zurückändern
+                //TODO wieder zurückändern, falls XML-Unit für alle diffs genutzt werden soll.
                 //return ComparisonResult.EQUAL;
                 if (controlValue[1].equals(testValue[1])) {
                     return ComparisonResult.EQUAL;
@@ -290,84 +275,37 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                     return ComparisonResult.DIFFERENT;
                 }
 
-
-                    /*
-                    NamedNodeMap testNodeMap;
-                    NamedNodeMap controlNodeMap;
-                    if (controlNode.hasAttributes() && testNode.hasAttributes()) {
-                        controlNodeMap = controlNode.getAttributes();
-                        testNodeMap = testNode.getAttributes();
-
-                        if (controlNodeMap.getLength() == 0 && testNodeMap.getLength() == 0) {
-                            //nothing more to do here, only need nodes where there are attributes (possibly containing version values)
-                            return comparisonResult;
-                        }
-                    } else {
-                        //nothing more to do here, only need nodes where there are attributes (possibly containing version values)
-                        return comparisonResult;
-                    }
-                    System.out.println("HAAAAAAAAAAAAAAAAAALLO3");
-                    //todo damit lässt sich potenziell die top-position finden.
-                    controlNode.getParentNode();
-
-                    //System.out.println("plugin-item: " + controlNode.getAttributes().getNamedItem("plugin"));
-                    Node controlNodePluginAttribute =           controlNode.getAttributes().getNamedItem("plugin");
-                    Node testNodePluginAttribute =              testNode.getAttributes().getNamedItem("plugin");
-                    if (controlNodePluginAttribute == null || testNodePluginAttribute == null) {
-                        return comparisonResult;
-                    }
-                    //they look like this: testPlugin@1.2.3
-                    String controlNodePluginAttributeValue =    controlNodePluginAttribute.getNodeValue();
-                    String testNodePluginAttributeValue =       testNodePluginAttribute.getNodeValue();
-
-                    System.out.println("lalal: " + controlNodePluginAttributeValue + ", " + testNodePluginAttributeValue);
-                    String[] controlNodePluginNameAndVersion =  controlNodePluginAttributeValue.split("@");
-                    String[] testNodePluginNameAndVersion =     testNodePluginAttributeValue.split("@");
-                    if (!controlNodePluginNameAndVersion[0].equals(testNodePluginNameAndVersion[0])
-                            || controlNodePluginNameAndVersion.length != 2 || testNodePluginNameAndVersion.length != 2) {
-                        //different plugins or misformatted plugin attribute: version number not determinable
-                        return comparisonResult;
-                    }
-                    //if  the version differs or not, return equal.
-                    System.out.println("equal plugin names: " + controlNodePluginAttribute + ", " + testNodePluginAttribute);
-                    return ComparisonResult.EQUAL;
-
-
-                    */
             }
         };
 
         Diff diff = DiffBuilder.compare(Input.fromFile(file1)).withTest(Input.fromFile(file2))
                 .ignoreWhitespace()
-                //.withNodeFilter(nodeFilter)		//DONT USE THIS, but the next one!!
-                //.withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, versionDifferenceEvaluator))    //not so sure bout this one.
-                //.withDifferenceEvaluator(DifferenceEvaluators.Default)
+                //the next line should be used if one wanted to use XMLUnit for the computing of all diffs.
+                //.withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, versionDifferenceEvaluator))
                 .withDifferenceEvaluator(versionDifferenceEvaluator)
                 .build();
-        System.out.println("\n\n\n\n DIFFERENCES! \n\n\n\n");
-        int diffCount = 0;
+        //System.out.println("\n\n\n\n DIFFERENCES! \n\n\n\n");
+        return diff;
+    }
 
-        HashMap<String, String> diffsAsMap = new HashMap<String, String>();
-        for (Difference difference : diff.getDifferences()) {
-            System.out.println("Comparison type: " + difference.getComparison().getType());
-            System.out.println("    diff ctrl value: " + difference.getComparison().getControlDetails().getValue());
-            System.out.println("    diff test value: " + difference.getComparison().getTestDetails().getValue());
-            System.out.println("    diff ctrl xpath: " + difference.getComparison().getControlDetails().getXPath());
+    /**
+     * Returns a unified diff between two string arrays representing an xml file.
+     * The order of elements in the xml file is NOT ignored.
+     *
+     * @param file1               first config file.
+     * @param file2               second config file.
+     * @param file1Lines          the lines of the first file.
+     * @param file2Lines          the lines of the second file.
+     * @param useRegex            determines whether <b>ignoredLinesPattern</b> shall be used.
+     * @return unified diff
+     */
+    protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
+                                           final String[] file2Lines, final boolean useRegex) {
 
-            diffsAsMap.put(
-                    difference.getComparison().getControlDetails().getValue().toString(),
-                    difference.getComparison().getTestDetails().getValue().toString()
-            );
-            diffCount++;
-        }
-        System.out.println("  +++DiffCount+++: " + diffCount);
-
-
-        //current test: XMLUnit XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
+        //calculate diffs to be excluded from the output.
+        Diff versionDiffs = getVersionDiffsOnly(file1, file2);
+        //calculate all diffs.
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
-
-        //TODO figure out something better than the bool-solution
 
         if (useRegex) {
             //bug/ feature in library: empty deltas are shown, too.
@@ -388,35 +326,15 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                     if (line > oriLinesSize - 1) {
                         // line <= revLinesSize-1, because of loop invariant.
                         // ori line is empty.
-                        if (revisedLines.get(line).matches(ignoredLinesPattern)) {
-                            //TODO this should be decided by method call, if the functionality is needed
-                            //this line is needed if a deleted or added line that matches the pattern should be hidden.
-                            //revisedLines.remove(line);
-                        }
                     } else if (line > revLinesSize - 1) {
                         // line <= oriLinesSize-1, because of loop invariant.
                         // rev line is empty.
-                        if (originalLines.get(line).matches(ignoredLinesPattern)) {
-                            //this line is needed if a deleted or added line that matches the pattern should be hidden.
-                            //TODO this should be decided by method call, if the functionality is needed
-                            //originalLines.remove(line);
-                        }
                     } else {
                         String originalLine = originalLines.get(line);
                         String revisedLine = revisedLines.get(line);
                         String diffStr = StringUtils.difference(originalLine, revisedLine);
                         // both lines are non-empty
-                        //TODO reset this if needed!!!
-                        /*
-                        if (originalLine.matches(ignoredLinesPattern)
-                                && revisedLine.matches(ignoredLinesPattern)
-                                && diffStr.matches(ignoredDiffPattern)) {
-                            originalLines.remove(line);
-                            revisedLines.remove(line);
-
-                        }
-                        */
-                        for (Difference difference : diff.getDifferences()) {
+                        for (Difference difference : versionDiffs.getDifferences()) {
                             String controlValue = difference.getComparison().getControlDetails().getValue().toString();
                             String testValue     = difference.getComparison().getTestDetails().getValue().toString();
 
@@ -440,11 +358,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
         final List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(file1.getPath(), file2.getPath(),
                 Arrays.asList(file1Lines), patch, 3);
-
-        System.out.println("\n\n\n DIFFUTILS unifiedDiff:");
-        for (String s : unifiedDiff) {
-            System.out.println("diffLine = " + s);
-        }
         return StringUtills.join(unifiedDiff, "\n") + "\n";
     }
 

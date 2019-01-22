@@ -358,28 +358,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 *             If diff doesn't work or xml files can't be read.
 	 */
 	public final List<Line> getLines() throws IOException {
-
-		//TODO perhaps make this more general? especially the name patterns..
-		//mustn't end with dot.
-		String whitespacePattern = 				"\\s*";
-		String nameWithDotPattern = 			"[[\\w]+[\\.]?]*[\\w]+";
-		String scmClassPattern = 				"scm class=\"" + nameWithDotPattern + "\"";
-		String nameWithHyphenPattern = 			"[[\\w]+[-]?]*[\\w]+";
-		//mustn't end with dot.
-		String versionPattern = 				"[[\\d]+(\\.|)]*[\\d]+(-SNAPSHOT|)";
-		String pluginNameVersionPattern = 		"plugin=\"" + nameWithHyphenPattern + "@" + versionPattern +"\"";
-		
-		// example:    <(test.test) plugin="test-test-test@1.2.3"/>
-		final String ignoredLinesPattern = 		whitespacePattern + "<" + 									// <
-												"(" + nameWithDotPattern + "|" + scmClassPattern + ")" 		// (test.test)
-												+ " " + pluginNameVersionPattern 							//  plugin="test-test-test@1.2.3
-												+ "(/|)" + ">"												// />
-												+ whitespacePattern;
-
-		//pattern slightly differs from versionPattern
-		final String ignoredDiffPattern = "[[\\d]*(\\.|)]*[\\d]*(-SNAPSHOT|)" + "\"" + "(/|)" + ">";
 		final boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
-		return getLines(hideVersionDiffs, ignoredLinesPattern, ignoredDiffPattern);
+		return getLines(hideVersionDiffs);
 	}
 	
 	/**
@@ -389,15 +369,10 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 * 
 	 * @param useRegex determines whether lines that match the
 	 *                 <i>ignoredLinesPattern</i> shall be hidden or not.
-	 * @param ignoredLinesPattern the regular expression
-	 *                            which the lines are matched against.
-	 * @param ignoredDiffPattern the regular expression which
-	 *                           the difference of two lines are matched against.
 	 * @return Differences between two config versions as list of lines.
 	 * @throws IOException If diff doesn't work or xml files can't be read.
 	 */
-	public final List<Line> getLines(boolean useRegex, String ignoredLinesPattern,
-									 String ignoredDiffPattern) throws IOException {
+	public final List<Line> getLines(boolean useRegex) throws IOException {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
 			checkConfigurePermission();
 			return null;
@@ -413,7 +388,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		//compute the diff with respect to ignoredLinesPattern if useRegex == true
 		final String diffAsString =
 				getDiffAsString(configXml1.getFile(), configXml2.getFile(), configXml1Lines,
-				configXml2Lines, useRegex, ignoredLinesPattern, ignoredDiffPattern);
+				configXml2Lines, useRegex);
 
 		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
 		return getDiffLines(diffLines);
