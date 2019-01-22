@@ -23,6 +23,25 @@
           </j:when>
           <j:otherwise>
             <div>
+
+              <j:set var="showVersionDiffs" value="${it.getShowVersionDiffs()}"/>
+              <!-- Button for showing/ hiding version changes.-->
+              <j:choose>
+                <j:when test="${showVersionDiffs}">
+                  <f:form method="post"
+                          action="toggleShowHideVersionDiffs?timestamp1=${timestamp1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}"
+                          name="showHideVersionDiffsForm">
+                    <f:submit value="${%Hide Version Changes}" />
+                  </f:form>
+                </j:when>
+                <j:otherwise>
+                  <f:form method="post"
+                          action="toggleShowHideVersionDiffs?timestamp1=${timestamp1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}"
+                          name="showHideVersionDiffsForm">
+                    <f:submit value="${%Show Version Changes}" />
+                  </f:form>
+                </j:otherwise>
+              </j:choose>
               <j:choose>
                 <j:when test="${it.getLines().size() == 0}">
                   <p>${%No lines changed}</p>

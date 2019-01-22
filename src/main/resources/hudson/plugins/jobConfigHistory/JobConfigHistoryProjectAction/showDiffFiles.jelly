@@ -21,7 +21,8 @@
               <j:set var="timestamp1" value="${it.getTimestamp(1)}"/>
               <j:set var="timestamp2" value="${it.getTimestamp(2)}"/>
               <j:set var="showVersionDiffs" value="${it.getShowVersionDiffs()}"/>
-              
+
+
               <j:choose>
               	<j:when test="${showVersionDiffs}">
                		<f:form method="post" 
@@ -38,7 +39,16 @@
               		</f:form>
               	</j:otherwise>
               </j:choose>
-              
+              <!-- this sucks. //TODO translate this to groovy and use that.
+              <f:radio name="testRadio" title="TESTRADIO" value=""/>
+              <f:optionalBlock name="testBlock" title="Test-OptionalBlock" checked="testRadio"
+                description="Test Description: oegnapogn">
+
+
+
+              </f:optionalBlock>
+              -->
+
               <table style="width:100%;">
                 <thead>
                   <tr>
