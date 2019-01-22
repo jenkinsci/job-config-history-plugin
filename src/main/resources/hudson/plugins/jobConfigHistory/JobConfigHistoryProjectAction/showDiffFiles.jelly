@@ -1,5 +1,7 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:g="glide" xmlns:y="wasauchimmeroa4">
+
   <l:layout title="Job Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
@@ -22,6 +24,23 @@
               <j:set var="timestamp2" value="${it.getTimestamp(2)}"/>
               <j:set var="showVersionDiffs" value="${it.getShowVersionDiffs()}"/>
 
+              <!-- TEST SECTION BEGIN>
+              <g:evaluate>
+                function foo() {
+                return "Hallo, " + " test";
+                }
+              </g:evaluate>
+              <g:set var="jaja" value="geht nicht."/>
+
+              <p>
+                Test von Evaluate: ${jaja}
+              </p>
+
+
+
+              <a href="toggleShowHideVersionDiffs?timestamp1=${timestamp1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}">${%TEST ob des was anderes tut.}</a> <br />
+
+              < TEST SECTION END-->
 
               <j:choose>
               	<j:when test="${showVersionDiffs}">

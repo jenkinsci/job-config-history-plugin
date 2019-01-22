@@ -317,12 +317,13 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
                                            final String[] file2Lines, final boolean useRegex) {
 
-        //calculate diffs to be excluded from the output.
-        Diff versionDiffs = getVersionDiffsOnly(file1, file2);
+
         //calculate all diffs.
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
-        System.out.println("hier");
+        //System.out.println("hier");
         if (useRegex) {
+            //calculate diffs to be excluded from the output.
+            Diff versionDiffs = getVersionDiffsOnly(file1, file2);
             System.out.println("hier falls useRegex==true");
             //bug/ feature in library: empty deltas are shown, too.
             List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
@@ -376,11 +377,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
         final List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(file1.getPath(), file2.getPath(),
                 Arrays.asList(file1Lines), patch, 3);
-
-        System.out.println("FINAL DIFF(useRegex: " + useRegex  + "):\n\n");
-        for (String str : unifiedDiff) {
-            System.out.println(str);
-        }
 
         return StringUtills.join(unifiedDiff, "\n") + "\n";
     }
