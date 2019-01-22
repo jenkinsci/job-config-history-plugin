@@ -229,7 +229,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 //System.out.println("++++++++++++Test4++++++++++++: " + comparisonResult + " compType: " + comparison.getType());
                 try {
 
-                    if (comparison.getControlDetails().getValue().toString().contains("periodic-reincarnation@")) {
+                    if (comparison.getControlDetails().getValue().toString().contains("lalala@")) {
                         System.out.println("comparison with periodic stuff: " + comparison.getControlDetails().getValue().toString()
                                 + "Type: " + comparison.getType());
                     }
@@ -264,6 +264,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                     //different plugins or misformatted plugin attribute: version number not determinable
                     //TODO wieder zurückändern, falls XML-Unit für alle diffs genutzt werden soll.
                     //return comparisonResult;
+                    System.out.println("misformatted plugin attribute or different plugins");
                     return ComparisonResult.EQUAL;
                 }
                 System.out.println("  found as equal: " + controlValue[1] + ", " + testValue[1]);
@@ -288,6 +289,20 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return diff;
     }
 
+
+    /**
+     * Get the current request's 'showVersionDiffs'-parameter. If there is none, "True" is returned.
+     *
+     * @return
+     * 		<b>true</b> if the current request has set this parameter to true or not at all.
+     *		<br>
+     * 		<b>false</b> else
+     */
+    public String getShowVersionDiffs() {
+        String showVersionDiffs = (String) (this.getRequestParameter("showVersionDiffs"));
+        return (showVersionDiffs  == null) ? "True" : showVersionDiffs;
+    }
+
     /**
      * Returns a unified diff between two string arrays representing an xml file.
      * The order of elements in the xml file is NOT ignored.
@@ -306,8 +321,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         Diff versionDiffs = getVersionDiffsOnly(file1, file2);
         //calculate all diffs.
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
-
+        System.out.println("hier");
         if (useRegex) {
+            System.out.println("hier falls useRegex==true");
             //bug/ feature in library: empty deltas are shown, too.
             List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
             for (Delta delta : patch.getDeltas()) {
@@ -315,40 +331,42 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 List<String> originalLines = Lists.newArrayList((List<String>) delta.getOriginal().getLines());
                 List<String> revisedLines = Lists.newArrayList((List<String>) delta.getRevised().getLines());
 
-                for (int line = 0; line < Math.max(originalLines.size(), revisedLines.size()); ++line) {
-                    // Delete lines which match the regex from both deltas.
-
-                    //These must be calculated IN the loop because it changes in some iterations.
-                    int oriLinesSize = originalLines.size();
-                    int revLinesSize = revisedLines.size();
-
-
-                    if (line > oriLinesSize - 1) {
-                        // line <= revLinesSize-1, because of loop invariant.
-                        // ori line is empty.
-                    } else if (line > revLinesSize - 1) {
-                        // line <= oriLinesSize-1, because of loop invariant.
-                        // rev line is empty.
-                    } else {
-                        String originalLine = originalLines.get(line);
-                        String revisedLine = revisedLines.get(line);
-                        String diffStr = StringUtils.difference(originalLine, revisedLine);
-                        // both lines are non-empty
-                        for (Difference difference : versionDiffs.getDifferences()) {
-                            String controlValue = difference.getComparison().getControlDetails().getValue().toString();
-                            String testValue     = difference.getComparison().getTestDetails().getValue().toString();
-
+                for (Difference versionDifference : versionDiffs.getDifferences()) {
+                    //check for each calculated versionDifference where it occured and delete it.
+                    String controlValue = versionDifference.getComparison().getControlDetails().getValue().toString();
+                    String testValue     = versionDifference.getComparison().getTestDetails().getValue().toString();
+                    for (int line = 0; line < Math.max(originalLines.size(), revisedLines.size()); ++line) {
+                        //go through each line and search for the diff
+                        if ((line > originalLines.size()-1) || (line > revisedLines.size())) {
+                            //too lazy to reformat this to the right negated expression...
+                        } else {
+                            String originalLine = originalLines.get(line);
+                            String revisedLine = revisedLines.get(line);
                             if ((originalLine.contains(controlValue) && revisedLine.contains(testValue))
-                            || (originalLine.contains(testValue) && revisedLine.contains(controlValue))) {
+                                    || (originalLine.contains(testValue) && revisedLine.contains(controlValue))) {
                                 originalLines.remove(line);
                                 revisedLines.remove(line);
+                                //check only once for each occurence. Not necessarily needed, but makes it slightly faster.
+                                break;
                             }
+
                         }
                     }
+
                 }
+
+
+
+
+
+
                 if (originalLines.isEmpty() && revisedLines.isEmpty()) {
                     //remove the delta from the list.
                     deltasToBeRemovedAfterTheMainLoop.add(delta);
+                } else {
+                    System.out.println("originalLines or revisedLines delta was not empty?: \n   ori: " + originalLines.toString()
+                            + "\n   rev: " + revisedLines.toString());
+
                 }
                 delta.getOriginal().setLines(originalLines);
                 delta.getRevised().setLines(revisedLines);
@@ -358,6 +376,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
         final List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(file1.getPath(), file2.getPath(),
                 Arrays.asList(file1Lines), patch, 3);
+
+        System.out.println("FINAL DIFF(useRegex: " + useRegex  + "):\n\n");
+        for (String str : unifiedDiff) {
+            System.out.println(str);
+        }
+
         return StringUtills.join(unifiedDiff, "\n") + "\n";
     }
 

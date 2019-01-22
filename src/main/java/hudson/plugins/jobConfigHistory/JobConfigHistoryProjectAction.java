@@ -463,7 +463,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	/**
 	 * Action when 'Show / hide Version Changes' button in showDiffFiles.jelly is pressed:
 	 * Reloads the page with "showVersionDiffs" parameter inversed.
-	 * 
+	 *
 	 * @param req
 	 * 		StaplerRequest created by pressing the button
 	 * @param rsp
@@ -479,22 +479,10 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		final String showVersionDiffs = Boolean.toString(!Boolean.parseBoolean(req.getParameter("showVersionDiffs")));
 		//System.out.println("---- OLD REQUEST PARAM: " + req.getParameter("showVersionDiffs")+ ", NEW REQUEST param: " + showVersionDiffs);
 		//System.out.println("---- old param: " + Boolean.getBoolean(getShowVersionDiffs()) +", NEW parameter: " + !Boolean.getBoolean(getShowVersionDiffs()));
-		rsp.sendRedirect("showDiffFiles?" + "timestamp1=" + timestamp1 
-				+ "&timestamp2=" + timestamp2 + "&showVersionDiffs=" + showVersionDiffs);		
+		rsp.sendRedirect("showDiffFiles?" + "timestamp1=" + timestamp1
+				+ "&timestamp2=" + timestamp2 + "&showVersionDiffs=" + showVersionDiffs);
 	}
-	
-	/** 
-	 * Get the current request's 'showVersionDiffs'-parameter. If there is none, "True" is returned.
-	 * 
-	 * @return 
-	 * 		<b>true</b> if the current request has set this parameter to true or not at all.
-	 *		<br>
-	 * 		<b>false</b> else
-	 */
-	public String getShowVersionDiffs() {
-		String showVersionDiffs = (String) (this.getRequestParameter("showVersionDiffs"));
-		return (showVersionDiffs  == null) ? "True" : showVersionDiffs;
-	}
+
 	
 	/**
 	 * For tests.

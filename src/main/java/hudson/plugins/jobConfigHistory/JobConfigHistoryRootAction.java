@@ -29,7 +29,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -326,16 +329,71 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	 *             If diff doesn't work or xml files can't be read.
 	 */
 	public final List<Line> getLines() throws IOException {
+		final boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
+		return getLines(hideVersionDiffs);
+	}
+
+	/**
+	 * Takes the two timestamp request parameters and returns the diff between
+	 * the corresponding config files of this project as a list of single lines.
+	 * Filters lines that contain plugin version infomation.
+	 *
+	 * @param useRegex determines whether lines that match the
+	 *                 <i>ignoredLinesPattern</i> shall be hidden or not.
+	 * @return Differences between two config versions as list of lines.
+	 * @throws IOException If diff doesn't work or xml files can't be read.
+	 */
+	public final List<Line> getLines(boolean useRegex) throws IOException {
 		final String name = getRequestParameter("name");
 		if ((name.contains(DeletedFileFilter.DELETED_MARKER)
 				&& hasJobConfigurePermission()) || hasConfigurePermission()) {
 			final String timestamp1 = getRequestParameter("timestamp1");
 			final String timestamp2 = getRequestParameter("timestamp2");
 
-			return getLines(getOldConfigXml(name, timestamp1), getOldConfigXml(name, timestamp2));
+			final XmlFile configXml1 = getOldConfigXml(name, timestamp1);
+			final String[] configXml1Lines = configXml1.asString().split("\\n");
+			final XmlFile configXml2 = getOldConfigXml(name, timestamp2);
+			final String[] configXml2Lines = configXml2.asString().split("\\n");
+
+			//compute the diff with respect to ignoredLinesPattern if useRegex == true
+			final String diffAsString = getDiffAsString(configXml1.getFile(),
+					configXml2.getFile(), configXml1Lines, configXml2Lines, useRegex);
+
+			final List<String> diffLines = Arrays
+					.asList(diffAsString.split("\n"));
+			return getDiffLines(diffLines);
 		} else {
 			return Collections.emptyList();
 		}
+	}
+
+	/**
+	 * Used in the Difference jelly only. Returns one of the two timestamps that
+	 * have been passed to the Difference page as parameter. timestampNumber
+	 * must be 1 or 2.
+	 *
+	 * @param timestampNumber
+	 *            1 for timestamp1 and 2 for timestamp2
+	 * @return the timestamp as String.
+	 */
+	public final String getTimestamp(int timestampNumber) {
+		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
+			checkConfigurePermission();
+			return null;
+		}
+		String timeStamp = this
+				.getRequestParameter("timestamp" + timestampNumber);
+		SimpleDateFormat format = new java.text.SimpleDateFormat(
+				"yyyy-MM-dd_HH-mm-ss");
+
+		try {
+			format.setLenient(false);
+			format.parse(timeStamp);
+			return timeStamp;
+		} catch (ParseException e) {
+			return null;
+		}
+
 	}
 
 	/**
@@ -481,6 +539,43 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 			StaplerResponse rsp) throws IOException {
 		final String name = req.getParameter("name");
 		rsp.sendRedirect("restoreQuestion?name=" + name);
+	}
+
+	/**
+	 * Action when 'Show / hide Version Changes' button in showDiffFiles.jelly is pressed:
+	 * Reloads the page with "showVersionDiffs" parameter inversed.
+	 *
+	 * @param req
+	 * 		StaplerRequest created by pressing the button
+	 * @param rsp
+	 * 		Outgoing StaplerResponse
+	 * @throws IOException
+	 * 		If XML file can't be read
+	 */
+	public final void doToggleShowHideVersionDiffs(StaplerRequest req,
+												   StaplerResponse rsp) throws IOException {
+		//simply reload current page.
+		final String timestamp1 = req.getParameter("timestamp1");
+		final String timestamp2 = req.getParameter("timestamp2");
+		final String name = req.getParameter("name");
+		final String showVersionDiffs = Boolean.toString(!Boolean.parseBoolean(req.getParameter("showVersionDiffs")));
+		rsp.sendRedirect("showDiffFiles?"
+				+ "name="			+ name
+				+ "&timestamp1=" 	+ timestamp1
+				+ "&timestamp2=" 	+ timestamp2 + "&showVersionDiffs=" + showVersionDiffs);
+	}
+
+	/**
+	 * Get the current request's 'showVersionDiffs'-parameter. If there is none, "True" is returned.
+	 *
+	 * @return
+	 * 		<b>true</b> if the current request has set this parameter to true or not at all.
+	 *		<br>
+	 * 		<b>false</b> else
+	 */
+	public String getShowVersionDiffs() {
+		String showVersionDiffs = (String) (this.getRequestParameter("showVersionDiffs"));
+		return (showVersionDiffs  == null) ? "True" : showVersionDiffs;
 	}
 
 	/**
