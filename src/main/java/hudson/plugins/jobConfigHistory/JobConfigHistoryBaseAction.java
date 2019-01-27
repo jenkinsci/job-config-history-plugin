@@ -37,6 +37,7 @@ import org.kohsuke.stapler.StaplerResponse;
 import difflib.DiffUtils;
 import difflib.Patch;
 import difflib.StringUtills;
+import hudson.XmlFile;
 import hudson.model.Action;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
@@ -264,6 +265,24 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 	 */
 	protected HistoryDao getHistoryDao() {
 		return PluginUtils.getHistoryDao();
+	}
+
+	/**
+	 * Takes the two config files and returns the diff between them as a list of
+	 * single lines.
+	 * 
+	 * @param leftConfig  first config file
+	 * @param rightConfig second config file
+	 * @return Differences between two config versions as list of lines.
+	 * @throws IOException If diff doesn't work or xml files can't be read.
+	 */
+	protected final List<Line> getLines(XmlFile leftConfig, XmlFile rightConfig) throws IOException {
+		final String[] leftLines = leftConfig.asString().toString().split("\\n");
+		final String[] rightLines = rightConfig.asString().toString().split("\\n");
+		final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines, rightLines);
+		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
+
+		return getDiffLines(diffLines);
 	}
 
 }

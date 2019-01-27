@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -333,17 +332,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 			final String timestamp1 = getRequestParameter("timestamp1");
 			final String timestamp2 = getRequestParameter("timestamp2");
 
-			final XmlFile configXml1 = getOldConfigXml(name, timestamp1);
-			final String[] configXml1Lines = configXml1.asString().split("\\n");
-			final XmlFile configXml2 = getOldConfigXml(name, timestamp2);
-			final String[] configXml2Lines = configXml2.asString().split("\\n");
-
-			final String diffAsString = getDiffAsString(configXml1.getFile(),
-					configXml2.getFile(), configXml1Lines, configXml2Lines);
-
-			final List<String> diffLines = Arrays
-					.asList(diffAsString.split("\n"));
-			return getDiffLines(diffLines);
+			return getLines(getOldConfigXml(name, timestamp1), getOldConfigXml(name, timestamp2));
 		} else {
 			return Collections.emptyList();
 		}
