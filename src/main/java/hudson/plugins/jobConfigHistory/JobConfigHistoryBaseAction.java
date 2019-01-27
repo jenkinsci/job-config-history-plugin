@@ -25,14 +25,32 @@ package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.xml.sax.InputSource;
 
 import difflib.DiffUtils;
 import difflib.Patch;
@@ -56,6 +74,10 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 	 * The jenkins instance.
 	 */
 	private final Jenkins jenkins;
+
+	private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+
+	private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
 
 	/**
 	 * Set the {@link Jenkins} instance.
@@ -267,6 +289,29 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 		return PluginUtils.getHistoryDao();
 	}
 
+	private Writer sort(File file) throws IOException {
+		try (Reader source = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
+			InputStream xslt = JobConfigHistoryBaseAction.class.getResourceAsStream("xslt/sort.xslt");
+			Objects.requireNonNull(xslt);
+			Transformer transformer = transformerFactory.newTransformer(new StreamSource(xslt));
+			Writer result = new StringWriter();
+			transformer.transform(new SAXSource(new InputSource(source)), new StreamResult(result));
+			transformer.reset();
+
+			return result;
+		} catch (TransformerFactoryConfigurationError | TransformerException | NullPointerException e) {
+			LogRecord lr = new LogRecord(Level.WARNING, "Diff may have extra changes for XML config {0}");
+			lr.setParameters(new Object[] { file.toPath() });
+			lr.setThrown(e);
+			LOG.log(lr);
+		}
+
+		// fallback - return an original file as is
+		Writer fallback = new StringWriter();
+		new XmlFile(file).writeRawTo(fallback);
+		return fallback;
+	}
+
 	/**
 	 * Takes the two config files and returns the diff between them as a list of
 	 * single lines.
@@ -277,8 +322,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 	 * @throws IOException If diff doesn't work or xml files can't be read.
 	 */
 	protected final List<Line> getLines(XmlFile leftConfig, XmlFile rightConfig) throws IOException {
-		final String[] leftLines = leftConfig.asString().toString().split("\\n");
-		final String[] rightLines = rightConfig.asString().toString().split("\\n");
+		final String[] leftLines = sort(leftConfig.getFile()).toString().split("\\n");
+		final String[] rightLines = sort(rightConfig.getFile()).toString().split("\\n");
 		final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines, rightLines);
 		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
 
