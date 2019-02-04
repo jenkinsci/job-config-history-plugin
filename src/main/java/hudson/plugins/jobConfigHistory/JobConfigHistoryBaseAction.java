@@ -222,51 +222,25 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             //TODO find the name of this software pattern
             @Override
             public ComparisonResult evaluate(Comparison comparison, ComparisonResult comparisonResult) {
-
-                //System.out.println("++++++++++++Test4++++++++++++: " + comparisonResult + " compType: " + comparison.getType());
-                try {
-
-                    if (comparison.getControlDetails().getValue().toString().contains("lalala@")) {
-                        System.out.println("comparison with periodic stuff: " + comparison.getControlDetails().getValue().toString()
-                                + "Type: " + comparison.getType());
-                    }
-                } catch (NullPointerException e) {;}
                 if (comparison.getType() != ComparisonType.ATTR_VALUE) {
                     //only want to compare attribute values!
-
-
-                    //TODO wieder zurückändern, falls XML-Unit für alle diffs genutzt werden soll.
-                    //return comparisonResult;
                     return ComparisonResult.EQUAL;
                 }
 
                 Node controlNode = comparison.getControlDetails().getTarget();
                 Node testNode = comparison.getTestDetails().getTarget();
                 if (controlNode == null || testNode == null) {
-
-                    //TODO wieder zurückändern, falls XML-Unit für alle diffs genutzt werden soll.
                     //return comparisonResult;
                     return ComparisonResult.EQUAL;
                 }
-                System.out.println(
-                        "  Control Node: " + controlNode.getNodeName() + ", " + controlNode.getNodeValue()
-                                + ", Test Node: " + testNode.getNodeName() + ", " + testNode.getNodeValue());
 
                 String[] controlValue = controlNode.getNodeValue().split("@");
                 String[] testValue = testNode.getNodeValue().split("@");
-
-
                 if (!controlValue[0].equals(testValue[0])
                         || controlValue.length != 2 || testValue.length != 2) {
                     //different plugins or misformatted plugin attribute: version number not determinable
-                    //TODO wieder zurückändern, falls XML-Unit für alle diffs genutzt werden soll.
-                    //return comparisonResult;
-                    System.out.println("misformatted plugin attribute or different plugins");
                     return ComparisonResult.EQUAL;
                 }
-                System.out.println("  found as equal: " + controlValue[1] + ", " + testValue[1]);
-                //TODO wieder zurückändern, falls XML-Unit für alle diffs genutzt werden soll.
-                //return ComparisonResult.EQUAL;
                 if (controlValue[1].equals(testValue[1])) {
                     return ComparisonResult.EQUAL;
                 } else {
@@ -282,7 +256,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 //.withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, versionDifferenceEvaluator))
                 .withDifferenceEvaluator(versionDifferenceEvaluator)
                 .build();
-        //System.out.println("\n\n\n\n DIFFERENCES! \n\n\n\n");
         return diff;
     }
 
@@ -347,11 +320,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
         //calculate all diffs.
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
-        //System.out.println("hier");
         if (useRegex) {
             //calculate diffs to be excluded from the output.
             Diff versionDiffs = getVersionDiffsOnly(file1, file2);
-            System.out.println("hier falls useRegex==true");
             //bug/ feature in library: empty deltas are shown, too.
             List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
             for (Delta delta : patch.getDeltas()) {
@@ -391,10 +362,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 if (originalLines.isEmpty() && revisedLines.isEmpty()) {
                     //remove the delta from the list.
                     deltasToBeRemovedAfterTheMainLoop.add(delta);
-                } else {
-                    System.out.println("originalLines or revisedLines delta was not empty?: \n   ori: " + originalLines.toString()
-                            + "\n   rev: " + revisedLines.toString());
-
                 }
                 delta.getOriginal().setLines(originalLines);
                 delta.getRevised().setLines(revisedLines);
