@@ -9,6 +9,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -107,6 +108,7 @@ public class JobConfigHistoryBaseActionIT
 			public String getIconFileName() {
 				return null;
 			}
+			public List<SideBySideView.Line> getLines(boolean useRegex) { throw new UnsupportedOperationException("Not supported yet."); }
 		};
 		return action;
 	}

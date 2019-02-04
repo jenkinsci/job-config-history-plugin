@@ -215,6 +215,8 @@ public class JobConfigHistoryBaseActionTest {
 			throw new UnsupportedOperationException("Not supported yet.");
 		}
 
+		public  List<SideBySideView.Line> getLines(boolean useRegex) { throw new UnsupportedOperationException("Not supported yet."); }
+
 		@Override
 		protected StaplerRequest getCurrentRequest() {
 			return staplerRequestMock;
