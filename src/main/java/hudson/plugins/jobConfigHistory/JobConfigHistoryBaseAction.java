@@ -198,7 +198,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return Nice and clean diff as list of single Lines. if reading one of the
      * config files does not succeed.
      */
-    public final List<Line> getDiffLines(List<String> diffLines) throws IOException {
+    public final List<Line> getDiffLines(List<String> diffLines) {
         return new GetDiffLines(diffLines).get();
     }
 
@@ -379,17 +379,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 Arrays.asList(file1Lines), patch, 3);
 
         return StringUtills.join(unifiedDiff, "\n") + "\n";
-    }
-
-    private static String stringArrayToString(String[] arr) {
-        String result = "";
-        for (int i = 0; i < arr.length; ++i) {
-            result += arr[i];
-            if (i < arr.length - 1) {
-                result += "\n";
-            }
-        }
-        return result;
     }
 
     /**
