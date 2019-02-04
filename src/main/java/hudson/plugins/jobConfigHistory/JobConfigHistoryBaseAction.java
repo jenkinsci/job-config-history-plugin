@@ -65,9 +65,7 @@ import difflib.DiffUtils;
 import difflib.Patch;
 import difflib.StringUtills;
 
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.xmlunit.*;
 
 import hudson.XmlFile;
 import hudson.model.Action;
@@ -78,7 +76,6 @@ import jenkins.model.Jenkins;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.*;
-import org.xmlunit.util.Predicate;
 
 /**
  * Implements some basic methods needed by the
@@ -302,6 +299,36 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         String showVersionDiffs = (String) (this.getRequestParameter("showVersionDiffs"));
         return (showVersionDiffs  == null) ? "True" : showVersionDiffs;
     }
+
+    /**
+     * Action when 'Show / hide Version Changes' button in the respective showDiffFiles.jelly is pressed:
+     * Reloads the page with "showVersionDiffs" parameter inversed.
+     *
+     * @param req
+     * 		StaplerRequest created by pressing the button
+     * @param rsp
+     * 		Outgoing StaplerResponse
+     * @throws IOException
+     * 		If XML file can't be read
+     */
+    public abstract void doToggleShowHideVersionDiffs(StaplerRequest req,
+                                                   StaplerResponse rsp) throws IOException;
+
+    /**
+     * Returns the diff between two config files as a list of single lines.
+     * Takes the two timestamps and the name of the system property or the
+     * deleted job from the url parameters.
+     *
+     * @return Differences between two config versions as list of lines.
+     * @throws IOException
+     *             If diff doesn't work or xml files can't be read.
+     */
+    public final List<Line> getLines() throws IOException {
+        final boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
+        return getLines(hideVersionDiffs);
+    }
+
+    public abstract List<Line> getLines(boolean useRegex) throws IOException;
 
     /**
      * Returns a unified diff between two string arrays representing an xml file.

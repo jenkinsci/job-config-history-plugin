@@ -347,20 +347,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		// no previous entry found
 		return timestamp;
 	}
-
-	/**
-	 * Takes the two timestamp request parameters and returns the diff between
-	 * the corresponding config files of this project as a list of single lines.
-	 * Filters lines that match the pattern described in the code if wanted.
-	 *
-	 * @return Differences between two config versions as list of lines.
-	 * @throws IOException
-	 *             If diff doesn't work or xml files can't be read.
-	 */
-	public final List<Line> getLines() throws IOException {
-		final boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
-		return getLines(hideVersionDiffs);
-	}
 	
 	/**
 	 * Takes the two timestamp request parameters and returns the diff between
@@ -477,10 +463,10 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		final String timestamp1 = req.getParameter("timestamp1");
 		final String timestamp2 = req.getParameter("timestamp2");
 		final String showVersionDiffs = Boolean.toString(!Boolean.parseBoolean(req.getParameter("showVersionDiffs")));
-		//System.out.println("---- OLD REQUEST PARAM: " + req.getParameter("showVersionDiffs")+ ", NEW REQUEST param: " + showVersionDiffs);
-		//System.out.println("---- old param: " + Boolean.getBoolean(getShowVersionDiffs()) +", NEW parameter: " + !Boolean.getBoolean(getShowVersionDiffs()));
-		rsp.sendRedirect("showDiffFiles?" + "timestamp1=" + timestamp1
-				+ "&timestamp2=" + timestamp2 + "&showVersionDiffs=" + showVersionDiffs);
+		rsp.sendRedirect("showDiffFiles?"
+				+ "timestamp1=" + timestamp1
+				+ "&timestamp2=" + timestamp2
+				+ "&showVersionDiffs=" + showVersionDiffs);
 	}
 
 	

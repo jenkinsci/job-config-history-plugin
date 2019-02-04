@@ -320,20 +320,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	}
 
 	/**
-	 * Returns the diff between two config files as a list of single lines.
-	 * Takes the two timestamps and the name of the system property or the
-	 * deleted job from the url parameters.
-	 *
-	 * @return Differences between two config versions as list of lines.
-	 * @throws IOException
-	 *             If diff doesn't work or xml files can't be read.
-	 */
-	public final List<Line> getLines() throws IOException {
-		final boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
-		return getLines(hideVersionDiffs);
-	}
-
-	/**
 	 * Takes the two timestamp request parameters and returns the diff between
 	 * the corresponding config files of this project as a list of single lines.
 	 * Filters lines that contain plugin version infomation.
@@ -563,19 +549,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 				+ "name="			+ name
 				+ "&timestamp1=" 	+ timestamp1
 				+ "&timestamp2=" 	+ timestamp2 + "&showVersionDiffs=" + showVersionDiffs);
-	}
-
-	/**
-	 * Get the current request's 'showVersionDiffs'-parameter. If there is none, "True" is returned.
-	 *
-	 * @return
-	 * 		<b>true</b> if the current request has set this parameter to true or not at all.
-	 *		<br>
-	 * 		<b>false</b> else
-	 */
-	public String getShowVersionDiffs() {
-		String showVersionDiffs = (String) (this.getRequestParameter("showVersionDiffs"));
-		return (showVersionDiffs  == null) ? "True" : showVersionDiffs;
 	}
 
 	/**
