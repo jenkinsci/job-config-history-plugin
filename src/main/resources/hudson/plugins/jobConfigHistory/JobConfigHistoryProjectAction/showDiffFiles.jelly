@@ -42,7 +42,7 @@
                 }
 
               </script>
-              <input id="showHideVersionDiffsJsButton" type="button" value="Hide version diffs" onClick="toggleShowHideVersionDiffsJs();"/>
+              <input id="showHideVersionDiffsJsButton" type="button" value="Hide Version Changes" onClick="toggleShowHideVersionDiffsJs();"/>
 
               <table style="width:100%;">
                 <thead>
@@ -94,7 +94,6 @@
                   </tr>
                 </thead>
 
-
                 <!-- The following 2 tbodys are switched via a js button-->
                 <!-- First is default and shows version diffs, second doesn't.-->
                 <tbody style="outline: 1pt solid #B2B2B2; display:''" id="tbody_versionDiffsShown">
@@ -130,7 +129,7 @@
                   </j:choose>
                 </tbody>
 
-                <tbody style="outline: 1pt solid #B2B2B2; display:'none'" id="tbody_versionDiffsHidden">
+                <tbody style="outline: 1pt solid #B2B2B2; display:none" id="tbody_versionDiffsHidden">
                   <j:choose>
                     <j:when test="${it.getLines().size() == 0}">
                       <tr>

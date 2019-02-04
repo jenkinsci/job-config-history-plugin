@@ -528,30 +528,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	}
 
 	/**
-	 * Action when 'Show / hide Version Changes' button in showDiffFiles.jelly is pressed:
-	 * Reloads the page with "showVersionDiffs" parameter inversed.
-	 *
-	 * @param req
-	 * 		StaplerRequest created by pressing the button
-	 * @param rsp
-	 * 		Outgoing StaplerResponse
-	 * @throws IOException
-	 * 		If XML file can't be read
-	 */
-	public final void doToggleShowHideVersionDiffs(StaplerRequest req,
-												   StaplerResponse rsp) throws IOException {
-		//simply reload current page.
-		final String timestamp1 = req.getParameter("timestamp1");
-		final String timestamp2 = req.getParameter("timestamp2");
-		final String name = req.getParameter("name");
-		final String showVersionDiffs = Boolean.toString(!Boolean.parseBoolean(req.getParameter("showVersionDiffs")));
-		rsp.sendRedirect("showDiffFiles?"
-				+ "name="			+ name
-				+ "&timestamp1=" 	+ timestamp1
-				+ "&timestamp2=" 	+ timestamp2 + "&showVersionDiffs=" + showVersionDiffs);
-	}
-
-	/**
 	 * For tests.
 	 *
 	 * @return historyDao

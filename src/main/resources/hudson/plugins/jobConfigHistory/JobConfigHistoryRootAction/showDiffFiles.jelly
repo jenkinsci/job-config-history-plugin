@@ -25,31 +25,38 @@
             <div>
               <j:set var="timestamp1" value="${it.getTimestamp(1)}"/>
               <j:set var="timestamp2" value="${it.getTimestamp(2)}"/>
-              <j:set var="showVersionDiffs" value="${it.getShowVersionDiffs()}"/>
-              <!-- Button for showing/ hiding version changes.-->
-              <j:choose>
-                <j:when test="${showVersionDiffs}">
-                  <f:form method="post"
-                          action="toggleShowHideVersionDiffs?name=${name}&amp;timestamp1=${timestamp1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}"
-                          name="showHideVersionDiffsForm">
-                    <f:submit value="${%Hide Version Changes}" />
-                  </f:form>
-                </j:when>
-                <j:otherwise>
-                  <f:form method="post"
-                          action="toggleShowHideVersionDiffs?name=${name}&amp;timestamp1=${timestamp1}&amp;timestamp2=${timestamp2}&amp;showVersionDiffs=${showVersionDiffs}"
-                          name="showHideVersionDiffsForm">
-                    <f:submit value="${%Show Version Changes}" />
-                  </f:form>
-                </j:otherwise>
-              </j:choose>
+
+              <script>
+                var showVersionDiffsJs = true;
+
+                function toggleShowHideVersionDiffsJs() {
+                showVersionDiffsJs = !showVersionDiffsJs;
+                if (showVersionDiffsJs === true) {
+                document.getElementById("tbody_versionDiffsShown").style.display = '';
+                document.getElementById("tbody_versionDiffsHidden").style.display = 'none';
+
+                document.getElementById("showHideVersionDiffsJsButton").value = "Hide Version Changes";
+                } else {
+                document.getElementById("tbody_versionDiffsShown").style.display = 'none';
+                document.getElementById("tbody_versionDiffsHidden").style.display = '';
+
+                document.getElementById("showHideVersionDiffsJsButton").value = "Show Version Changes";
+                }
+                }
+
+              </script>
+              <input id="showHideVersionDiffsJsButton" type="button" value="Hide Version Changes" onClick="toggleShowHideVersionDiffsJs();"/>
+
               <j:choose>
                 <j:when test="${it.getLines().size() == 0}">
                   <p>${%No lines changed}</p>
                 </j:when>
                 <j:otherwise>
-                  <table class="pane" style="width:100%">
-                    <j:forEach items="${it.getLines()}" var="line">
+
+                  <!-- The following 2 tbodys are switched via a js button-->
+                  <!-- First is default and shows version diffs, second doesn't.-->
+                  <table class="pane" style="width:100%; display:''" id="tbody_versionDiffsShown">
+                    <j:forEach items="${it.getLines(false)}" var="line">
                       <tr>
                         <j:choose>
                           <j:when test="${line.skipping}">
@@ -68,6 +75,28 @@
                       </tr>
                     </j:forEach>
                   </table>
+
+                  <table class="pane" style="width:100%; display:none" id="tbody_versionDiffsHidden">
+                    <j:forEach items="${it.getLines(true)}" var="line">
+                      <tr>
+                        <j:choose>
+                          <j:when test="${line.skipping}">
+                            <th class="lineNum">...</th>
+                            <td class="skipping"></td>
+                            <th class="lineNum">...</th>
+                            <td class="skipping"></td>
+                          </j:when>
+                          <j:otherwise>
+                            <th class="lineNum">${line.left.lineNumber}</th>
+                            <td class="${line.left.cssClass}"><pre><j:out value="${line.left.text}"/></pre></td>
+                            <th class="lineNum">${line.right.lineNumber}</th>
+                            <td class="${line.right.cssClass}"><pre><j:out value="${line.right.text}"/></pre></td>
+                          </j:otherwise>
+                        </j:choose>
+                      </tr>
+                    </j:forEach>
+                  </table>
+
                 </j:otherwise>
               </j:choose>
             </div>
