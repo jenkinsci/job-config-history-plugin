@@ -274,20 +274,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     * Action when 'Show / hide Version Changes' button in the respective showDiffFiles.jelly is pressed:
-     * Reloads the page with "showVersionDiffs" parameter inversed.
-     *
-     * @param req
-     * 		StaplerRequest created by pressing the button
-     * @param rsp
-     * 		Outgoing StaplerResponse
-     * @throws IOException
-     * 		If XML file can't be read
-     */
-    public abstract void doToggleShowHideVersionDiffs(StaplerRequest req,
-                                                   StaplerResponse rsp) throws IOException;
-
-    /**
      * Returns the diff between two config files as a list of single lines.
      * Takes the two timestamps and the name of the system property or the
      * deleted job from the url parameters.
@@ -311,16 +297,16 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @param file2               second config file.
      * @param file1Lines          the lines of the first file.
      * @param file2Lines          the lines of the second file.
-     * @param useRegex            determines whether <b>ignoredLinesPattern</b> shall be used.
+     * @param hideVersionDiffs            determines whether version diffs shall be shown or not.
      * @return unified diff
      */
     protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
-                                           final String[] file2Lines, final boolean useRegex) {
+                                           final String[] file2Lines, final boolean hideVersionDiffs) {
 
 
         //calculate all diffs.
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
-        if (useRegex) {
+        if (hideVersionDiffs) {
             //calculate diffs to be excluded from the output.
             Diff versionDiffs = getVersionDiffsOnly(file1, file2);
             //bug/ feature in library: empty deltas are shown, too.
