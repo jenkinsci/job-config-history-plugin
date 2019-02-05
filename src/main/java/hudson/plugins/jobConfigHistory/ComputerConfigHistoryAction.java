@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -315,17 +314,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		checkConfigurePermission();
 		final String timestamp1 = getRequestParameter("timestamp1");
 		final String timestamp2 = getRequestParameter("timestamp2");
-
-		final XmlFile configXml1 = getOldConfigXml(timestamp1);
-		final String[] configXml1Lines = configXml1.asString().split("\\n");
-		final XmlFile configXml2 = getOldConfigXml(timestamp2);
-		final String[] configXml2Lines = configXml2.asString().split("\\n");
-
-		final String diffAsString = getDiffAsString(configXml1.getFile(),
-				configXml2.getFile(), configXml1Lines, configXml2Lines);
-
-		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
-		return getDiffLines(diffLines);
+		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2));
 	}
 
 	/**
