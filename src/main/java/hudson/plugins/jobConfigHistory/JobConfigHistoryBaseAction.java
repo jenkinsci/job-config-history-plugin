@@ -23,7 +23,6 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +32,6 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -52,7 +50,6 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -214,7 +211,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     private Diff getVersionDiffsOnly(final File file1, final File file2) {
-        //TODO implement this, this is the way.
         DifferenceEvaluator versionDifferenceEvaluator = new DifferenceEvaluator() {
             //takes the comparison and the result that a possible previous DifferenceEvaluator created for this node
             // and compares the node based on whether there was a version change or not.
@@ -230,7 +226,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 Node controlNode = comparison.getControlDetails().getTarget();
                 Node testNode = comparison.getTestDetails().getTarget();
                 if (controlNode == null || testNode == null) {
-                    //return comparisonResult;
                     return ComparisonResult.EQUAL;
                 }
 
@@ -306,16 +301,16 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
         //calculate all diffs.
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
+
         if (hideVersionDiffs) {
             //calculate diffs to be excluded from the output.
             Diff versionDiffs = getVersionDiffsOnly(file1, file2);
-            //bug/ feature in library: empty deltas are shown, too.
+            //feature in library: empty deltas are shown, too.
             List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
             for (Delta delta : patch.getDeltas()) {
                 // Modify both deltas and save the changes.
                 List<String> originalLines = Lists.newArrayList((List<String>) delta.getOriginal().getLines());
                 List<String> revisedLines = Lists.newArrayList((List<String>) delta.getRevised().getLines());
-
                 for (Difference versionDifference : versionDiffs.getDifferences()) {
                     //check for each calculated versionDifference where it occured and delete it.
                     String controlValue = versionDifference.getComparison().getControlDetails().getValue().toString();
@@ -334,17 +329,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                                 //check only once for each occurence. Not necessarily needed, but makes it slightly faster.
                                 break;
                             }
-
                         }
                     }
-
                 }
-
-
-
-
-
-
                 if (originalLines.isEmpty() && revisedLines.isEmpty()) {
                     //remove the delta from the list.
                     deltasToBeRemovedAfterTheMainLoop.add(delta);

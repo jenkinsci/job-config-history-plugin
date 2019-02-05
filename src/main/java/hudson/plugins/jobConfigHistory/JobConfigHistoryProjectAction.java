@@ -458,9 +458,4 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		return new Api(this);
 	}
 
-	//TEST AREA ####################################################################################################################
-
-
-
-
 }
