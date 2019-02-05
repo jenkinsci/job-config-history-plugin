@@ -411,7 +411,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
 	private Writer sort(File file) throws IOException {
-		try (Reader source = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
+		//FOR TEST PURPOSES...
+        /*try (Reader source = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
 			InputStream xslt = JobConfigHistoryBaseAction.class.getResourceAsStream("xslt/sort.xslt");
 			Objects.requireNonNull(xslt);
 			Transformer transformer = transformerFactory.newTransformer(new StreamSource(xslt));
@@ -425,7 +426,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 			lr.setParameters(new Object[] { file.toPath() });
 			lr.setThrown(e);
 			LOG.log(lr);
-		}
+		}*/
 
 		// fallback - return an original file as is
 		Writer fallback = new StringWriter();
@@ -442,10 +443,24 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 	 * @return Differences between two config versions as list of lines.
 	 * @throws IOException If diff doesn't work or xml files can't be read.
 	 */
-	protected final List<Line> getLines(XmlFile leftConfig, XmlFile rightConfig) throws IOException {
+	protected final List<Line> getLines(XmlFile leftConfig, XmlFile rightConfig, boolean hideVersionDiffs) throws IOException {
+
+	    //DEBUG: print before and after
+        System.out.println("-----------BEFORE SORTING:\n\n");
+        System.out.println(leftConfig.asString() + "\n\n");
+
 		final String[] leftLines = sort(leftConfig.getFile()).toString().split("\\n");
 		final String[] rightLines = sort(rightConfig.getFile()).toString().split("\\n");
-		final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines, rightLines);
+
+        System.out.println("-----------AFTER SORTING:\n\n");
+        for (String line : leftLines) {
+            System.out.println(line);
+        }
+
+
+		final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines,
+                rightLines, hideVersionDiffs);
+
 		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
 
 		return getDiffLines(diffLines);

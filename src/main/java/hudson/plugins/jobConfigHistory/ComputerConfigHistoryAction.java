@@ -303,22 +303,11 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		return xmlFile.asString();
 	}
 
-	public final List<Line> getLines(boolean useRegex) throws IOException {
+	public final List<Line> getLines(boolean hideVersionDiffs) throws IOException {
 		checkConfigurePermission();
 		final String timestamp1 = getRequestParameter("timestamp1");
 		final String timestamp2 = getRequestParameter("timestamp2");
-
-		final XmlFile configXml1 = getOldConfigXml(timestamp1);
-		final String[] configXml1Lines = configXml1.asString().split("\\n");
-		final XmlFile configXml2 = getOldConfigXml(timestamp2);
-		final String[] configXml2Lines = configXml2.asString().split("\\n");
-
-		//compute the diff with respect to ignoredLinesPattern if useRegex == true
-		final String diffAsString = getDiffAsString(configXml1.getFile(),
-				configXml2.getFile(), configXml1Lines, configXml2Lines, useRegex);
-
-		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
-		return getDiffLines(diffLines);
+		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2), hideVersionDiffs);
 	}
 
 	/**
