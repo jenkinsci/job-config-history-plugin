@@ -411,7 +411,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
 	private Writer sort(File file) throws IOException {
-		//FOR TEST PURPOSES...
+        //this produces a sorted xml without indentation. TODO find out how to get indentation.
         /*try (Reader source = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
 			InputStream xslt = JobConfigHistoryBaseAction.class.getResourceAsStream("xslt/sort.xslt");
 			Objects.requireNonNull(xslt);
