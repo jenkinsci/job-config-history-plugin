@@ -317,7 +317,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                     String testValue     = versionDifference.getComparison().getTestDetails().getValue().toString();
                     for (int line = 0; line < Math.max(originalLines.size(), revisedLines.size()); ++line) {
                         //go through each line and search for the diff
-                        if ((line > originalLines.size()-1) || (line > revisedLines.size())) {
+                        if ((line > originalLines.size()-1) || (line > revisedLines.size()-1)) {
                             //too lazy to reformat this to the right negated expression...
                         } else {
                             String originalLine = originalLines.get(line);
