@@ -1,10 +1,10 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
 	<!-- strip whitespace -->
-	<!xsl:strip-space elements="*" />
+	<xsl:strip-space elements="*" />
 
 	<!-- pretty print -->
-	<!xsl:output method="xml" indent="yes" />
+	<xsl:output method="xml" indent="yes" />
 
 	<!-- sort tags -->
 	<xsl:template match="node()|@*">
