@@ -243,9 +243,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             }
         };
 
-        //NEW stuff
         Diff diff = DiffBuilder.compare(Input.fromString(file1Str)).withTest(Input.fromString(file2Str))
-        //Diff diff = DiffBuilder.compare(Input.fromFile(file1)).withTest(Input.fromFile(file2))
                 .ignoreWhitespace()
                 //the next line should be used if one wanted to use XMLUnit for the computing of all diffs.
                 //.withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, versionDifferenceEvaluator))
@@ -284,30 +282,26 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     public abstract List<Line> getLines(boolean useRegex) throws IOException;
 
-    private String concatStringArray(String[] arr) {
+    private String reFormatAndconcatStringArray(String[] arr) {
         String ret = "";
-        //TODO find a BETTER, non-hacky solution!
-        if (arr[0].contains("<project>")) {
-            String arrElem = arr[0].replace("<project>", "");
+
+        //TODO find a better, non-hacky solution!
+        //this needs to be done because the sorting  process writes the first line as:
+        //<?xml version="1.0" encoding="UTF-8"?><project>
+        //which can't be processed by xmlUnit...
+        if (arr[0].endsWith("<project>") && !arr[0].equals("<project>")) {
+            //rewrite <project> in a new line.
+            String arrElem = arr[0].substring(0,arr[0].length()-1-"<project".length());
 
             ret+= arrElem + "\n"
                     + "<project>" + "\n";
-
         }
-
-
         for (int i = 1; i < arr.length; ++i) {
-
             if (i < arr.length-1) {
                 ret += arr[i] + "\n";
             } else {
                 ret += arr[i];
             }
-        }
-
-        //hacky solution for another problem...
-        if(arr[0].contains("<project>") && !arr[arr.length-1].equals("</project>")) {
-            ret += "\n</project>";
         }
         return ret;
     }
@@ -326,12 +320,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                                            final String[] file2Lines, final boolean hideVersionDiffs) {
         //calculate all diffs.
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
-
         if (hideVersionDiffs) {
             //calculate diffs to be excluded from the output.
-            //TODO use the fileLines, not the files
-
-            Diff versionDiffs = getVersionDiffsOnly(concatStringArray(file1Lines), concatStringArray(file2Lines));
+            Diff versionDiffs = getVersionDiffsOnly(reFormatAndconcatStringArray(file1Lines), reFormatAndconcatStringArray(file2Lines));
             //feature in library: empty deltas are shown, too.
             List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
             for (Delta delta : patch.getDeltas()) {
