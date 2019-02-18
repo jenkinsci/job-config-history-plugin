@@ -298,9 +298,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         }
         for (int i = 1; i < arr.length; ++i) {
             if (i < arr.length-1) {
-                ret += arr[i] + "\n";
+                ret = ret.concat(arr[i]).concat("\n");
             } else {
-                ret += arr[i];
+                ret = ret.concat(arr[i]);
             }
         }
         return ret;
