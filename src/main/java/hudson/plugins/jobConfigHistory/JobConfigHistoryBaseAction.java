@@ -32,6 +32,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -52,15 +53,24 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.xml.sax.InputSource;
 
+import com.google.common.collect.Lists;
+
+import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
 import difflib.StringUtills;
+
+import org.w3c.dom.Node;
+
 import hudson.XmlFile;
 import hudson.model.Action;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
 import jenkins.model.Jenkins;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.*;
 
 /**
  * Implements some basic methods needed by the
@@ -70,10 +80,10 @@ import jenkins.model.Jenkins;
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
 
-	/**
-	 * The jenkins instance.
-	 */
-	private final Jenkins jenkins;
+    /**
+     * The jenkins instance.
+     */
+    private final Jenkins jenkins;
 
 	private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
@@ -86,211 +96,341 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 		jenkins = Jenkins.getInstance();
 	}
 
-	/**
-	 * For tests only.
-	 *
-	 * @param jenkins
-	 *            injected jenkins
-	 */
-	JobConfigHistoryBaseAction(Jenkins jenkins) {
-		this.jenkins = jenkins;
-	}
+    /**
+     * For tests only.
+     *
+     * @param jenkins injected jenkins
+     */
+    JobConfigHistoryBaseAction(Jenkins jenkins) {
+        this.jenkins = jenkins;
+    }
 
-	@Override
-	public String getDisplayName() {
-		return Messages.displayName();
-	}
+    @Override
+    public String getDisplayName() {
+        return Messages.displayName();
+    }
 
-	@Override
-	public String getUrlName() {
-		return JobConfigHistoryConsts.URLNAME;
-	}
+    @Override
+    public String getUrlName() {
+        return JobConfigHistoryConsts.URLNAME;
+    }
 
-	/**
-	 * Returns how the config file should be formatted in configOutput.jelly: as
-	 * plain text or xml.
-	 *
-	 * @return "plain" or "xml"
-	 */
-	public final String getOutputType() {
-		if (("xml").equalsIgnoreCase(getRequestParameter("type"))) {
-			return "xml";
-		}
-		return "plain";
-	}
+    /**
+     * Returns how the config file should be formatted in configOutput.jelly: as
+     * plain text or xml.
+     *
+     * @return "plain" or "xml"
+     */
+    public final String getOutputType() {
+        if (("xml").equalsIgnoreCase(getRequestParameter("type"))) {
+            return "xml";
+        }
+        return "plain";
+    }
 
-	/**
-	 * Checks the url parameter 'timestamp' and returns true if it is parseable
-	 * as a date.
-	 * 
-	 * @param timestamp
-	 *            Timestamp of config change.
-	 * @return True if timestamp is okay.
-	 */
-	protected boolean checkTimestamp(String timestamp) {
-		if (timestamp == null || "null".equals(timestamp)) {
-			return false;
-		}
-		PluginUtils.parsedDate(timestamp);
-		return true;
-	}
+    /**
+     * Checks the url parameter 'timestamp' and returns true if it is parseable as a
+     * date.
+     *
+     * @param timestamp Timestamp of config change.
+     * @return True if timestamp is okay.
+     */
+    protected boolean checkTimestamp(String timestamp) {
+        if (timestamp == null || "null".equals(timestamp)) {
+            return false;
+        }
+        PluginUtils.parsedDate(timestamp);
+        return true;
+    }
 
-	/**
-	 * Returns the parameter named {@code parameterName} from current request.
-	 *
-	 * @param parameterName
-	 *            name of the parameter.
-	 * @return value of the request parameter or null if it does not exist.
-	 */
-	protected String getRequestParameter(final String parameterName) {
-		return getCurrentRequest().getParameter(parameterName);
-	}
+    /**
+     * Returns the parameter named {@code parameterName} from current request.
+     *
+     * @param parameterName name of the parameter.
+     * @return value of the request parameter or null if it does not exist.
+     */
+    protected String getRequestParameter(final String parameterName) {
+        return getCurrentRequest().getParameter(parameterName);
+    }
 
-	/**
-	 * See whether the current user may read configurations in the object
-	 * returned by
-	 * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
-	 */
-	protected abstract void checkConfigurePermission();
+    /**
+     * See whether the current user may read configurations in the object returned
+     * by {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
+     */
+    protected abstract void checkConfigurePermission();
 
-	/**
-	 * Returns whether the current user may read configurations in the object
-	 * returned by
-	 * {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
-	 *
-	 * @return true if the current user may read configurations.
-	 */
-	protected abstract boolean hasConfigurePermission();
+    /**
+     * Returns whether the current user may read configurations in the object
+     * returned by {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
+     *
+     * @return true if the current user may read configurations.
+     */
+    protected abstract boolean hasConfigurePermission();
 
-	/**
-	 * Returns the jenkins instance.
-	 *
-	 * @return the jenkins
-	 */
-	protected Jenkins getJenkins() {
-		return jenkins;
-	}
+    /**
+     * Returns the jenkins instance.
+     *
+     * @return the jenkins
+     */
+    protected Jenkins getJenkins() {
+        return jenkins;
+    }
 
-	/**
-	 * Returns the object for which we want to provide access control.
-	 *
-	 * @return the access controlled object.
-	 */
-	protected abstract AccessControlled getAccessControlledObject();
+    /**
+     * Returns the object for which we want to provide access control.
+     *
+     * @return the access controlled object.
+     */
+    protected abstract AccessControlled getAccessControlledObject();
 
-	/**
-	 * Returns side-by-side (i.e. human-readable) diff view lines.
-	 *
-	 * @param diffLines
-	 *            Unified diff as list of Strings.
-	 * @return Nice and clean diff as list of single Lines.
-	 * @throws IOException
-	 *             if reading one of the config files does not succeed.
-	 */
-	public final List<Line> getDiffLines(List<String> diffLines)
-			throws IOException {
-		return new GetDiffLines(diffLines).get();
-	}
+    /**
+     * Returns side-by-side (i.e. human-readable) diff view lines.
+     *
+     * @param diffLines Unified diff as list of Strings.
+     * @return Nice and clean diff as list of single Lines. if reading one of the
+     * config files does not succeed.
+     */
+    public final List<Line> getDiffLines(List<String> diffLines) {
+        return new GetDiffLines(diffLines).get();
+    }
 
-	/**
-	 * Returns a unified diff between two string arrays.
-	 *
-	 * @param file1
-	 *            first config file.
-	 * @param file2
-	 *            second config file.
-	 * @param file1Lines
-	 *            the lines of the first file.
-	 * @param file2Lines
-	 *            the lines of the second file.
-	 * @return unified diff
-	 */
-	protected final String getDiffAsString(final File file1, final File file2,
-			final String[] file1Lines, final String[] file2Lines) {
-		final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines),
-				Arrays.asList(file2Lines));
-		final List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(
-				file1.getPath(), file2.getPath(), Arrays.asList(file1Lines),
-				patch, 3);
-		return StringUtills.join(unifiedDiff, "\n") + "\n";
-	}
+    /**
+     * Returns a unified diff between two string arrays.
+     *
+     * @param file1      first config file.
+     * @param file2      second config file.
+     * @param file1Lines the lines of the first file.
+     * @param file2Lines the lines of the second file.
+     * @return unified diff
+     */
+    protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
+                                           final String[] file2Lines) {
+        return getDiffAsString(file1, file2, file1Lines, file2Lines, false);
+    }
 
-	/**
-	 * Parses the incoming {@literal POST} request and redirects as
-	 * {@literal GET showDiffFiles}.
-	 *
-	 * @param req
-	 *            incoming request
-	 * @param rsp
-	 *            outgoing response
-	 * @throws ServletException
-	 *             when parsing the request as {@link MultipartFormDataParser}
-	 *             does not succeed.
-	 * @throws IOException
-	 *             when the redirection does not succeed.
-	 */
-	public void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
-			throws ServletException, IOException {
-		String timestamp1 = req.getParameter("timestamp1");
-		String timestamp2 = req.getParameter("timestamp2");
+    private Diff getVersionDiffsOnly(final String file1Str, final String file2Str) {
+        DifferenceEvaluator versionDifferenceEvaluator = new DifferenceEvaluator() {
+            //takes the comparison and the result that a possible previous DifferenceEvaluator created for this node
+            // and compares the node based on whether there was a version change or not.
+            // if there wasn't, "comparisonResult" is returned.
+            //TODO find the name of this software pattern
+            @Override
+            public ComparisonResult evaluate(Comparison comparison, ComparisonResult comparisonResult) {
+                if (comparison.getType() != ComparisonType.ATTR_VALUE) {
+                    //only want to compare attribute values!
+                    return ComparisonResult.EQUAL;
+                }
 
-		if (PluginUtils.parsedDate(timestamp1)
-				.after(PluginUtils.parsedDate(timestamp2))) {
-			timestamp1 = req.getParameter("timestamp2");
-			timestamp2 = req.getParameter("timestamp1");
-		}
-		rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
-				+ "&timestamp2=" + timestamp2);
-	}
+                Node controlNode = comparison.getControlDetails().getTarget();
+                Node testNode = comparison.getTestDetails().getTarget();
+                if (controlNode == null || testNode == null) {
+                    return ComparisonResult.EQUAL;
+                }
 
-	/**
-	 * Action when 'Prev' or 'Next' button in showDiffFiles.jelly is pressed.
-	 * Forwards to the previous or next diff.
-	 * 
-	 * @param req
-	 *            StaplerRequest created by pressing the button
-	 * @param rsp
-	 *            Outgoing StaplerResponse
-	 * @throws IOException
-	 *             If XML file can't be read
-	 */
-	public final void doDiffFilesPrevNext(StaplerRequest req,
-			StaplerResponse rsp) throws IOException {
-		final String timestamp1 = req.getParameter("timestamp1");
-		final String timestamp2 = req.getParameter("timestamp2");
-		rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1
-				+ "&timestamp2=" + timestamp2);
-	}
+                String[] controlValue = controlNode.getNodeValue().split("@");
+                String[] testValue = testNode.getNodeValue().split("@");
+                if (!controlValue[0].equals(testValue[0])
+                        || controlValue.length != 2 || testValue.length != 2) {
+                    //different plugins or misformatted plugin attribute: version number not determinable
+                    return ComparisonResult.EQUAL;
+                }
+                if (controlValue[1].equals(testValue[1])) {
+                    return ComparisonResult.EQUAL;
+                } else {
+                    return ComparisonResult.DIFFERENT;
+                }
 
-	/**
-	 * Overridable for tests.
-	 *
-	 * @return current request
-	 */
-	protected StaplerRequest getCurrentRequest() {
-		return Stapler.getCurrentRequest();
-	}
+            }
+        };
 
-	/**
-	 * Returns the plugin for tests.
-	 *
-	 * @return plugin
-	 */
-	protected JobConfigHistory getPlugin() {
-		return PluginUtils.getPlugin();
-	}
+        Diff diff = DiffBuilder.compare(Input.fromString(file1Str)).withTest(Input.fromString(file2Str))
+                .ignoreWhitespace()
+                //the next line should be used if one wanted to use XMLUnit for the computing of all diffs.
+                //.withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, versionDifferenceEvaluator))
+                .withDifferenceEvaluator(versionDifferenceEvaluator)
+                .build();
+        return diff;
+    }
 
-	/**
-	 * For tests.
-	 *
-	 * @return historyDao
-	 */
-	protected HistoryDao getHistoryDao() {
-		return PluginUtils.getHistoryDao();
-	}
+
+    /**
+     * Get the current request's 'showVersionDiffs'-parameter. If there is none, "True" is returned.
+     *
+     * @return
+     * 		<b>true</b> if the current request has set this parameter to true or not at all.
+     *		<br>
+     * 		<b>false</b> else
+     */
+    public String getShowVersionDiffs() {
+        String showVersionDiffs = (String) (this.getRequestParameter("showVersionDiffs"));
+        return (showVersionDiffs  == null) ? "True" : showVersionDiffs;
+    }
+
+    /**
+     * Returns the diff between two config files as a list of single lines.
+     * Takes the two timestamps and the name of the system property or the
+     * deleted job from the url parameters.
+     *
+     * @return Differences between two config versions as list of lines.
+     * @throws IOException
+     *             If diff doesn't work or xml files can't be read.
+     */
+    public final List<Line> getLines() throws IOException {
+        final boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
+        return getLines(hideVersionDiffs);
+    }
+
+    public abstract List<Line> getLines(boolean useRegex) throws IOException;
+
+    private String reFormatAndconcatStringArray(String[] arr) {
+        String ret = "";
+
+        //TODO find a better, non-hacky solution!
+        //this needs to be done because the sorting  process writes the first line as:
+        //<?xml version="1.0" encoding="UTF-8"?><project>
+        //which can't be processed by xmlUnit...
+        if (arr[0].endsWith("<project>") && !arr[0].equals("<project>")) {
+            //rewrite <project> in a new line.
+            String arrElem = arr[0].substring(0,arr[0].length()-1-"<project".length());
+
+            ret+= arrElem + "\n"
+                    + "<project>" + "\n";
+        }
+        for (int i = 1; i < arr.length; ++i) {
+            if (i < arr.length-1) {
+                ret = ret.concat(arr[i]).concat("\n");
+            } else {
+                ret = ret.concat(arr[i]);
+            }
+        }
+        return ret;
+    }
+    /**
+     * Returns a unified diff between two string arrays representing an xml file.
+     * The order of elements in the xml file is NOT ignored.
+     *
+     * @param file1               first config file.
+     * @param file2               second config file.
+     * @param file1Lines          the lines of the first file.
+     * @param file2Lines          the lines of the second file.
+     * @param hideVersionDiffs            determines whether version diffs shall be shown or not.
+     * @return unified diff
+     */
+    protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
+                                           final String[] file2Lines, final boolean hideVersionDiffs) {
+        //calculate all diffs.
+        final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
+        if (hideVersionDiffs) {
+            //calculate diffs to be excluded from the output.
+            Diff versionDiffs = getVersionDiffsOnly(reFormatAndconcatStringArray(file1Lines), reFormatAndconcatStringArray(file2Lines));
+            //feature in library: empty deltas are shown, too.
+            List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
+            for (Delta delta : patch.getDeltas()) {
+                // Modify both deltas and save the changes.
+                List<String> originalLines = Lists.newArrayList((List<String>) delta.getOriginal().getLines());
+                List<String> revisedLines = Lists.newArrayList((List<String>) delta.getRevised().getLines());
+                for (Difference versionDifference : versionDiffs.getDifferences()) {
+                    //check for each calculated versionDifference where it occured and delete it.
+                    String controlValue = versionDifference.getComparison().getControlDetails().getValue().toString();
+                    String testValue     = versionDifference.getComparison().getTestDetails().getValue().toString();
+                    for (int line = 0; line < Math.max(originalLines.size(), revisedLines.size()); ++line) {
+                        //go through each line and search for the diff
+                        if ((line > originalLines.size()-1) || (line > revisedLines.size()-1)) {
+                            //too lazy to reformat this to the right negated expression...
+                        } else {
+                            String originalLine = originalLines.get(line);
+                            String revisedLine = revisedLines.get(line);
+                            if ((originalLine.contains(controlValue) && revisedLine.contains(testValue))
+                                    || (originalLine.contains(testValue) && revisedLine.contains(controlValue))) {
+                                originalLines.remove(line);
+                                revisedLines.remove(line);
+                                //check only once for each occurence. Not necessarily needed, but makes it slightly faster.
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (originalLines.isEmpty() && revisedLines.isEmpty()) {
+                    //remove the delta from the list.
+                    deltasToBeRemovedAfterTheMainLoop.add(delta);
+                }
+                delta.getOriginal().setLines(originalLines);
+                delta.getRevised().setLines(revisedLines);
+            }
+            patch.getDeltas().removeAll(deltasToBeRemovedAfterTheMainLoop);
+        }
+
+        final List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(file1.getPath(), file2.getPath(),
+                Arrays.asList(file1Lines), patch, 3);
+
+        return StringUtills.join(unifiedDiff, "\n") + "\n";
+    }
+
+    /**
+     * Parses the incoming {@literal POST} request and redirects as
+     * {@literal GET showDiffFiles}.
+     *
+     * @param req incoming request
+     * @param rsp outgoing response
+     * @throws ServletException when parsing the request as
+     *                          {@link MultipartFormDataParser} does not succeed.
+     * @throws IOException      when the redirection does not succeed.
+     */
+    public void doDiffFiles(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
+        String timestamp1 = req.getParameter("timestamp1");
+        String timestamp2 = req.getParameter("timestamp2");
+
+        if (PluginUtils.parsedDate(timestamp1).after(PluginUtils.parsedDate(timestamp2))) {
+            timestamp1 = req.getParameter("timestamp2");
+            timestamp2 = req.getParameter("timestamp1");
+        }
+        rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1 + "&timestamp2=" + timestamp2);
+    }
+
+    /**
+     * Action when 'Prev' or 'Next' button in showDiffFiles.jelly is pressed.
+     * Forwards to the previous or next diff.
+     *
+     * @param req StaplerRequest created by pressing the button
+     * @param rsp Outgoing StaplerResponse
+     * @throws IOException If XML file can't be read
+     */
+    public final void doDiffFilesPrevNext(StaplerRequest req, StaplerResponse rsp) throws IOException {
+        final String timestamp1 = req.getParameter("timestamp1");
+        final String timestamp2 = req.getParameter("timestamp2");
+        rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1 + "&timestamp2=" + timestamp2);
+    }
+
+    /**
+     * Overridable for tests.
+     *
+     * @return current request
+     */
+    protected StaplerRequest getCurrentRequest() {
+        return Stapler.getCurrentRequest();
+    }
+
+    /**
+     * Returns the plugin for tests.
+     *
+     * @return plugin
+     */
+    protected JobConfigHistory getPlugin() {
+        return PluginUtils.getPlugin();
+    }
+
+    /**
+     * For tests.
+     *
+     * @return historyDao
+     */
+    protected HistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
+    }
 
 	private Writer sort(File file) throws IOException {
-		try (Reader source = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
+        //this produces a sorted xml without indentation.
+        try (Reader source = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
 			InputStream xslt = JobConfigHistoryBaseAction.class.getResourceAsStream("xslt/sort.xslt");
 			Objects.requireNonNull(xslt);
 			Transformer transformer = transformerFactory.newTransformer(new StreamSource(xslt));
@@ -315,16 +455,20 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 	/**
 	 * Takes the two config files and returns the diff between them as a list of
 	 * single lines.
-	 * 
+	 *
 	 * @param leftConfig  first config file
 	 * @param rightConfig second config file
 	 * @return Differences between two config versions as list of lines.
 	 * @throws IOException If diff doesn't work or xml files can't be read.
 	 */
-	protected final List<Line> getLines(XmlFile leftConfig, XmlFile rightConfig) throws IOException {
+	protected final List<Line> getLines(XmlFile leftConfig, XmlFile rightConfig, boolean hideVersionDiffs) throws IOException {
+
 		final String[] leftLines = sort(leftConfig.getFile()).toString().split("\\n");
 		final String[] rightLines = sort(rightConfig.getFile()).toString().split("\\n");
-		final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines, rightLines);
+
+		//TODO: INCONSISTENCY: leftConfig and rightConfig (XmlFile) are NOT sorted!!! fix this!
+		final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines,
+                rightLines, hideVersionDiffs);
 		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
 
 		return getDiffLines(diffLines);

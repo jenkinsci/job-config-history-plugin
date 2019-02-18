@@ -114,6 +114,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-core</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+        <dependency>
             <groupId>com.googlecode.java-diff-utils</groupId>
             <artifactId>diffutils</artifactId>
             <version>1.2.1</version>

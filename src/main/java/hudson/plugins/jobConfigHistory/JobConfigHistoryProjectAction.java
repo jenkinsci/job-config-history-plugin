@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -346,23 +347,24 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		// no previous entry found
 		return timestamp;
 	}
-
+	
 	/**
 	 * Takes the two timestamp request parameters and returns the diff between
 	 * the corresponding config files of this project as a list of single lines.
-	 *
+	 * Filters lines that match the <i>ignoredLinesPattern</i> if wanted.
+	 * 
+	 * @param hideVersionDiffs determines whether version diffs shall be shown or not.
 	 * @return Differences between two config versions as list of lines.
-	 * @throws IOException
-	 *             If diff doesn't work or xml files can't be read.
+	 * @throws IOException If diff doesn't work or xml files can't be read.
 	 */
-	public final List<Line> getLines() throws IOException {
+	public final List<Line> getLines(boolean hideVersionDiffs) throws IOException {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
 			checkConfigurePermission();
 			return null;
 		}
 		final String timestamp1 = getRequestParameter("timestamp1");
 		final String timestamp2 = getRequestParameter("timestamp2");
-		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2));
+		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2), hideVersionDiffs);
 	}
 
 	/**
@@ -442,4 +444,5 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	public Api getApi() {
 		return new Api(this);
 	}
+
 }

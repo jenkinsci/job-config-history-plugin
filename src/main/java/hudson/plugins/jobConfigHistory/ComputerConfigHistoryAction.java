@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -302,19 +303,11 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		return xmlFile.asString();
 	}
 
-	/**
-	 * Takes the two timestamp request parameters and returns the diff between
-	 * the corresponding config files of this slave as a list of single lines.
-	 *
-	 * @return Differences between two config versions as list of lines.
-	 * @throws IOException
-	 *             If diff doesn't work or xml files can't be read.
-	 */
-	public final List<Line> getLines() throws IOException {
+	public final List<Line> getLines(boolean hideVersionDiffs) throws IOException {
 		checkConfigurePermission();
 		final String timestamp1 = getRequestParameter("timestamp1");
 		final String timestamp2 = getRequestParameter("timestamp2");
-		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2));
+		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2), hideVersionDiffs);
 	}
 
 	/**
@@ -385,6 +378,28 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 			StaplerResponse rsp) throws IOException {
 		final String timestamp = req.getParameter("timestamp");
 		rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
+	}
+
+	/**
+	 * Action when 'Show / hide Version Changes' button in showDiffFiles.jelly is pressed:
+	 * Reloads the page with "showVersionDiffs" parameter inversed.
+	 *
+	 * @param req
+	 * 		StaplerRequest created by pressing the button
+	 * @param rsp
+	 * 		Outgoing StaplerResponse
+	 * @throws IOException
+	 * 		If XML file can't be read
+	 */
+	public final void doToggleShowHideVersionDiffs(StaplerRequest req, StaplerResponse rsp) throws IOException {
+		//simply reload current page.
+		final String timestamp1 = req.getParameter("timestamp1");
+		final String timestamp2 = req.getParameter("timestamp2");
+		final String showVersionDiffs = Boolean.toString(!Boolean.parseBoolean(req.getParameter("showVersionDiffs")));
+		rsp.sendRedirect("showDiffFiles?"
+				+ "timestamp1=" + timestamp1
+				+ "&timestamp2=" + timestamp2
+				+ "&showVersionDiffs=" + showVersionDiffs);
 	}
 
 	public Api getApi() {
