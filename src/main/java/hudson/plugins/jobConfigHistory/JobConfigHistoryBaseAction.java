@@ -412,7 +412,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
 	private Writer sort(File file) throws IOException {
         //this produces a sorted xml without indentation. TODO find out how to get indentation.
-        /*try (Reader source = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
+        try (Reader source = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
 			InputStream xslt = JobConfigHistoryBaseAction.class.getResourceAsStream("xslt/sort.xslt");
 			Objects.requireNonNull(xslt);
 			Transformer transformer = transformerFactory.newTransformer(new StreamSource(xslt));
@@ -426,7 +426,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 			lr.setParameters(new Object[] { file.toPath() });
 			lr.setThrown(e);
 			LOG.log(lr);
-		}*/
+		}
 
 		// fallback - return an original file as is
 		Writer fallback = new StringWriter();
@@ -446,16 +446,16 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 	protected final List<Line> getLines(XmlFile leftConfig, XmlFile rightConfig, boolean hideVersionDiffs) throws IOException {
 
 	    //DEBUG: print before and after
-        System.out.println("-----------BEFORE SORTING:\n\n");
-        System.out.println(leftConfig.asString() + "\n\n");
+        /*System.out.println("-----------BEFORE SORTING:\n\n");
+        System.out.println(leftConfig.asString() + "\n\n");*/
 
 		final String[] leftLines = sort(leftConfig.getFile()).toString().split("\\n");
 		final String[] rightLines = sort(rightConfig.getFile()).toString().split("\\n");
 
-        System.out.println("-----------AFTER SORTING:\n\n");
+        /*System.out.println("-----------AFTER SORTING:\n\n");
         for (String line : leftLines) {
             System.out.println(line);
-        }
+        }*/
 
 
 		final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines,
