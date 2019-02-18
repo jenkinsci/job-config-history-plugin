@@ -38,8 +38,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.xml.transform.Transformer;
@@ -210,7 +208,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return getDiffAsString(file1, file2, file1Lines, file2Lines, false);
     }
 
-    private Diff getVersionDiffsOnly(final File file1, final File file2) {
+    private Diff getVersionDiffsOnly(final String file1Str, final String file2Str) {
         DifferenceEvaluator versionDifferenceEvaluator = new DifferenceEvaluator() {
             //takes the comparison and the result that a possible previous DifferenceEvaluator created for this node
             // and compares the node based on whether there was a version change or not.
@@ -245,7 +243,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             }
         };
 
-        Diff diff = DiffBuilder.compare(Input.fromFile(file1)).withTest(Input.fromFile(file2))
+        //NEW stuff
+        Diff diff = DiffBuilder.compare(Input.fromString(file1Str)).withTest(Input.fromString(file2Str))
+        //Diff diff = DiffBuilder.compare(Input.fromFile(file1)).withTest(Input.fromFile(file2))
                 .ignoreWhitespace()
                 //the next line should be used if one wanted to use XMLUnit for the computing of all diffs.
                 //.withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, versionDifferenceEvaluator))
@@ -284,6 +284,33 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     public abstract List<Line> getLines(boolean useRegex) throws IOException;
 
+    private String concatStringArray(String[] arr) {
+        String ret = "";
+        //TODO find a BETTER, non-hacky solution!
+        if (arr[0].contains("<project>")) {
+            String arrElem = arr[0].replace("<project>", "");
+
+            ret+= arrElem + "\n"
+                    + "<project>" + "\n";
+
+        }
+
+
+        for (int i = 1; i < arr.length; ++i) {
+
+            if (i < arr.length-1) {
+                ret += arr[i] + "\n";
+            } else {
+                ret += arr[i];
+            }
+        }
+
+        //hacky solution for another problem...
+        if(arr[0].contains("<project>") && !arr[arr.length-1].equals("</project>")) {
+            ret += "\n</project>";
+        }
+        return ret;
+    }
     /**
      * Returns a unified diff between two string arrays representing an xml file.
      * The order of elements in the xml file is NOT ignored.
@@ -297,14 +324,14 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
                                            final String[] file2Lines, final boolean hideVersionDiffs) {
-
-
         //calculate all diffs.
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
 
         if (hideVersionDiffs) {
             //calculate diffs to be excluded from the output.
-            Diff versionDiffs = getVersionDiffsOnly(file1, file2);
+            //TODO use the fileLines, not the files
+
+            Diff versionDiffs = getVersionDiffsOnly(concatStringArray(file1Lines), concatStringArray(file2Lines));
             //feature in library: empty deltas are shown, too.
             List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
             for (Delta delta : patch.getDeltas()) {
@@ -411,7 +438,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
 	private Writer sort(File file) throws IOException {
-        //this produces a sorted xml without indentation. TODO find out how to get indentation.
+        //this produces a sorted xml without indentation.
         try (Reader source = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
 			InputStream xslt = JobConfigHistoryBaseAction.class.getResourceAsStream("xslt/sort.xslt");
 			Objects.requireNonNull(xslt);
@@ -445,22 +472,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 	 */
 	protected final List<Line> getLines(XmlFile leftConfig, XmlFile rightConfig, boolean hideVersionDiffs) throws IOException {
 
-	    //DEBUG: print before and after
-        /*System.out.println("-----------BEFORE SORTING:\n\n");
-        System.out.println(leftConfig.asString() + "\n\n");*/
-
 		final String[] leftLines = sort(leftConfig.getFile()).toString().split("\\n");
 		final String[] rightLines = sort(rightConfig.getFile()).toString().split("\\n");
 
-        /*System.out.println("-----------AFTER SORTING:\n\n");
-        for (String line : leftLines) {
-            System.out.println(line);
-        }*/
-
-
+		//TODO: INCONSISTENCY: leftConfig and rightConfig (XmlFile) are NOT sorted!!! fix this!
 		final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines,
                 rightLines, hideVersionDiffs);
-
 		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
 
 		return getDiffLines(diffLines);
