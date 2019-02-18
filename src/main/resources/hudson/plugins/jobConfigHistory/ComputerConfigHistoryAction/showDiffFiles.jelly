@@ -25,18 +25,18 @@
                 var showVersionDiffsJs = true;
 
                 function toggleShowHideVersionDiffsJs() {
-                showVersionDiffsJs = !showVersionDiffsJs;
-                if (showVersionDiffsJs === true) {
-                document.getElementById("tbody_versionDiffsShown").style.display = '';
-                document.getElementById("tbody_versionDiffsHidden").style.display = 'none';
+                  showVersionDiffsJs = !showVersionDiffsJs;
+                  if (showVersionDiffsJs === true) {
+                    document.getElementById("tbody_versionDiffsShown").style.display = '';
+                    document.getElementById("tbody_versionDiffsHidden").style.display = 'none';
 
-                document.getElementById("showHideVersionDiffsJsButton").value = "Hide Version Changes";
-                } else {
-                document.getElementById("tbody_versionDiffsShown").style.display = 'none';
-                document.getElementById("tbody_versionDiffsHidden").style.display = '';
+                    document.getElementById("showHideVersionDiffsJsButton").value = "Hide Version Changes";
+                  } else {
+                    document.getElementById("tbody_versionDiffsShown").style.display = 'none';
+                    document.getElementById("tbody_versionDiffsHidden").style.display = '';
 
-                document.getElementById("showHideVersionDiffsJsButton").value = "Show Version Changes";
-                }
+                    document.getElementById("showHideVersionDiffsJsButton").value = "Show Version Changes";
+                  }
                 }
 
               </script>

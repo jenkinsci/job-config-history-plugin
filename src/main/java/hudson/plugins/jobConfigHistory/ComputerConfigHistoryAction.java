@@ -391,8 +391,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	 * @throws IOException
 	 * 		If XML file can't be read
 	 */
-	public final void doToggleShowHideVersionDiffs(StaplerRequest req,
-												   StaplerResponse rsp) throws IOException {
+	public final void doToggleShowHideVersionDiffs(StaplerRequest req, StaplerResponse rsp) throws IOException {
 		//simply reload current page.
 		final String timestamp1 = req.getParameter("timestamp1");
 		final String timestamp2 = req.getParameter("timestamp2");
