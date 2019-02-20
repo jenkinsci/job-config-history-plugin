@@ -174,7 +174,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 			return Collections.emptyList();
 		} else {
 			return new ConfigInfoCollector(type, getOverviewHistoryDao())
-					.collect("");
+					//.collect("");
+					//.collect("ExemplarischerFolder");
+					.collect();
 		}
 	}
 

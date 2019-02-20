@@ -25,22 +25,9 @@ package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.FINEST;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -686,19 +673,25 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			return true;
 		}
 	}
-
+	//TODO rewrite the interface
 	@Override
 	public File[] getDeletedJobs(final String folderName) {
-		return returnEmptyFileArrayForNull(
+		/*return returnEmptyFileArrayForNull(
 				getJobDirectoryIncludingFolder(folderName)
-						.listFiles(DeletedFileFilter.INSTANCE));
+						.listFiles(DeletedFileFilter.INSTANCE));*/
+		return returnEmptyFileArrayForNull(getJobsIncludingThoseInFolders(DeletedFileFilter.INSTANCE));
 	}
-
+	//TODO rewrite the interface
 	@Override
 	public File[] getJobs(final String folderName) {
-		return returnEmptyFileArrayForNull(
+		/*return returnEmptyFileArrayForNull(
 				getJobDirectoryIncludingFolder(folderName)
-						.listFiles(NonDeletedFileFilter.INSTANCE));
+						.listFiles(NonDeletedFileFilter.INSTANCE));*/
+		//System.out.println("JOBZ:");
+		/*for (File file : returnEmptyFileArrayForNull(getJobsIncludingThoseInFolders(NonDeletedFileFilter.INSTANCE))) {
+			//System.out.println("file = " + file);
+		}*/
+		return returnEmptyFileArrayForNull(getJobsIncludingThoseInFolders(NonDeletedFileFilter.INSTANCE));
 	}
 
 	/**
@@ -712,7 +705,42 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		final String realFolderName = folderName.isEmpty()
 				? folderName
 				: folderName + "/jobs";
+		getFolderFiles();
 		return new File(getJobHistoryRootDir(), realFolderName);
+	}
+
+	private File[] getJobsIncludingThoseInFolders(final FileFilter fileFilter) {
+		final List<File> folderFiles = getFolderFiles();
+		File[] standardJobs = getJobHistoryRootDir().listFiles(fileFilter);
+
+		for (int i = 0; i < folderFiles.size(); ++i) {
+			if (!fileFilter.accept(folderFiles.get(i))) {
+				folderFiles.remove(folderFiles.get(i));
+			}
+		}
+		folderFiles.addAll(Arrays.asList(standardJobs));
+		return folderFiles.toArray(new File[folderFiles.size()]);
+	}
+
+	private List<File> getFolderFiles() {
+		//no full tree search, just one layer
+		List<File> folderNames = new LinkedList<File>();
+		File jobHistoryRootDir = getJobHistoryRootDir();
+		//System.out.println("LIST FILES: ");
+		for (File possibleFolder : jobHistoryRootDir.listFiles()) {
+			//System.out.println(possibleFolder.toString());
+			if (possibleFolder.isDirectory()) {
+				for (File possibleSubFolder : possibleFolder.listFiles()) {
+					//System.out.println("    " + possibleSubFolder.getName());
+					if (possibleSubFolder.isDirectory() && possibleSubFolder.getName().equals("jobs")) {
+						//folder found.
+						folderNames.addAll(Arrays.asList(possibleSubFolder.listFiles()));
+					}
+				}
+			}
+		}
+		//System.out.println("FOLDERS FOUND:\n" + folderNames.toString());
+		return folderNames;
 	}
 
 	@Override

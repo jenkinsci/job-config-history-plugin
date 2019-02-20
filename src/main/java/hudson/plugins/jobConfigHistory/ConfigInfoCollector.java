@@ -159,4 +159,30 @@ final class ConfigInfoCollector {
 		}
 		return configs;
 	}
+
+	public List<ConfigInfo> collect() throws  IOException{
+		final File[] itemDirs;
+		if ("deleted".equals(type)) {
+			itemDirs = overViewhistoryDao.getDeletedJobs("");
+		} else {
+			itemDirs = (File[]) ArrayUtils.addAll(
+					overViewhistoryDao.getDeletedJobs(""),
+					overViewhistoryDao.getJobs(""));
+		}
+		Arrays.sort(itemDirs, FileNameComparator.INSTANCE);
+		for (final File itemDir : itemDirs) {
+			String folderName = getFolderName(itemDir);
+			//System.out.println("itemDir: " + itemDir + ",\n  folderName: " + folderName);
+			getConfigsForType(itemDir, folderName);
+		}
+		return configs;
+	}
+
+	private String getFolderName(File file) {
+		//too damn hacky...
+		if (file.getParentFile().getName().equals("jobs")
+				&& file.getParentFile().getParentFile().getParentFile().getName().equals("jobs")) {
+			return file.getParentFile().getParentFile().getName();
+		} else return "";
+	}
 }
