@@ -83,10 +83,8 @@
                     <td>${config.date}</td>
                     <j:choose>
                       <j:when test="${config.getIsJob()}">
-                        <!-- TODO besides clumsiness with folders, this fails to URL-escape characters in job names -->
                         <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
                         <td>
-
                           <a href="${rootURL}/job/${config.job.replace('/jobs', '/job')}/jobConfigHistory">
                             <!-- Adding breadcrumbs and deleting irrelevant information about the jobs subdirectory -->
                             ${config.job.replace('/jobs', '').replace('/', ' » ')}

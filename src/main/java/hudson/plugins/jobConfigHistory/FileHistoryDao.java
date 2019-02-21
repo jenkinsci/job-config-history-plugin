@@ -673,25 +673,29 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			return true;
 		}
 	}
-	//TODO rewrite the interface
+
 	@Override
-	public File[] getDeletedJobs(final String folderName) {
-		/*return returnEmptyFileArrayForNull(
-				getJobDirectoryIncludingFolder(folderName)
-						.listFiles(DeletedFileFilter.INSTANCE));*/
+	public File[] getDeletedJobs() {
 		return returnEmptyFileArrayForNull(getJobsIncludingThoseInFolders(DeletedFileFilter.INSTANCE));
 	}
-	//TODO rewrite the interface
+
+	@Override
+	public File[] getDeletedJobs(final String folderName) {
+		return returnEmptyFileArrayForNull(
+				getJobDirectoryIncludingFolder(folderName)
+						.listFiles(DeletedFileFilter.INSTANCE));
+	}
+
+	@Override
+	public File[] getJobs() {
+		return returnEmptyFileArrayForNull(getJobsIncludingThoseInFolders(NonDeletedFileFilter.INSTANCE));
+	}
+
 	@Override
 	public File[] getJobs(final String folderName) {
-		/*return returnEmptyFileArrayForNull(
+		return returnEmptyFileArrayForNull(
 				getJobDirectoryIncludingFolder(folderName)
-						.listFiles(NonDeletedFileFilter.INSTANCE));*/
-		//System.out.println("JOBZ:");
-		/*for (File file : returnEmptyFileArrayForNull(getJobsIncludingThoseInFolders(NonDeletedFileFilter.INSTANCE))) {
-			//System.out.println("file = " + file);
-		}*/
-		return returnEmptyFileArrayForNull(getJobsIncludingThoseInFolders(NonDeletedFileFilter.INSTANCE));
+						.listFiles(NonDeletedFileFilter.INSTANCE));
 	}
 
 	/**

@@ -163,11 +163,11 @@ final class ConfigInfoCollector {
 	public List<ConfigInfo> collect() throws  IOException{
 		final File[] itemDirs;
 		if ("deleted".equals(type)) {
-			itemDirs = overViewhistoryDao.getDeletedJobs("");
+			itemDirs = overViewhistoryDao.getDeletedJobs();
 		} else {
 			itemDirs = (File[]) ArrayUtils.addAll(
-					overViewhistoryDao.getDeletedJobs(""),
-					overViewhistoryDao.getJobs(""));
+					overViewhistoryDao.getDeletedJobs(),
+					overViewhistoryDao.getJobs());
 		}
 		Arrays.sort(itemDirs, FileNameComparator.INSTANCE);
 		for (final File itemDir : itemDirs) {

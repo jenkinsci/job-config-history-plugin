@@ -44,6 +44,15 @@ public interface OverviewHistoryDao {
 	File[] getDeletedJobs(String folderName);
 
 	/**
+	 * Returns a list of deleted jobs with a history, including all those
+	 * contained in folders.
+	 *
+	 * @return list of deleted jobs with a history, emtpy when no history
+	 *         exists.
+	 */
+	File[] getDeletedJobs();
+
+	/**
 	 * Returns a list of jobs with a history.
 	 *
 	 * @param folderName
@@ -51,6 +60,13 @@ public interface OverviewHistoryDao {
 	 * @return list of jobs with a history, empty when no history exists.
 	 */
 	File[] getJobs(String folderName);
+
+	/**
+	 * Returns a list of jobs with a history, including all those contained in folders.
+	 *
+	 * @return list of all jobs with a history, empty when no history exists.
+	 */
+	File[] getJobs();
 
 	/**
 	 * Returns a list of all system configuration files with a history.
