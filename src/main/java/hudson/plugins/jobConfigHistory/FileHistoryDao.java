@@ -339,7 +339,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	@Override
 	public void changeItemLocation(Item item, String oldFullName, String newFullName) {
 		//do the old switcheroo
-		final AbstractItem abstractItem = (AbstractItem) item;
 		final String onLocationChangedDescription = "old full name: " + oldFullName
 				+ ", new full name: " + newFullName;
 		if (historyRootDir != null) {
