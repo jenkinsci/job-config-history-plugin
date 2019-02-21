@@ -722,7 +722,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				folderFiles.remove(folderFiles.get(i));
 			}
 		}
-		folderFiles.addAll(Arrays.asList(standardJobs));
+		if (standardJobs != null) {
+			folderFiles.addAll(Arrays.asList(standardJobs));
+		}
 		return folderFiles.toArray(new File[folderFiles.size()]);
 	}
 
@@ -730,20 +732,20 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		//no full tree search, just one layer
 		List<File> folderNames = new LinkedList<File>();
 		File jobHistoryRootDir = getJobHistoryRootDir();
-		//System.out.println("LIST FILES: ");
-		for (File possibleFolder : jobHistoryRootDir.listFiles()) {
-			//System.out.println(possibleFolder.toString());
-			if (possibleFolder.isDirectory()) {
-				for (File possibleSubFolder : possibleFolder.listFiles()) {
-					//System.out.println("    " + possibleSubFolder.getName());
-					if (possibleSubFolder.isDirectory() && possibleSubFolder.getName().equals("jobs")) {
-						//folder found.
-						folderNames.addAll(Arrays.asList(possibleSubFolder.listFiles()));
+		File[] jobHistoryRootDirFiles = jobHistoryRootDir.listFiles();
+		if (jobHistoryRootDirFiles != null) {
+			for (File possibleFolder : jobHistoryRootDirFiles) {
+				File[] possibleFolderFiles = possibleFolder.listFiles();
+				if (possibleFolderFiles != null && possibleFolder.isDirectory()) {
+					for (File possibleSubFolder : possibleFolderFiles) {
+						if (possibleSubFolder.isDirectory() && possibleSubFolder.getName().equals("jobs")) {
+							//folder found.
+							folderNames.addAll(Arrays.asList(possibleFolderFiles));
+						}
 					}
 				}
 			}
 		}
-		//System.out.println("FOLDERS FOUND:\n" + folderNames.toString());
 		return folderNames;
 	}
 
