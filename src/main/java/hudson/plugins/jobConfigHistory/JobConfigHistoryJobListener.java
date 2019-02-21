@@ -57,6 +57,16 @@ public class JobConfigHistoryJobListener extends ItemListener {
 		LOG.log(FINEST, "onCreated for {0} done.", item);
 	}
 
+	@Override
+	public void onLocationChanged(Item item, String oldFullName, String newFullName) {
+		final String onLocationChangedDescription = "old full name: " + oldFullName
+				+ ", new full name: " + newFullName;
+		LOG.log(FINEST, "In onLocationChanged for {0}{1}", new Object[]{item, onLocationChangedDescription});
+		switchHistoryDao(item).changeItemLocation(item, oldFullName, newFullName);
+		LOG.log(FINEST, "Completed onLocationChanged for {0}", item);
+
+	}
+
 	/**
 	 * {@inheritDoc}
 	 *
@@ -135,6 +145,13 @@ public class JobConfigHistoryJobListener extends ItemListener {
 		public void deleteItem(Item item) {
 			LOG.log(Level.FINEST,
 					"onDeleted: not an AbstractItem {0}, skipping.", item);
+		}
+
+		@Override
+		public void changeItemLocation(Item item, String oldFullName, String newFullName) {
+			//TODO implement
+			LOG.log(FINEST,
+					"onLocationChanged: not an AbstractItem{0}, skipping.", item);
 		}
 
 	}

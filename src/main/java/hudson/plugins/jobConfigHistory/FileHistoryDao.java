@@ -326,6 +326,49 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		}
 	}
 
+	public static final String ANSI_RESET = "\u001B[0m";
+	public static final String ANSI_BLACK = "\u001B[30m";
+	public static final String ANSI_RED = "\u001B[31m";
+	public static final String ANSI_GREEN = "\u001B[32m";
+	public static final String ANSI_YELLOW = "\u001B[33m";
+	public static final String ANSI_BLUE = "\u001B[34m";
+	public static final String ANSI_PURPLE = "\u001B[35m";
+	public static final String ANSI_CYAN = "\u001B[36m";
+	public static final String ANSI_WHITE = "\u001B[37m";
+
+	@Override
+	public void changeItemLocation(Item item, String oldFullName, String newFullName) {
+		//do the old switcheroo
+		final AbstractItem abstractItem = (AbstractItem) item;
+		final String onLocationChangedDescription = "old full name: " + oldFullName
+				+ ", new full name: " + newFullName;
+		if (historyRootDir != null) {
+			final String jobsStr = "/jobs/";
+			final File newHistoryDir = new File(historyRootDir, jobsStr + newFullName.replaceAll("/", jobsStr));
+			final File oldHistoryDir = new File(historyRootDir, jobsStr + oldFullName.replaceAll("/", jobsStr));
+
+			if (oldHistoryDir.exists()) {
+				final FilePath newHistoryFilePath = new FilePath(newHistoryDir);
+				final FilePath oldHistoryFilePath = new FilePath(oldHistoryDir);
+				try {
+					oldHistoryFilePath.copyRecursiveTo(newHistoryFilePath);
+					oldHistoryFilePath.deleteRecursive();
+					LOG.log(FINEST,
+							"completed move of old history files on location change {0}{1}",
+							onLocationChangedDescription);
+				} catch (IOException e) {
+					final String ioExceptionStr = "unable to move old history on location change."
+							+ onLocationChangedDescription;
+					LOG.log(Level.SEVERE, ioExceptionStr, e);
+				} catch (InterruptedException e) {
+					final String irExceptionStr = "interrupted while moving old history on location change."
+							+ onLocationChangedDescription;
+					LOG.log(Level.WARNING, irExceptionStr, e);
+				}
+			}
+		}
+	}
+
 	@Override
 	public void renameItem(final Item item, final String oldName,
 			final String newName) {
