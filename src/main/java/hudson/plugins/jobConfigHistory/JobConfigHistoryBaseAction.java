@@ -285,17 +285,22 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     private String reFormatAndconcatStringArray(String[] arr) {
         String ret = "";
 
-        //TODO find a better, non-hacky solution!
         //this needs to be done because the sorting  process writes the first line as:
         //<?xml version="1.0" encoding="UTF-8"?><project>
         //which can't be processed by xmlUnit...
-        if (arr[0].endsWith("<project>") && !arr[0].equals("<project>")) {
-            //rewrite <project> in a new line.
-            String arrElem = arr[0].substring(0,arr[0].length()-1-"<project".length());
+        final String firstLineRegex = "<[^<>]*>";
+        final String firstLine = arr[0];
 
-            ret+= arrElem + "\n"
-                    + "<project>" + "\n";
+        if (firstLine.matches(firstLineRegex)) {
+            ret += firstLine;
+        } else {
+            //extract anything that doesnt match.
+            String tagThatBelongsInTheNextLine = firstLine.replaceFirst(firstLineRegex, "");
+
+            ret += firstLine.substring(0, firstLine.length()-tagThatBelongsInTheNextLine.length()) + "\n"
+                + tagThatBelongsInTheNextLine + "\n";
         }
+
         for (int i = 1; i < arr.length; ++i) {
             if (i < arr.length-1) {
                 ret = ret.concat(arr[i]).concat("\n");
@@ -330,22 +335,28 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 List<String> originalLines = Lists.newArrayList((List<String>) delta.getOriginal().getLines());
                 List<String> revisedLines = Lists.newArrayList((List<String>) delta.getRevised().getLines());
                 for (Difference versionDifference : versionDiffs.getDifferences()) {
-                    //check for each calculated versionDifference where it occured and delete it.
+                    //check for each calculated versionDifference where it occurred and delete it.
                     String controlValue = versionDifference.getComparison().getControlDetails().getValue().toString();
                     String testValue     = versionDifference.getComparison().getTestDetails().getValue().toString();
-                    for (int line = 0; line < Math.max(originalLines.size(), revisedLines.size()); ++line) {
-                        //go through each line and search for the diff
-                        if ((line > originalLines.size()-1) || (line > revisedLines.size()-1)) {
-                            //too lazy to reformat this to the right negated expression...
-                        } else {
-                            String originalLine = originalLines.get(line);
-                            String revisedLine = revisedLines.get(line);
-                            if ((originalLine.contains(controlValue) && revisedLine.contains(testValue))
-                                    || (originalLine.contains(testValue) && revisedLine.contains(controlValue))) {
-                                originalLines.remove(line);
-                                revisedLines.remove(line);
-                                //check only once for each occurence. Not necessarily needed, but makes it slightly faster.
-                                break;
+
+                    //go through both line lists and find pairs.
+                    for (int oriLineNumber = 0; oriLineNumber < originalLines.size(); oriLineNumber++) {
+                        String currentOriLine = originalLines.get(oriLineNumber);
+
+                        String otherValue = "";
+                        if (currentOriLine.contains(controlValue)) {
+                            otherValue = testValue;
+
+                        } else if  (currentOriLine.contains(testValue)) {
+                            otherValue = controlValue;
+                        } else continue;
+                            //search for test value in the other list
+                        for (int revLineNumber = 0; revLineNumber < revisedLines.size(); revLineNumber++) {
+                            String currentRevLine = revisedLines.get(revLineNumber);
+                            if (currentRevLine.contains(otherValue)) {
+                                //found both lines. Delete them
+                                originalLines.remove(oriLineNumber);
+                                revisedLines.remove(revLineNumber);
                             }
                         }
                     }
