@@ -733,19 +733,23 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		List<File> folderNames = new LinkedList<File>();
 		File jobHistoryRootDir = getJobHistoryRootDir();
 		File[] jobHistoryRootDirFiles = jobHistoryRootDir.listFiles();
-		if (jobHistoryRootDirFiles != null) {
-			for (File possibleFolder : jobHistoryRootDirFiles) {
-				File[] possibleFolderFiles = possibleFolder.listFiles();
-				if (possibleFolderFiles != null && possibleFolder.isDirectory()) {
-					for (File possibleSubFolder : possibleFolderFiles) {
-						if (possibleSubFolder.isDirectory() && possibleSubFolder.getName().equals("jobs")) {
-							//folder found.
-							folderNames.addAll(Arrays.asList(possibleFolderFiles));
-						}
-					}
+		if (jobHistoryRootDirFiles == null) {
+			return folderNames;
+		}
+		for (File possibleFolder : jobHistoryRootDirFiles) {
+			File[] possibleFolderFiles = possibleFolder.listFiles();
+			if (possibleFolderFiles != null && possibleFolder.isDirectory()) {
+				continue;
+			}
+			for (File possibleSubFolder : possibleFolderFiles) {
+				if (possibleSubFolder.isDirectory() && possibleSubFolder.getName().equals("jobs")) {
+					//folder found.
+					folderNames.addAll(Arrays.asList(possibleFolderFiles));
 				}
 			}
+
 		}
+
 		return folderNames;
 	}
 
