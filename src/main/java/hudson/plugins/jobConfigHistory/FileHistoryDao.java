@@ -738,14 +738,19 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		}
 		for (File possibleFolder : jobHistoryRootDirFiles) {
 			File[] possibleFolderFiles = possibleFolder.listFiles();
-			if (possibleFolderFiles != null && possibleFolder.isDirectory()) {
+			if (possibleFolderFiles == null || !possibleFolder.isDirectory()) {
 				continue;
 			}
 			for (File possibleSubFolder : possibleFolderFiles) {
-				if (possibleSubFolder.isDirectory() && possibleSubFolder.getName().equals("jobs")) {
-					//folder found.
-					folderNames.addAll(Arrays.asList(possibleFolderFiles));
+				if (!possibleSubFolder.isDirectory() || !possibleSubFolder.getName().equals("jobs")) {
+					continue;
 				}
+				//folder found.
+				File[] possibleSubFolderFiles = possibleSubFolder.listFiles();
+				if (possibleSubFolderFiles != null) {
+					folderNames.addAll(Arrays.asList(possibleSubFolderFiles));
+				}
+
 			}
 
 		}
