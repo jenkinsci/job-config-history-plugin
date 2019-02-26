@@ -51,6 +51,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.cloudbees.hudson.plugins.folder.AbstractFolder;
+import com.cloudbees.hudson.plugins.folder.AbstractFolderDescriptor;
+import com.cloudbees.hudson.plugins.folder.ChildNameGenerator;
+import com.cloudbees.hudson.plugins.folder.Folder;
+import hudson.diagnosis.OldDataMonitor;
+import hudson.model.*;
 import org.apache.commons.io.FileUtils;
 
 import hudson.Extension;
@@ -326,15 +332,24 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		}
 	}
 
+	private File getHistoryDir(Item item) {
+	    return new File(getHistoryDir(item.getRootDir()), item.getName());
+    }
+
 	@Override
 	public void changeItemLocation(Item item, String oldFullName, String newFullName) {
-		//do the old switcheroo
 		final String onLocationChangedDescription = "old full name: " + oldFullName
 				+ ", new full name: " + newFullName;
 		if (historyRootDir != null) {
 			final String jobsStr = "/jobs/";
-			final File newHistoryDir = new File(historyRootDir, jobsStr + newFullName.replaceAll("/", jobsStr));
-			final File oldHistoryDir = new File(historyRootDir, jobsStr + oldFullName.replaceAll("/", jobsStr));
+
+			final File newHistoryDir = getHistoryDir(item);
+            final File oldHistoryDir = new File(newHistoryDir.getAbsolutePath()
+                    .replaceFirst(
+                            newFullName.replaceAll("/", jobsStr),
+                            oldFullName.replaceAll("/", jobsStr)
+                    )
+            );
 
 			if (oldHistoryDir.exists()) {
 				final FilePath newHistoryFilePath = new FilePath(newHistoryDir);

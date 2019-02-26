@@ -105,6 +105,7 @@
     </developers>
 
     <properties>
+        <java.level>8</java.level>
     	<jenkins-test-harness.version>1.554.1</jenkins-test-harness.version>
         <maven-surefire-report-plugin.version>2.20</maven-surefire-report-plugin.version>
         <maven-hpi-plugin.injectedTestName>InjectedIT</maven-hpi-plugin.injectedTestName>
@@ -114,6 +115,13 @@
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.jenkins-ci.plugins/cloudbees-folder -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>cloudbees-folder</artifactId>
+            <version>6.7</version>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
