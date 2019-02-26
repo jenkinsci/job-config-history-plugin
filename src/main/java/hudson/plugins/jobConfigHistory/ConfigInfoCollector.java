@@ -172,7 +172,6 @@ final class ConfigInfoCollector {
 		Arrays.sort(itemDirs, FileNameComparator.INSTANCE);
 		for (final File itemDir : itemDirs) {
 			String folderName = getFolderName(itemDir);
-			//System.out.println("itemDir: " + itemDir + ",\n  folderName: " + folderName);
 			getConfigsForType(itemDir, folderName);
 		}
 		return configs;
