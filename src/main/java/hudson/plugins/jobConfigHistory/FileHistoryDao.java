@@ -69,6 +69,7 @@ import hudson.model.Item;
 import hudson.model.Node;
 import hudson.model.User;
 import jenkins.model.Jenkins;
+import org.apache.commons.lang.SystemUtils;
 
 /**
  * Defines some helper functions needed by {@link JobConfigHistoryJobListener}
@@ -341,9 +342,14 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		final String onLocationChangedDescription = "old full name: " + oldFullName
 				+ ", new full name: " + newFullName;
 		if (historyRootDir != null) {
-			final String jobsStr = "/jobs/";
-
+			final String jobsStr;
 			final File newHistoryDir = getHistoryDir(item);
+			if (SystemUtils.IS_OS_UNIX) {
+				jobsStr = "/jobs/";
+			} else {
+				//windows
+				jobsStr = "\\jobs\\";
+			}
             final File oldHistoryDir = new File(newHistoryDir.getAbsolutePath()
                     .replaceFirst(
                             newFullName.replaceAll("/", jobsStr),
