@@ -149,7 +149,6 @@ public class JobConfigHistoryJobListener extends ItemListener {
 
 		@Override
 		public void changeItemLocation(Item item, String oldFullName, String newFullName) {
-			//TODO implement
 			LOG.log(FINEST,
 					"onLocationChanged: not an AbstractItem{0}, skipping.", item);
 		}
