@@ -735,7 +735,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	private boolean isFolder(File file) {
 		//a file is a jenkins-folder if its contained in a "jobs" directory and has one itself.
 		boolean hasJobsSubdirectory = false;
-		for (File child : file.listFiles()) {
+		File[] files = file.listFiles();
+		if (files == null) return false;
+		for (File child : files) {
 			if (child.getName().equals("jobs")) {
 				hasJobsSubdirectory = true;
 				break;
@@ -749,10 +751,14 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	}
 
 	private File getSubDirectory(File file, String subdirectoryName) throws FileNotFoundException {
-		for (File child : file.listFiles()) {
+		FileNotFoundException up = new FileNotFoundException("File " + new File(file, subdirectoryName).toString() + " not found.");
+
+		File[] files = file.listFiles();
+		if (files == null) throw up;
+		for (File child : files) {
 			if (child.getName().equals(subdirectoryName)) return child;
 		}
-		FileNotFoundException up = new FileNotFoundException("File " + new File(file, subdirectoryName).toString() + " not found.");
+
 		throw up;
 	}
 
@@ -760,6 +766,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		List<File> folderNames = new LinkedList<File>();
 
 		File[] currentChildren = fromFile.listFiles();
+		if (currentChildren == null) return folderNames;
 		for (File child : currentChildren) {
 			if (isFolder(child)) {
 				//get everything from the jobs subdirectory (which it has)
