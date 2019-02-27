@@ -29,9 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import jenkins.model.Jenkins;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.ObjectUtils;
 
 /**
  * Collects all configs of a special type. For Jobs these follow the pattern:
