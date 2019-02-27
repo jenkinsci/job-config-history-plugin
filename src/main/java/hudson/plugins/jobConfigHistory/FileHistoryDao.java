@@ -51,11 +51,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import com.cloudbees.hudson.plugins.folder.AbstractFolder;
-import com.cloudbees.hudson.plugins.folder.AbstractFolderDescriptor;
-import com.cloudbees.hudson.plugins.folder.ChildNameGenerator;
-import com.cloudbees.hudson.plugins.folder.Folder;
-import hudson.diagnosis.OldDataMonitor;
 import hudson.model.*;
 import org.apache.commons.io.FileUtils;
 
