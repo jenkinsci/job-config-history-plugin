@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 
@@ -676,7 +677,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
 	@Override
 	public File[] getDeletedJobs() {
-		return returnEmptyFileArrayForNull(getJobsIncludingThoseInFolders(DeletedFileFilter.INSTANCE));
+		return returnEmptyFileArrayForNull(getJobFilesIncludingThoseInFolders(DeletedFileFilter.INSTANCE));
 	}
 
 	@Override
@@ -688,9 +689,10 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
 	@Override
 	public File[] getJobs() {
-		return returnEmptyFileArrayForNull(getJobsIncludingThoseInFolders(NonDeletedFileFilter.INSTANCE));
+		return returnEmptyFileArrayForNull(getJobFilesIncludingThoseInFolders(NonDeletedFileFilter.INSTANCE));
 	}
 
+	//TODO delete this.
 	@Override
 	public File[] getJobs(final String folderName) {
 		return returnEmptyFileArrayForNull(
@@ -698,7 +700,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 						.listFiles(NonDeletedFileFilter.INSTANCE));
 	}
 
-	/**
+	/**TODO delete this
 	 * Returns the history directory for a job in a folder.
 	 *
 	 * @param folderName
@@ -709,52 +711,69 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		final String realFolderName = folderName.isEmpty()
 				? folderName
 				: folderName + "/jobs";
-		getFolderFiles();
 		return new File(getJobHistoryRootDir(), realFolderName);
 	}
 
-	private File[] getJobsIncludingThoseInFolders(final FileFilter fileFilter) {
-		final List<File> folderFiles = getFolderFiles();
-		File[] standardJobs = getJobHistoryRootDir().listFiles(fileFilter);
+	private File[] getJobFilesIncludingThoseInFolders(final FileFilter fileFilter) {
+		final List<File> folderFiles = getJobFilesIncludingThoseInFolders();
 
-		for (int i = 0; i < folderFiles.size(); ++i) {
-			if (!fileFilter.accept(folderFiles.get(i))) {
-				folderFiles.remove(folderFiles.get(i));
-			}
-		}
-		if (standardJobs != null) {
-			folderFiles.addAll(Arrays.asList(standardJobs));
-		}
-		return folderFiles.toArray(new File[folderFiles.size()]);
+		List<File> resultList = folderFiles.stream()
+				.filter(folderFile -> fileFilter.accept(folderFile))
+				.collect(Collectors.toList());
+
+		return resultList.toArray(new File[resultList.size()]);
 	}
 
-	private List<File> getFolderFiles() {
-		//no full tree search, just one layer
+	/**
+	 *
+	 * @return all jobs
+	 */
+	private List<File> getJobFilesIncludingThoseInFolders() {
+		return getJobFilesIncludingThoseInFolders(getJobHistoryRootDir());
+	}
+
+	private boolean isFolder(File file) {
+		//a file is a jenkins-folder if its contained in a "jobs" directory and has one itself.
+		boolean hasJobsSubdirectory = false;
+		for (File child : file.listFiles()) {
+			if (child.getName().equals("jobs")) {
+				hasJobsSubdirectory = true;
+				break;
+			}
+		}
+		return file.getParentFile().getName().equals("jobs") && file.isDirectory() && hasJobsSubdirectory;
+	}
+
+	private boolean isJobFile(File file) {
+		return file.getParentFile().getName().equals("jobs");
+	}
+
+	private File getSubDirectory(File file, String subdirectoryName) throws FileNotFoundException {
+		for (File child : file.listFiles()) {
+			if (child.getName().equals(subdirectoryName)) return child;
+		}
+		FileNotFoundException up = new FileNotFoundException("File " + new File(file, subdirectoryName).toString() + " not found.");
+		throw up;
+	}
+
+	private List<File> getJobFilesIncludingThoseInFolders(File fromFile) {
 		List<File> folderNames = new LinkedList<File>();
-		File jobHistoryRootDir = getJobHistoryRootDir();
-		File[] jobHistoryRootDirFiles = jobHistoryRootDir.listFiles();
-		if (jobHistoryRootDirFiles == null) {
-			return folderNames;
-		}
-		for (File possibleFolder : jobHistoryRootDirFiles) {
-			File[] possibleFolderFiles = possibleFolder.listFiles();
-			if (possibleFolderFiles == null || !possibleFolder.isDirectory()) {
-				continue;
-			}
-			for (File possibleSubFolder : possibleFolderFiles) {
-				if (!possibleSubFolder.isDirectory() || !possibleSubFolder.getName().equals("jobs")) {
-					continue;
+
+		File[] currentChildren = fromFile.listFiles();
+		for (File child : currentChildren) {
+			if (isFolder(child)) {
+				//get everything from the jobs subdirectory (which it has)
+				try {
+					folderNames.addAll(getJobFilesIncludingThoseInFolders(getSubDirectory(child, "jobs")));
+				} catch (FileNotFoundException e) {
+					//do nothing, this cannot happen. If it happens, it should probably be logged.
+					LOG.log(Level.SEVERE, "File not found although it should have been found: " + new File(child, "jobs"));
 				}
-				//folder found.
-				File[] possibleSubFolderFiles = possibleSubFolder.listFiles();
-				if (possibleSubFolderFiles != null) {
-					folderNames.addAll(Arrays.asList(possibleSubFolderFiles));
-				}
-
+			} else if (isJobFile(child)) {
+				//stop recursion, for the job found can't be a folder.
+				folderNames.add(child);
 			}
-
 		}
-
 		return folderNames;
 	}
 
