@@ -48,7 +48,7 @@ public interface OverviewHistoryDao {
 	 * contained in folders.
 	 *
 	 * @return list of deleted jobs with a history, emtpy when no history
-	 *         exists.folderName
+	 *         exists.
 	 */
 	File[] getDeletedJobs();
 

@@ -692,7 +692,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		return returnEmptyFileArrayForNull(getJobFilesIncludingThoseInFolders(NonDeletedFileFilter.INSTANCE));
 	}
 
-	//TODO delete this.
 	@Override
 	public File[] getJobs(final String folderName) {
 		return returnEmptyFileArrayForNull(
@@ -700,7 +699,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 						.listFiles(NonDeletedFileFilter.INSTANCE));
 	}
 
-	/**TODO delete this
+	/**
 	 * Returns the history directory for a job in a folder.
 	 *
 	 * @param folderName
@@ -850,7 +849,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	private void createNewHistoryEntryAndSaveConfig(final Node node,
 			final String content, final String operation, final String newName,
 			final String oldName) {
-		// TODO:
 		final File timestampedDir = createNewHistoryEntry(node, operation,
 				newName, oldName);
 		final File nodeConfigHistoryFile = new File(timestampedDir,
@@ -924,7 +922,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
 		}
 		final String content = Jenkins.XSTREAM2.toXML(node);
-		// TODO:
 		createNewHistoryEntryAndSaveConfig(node, content,
 				Messages.ConfigHistoryListenerHelper_RENAMED(), newName,
 				oldName);
