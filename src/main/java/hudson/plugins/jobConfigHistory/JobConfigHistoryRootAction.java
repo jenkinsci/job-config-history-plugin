@@ -454,6 +454,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		final InputStream is = new ByteArrayInputStream(
 				configXml.asString().getBytes("UTF-8"));
 		final String calculatedNewName = findNewName(newName);
+
+		//TODO problem: this only creates Items with Jenkins.getInstance() as parent ItemGroup, which breaks the restoration of folders.
 		final TopLevelItem project = getJenkins()
 				.createProjectFromXML(calculatedNewName, is);
 		// TODO: Casting here should be removed.
