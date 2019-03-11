@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -174,7 +173,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 			return Collections.emptyList();
 		} else {
 			return new ConfigInfoCollector(type, getOverviewHistoryDao())
-					.collect("");
+					.collect();
 		}
 	}
 
@@ -455,6 +454,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		final InputStream is = new ByteArrayInputStream(
 				configXml.asString().getBytes("UTF-8"));
 		final String calculatedNewName = findNewName(newName);
+
+		//TODO problem: this only creates Items with Jenkins.getInstance() as parent ItemGroup, which breaks the restoration of folders.
 		final TopLevelItem project = getJenkins()
 				.createProjectFromXML(calculatedNewName, is);
 		// TODO: Casting here should be removed.
