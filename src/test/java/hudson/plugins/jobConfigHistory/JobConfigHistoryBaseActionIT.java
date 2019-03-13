@@ -18,7 +18,6 @@ import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.TextPage;
-import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
@@ -202,9 +201,7 @@ public class JobConfigHistoryBaseActionIT
 		final HtmlPage historyPage = webClient
 				.goTo("job/" + jobName + "/" + JobConfigHistoryConsts.URLNAME);
 		final HtmlForm diffFilesForm = historyPage.getFormByName("diffFiles");
-		final HtmlPage diffPage = (HtmlPage) diffFilesForm
-				.submit((HtmlButton) last(
-						diffFilesForm.getHtmlElementsByTagName("button")));
+		final HtmlPage diffPage = (HtmlPage) last(diffFilesForm.getHtmlElementsByTagName("button")).click();
 		assertStringContains(diffPage.asText(), "<daysToKeep>42</daysToKeep>");
 		assertStringContains(diffPage.asText(), "<numToKeep>42</numToKeep>");
 		assertStringContains(diffPage.asText(), "<daysToKeep>47</daysToKeep>");

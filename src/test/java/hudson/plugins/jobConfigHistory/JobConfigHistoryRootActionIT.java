@@ -12,7 +12,6 @@ import org.jvnet.hudson.test.recipes.LocalData;
 import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.WebAssert;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
@@ -39,7 +38,6 @@ public class JobConfigHistoryRootActionIT
 		Logger.getLogger(this.getClass().getPackage().getName())
 				.setLevel(Level.INFO);
 		webClient.setJavaScriptEnabled(true);
-		webClient.setCssEnabled(false);
 	}
 
 	/**
@@ -182,9 +180,7 @@ public class JobConfigHistoryRootActionIT
 					page.split("Changed").length > 2);
 
 			final HtmlForm diffFilesForm = htmlPage.getFormByName("diffFiles");
-			final HtmlPage diffPage = (HtmlPage) diffFilesForm
-					.submit((HtmlButton) last(
-							diffFilesForm.getHtmlElementsByTagName("button")));
+			final HtmlPage diffPage = (HtmlPage) last(diffFilesForm.getHtmlElementsByTagName("button")).click();
 			assertStringContains(diffPage.asText(), firstMessage);
 			assertStringContains(diffPage.asText(), secondMessage);
 		} catch (Exception ex) {
@@ -284,7 +280,7 @@ public class JobConfigHistoryRootActionIT
 		System.out.println(historyAsXml);
 		Assert.assertTrue("History page should contain 'Deleted' entry",
 				historyAsXml.contains("Deleted"));
-		final List<HtmlAnchor> hrefs = historyPage
+		final List<HtmlAnchor> hrefs = (List<HtmlAnchor>) historyPage
 				.getByXPath("//a[contains(@href, \"configOutput?type=xml\")]");
 		Assert.assertTrue(hrefs.size() > 2);
 	}
@@ -377,7 +373,7 @@ public class JobConfigHistoryRootActionIT
 
 		final HtmlPage htmlPage = webClient
 				.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
-		final List<HtmlAnchor> hrefs = htmlPage
+		final List<HtmlAnchor> hrefs = (List<HtmlAnchor>) htmlPage
 				.getByXPath("//a[contains(@href, \"TestProject_deleted_\")]");
 		final HtmlPage historyPage = (HtmlPage) hrefs.get(0).click();
 		final HtmlPage reallyRestorePage = submit(

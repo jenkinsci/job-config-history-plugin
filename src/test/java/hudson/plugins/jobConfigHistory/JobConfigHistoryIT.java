@@ -16,6 +16,7 @@ import hudson.maven.MavenModuleSet;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.security.HudsonPrivateSecurityRealm;
+import jenkins.model.Jenkins;
 
 /**
  * @author jborghi@cisco.com
@@ -125,7 +126,7 @@ public class JobConfigHistoryIT
 		// This would more naturally belong in
 		// JobConfigHistoryTest.testIsSaveable but Mockito chokes on
 		// MavenModuleSet.<clinit>:
-		MavenModuleSet mms = createMavenProject();
+		MavenModuleSet mms = new MavenModuleSet(Jenkins.getInstance(), "");
 		Assert.assertTrue("MavenModuleSet should be saved",
 				jch.isSaveable(mms, mms.getConfigFile()));
 
