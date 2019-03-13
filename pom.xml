@@ -105,7 +105,6 @@
     </developers>
 
     <properties>
-    	<jenkins-test-harness.version>1.554.1</jenkins-test-harness.version>
         <maven-surefire-report-plugin.version>2.20</maven-surefire-report-plugin.version>
         <maven-hpi-plugin.injectedTestName>InjectedIT</maven-hpi-plugin.injectedTestName>
         <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>

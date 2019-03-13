@@ -125,7 +125,7 @@ public class JobConfigHistoryIT
 		// This would more naturally belong in
 		// JobConfigHistoryTest.testIsSaveable but Mockito chokes on
 		// MavenModuleSet.<clinit>:
-		MavenModuleSet mms = createMavenProject();
+		MavenModuleSet mms = new MavenModuleSet(null, "");
 		Assert.assertTrue("MavenModuleSet should be saved",
 				jch.isSaveable(mms, mms.getConfigFile()));
 

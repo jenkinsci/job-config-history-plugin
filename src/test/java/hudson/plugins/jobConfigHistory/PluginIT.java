@@ -16,7 +16,6 @@ import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
@@ -82,7 +81,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 		}
 
 		public List<HtmlAnchor> getConfigOutputLinks(final String type) {
-			final List<HtmlAnchor> hrefs = historyPage.getByXPath(
+			final List<HtmlAnchor> hrefs = (List<HtmlAnchor>) historyPage.getByXPath(
 					"//a[contains(@href, \"configOutput?type=" + type + "\")]");
 			return hrefs;
 		}
@@ -111,8 +110,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 		public HtmlPage getDiffPage() throws IOException {
 			final HtmlForm diffFilesForm = historyPage
 					.getFormByName("diffFiles");
-			return (HtmlPage) diffFilesForm.submit((HtmlButton) last(
-					diffFilesForm.getHtmlElementsByTagName("button")));
+			return (HtmlPage) last(diffFilesForm.getHtmlElementsByTagName("button")).click();
 		}
 
 		public void setCheckedTimestamp1RadioButton(int index,
@@ -236,7 +234,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 		try {
 			final HtmlPage historyPage = webClient.goTo(
 					JobConfigHistoryConsts.URLNAME + "/history?name=config");
-			final List<HtmlAnchor> allRawHRefs = historyPage.getByXPath(
+			final List<HtmlAnchor> allRawHRefs = (List<HtmlAnchor>) historyPage.getByXPath(
 					"//a[contains(@href, \"configOutput?type=raw\")]");
 			Assert.assertTrue(
 					"Check that there are at least 2 links for raw output.",
