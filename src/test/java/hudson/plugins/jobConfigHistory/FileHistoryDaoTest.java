@@ -126,7 +126,7 @@ public class FileHistoryDaoTest {
 		sutWithoutUserAndDuplicateHistory.createNewHistoryEntry(test1Config,
 				"foo", null, null);
 		final int newLength = getHistoryLength();
-		assertEquals(6, newLength);
+		assertEquals(7, newLength);
 	}
 
 	/**
@@ -295,7 +295,7 @@ public class FileHistoryDaoTest {
 	@Test
 	public void testSaveItem_XmlFileDuplicate() {
 		sutWithoutUserAndDuplicateHistory.saveItem(test1Config);
-		assertEquals(6, getHistoryLength());
+		assertEquals(7, getHistoryLength());
 	}
 
 	private int getHistoryLength() {
@@ -326,7 +326,7 @@ public class FileHistoryDaoTest {
 				"NewName");
 		final File newHistoryDir = new File(historyRoot, "jobs/" + newName);
 		assertTrue(newHistoryDir.exists());
-		assertEquals(6, newHistoryDir.list().length);
+		assertEquals(7, newHistoryDir.list().length);
 	}
 
 	/**

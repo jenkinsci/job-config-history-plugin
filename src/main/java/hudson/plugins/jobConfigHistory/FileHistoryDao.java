@@ -94,6 +94,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	/** Should we save duplicate entries? */
 	private final boolean saveDuplicates;
 
+	/** Last history **/
+	private final static String LAST_HISTORY = "lastHistory";
+
 	public FileHistoryDao() {
 		this(null, null, null, 0, false);
 	}
@@ -659,12 +662,30 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 */
 	boolean hasDuplicateHistory(final XmlFile xmlFile) {
 		boolean isDuplicated = false;
-		final ArrayList<String> timeStamps = new ArrayList<String>(
-				getRevisions(xmlFile).keySet());
-		if (!timeStamps.isEmpty()) {
-			Collections.sort(timeStamps, Collections.reverseOrder());
-			final XmlFile lastRevision = getOldRevision(xmlFile,
-					timeStamps.get(0));
+		XmlFile lastRevision = null;
+
+		// Frist, we try to obtain the latest revision from the symblink
+		final File historiesDir = getHistoryDir(xmlFile.getFile());
+		File symblink = new File(historiesDir.getPath() + "/" + LAST_HISTORY);
+		if(symblink.exists()) {
+			try {
+				lastRevision = new XmlFile(getConfigFile(new File(Util.resolveSymlink(symblink))));
+			} catch (IOException | InterruptedException e) {
+				LOGGER.log(Level.WARNING, String.format("Could not get access to the last revision %s", historiesDir.getPath() + "/" + LAST_HISTORY), e);
+			}
+		} else {
+			// In case symblink still does not exist we try to obtain the latest revision
+			// using the old way
+			final ArrayList<String> timeStamps = new ArrayList<String>(
+					getRevisions(xmlFile).keySet());
+			if (!timeStamps.isEmpty()) {
+				Collections.sort(timeStamps, Collections.reverseOrder());
+				lastRevision = getOldRevision(xmlFile,
+						timeStamps.get(0));
+			}
+		}
+
+		if (lastRevision != null) {
 			try {
 				if (xmlFile.asString().equals(lastRevision.asString())) {
 					isDuplicated = true;
