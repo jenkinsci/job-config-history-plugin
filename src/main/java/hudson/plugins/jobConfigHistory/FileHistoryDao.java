@@ -35,7 +35,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import java.io.FileFilter;
+
 import java.text.SimpleDateFormat;
+
+import java.util.List;
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -47,6 +53,7 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import hudson.model.TaskListener;
 import hudson.util.LogTaskListener;
@@ -723,10 +730,20 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	}
 
 	@Override
+	public File[] getDeletedJobs() {
+		return returnEmptyFileArrayForNull(getJobFilesIncludingThoseInFolders(DeletedFileFilter.INSTANCE));
+	}
+
+	@Override
 	public File[] getDeletedJobs(final String folderName) {
 		return returnEmptyFileArrayForNull(
 				getJobDirectoryIncludingFolder(folderName)
 						.listFiles(DeletedFileFilter.INSTANCE));
+	}
+
+	@Override
+	public File[] getJobs() {
+		return returnEmptyFileArrayForNull(getJobFilesIncludingThoseInFolders(NonDeletedFileFilter.INSTANCE));
 	}
 
 	@Override
@@ -748,6 +765,76 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				? folderName
 				: folderName + "/jobs";
 		return new File(getJobHistoryRootDir(), realFolderName);
+	}
+
+	private File[] getJobFilesIncludingThoseInFolders(final FileFilter fileFilter) {
+		final List<File> folderFiles = getJobFilesIncludingThoseInFolders();
+
+		List<File> resultList = folderFiles.stream()
+				.filter(folderFile -> fileFilter.accept(folderFile))
+				.collect(Collectors.toList());
+
+		return resultList.toArray(new File[resultList.size()]);
+	}
+
+	/**
+	 *
+	 * @return all jobs
+	 */
+	private List<File> getJobFilesIncludingThoseInFolders() {
+		return getJobFilesIncludingThoseInFolders(getJobHistoryRootDir());
+	}
+
+	private boolean isFolder(File file) {
+		//a file is a jenkins-folder if its contained in a "jobs" directory and has one itself.
+		boolean hasJobsSubdirectory = false;
+		File[] files = file.listFiles();
+		if (files == null) return false;
+		for (File child : files) {
+			if (child.getName().equals("jobs")) {
+				hasJobsSubdirectory = true;
+				break;
+			}
+		}
+		return file.getParentFile().getName().equals("jobs") && file.isDirectory() && hasJobsSubdirectory;
+	}
+
+	private boolean isJobFile(File file) {
+		return file.getParentFile().getName().equals("jobs");
+	}
+
+	private File getSubDirectory(File file, String subdirectoryName) throws FileNotFoundException {
+		FileNotFoundException up = new FileNotFoundException("File " + new File(file, subdirectoryName).toString() + " not found.");
+
+		File[] files = file.listFiles();
+		if (files == null) throw up;
+		for (File child : files) {
+			if (child.getName().equals(subdirectoryName)) return child;
+		}
+
+		throw up;
+	}
+
+	private List<File> getJobFilesIncludingThoseInFolders(File fromFile) {
+		List<File> folderNames = new LinkedList<File>();
+
+		File[] currentChildren = fromFile.listFiles();
+		if (currentChildren == null) return folderNames;
+		for (File child : currentChildren) {
+			if (isFolder(child)) {
+				//get everything from the jobs subdirectory (which it has)
+				try {
+					folderNames.addAll(getJobFilesIncludingThoseInFolders(getSubDirectory(child, "jobs")));
+				} catch (FileNotFoundException e) {
+					//do nothing, this cannot happen. If it happens, it should probably be logged.
+					LOG.log(Level.SEVERE, "File not found although it should have been found: " + new File(child, "jobs"));
+				}
+			} else if (isJobFile(child)) {
+				//stop recursion, for the job found can't be a folder.
+				folderNames.add(child);
+			}
+		}
+		return folderNames;
 	}
 
 	@Override
@@ -816,7 +903,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	private void createNewHistoryEntryAndSaveConfig(final Node node,
 			final String content, final String operation, final String newName,
 			final String oldName) {
-		// TODO:
 		final File timestampedDir = createNewHistoryEntry(node, operation,
 				newName, oldName);
 		final File nodeConfigHistoryFile = new File(timestampedDir,
@@ -890,7 +976,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
 		}
 		final String content = Jenkins.XSTREAM2.toXML(node);
-		// TODO:
 		createNewHistoryEntryAndSaveConfig(node, content,
 				Messages.ConfigHistoryListenerHelper_RENAMED(), newName,
 				oldName);
