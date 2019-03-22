@@ -33,6 +33,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -404,7 +406,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				final XmlFile historyXml = getHistoryXmlFile(historyDir);
 				final LazyHistoryDescr historyDescription = new LazyHistoryDescr(
 						historyXml);
-				map.put(historyDir.getName(), historyDescription);
+				if (!Files.isSymbolicLink(Paths.get(historyDir.getAbsolutePath()))) {
+					map.put(historyDir.getName(), historyDescription);
+				}
 			}
 			return map;
 		}
