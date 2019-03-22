@@ -44,6 +44,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -267,7 +269,15 @@ public class FileHistoryDaoTest {
 		final File historyDir = new File(jenkinsHome,
 				"config-history/jobs/MyTest");
 		assertTrue(historyDir.exists());
-		assertEquals(1, historyDir.list().length);
+
+		final File lastHistory = new File(jenkinsHome,
+				"config-history/jobs/MyTest/lastHistory");
+
+		Files.isSymbolicLink(Paths.get(lastHistory.getAbsolutePath()));
+		assertEquals(2, historyDir.list().length);
+
+
+
 	}
 
 	/**
@@ -680,7 +690,7 @@ public class FileHistoryDaoTest {
 		sutWithUserAndNoDuplicateHistory.createNewNode(mockedNode);
 		File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
 		File revisions = new File(file, "slave1");
-		assertEquals("Slave1 should have only one save history.", 1,
+		assertEquals("Slave1 should have only one save history.", 2,
 				revisions.list().length);
 		File config = new File(revisions.listFiles()[0], "config.xml");
 		assertTrue("File config.xml should be saved.", config.exists());
@@ -787,7 +797,7 @@ public class FileHistoryDaoTest {
 		File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
 		File revisions = new File(file, "slave1");
 		sutWithUserAndNoDuplicateHistory.saveNode(mockedNode);
-		assertEquals("New revision should be saved.", 1,
+		assertEquals("New revision should be saved.", 2,
 				revisions.list().length);
 	}
 

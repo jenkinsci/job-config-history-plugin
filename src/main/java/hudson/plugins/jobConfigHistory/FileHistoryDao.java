@@ -249,12 +249,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			timestamp = new GregorianCalendar();
 			f = new File(itemHistoryDir,
 					getIdFormatter().format(timestamp.getTime()));
-			// Create a symlink pointing to the last change
-			try {
-				Util.createSymlink(itemHistoryDir, f.toPath().toString(), "lastHistory", TaskListener.NULL);
-			} catch (InterruptedException e) {
-				LOGGER.log(Level.WARNING, String.format("Could not create symblink for %s",  itemHistoryDir.toPath()), e);
-			}
 			if (f.isDirectory()) {
 				LOG.log(Level.FINE, "clash on {0}, will wait a moment", f);
 				try {
@@ -272,6 +266,13 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		if (!(f.mkdirs() || f.exists())) {
 			throw new RuntimeException("Could not create rootDir " + f);
 		}
+		// Create a symlink pointing to the last change
+		try {
+			Util.createSymlink(itemHistoryDir, f.toPath().toString(), "lastHistory", TaskListener.NULL);
+		} catch (InterruptedException e) {
+			LOGGER.log(Level.WARNING, String.format("Could not create symblink for %s",  itemHistoryDir.toPath()), e);
+		}
+
 		return f;
 	}
 
