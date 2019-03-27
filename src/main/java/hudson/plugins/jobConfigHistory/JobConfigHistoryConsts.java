@@ -29,14 +29,7 @@ package hudson.plugins.jobConfigHistory;
  * @author Stefan Brausch
  */
 public final class JobConfigHistoryConsts {
-
-	/**
-	 * Holder for constants.
-	 */
-	private JobConfigHistoryConsts() {
-		// Holder for constants
-	}
-
+	
 	/** Path to the jobConfigHistory base. */
 	public static final String URLNAME = "jobConfigHistory";
 
@@ -56,7 +49,7 @@ public final class JobConfigHistoryConsts {
 	public static final String HISTORY_FILE = "history.xml";
 
 	/** Default regexp pattern of configuration files not to save. */
-	public static final String DEFAULT_EXCLUDE = "queue\\.xml|nodeMonitors\\.xml|UpdateCenter\\.xml|global-build-stats|LockableResourcesManager\\.xml";
+	public static final String DEFAULT_EXCLUDE = "queue\\.xml|nodeMonitors\\.xml|UpdateCenter\\.xml|global-build-stats|LockableResourcesManager\\.xml|MilestoneStep\\.xml";
 
 	/** Format for timestamped dirs. */
 	public static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
@@ -69,4 +62,11 @@ public final class JobConfigHistoryConsts {
 
 	/** Default maximum number of days to keep entries. */
 	public static final String DEFAULT_MAX_DAYS_TO_KEEP_ENTRIES = "20";
+
+	/**
+	 * Holder for constants.
+	 */
+	private JobConfigHistoryConsts() {
+		// Holder for constants
+	}
 }

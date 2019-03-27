@@ -56,7 +56,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import hudson.model.TaskListener;
-import hudson.util.LogTaskListener;
 import org.apache.commons.io.FileUtils;
 
 import hudson.Extension;
