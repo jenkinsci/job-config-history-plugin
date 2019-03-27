@@ -40,6 +40,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -227,18 +228,29 @@ public class FileHistoryDaoTest {
 	 * Test of createNewHistoryDir method, of class FileHistoryDao.
 	 */
 	@Test
-	public void testCreateNewHistoryDir() throws IOException {
+	public void testCreateNewHistoryDir() throws IOException, InterruptedException {
 		final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
 		final File first = FileHistoryDao.createNewHistoryDir(historyRoot,
 				timestampHolder);
 		assertTrue(first.exists());
 		assertTrue(first.isDirectory());
+		assertTrue(Files.isSymbolicLink(Paths.get(historyRoot.getAbsolutePath() + "/lastHistory")));
+		// Check that symblink points to the first history dir created
+		File firstSymblink = new File(Paths.get(historyRoot.getAbsolutePath() + "/lastHistory").toString());
+		File firstLastRevision = new File(Util.resolveSymlink(firstSymblink));
+		assertEquals(first.getAbsolutePath(), firstLastRevision.getAbsolutePath());
 		// Should provoke clash
 		final File second = FileHistoryDao.createNewHistoryDir(historyRoot,
 				timestampHolder);
 		assertTrue(second.exists());
 		assertTrue(second.isDirectory());
 		assertNotEquals(first.getAbsolutePath(), second.getAbsolutePath());
+		assertTrue(Files.isSymbolicLink(Paths.get(historyRoot.getAbsolutePath() + "/lastHistory")));
+		// Check that symblink now points to the second history dir created
+		File secondSymblink = new File(Paths.get(historyRoot.getAbsolutePath() + "/lastHistory").toString());
+		File secondlastRevision = new File(Util.resolveSymlink(secondSymblink));
+		assertEquals(second.getAbsolutePath(), secondlastRevision.getAbsolutePath());
+
 	}
 
 	/**
@@ -690,11 +702,17 @@ public class FileHistoryDaoTest {
 		sutWithUserAndNoDuplicateHistory.createNewNode(mockedNode);
 		File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
 		File revisions = new File(file, "slave1");
-		assertEquals("Slave1 should have only one save history.", 2,
-				revisions.list().length);
-		File config = new File(revisions.listFiles()[0], "config.xml");
+		File[] revisionsList = revisions.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return !name.matches("lastHistory");
+			}
+		});
+		assertEquals("Slave1 should have only one save history.", 1,
+				revisionsList.length);
+		File config = new File(revisionsList[0], "config.xml");
 		assertTrue("File config.xml should be saved.", config.exists());
-		File history = new File(revisions.listFiles()[0],
+		File history = new File(revisionsList[0],
 				JobConfigHistoryConsts.HISTORY_FILE);
 		assertTrue("File history.xml should be saved.", history.exists());
 	}

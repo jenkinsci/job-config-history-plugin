@@ -31,10 +31,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.net.URI;
 
 import java.io.FileFilter;
 
@@ -363,7 +363,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				final FilePath newHistoryFilePath = new FilePath(newHistoryDir);
 				final FilePath oldHistoryFilePath = new FilePath(oldHistoryDir);
 				try {
-					oldHistoryFilePath.copyRecursiveTo(newHistoryFilePath);
+					oldHistoryFilePath.copyRecursiveTo("**/*", "**/lastHistory/**",newHistoryFilePath);
 					oldHistoryFilePath.deleteRecursive();
 					LOG.log(FINEST,
 						"completed move of old history files on location change {0}{1}",
@@ -398,7 +398,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				// rename
 				// tasks.
 				try {
-					fp.copyRecursiveTo(new FilePath(currentHistoryDir));
+					//final String fileMask, final String excludes, final FilePath target
+					fp.copyRecursiveTo("**/*", "**/lastHistory",new FilePath(currentHistoryDir));
+					//fp.copyRecursiveTo(new FilePath(currentHistoryDir));
 					fp.deleteRecursive();
 					LOG.log(FINEST,
 						"completed move of old history files on rename.{0}",
@@ -450,9 +452,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				final XmlFile historyXml = getHistoryXmlFile(historyDir);
 				final LazyHistoryDescr historyDescription = new LazyHistoryDescr(
 						historyXml);
-				if (!Files.isSymbolicLink(Paths.get(historyDir.getAbsolutePath()))) {
 					map.put(historyDir.getName(), historyDescription);
-				}
 			}
 			return map;
 		}
@@ -712,7 +712,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		if(symblink.exists()) {
 			try {
 				lastRevision = new XmlFile(getConfigFile(new File(Util.resolveSymlink(symblink))));
-			} catch (IOException | InterruptedException e) {
+			} catch (IOException | InterruptedException | NullPointerException e) {
 				LOGGER.log(Level.WARNING, String.format("Could not get access to the last revision %s", historiesDir.getPath() + "/" + LAST_HISTORY), e);
 			}
 		} else {
@@ -989,7 +989,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				// rename
 				// tasks.
 				try {
-					fp.copyRecursiveTo(new FilePath(currentHistoryDir));
+					fp.copyRecursiveTo("**/*", "**/lastHistory/**",new FilePath(currentHistoryDir));
 					fp.deleteRecursive();
 					LOG.log(Level.FINEST,
 						"completed move of old history files on rename.{0}",
@@ -1028,7 +1028,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 					historyDescription = (HistoryDescr) historyXml.read();
 				} catch (IOException ex) {
 					throw new RuntimeException("Unable to read history for "
-						+ node.getDisplayName(), ex);
+							+ node.getDisplayName(), ex);
 				}
 				map.put(historyDir.getName(), historyDescription);
 			}
@@ -1153,4 +1153,34 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		final XmlFile oldRevision = getOldRevision(node, identifier);
 		return oldRevision.getFile() != null && oldRevision.getFile().exists();
 	}
+
+	public static class JobConfigHistoryListFiles extends File {
+
+		public JobConfigHistoryListFiles(String pathname) {
+			super(pathname);
+		}
+
+		public JobConfigHistoryListFiles(String parent, String child) {
+			super(parent, child);
+		}
+
+		public JobConfigHistoryListFiles(File parent, String child) {
+			super(parent, child);
+		}
+
+		public JobConfigHistoryListFiles(URI uri) {
+			super(uri);
+		}
+
+		public File[] configHistoryListFiles(File file)  {
+			return file.listFiles(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					return !name.matches("lastHistory");
+				}
+			});
+		}
+	}
+
+
 }
