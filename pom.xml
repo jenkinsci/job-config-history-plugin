@@ -36,7 +36,7 @@
 
     <artifactId>jobConfigHistory</artifactId>
     <packaging>hpi</packaging>
-    <version>2.18.4-SNAPSHOT</version>
+    <version>2.20-SNAPSHOT</version>
 
     <name>Jenkins Job Configuration History Plugin</name>
     <description>Saves copies of job, node and system configurations.</description>
@@ -44,7 +44,7 @@
     
     <issueManagement>
         <system>JIRA</system>
-        <url>http://issues.jenkins-ci.org/secure/IssueNavigator.jspa?reset=true&amp;jqlQuery=project+%3D+JENKINS+AND+status+in+%28Open%2C+%22In+Progress%22%2C+Reopened%29+AND+component+%3D+%27jobconfighistory-plugin%27</url>
+        <url>https://issues.jenkins-ci.org/issues/?jql=project %3D Jenkins AND status in (Open, "In Progress", Reopened) AND component %3D jobconfighistory-plugin</url>
     </issueManagement>
     
     <scm>
@@ -108,14 +108,19 @@
     </developers>
 
     <properties>
-    	<jenkins-test-harness.version>1.554.1</jenkins-test-harness.version>
         <maven-surefire-report-plugin.version>2.20</maven-surefire-report-plugin.version>
         <maven-hpi-plugin.injectedTestName>InjectedIT</maven-hpi-plugin.injectedTestName>
         <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
         <jdepend-maven-plugin.version>2.9.1</jdepend-maven-plugin.version>
+        <java.level>8</java.level>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-core</artifactId>
+            <version>2.6.2</version>
+        </dependency>
         <dependency>
             <groupId>com.googlecode.java-diff-utils</groupId>
             <artifactId>diffutils</artifactId>
