@@ -704,7 +704,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 */
 	boolean hasDuplicateHistory(final XmlFile xmlFile) {
 		boolean isDuplicated = false;
-<<<<<<< HEAD
 		XmlFile lastRevision = null;
 
 		// Frist, we try to obtain the latest revision from the symblink
@@ -729,14 +728,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		}
 
 		if (lastRevision != null) {
-=======
-		final ArrayList<String> timeStamps = new ArrayList<String>(
-			getRevisions(xmlFile).keySet());
-		if (!timeStamps.isEmpty()) {
-			Collections.sort(timeStamps, Collections.reverseOrder());
-			final XmlFile lastRevision = getOldRevision(xmlFile,
-				timeStamps.get(0));
->>>>>>> origin
 			try {
 				if (xmlFile.asString().equals(lastRevision.asString())) {
 					isDuplicated = true;
