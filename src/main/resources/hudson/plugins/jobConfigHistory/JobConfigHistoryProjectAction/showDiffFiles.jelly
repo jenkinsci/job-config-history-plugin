@@ -1,5 +1,7 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:g="glide" xmlns:y="wasauchimmeroa4">
+
   <l:layout title="Job Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
@@ -20,6 +22,28 @@
               <j:set var="next2" value="${it.getNextTimestamp(2)}"/>
               <j:set var="timestamp1" value="${it.getTimestamp(1)}"/>
               <j:set var="timestamp2" value="${it.getTimestamp(2)}"/>
+
+              <script>
+                var showVersionDiffsJs = true;
+
+                function toggleShowHideVersionDiffsJs() {
+                  showVersionDiffsJs = !showVersionDiffsJs;
+                  if (showVersionDiffsJs === true) {
+                    document.getElementById("tbody_versionDiffsShown").style.display = '';
+                    document.getElementById("tbody_versionDiffsHidden").style.display = 'none';
+
+                    document.getElementById("showHideVersionDiffsJsButton").value = "Hide Version Changes";
+                  } else {
+                    document.getElementById("tbody_versionDiffsShown").style.display = 'none';
+                    document.getElementById("tbody_versionDiffsHidden").style.display = '';
+
+                    document.getElementById("showHideVersionDiffsJsButton").value = "Show Version Changes";
+                  }
+                }
+
+              </script>
+              <input id="showHideVersionDiffsJsButton" type="button" value="Hide Version Changes" onClick="toggleShowHideVersionDiffsJs();"/>
+
               <table style="width:100%;">
                 <thead>
                   <tr>
@@ -69,23 +93,27 @@
                     </td>
                   </tr>
                 </thead>
-                <tbody style="outline: 1pt solid #B2B2B2;">
-              <j:choose>
-                <j:when test="${it.getLines().size() == 0}">
+
+                <!-- The following 2 tbodys are switched via a js button-->
+                <!-- First is default and shows version diffs, second doesn't.-->
+                <tbody style="outline: 1pt solid #B2B2B2; display:''" id="tbody_versionDiffsShown">
+                  <j:choose>
+                    <j:when test="${it.getLines().size() == 0}">
                       <tr>
                         <td colspan="4">
                           <p>${%No lines changed}</p>
                         </td>
                       </tr>
                     </j:when>
-                  <j:otherwise>
-              <j:forEach items="${it.getLines()}" var="line">
-                      <tr>
-                        <j:choose>
-                          <j:when test="${line.skipping}">
-                            <th class="lineNum">...</th>
+                    <j:otherwise>
+
+                      <j:forEach items="${it.getLines(false)}" var="line">
+                        <tr>
+                          <j:choose>
+                            <j:when test="${line.skipping}">
+                              <th class="lineNum">...</th>
                               <td class="skipping"></td>
-                            <th class="lineNum">...</th>
+                              <th class="lineNum">...</th>
                               <td class="skipping"></td>
                             </j:when>
                             <j:otherwise>
@@ -100,6 +128,43 @@
                     </j:otherwise>
                   </j:choose>
                 </tbody>
+
+                <tbody style="outline: 1pt solid #B2B2B2; display:none" id="tbody_versionDiffsHidden">
+                  <j:choose>
+                    <j:when test="${it.getLines().size() == 0}">
+                      <tr>
+                        <td colspan="4">
+                          <p>${%No lines changed}</p>
+                        </td>
+                      </tr>
+                    </j:when>
+                    <j:otherwise>
+                      <!-- hide version diffs-->
+                      <j:forEach items="${it.getLines(true)}" var="line">
+                        <tr>
+                          <j:choose>
+                            <j:when test="${line.skipping}">
+                              <th class="lineNum">...</th>
+                              <td class="skipping"></td>
+                              <th class="lineNum">...</th>
+                              <td class="skipping"></td>
+                            </j:when>
+                            <j:otherwise>
+                              <th class="lineNum">${line.left.lineNumber}</th>
+                              <td class="${line.left.cssClass}"><pre><j:out value="${line.left.text}"/></pre></td>
+                              <th class="lineNum">${line.right.lineNumber}</th>
+                              <td class="${line.right.cssClass}"><pre><j:out value="${line.right.text}"/></pre></td>
+                            </j:otherwise>
+                          </j:choose>
+                        </tr>
+                      </j:forEach>
+                    </j:otherwise>
+                  </j:choose>
+                </tbody>
+
+
+
+
               </table>
               <div align="middle">
                 <table>

@@ -122,14 +122,13 @@ final public class PluginUtils {
 
 	public static boolean isUserExcluded(final JobConfigHistory plugin) {
 
-		final User user = User.current();
+		String user = Jenkins.getAuthentication().getName();
 
 		if (plugin.getExcludedUsers() != null) {
 			String excludedUsers = plugin.getExcludedUsers().trim();
 			String[] segs = excludedUsers.split(Pattern.quote(","));
 			for (String seg : segs) {
-				if (user != null && user.getId() != null
-						&& seg.trim().equals(user.getId())) {
+				if (seg.trim().equals(user)) {
 					return true;
 				}
 			}

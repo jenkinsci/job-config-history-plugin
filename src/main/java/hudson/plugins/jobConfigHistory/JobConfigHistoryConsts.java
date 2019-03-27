@@ -29,7 +29,7 @@ package hudson.plugins.jobConfigHistory;
  * @author Stefan Brausch
  */
 public final class JobConfigHistoryConsts {
-	
+
 	/** Path to the jobConfigHistory base. */
 	public static final String URLNAME = "jobConfigHistory";
 

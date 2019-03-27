@@ -73,16 +73,19 @@
             <timezone>+1</timezone>
         </developer>
         <developer>
-            <id>mfriedenhagen</id>
-            <name>Mirko Friedenhagen</name>
-            <email>mfriedenhagen@gmail.com</email>
-            <timezone>+1</timezone>
-        </developer>
-        <developer>
             <id>jochenafuerbacher</id>
             <name>Jochen A. Fuerbacher</name>
             <email>jochen.fuerbacher@1und1.de</email>
             <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>mfriedenhagen</id>
+            <name>Mirko Friedenhagen</name>
+            <email>mfriedenhagen@gmail.com</email>
+            <timezone>+1</timezone>
+            <roles>
+                <role>inactive</role>
+            </roles>
         </developer>
         <developer>
             <id>kstutz</id>

@@ -85,9 +85,10 @@ final class ConfigInfoCollector {
 	 *             If one of the entries cannot be read.
 	 */
 	void getConfigsForType(File itemDir, String folderName) throws IOException {
+		final String jobsString = "/jobs/";
 		final String itemName = folderName.isEmpty()
 				? itemDir.getName()
-				: folderName + "/jobs/" + itemDir.getName();
+				: folderName + jobsString + itemDir.getName();
 		final List<HistoryDescr> historyEntries = new ArrayList<HistoryDescr>(
 				overViewhistoryDao.getJobHistory(itemName).values());
 		if (historyEntries.isEmpty()) {
@@ -99,25 +100,21 @@ final class ConfigInfoCollector {
 			if (isADeletedJob) {
 				return;
 			}
-			HistoryDescr histDescr = historyEntries.get(0);
-			if ("Created".equals(histDescr.getOperation())) {
-				final ConfigInfo config = ConfigInfo.create(itemName, true,
-						histDescr, true);
-				configs.add(config);
-			} else {
-				// Why would the created entry not be the first one? Answer:
-				// There's always a 'Changed' entry before the 'Created' entry,
-				// because in the Jenkins core, when creating a new job,
-				// the SaveableListener (which handles changes) fires
-				// before the ItemListener (which handles creation, deletion
-				// etc.)
-				// Older versions of the plugin didn't show this behaviour
-				// since it was masked by some race condition.
-				histDescr = historyEntries.get(1);
-				if ("Created".equals(histDescr.getOperation())) {
+			// Why would the created entry not be the first one? Answer:
+			// There's always a 'Changed' entry before the 'Created' entry,
+			// because in the Jenkins core, when creating a new job,
+			// the SaveableListener (which handles changes) fires
+			// before the ItemListener (which handles creation, deletion
+			// etc.)
+			// Older versions of the plugin didn't show this behaviour
+			// since it was masked by some race condition.
+			for (HistoryDescr descr : historyEntries) {
+				//this loop isn't necessary, but easier to comprehend than the previous construct.
+				if ("Created".equals(descr.getOperation())) {
 					final ConfigInfo config = ConfigInfo.create(itemName, true,
-							histDescr, true);
+							descr, true);
 					configs.add(config);
+					return;
 				}
 			}
 		} else if ("deleted".equals(type)) {
@@ -158,5 +155,53 @@ final class ConfigInfoCollector {
 			getConfigsForType(itemDir, folderName);
 		}
 		return configs;
+	}
+
+	public List<ConfigInfo> collect() throws  IOException{
+		final File[] itemDirs;
+		if ("deleted".equals(type)) {
+			itemDirs = overViewhistoryDao.getDeletedJobs();
+		} else {
+			itemDirs = (File[]) ArrayUtils.addAll(
+					overViewhistoryDao.getDeletedJobs(),
+					overViewhistoryDao.getJobs());
+		}
+		Arrays.sort(itemDirs, FileNameComparator.INSTANCE);
+
+		for (final File itemDir : itemDirs) {
+			String folderName = getFolderName(itemDir);
+			getConfigsForType(itemDir, folderName);
+		}
+		return configs;
+	}
+
+	private String getFolderName(File file) {
+		if (isJobInFolder(file)) {
+			File nextAncestor = file.getParentFile().getParentFile();
+			String folderName = "";
+			File jobConfigHistoryJobDirection = new File(PluginUtils.getPlugin().getConfiguredHistoryRootDir(), "jobs");
+			while (nextAncestor.isDirectory() && !nextAncestor.toString().equals(jobConfigHistoryJobDirection.toString())) {
+
+				folderName = nextAncestor.getName()
+                        + (folderName.isEmpty() ? "" : "/")
+                        + folderName;
+
+				nextAncestor = nextAncestor.getParentFile();
+			}
+			return folderName;
+		} else return "";
+	}
+
+	private boolean isJobInFolder(File file) {
+		try {
+			File jobConfigHistoryRootDirection = PluginUtils.getPlugin().getConfiguredHistoryRootDir();
+			return (!file.getParentFile().getParentFile().toString()
+					.equals(jobConfigHistoryRootDirection.toString()));
+		} catch (NullPointerException e) {
+			//this happens sometimes, idk...
+			return false;
+		}
+
+
 	}
 }

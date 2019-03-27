@@ -59,4 +59,12 @@ public interface ItemListenerHistoryDao {
 	 *            project
 	 */
 	void deleteItem(Item item);
+
+	/**
+	 * Changes the item's history's location.
+	 * @param item
+	 * @param oldFullName
+	 * @param newFullName
+	 */
+	void changeItemLocation(Item item, String oldFullName, String newFullName);
 }

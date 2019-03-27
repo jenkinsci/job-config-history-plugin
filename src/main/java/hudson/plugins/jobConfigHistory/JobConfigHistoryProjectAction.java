@@ -347,33 +347,24 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		// no previous entry found
 		return timestamp;
 	}
-
+	
 	/**
 	 * Takes the two timestamp request parameters and returns the diff between
 	 * the corresponding config files of this project as a list of single lines.
-	 *
+	 * Filters lines that match the <i>ignoredLinesPattern</i> if wanted.
+	 * 
+	 * @param hideVersionDiffs determines whether version diffs shall be shown or not.
 	 * @return Differences between two config versions as list of lines.
-	 * @throws IOException
-	 *             If diff doesn't work or xml files can't be read.
+	 * @throws IOException If diff doesn't work or xml files can't be read.
 	 */
-	public final List<Line> getLines() throws IOException {
+	public final List<Line> getLines(boolean hideVersionDiffs) throws IOException {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
 			checkConfigurePermission();
 			return null;
 		}
 		final String timestamp1 = getRequestParameter("timestamp1");
 		final String timestamp2 = getRequestParameter("timestamp2");
-
-		final XmlFile configXml1 = getOldConfigXml(timestamp1);
-		final String[] configXml1Lines = configXml1.asString().split("\\n");
-		final XmlFile configXml2 = getOldConfigXml(timestamp2);
-		final String[] configXml2Lines = configXml2.asString().split("\\n");
-
-		final String diffAsString = getDiffAsString(configXml1.getFile(),
-				configXml2.getFile(), configXml1Lines, configXml2Lines);
-
-		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
-		return getDiffLines(diffLines);
+		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2), hideVersionDiffs);
 	}
 
 	/**
@@ -453,4 +444,5 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	public Api getApi() {
 		return new Api(this);
 	}
+
 }

@@ -29,8 +29,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -172,7 +173,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 			return Collections.emptyList();
 		} else {
 			return new ConfigInfoCollector(type, getOverviewHistoryDao())
-					.collect("");
+					.collect();
 		}
 	}
 
@@ -318,35 +319,67 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	}
 
 	/**
-	 * Returns the diff between two config files as a list of single lines.
-	 * Takes the two timestamps and the name of the system property or the
-	 * deleted job from the url parameters.
+	 * Takes the two timestamp request parameters and returns the diff between
+	 * the corresponding config files of this project as a list of single lines.
+	 * Filters lines that contain plugin version infomation.
 	 *
+	 * @param hideVersionDiffs determines whether lines that match the
+	 *                 <i>ignoredLinesPattern</i> shall be hidden or not.
 	 * @return Differences between two config versions as list of lines.
-	 * @throws IOException
-	 *             If diff doesn't work or xml files can't be read.
+	 * @throws IOException If diff doesn't work or xml files can't be read.
 	 */
-	public final List<Line> getLines() throws IOException {
+	public final List<Line> getLines(boolean hideVersionDiffs) throws IOException {
 		final String name = getRequestParameter("name");
 		if ((name.contains(DeletedFileFilter.DELETED_MARKER)
 				&& hasJobConfigurePermission()) || hasConfigurePermission()) {
 			final String timestamp1 = getRequestParameter("timestamp1");
 			final String timestamp2 = getRequestParameter("timestamp2");
 
-			final XmlFile configXml1 = getOldConfigXml(name, timestamp1);
+			/*final XmlFile configXml1 = getOldConfigXml(name, timestamp1);
 			final String[] configXml1Lines = configXml1.asString().split("\\n");
 			final XmlFile configXml2 = getOldConfigXml(name, timestamp2);
 			final String[] configXml2Lines = configXml2.asString().split("\\n");
 
+			//compute the diff with respect to ignoredLinesPattern if hideVersionDiffs == true
 			final String diffAsString = getDiffAsString(configXml1.getFile(),
-					configXml2.getFile(), configXml1Lines, configXml2Lines);
+					configXml2.getFile(), configXml1Lines, configXml2Lines, hideVersionDiffs);
 
 			final List<String> diffLines = Arrays
 					.asList(diffAsString.split("\n"));
-			return getDiffLines(diffLines);
+			return getDiffLines(diffLines);*/
+			return getLines(getOldConfigXml(name, timestamp1), getOldConfigXml(name, timestamp2), hideVersionDiffs);
 		} else {
 			return Collections.emptyList();
 		}
+	}
+
+	/**
+	 * Used in the Difference jelly only. Returns one of the two timestamps that
+	 * have been passed to the Difference page as parameter. timestampNumber
+	 * must be 1 or 2.
+	 *
+	 * @param timestampNumber
+	 *            1 for timestamp1 and 2 for timestamp2
+	 * @return the timestamp as String.
+	 */
+	public final String getTimestamp(int timestampNumber) {
+		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
+			checkConfigurePermission();
+			return null;
+		}
+		String timeStamp = this
+				.getRequestParameter("timestamp" + timestampNumber);
+		SimpleDateFormat format = new java.text.SimpleDateFormat(
+				"yyyy-MM-dd_HH-mm-ss");
+
+		try {
+			format.setLenient(false);
+			format.parse(timeStamp);
+			return timeStamp;
+		} catch (ParseException e) {
+			return null;
+		}
+
 	}
 
 	/**
@@ -421,6 +454,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		final InputStream is = new ByteArrayInputStream(
 				configXml.asString().getBytes("UTF-8"));
 		final String calculatedNewName = findNewName(newName);
+
+		//TODO problem: this only creates Items with Jenkins.getInstance() as parent ItemGroup, which breaks the restoration of folders.
 		final TopLevelItem project = getJenkins()
 				.createProjectFromXML(calculatedNewName, is);
 		// TODO: Casting here should be removed.
@@ -480,7 +515,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	/**
 	 * Action when 'restore' button in history.jelly is pressed. Gets required
 	 * parameter and forwards to restoreQuestion.jelly.
-	 * 
+	 *
 	 * @param req
 	 *            StaplerRequest created by pressing the button
 	 * @param rsp

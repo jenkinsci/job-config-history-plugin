@@ -83,9 +83,13 @@
                     <td>${config.date}</td>
                     <j:choose>
                       <j:when test="${config.getIsJob()}">
-                        <!-- TODO besides clumsiness with folders, this fails to URL-escape characters in job names -->
                         <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
-                        <td><a href="${rootURL}/job/${config.job.replace('/', '/job/')}/jobConfigHistory">${config.job.replace('/', ' » ')}</a></td>
+                        <td>
+                          <a href="${rootURL}/job/${config.job.replace('/jobs', '/job')}/jobConfigHistory">
+                            <!-- Adding breadcrumbs and deleting irrelevant information about the jobs subdirectory -->
+                            ${config.job.replace('/jobs', '').replace('/', ' » ')}
+                          </a>
+                        </td>
                       </j:when>
                       <j:otherwise>
                         <j:choose>
@@ -116,9 +120,13 @@
                       <td>
                         <j:if test="${it.getLastAvailableConfigXml(config.getJob()) != null}">
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                            <a id="restore" href="restoreQuestion?name=${config.getJob()}">
-							<img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
-						    </a>
+                            <!--this prevents people from destroying their history by trying to restore deleted folder jobs
+                             TODO Fix that. (see code)-->
+                            <j:if test="${config.job.replace('/jobs', '/job').equals(config.job)}">
+                              <a id="restore" href="restoreQuestion?name=${config.getJob()}">
+                                <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
+                              </a>
+                            </j:if>
                           </j:if>
 						</j:if>
                       </td>
