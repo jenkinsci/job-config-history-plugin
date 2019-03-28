@@ -810,8 +810,8 @@ public class FileHistoryDaoTest {
 		File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
 		File revisions = new File(file, "slave1");
 		sutWithUserAndNoDuplicateHistory.saveNode(mockedNode);
-		assertEquals("New revision should be saved.", 2,
-				revisions.list().length);
+		assertEquals("New revision should be saved.", 1,
+				revisions.listFiles(HistoryFileFilter.INSTANCE).length);
 	}
 
 	@Test
