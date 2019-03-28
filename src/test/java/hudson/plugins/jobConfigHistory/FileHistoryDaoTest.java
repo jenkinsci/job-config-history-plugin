@@ -129,7 +129,7 @@ public class FileHistoryDaoTest {
 		sutWithoutUserAndDuplicateHistory.createNewHistoryEntry(test1Config,
 				"foo", null, null);
 		final int newLength = getHistoryLength();
-		assertEquals(7, newLength);
+		assertEquals(6, newLength);
 	}
 
 	/**
@@ -317,11 +317,11 @@ public class FileHistoryDaoTest {
 	@Test
 	public void testSaveItem_XmlFileDuplicate() {
 		sutWithoutUserAndDuplicateHistory.saveItem(test1Config);
-		assertEquals(7, getHistoryLength());
+		assertEquals(6, getHistoryLength());
 	}
 
 	private int getHistoryLength() {
-		return test1History.list().length;
+		return test1History.listFiles(HistoryFileFilter.INSTANCE).length;
 	}
 
 	/**
@@ -348,7 +348,7 @@ public class FileHistoryDaoTest {
 				"NewName");
 		final File newHistoryDir = new File(historyRoot, "jobs/" + newName);
 		assertTrue(newHistoryDir.exists());
-		assertEquals(7, newHistoryDir.list().length);
+		assertEquals(6, newHistoryDir.listFiles(HistoryFileFilter.INSTANCE).length);
 	}
 
 	/**
@@ -702,12 +702,7 @@ public class FileHistoryDaoTest {
 		sutWithUserAndNoDuplicateHistory.createNewNode(mockedNode);
 		File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
 		File revisions = new File(file, "slave1");
-		File[] revisionsList = revisions.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return !name.matches("lastHistory");
-			}
-		});
+		File[] revisionsList = revisions.listFiles(HistoryFileFilter.INSTANCE);
 		assertEquals("Slave1 should have only one save history.", 1,
 				revisionsList.length);
 		File config = new File(revisionsList[0], "config.xml");
