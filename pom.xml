@@ -105,6 +105,12 @@
                 <role>inactive</role>
             </roles>
         </developer>
+        <developer>
+            <id>robischulz</id>
+            <name>Robin Schulz</name>
+            <email>robin.schulz@1und1.de</email>
+            <timezone>+1</timezone>
+        </developer>
     </developers>
 
     <properties>
