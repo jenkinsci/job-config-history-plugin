@@ -49,7 +49,7 @@ public class ComputerHistoryListener extends ComputerListener {
 	
 	public ComputerHistoryListener() {
 		Jenkins jenkins = Jenkins.getInstance();
-		nodes = jenkins != null ? jenkins.getNodes() : null;
+		nodes = jenkins.getNodes();
 	}
 
 	@Override
@@ -58,8 +58,6 @@ public class ComputerHistoryListener extends ComputerListener {
 		// during class initialization. NodeList will surely be defined
 		// on the first run of this method.
 		Jenkins jenkins = Jenkins.getInstance();
-		if(jenkins == null)
-			return;
 		if (nodes == null) {
 			nodes = jenkins.getNodes();
 		}
@@ -86,8 +84,6 @@ public class ComputerHistoryListener extends ComputerListener {
 	 */
 	private void onAdd() {
 		Jenkins jenkins = Jenkins.getInstance();
-		if(jenkins == null)
-			return;
 		for (Node node : jenkins.getNodes()) {
 			if (!nodes.contains(node) && isTracked(node)) {
 				switchHistoryDao(node).createNewNode(node);
@@ -111,8 +107,6 @@ public class ComputerHistoryListener extends ComputerListener {
 	 */
 	private void onRemove() {
 		Jenkins jenkins = Jenkins.getInstance();
-		if(jenkins == null)
-			return;
 		for (Node node : nodes) {
 			if (!jenkins.getNodes().contains(node)
 					&& isTracked(node)) {
@@ -127,8 +121,6 @@ public class ComputerHistoryListener extends ComputerListener {
 	 */
 	private void onChange() {
 		Jenkins jenkins = Jenkins.getInstance();
-		if(jenkins == null)
-			return;
 		final JobConfigHistoryStrategy hdao = PluginUtils.getHistoryDao();
 		for (Node node : jenkins.getNodes()) {
 			if (!PluginUtils.isUserExcluded(PluginUtils.getPlugin())
@@ -145,8 +137,6 @@ public class ComputerHistoryListener extends ComputerListener {
 	private void onRename() {
 		Node originalNode = null;
 		Jenkins jenkins = Jenkins.getInstance();
-		if(jenkins == null)
-			return;
 		for (Node node : nodes) {
 			if (!jenkins.getNodes().contains(node)
 					&& isTracked(node)) {

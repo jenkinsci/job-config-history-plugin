@@ -204,7 +204,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 	 */
 	String getRootUrl() {
 		Jenkins jenkins = Jenkins.getInstance();
-		return jenkins != null ? jenkins.getRootUrl() : null;
+		return jenkins.getRootUrl();
 	}
 
 	/**

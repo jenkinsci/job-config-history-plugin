@@ -70,15 +70,11 @@ public class JobConfigHistoryPurger extends PeriodicWork {
 	 * Standard constructor using instance.
 	 */
 	public JobConfigHistoryPurger() {
-		Jenkins jenkins = Jenkins.getInstance();
-		if(jenkins == null)
-			return;
-		JobConfigHistory plugin = jenkins.getPlugin(JobConfigHistory.class);
-		assignValue(plugin, 
-				(PluginUtils.getHistoryDao(plugin, null) instanceof Purgeable
-				? (Purgeable) PluginUtils.getHistoryDao(plugin, null)
-				: null), 
-				PluginUtils.getHistoryDao(plugin, null));
+		JobConfigHistory plugin = PluginUtils.getPlugin();
+		JobConfigHistoryStrategy historyDao = PluginUtils.getAnonymousHistoryDao(plugin);
+		assignValue(plugin,
+				historyDao instanceof Purgeable ? (Purgeable) historyDao : null,
+				historyDao);
 	}
 
 	/**

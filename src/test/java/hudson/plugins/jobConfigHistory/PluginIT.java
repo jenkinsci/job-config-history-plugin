@@ -52,7 +52,6 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 		private final HtmlPage configPage;
 
 		/**
-		 * @param configPage
 		 * @throws SAXException
 		 * @throws IOException
 		 */
@@ -81,7 +80,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 		}
 
 		public List<HtmlAnchor> getConfigOutputLinks(final String type) {
-			final List<HtmlAnchor> hrefs = (List<HtmlAnchor>) historyPage.getByXPath(
+			final List<HtmlAnchor> hrefs = historyPage.getByXPath(
 					"//a[contains(@href, \"configOutput?type=" + type + "\")]");
 			return hrefs;
 		}
@@ -110,7 +109,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 		public HtmlPage getDiffPage() throws IOException {
 			final HtmlForm diffFilesForm = historyPage
 					.getFormByName("diffFiles");
-			return (HtmlPage) last(diffFilesForm.getHtmlElementsByTagName("button")).click();
+			return last(diffFilesForm.getElementsByTagName("button")).click();
 		}
 
 		public void setCheckedTimestamp1RadioButton(int index,
@@ -174,7 +173,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 					.getConfigOutputLinks("xml");
 			Assert.assertTrue(hrefs.size() >= 1);
 			final HtmlAnchor xmlAnchor = hrefs.get(0);
-			final XmlPage xmlPage = (XmlPage) xmlAnchor.click();
+			final XmlPage xmlPage = xmlAnchor.click();
 			assertThat(xmlPage.asXml(), containsString(firstDescription));
 		}
 		{
@@ -183,7 +182,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 					.getConfigOutputLinks("raw");
 			Assert.assertTrue(hrefs.size() >= 2);
 			final HtmlAnchor rawAnchor = hrefs.get(0);
-			final TextPage firstRaw = (TextPage) rawAnchor.click();
+			final TextPage firstRaw = rawAnchor.click();
 			assertThat(firstRaw.getContent(),
 					containsString(secondDescription));
 		}
@@ -195,7 +194,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 		final List<? extends HtmlAnchor> allXmlHRefs = allJobConfigHistoryPage
 				.getConfigOutputLinks("xml");
 		Assert.assertTrue(allXmlHRefs.size() >= 2);
-		final TextPage firstRawOfAll = (TextPage) allRawHRefs.get(0).click();
+		final TextPage firstRawOfAll = allRawHRefs.get(0).click();
 		assertThat(firstRawOfAll.getContent(),
 				containsString(secondDescription));
 		final HistoryPage historyPage = new HistoryPage();
@@ -234,13 +233,12 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 		try {
 			final HtmlPage historyPage = webClient.goTo(
 					JobConfigHistoryConsts.URLNAME + "/history?name=config");
-			final List<HtmlAnchor> allRawHRefs = (List<HtmlAnchor>) historyPage.getByXPath(
+			final List<HtmlAnchor> allRawHRefs = historyPage.getByXPath(
 					"//a[contains(@href, \"configOutput?type=raw\")]");
 			Assert.assertTrue(
 					"Check that there are at least 2 links for raw output.",
 					allRawHRefs.size() >= 2);
-			final TextPage firstRawOfAll = (TextPage) allRawHRefs.get(0)
-					.click();
+			final TextPage firstRawOfAll = allRawHRefs.get(0).click();
 			assertThat(
 					"Check that the first raw output link leads to the right target.",
 					firstRawOfAll.getContent(),
