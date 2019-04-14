@@ -37,7 +37,7 @@
         <br />
         <f:radio name="showBuildBadges" title="${%Only for administrators}" value="adminUser" checked="${it.getShowBuildBadges() == 'adminUser'}"/>
       </f:entry>
-      <f:entry title="${%Exclude users}" help="/plugin/jobConfigHistory/help/help-excludeUsers.html">
+      <f:entry title="${%Exclude users}" help="/plugin/jobConfigHistory/help/help-excludedUsers.html">
         <f:textbox name="excludedUsers" value="${it.excludedUsers}" />
       </f:entry>
     </f:advanced>
