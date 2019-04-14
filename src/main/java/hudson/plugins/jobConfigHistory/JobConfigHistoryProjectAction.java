@@ -322,7 +322,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 * 
 	 * @param timestampNumber
 	 *            1 for File A, 2 for File B
-	 * @return the timestamp of the preious entry as String.
+	 * @return the timestamp of the previous entry as String.
 	 */
 	public final String getPrevTimestamp(int timestampNumber) {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {

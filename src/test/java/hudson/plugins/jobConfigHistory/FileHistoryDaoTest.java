@@ -755,13 +755,13 @@ public class FileHistoryDaoTest {
 		createNodeRevision("2014-01-20_10-21-34", mockedNode);
 		SortedMap<String, HistoryDescr> revisions = sutWithUserAndNoDuplicateHistory
 				.getRevisions(mockedNode);
-		assertNotNull("Revisiosn 2014-01-18_10-12-34 should be returned.",
+		assertNotNull("Revision 2014-01-18_10-12-34 should be returned.",
 				revisions.get("2014-01-18_10-12-34"));
-		assertNotNull("Revisiosn 2014-01-19_10-12-34 should be returned.",
+		assertNotNull("Revision 2014-01-19_10-12-34 should be returned.",
 				revisions.get("2014-01-19_10-12-34"));
-		assertNotNull("Revisiosn 2014-01-20_10-12-34 should be returned.",
+		assertNotNull("Revision 2014-01-20_10-12-34 should be returned.",
 				revisions.get("2014-01-20_10-12-34"));
-		assertNotNull("Revisiosn 2014-01-20_10-21-34 should be returned.",
+		assertNotNull("Revision 2014-01-20_10-21-34 should be returned.",
 				revisions.get("2014-01-20_10-21-34"));
 	}
 

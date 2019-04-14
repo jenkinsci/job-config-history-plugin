@@ -227,7 +227,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	}
 
 	/**
-	 * Creates links to the correct configOutput.jellys for job history vs.
+	 * Creates links to the correct configOutput.jelly for job history vs.
 	 * system history and for xml vs. plain text.
 	 *
 	 * @param config
@@ -322,7 +322,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	/**
 	 * Takes the two timestamp request parameters and returns the diff between
 	 * the corresponding config files of this project as a list of single lines.
-	 * Filters lines that contain plugin version infomation.
+	 * Filters lines that contain plugin version information.
 	 *
 	 * @param hideVersionDiffs determines whether lines that match the
 	 *                 <i>ignoredLinesPattern</i> shall be hidden or not.

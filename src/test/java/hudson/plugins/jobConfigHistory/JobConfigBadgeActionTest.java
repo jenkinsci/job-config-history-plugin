@@ -184,7 +184,7 @@ public class JobConfigBadgeActionTest {
 	}
 
 	@Test
-	public void testListenerOnStartedGreatherThan2ButNoPreviousBuild() {
+	public void testListenerOnStartedGreaterThan2ButNoPreviousBuild() {
 		final JobConfigBadgeAction.Listener psut = createListenerSut();
 		when(mockedProject.getNextBuildNumber()).thenReturn(3);
 		when(mockedProject.getLastBuild()).thenReturn(mockedBuild);

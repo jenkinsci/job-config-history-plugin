@@ -226,7 +226,7 @@ public class JobConfigHistoryIT
 					form.getTextContent()
 							.contains("Enter a valid positive integer"));
 			Assert.assertFalse(
-					"Check no error messgae present for regexp excludePattern.",
+					"Check no error message present for regexp excludePattern.",
 					form.getTextContent().contains("Invalid regexp"));
 			form.getInputByName("excludePattern").setValueAttribute("**");
 			Assert.assertTrue(

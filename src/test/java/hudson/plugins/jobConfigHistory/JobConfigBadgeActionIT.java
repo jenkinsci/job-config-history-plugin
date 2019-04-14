@@ -251,7 +251,7 @@ public class JobConfigBadgeActionIT
 		Thread.sleep(SLEEP_TIME);
 
 		for (int i = 3; i < 6; i++) {
-			project.setDescription("decription no. " + i);
+			project.setDescription("description no. " + i);
 			Thread.sleep(SLEEP_TIME);
 		}
 		final String lastDescription = "last description";

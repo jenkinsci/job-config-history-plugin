@@ -281,7 +281,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     public abstract List<Line> getLines(boolean useRegex) throws IOException;
 
-    private String reFormatAndconcatStringArray(String[] arr) {
+    private String reformatAndConcatStringArray(String[] arr) {
         String ret = "";
 
         //this needs to be done because the sorting  process writes the first line as:
@@ -326,7 +326,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
         if (hideVersionDiffs) {
             //calculate diffs to be excluded from the output.
-            Diff versionDiffs = getVersionDiffsOnly(reFormatAndconcatStringArray(file1Lines), reFormatAndconcatStringArray(file2Lines));
+            Diff versionDiffs = getVersionDiffsOnly(reformatAndConcatStringArray(file1Lines), reformatAndConcatStringArray(file2Lines));
             //feature in library: empty deltas are shown, too.
             List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
             for (Delta delta : patch.getDeltas()) {

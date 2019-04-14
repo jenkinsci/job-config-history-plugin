@@ -35,7 +35,7 @@ public class ComputerHistoryListenerIT {
 				revisions.size());
 		String firstKey = revisions.firstKey();
 		HistoryDescr descr = dao.getRevisions(slave1).get(firstKey);
-		assertEquals("Revisoins should have status created.",
+		assertEquals("Revisions should have status created.",
 				Messages.ConfigHistoryListenerHelper_CREATED(),
 				descr.getOperation());
 	}
@@ -83,7 +83,7 @@ public class ComputerHistoryListenerIT {
 				"Revisions of " + slave1.getNodeName()
 						+ " should contains 1 revision.",
 				1, dao.getRevisions(slave1).size());
-		assertEquals(slave2.getNodeName() + " should have anyrevision.", 0,
+		assertEquals(slave2.getNodeName() + " should have any revision.", 0,
 				dao.getRevisions(slave2).size());
 		assertEquals(
 				"Revisions of " + slave3.getNodeName()
