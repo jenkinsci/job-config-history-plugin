@@ -505,7 +505,7 @@ public class FileHistoryDaoTest {
 		IOUtils.write(xmlFile.asString(), new FileOutputStream(configFile));
 		boolean result = sutWithUserAndNoDuplicateHistory
 				.hasDuplicateHistory(new XmlFile(configFile));
-		assertEquals(false, result);
+		assertFalse(result);
 	}
 
 	/**
@@ -516,7 +516,7 @@ public class FileHistoryDaoTest {
 		final File configFile = new File(test1JobDirectory, "config.xml");
 		boolean result = sutWithUserAndNoDuplicateHistory
 				.hasDuplicateHistory(new XmlFile(configFile));
-		assertEquals(true, result);
+		assertTrue(result);
 	}
 
 	/**
@@ -527,7 +527,7 @@ public class FileHistoryDaoTest {
 		final File configFile = new File(jenkinsHome, "jobs/Test2/config.xml");
 		boolean result = sutWithUserAndNoDuplicateHistory
 				.hasDuplicateHistory(new XmlFile(configFile));
-		assertEquals(false, result);
+		assertFalse(result);
 	}
 
 	/**
@@ -539,7 +539,7 @@ public class FileHistoryDaoTest {
 				new File(test1JobDirectory, "config.xml"));
 		boolean result = sutWithoutUserAndDuplicateHistory
 				.checkDuplicate(xmlFile);
-		assertEquals(true, result);
+		assertTrue(result);
 	}
 
 	/**
@@ -551,7 +551,7 @@ public class FileHistoryDaoTest {
 				new File(test1JobDirectory, "config.xml"));
 		boolean result = sutWithUserAndNoDuplicateHistory
 				.checkDuplicate(xmlFile);
-		assertEquals(false, result);
+		assertFalse(result);
 	}
 
 	/**
@@ -563,7 +563,7 @@ public class FileHistoryDaoTest {
 				new File(jenkinsHome, "jobs/Test2/config.xml"));
 		boolean result = sutWithUserAndNoDuplicateHistory
 				.checkDuplicate(xmlFile);
-		assertEquals(true, result);
+		assertTrue(result);
 	}
 
 	/**
