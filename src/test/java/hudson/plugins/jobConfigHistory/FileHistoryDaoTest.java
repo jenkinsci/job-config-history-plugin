@@ -53,6 +53,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,7 +63,6 @@ import hudson.XmlFile;
 import hudson.model.AbstractItem;
 import hudson.model.Node;
 import hudson.model.User;
-import hudson.util.IOUtils;
 import jenkins.model.Jenkins;
 
 /**
@@ -259,8 +259,7 @@ public class FileHistoryDaoTest {
 	public void testCreateNewItem() throws IOException {
 		final File jobDir = new File(jenkinsHome, "jobs/MyTest");
 		jobDir.mkdirs();
-		IOUtils.copy(test1Config.getFile(),
-				new FileOutputStream(new File(jobDir, "config.xml")));
+		FileUtils.copyFile(test1Config.getFile(), new File(jobDir, "config.xml"));
 		when(mockedItem.getRootDir()).thenReturn(jobDir);
 		sutWithUserAndNoDuplicateHistory.createNewItem(mockedItem);
 		assertTrue(new File(jobDir, "config.xml").exists());

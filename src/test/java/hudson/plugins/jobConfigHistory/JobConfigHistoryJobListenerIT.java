@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
-import org.jvnet.hudson.test.Bug;
+import org.jvnet.hudson.test.Issue;
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
@@ -130,7 +130,7 @@ public class JobConfigHistoryJobListenerIT
 		}
 	}
 
-	@Bug(16499)
+	@Issue("JENKINS-16499")
 	public void testCopyJob() throws Exception {
 		final String text = "This is a description.";
 		final FreeStyleProject project1 = createFreeStyleProject();

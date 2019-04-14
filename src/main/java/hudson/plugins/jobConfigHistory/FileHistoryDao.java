@@ -55,7 +55,6 @@ import org.apache.commons.io.FileUtils;
 
 import hudson.Extension;
 import hudson.FilePath;
-import hudson.Util;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
@@ -63,6 +62,7 @@ import hudson.model.Item;
 import hudson.model.Node;
 import hudson.model.User;
 import jenkins.model.Jenkins;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.SystemUtils;
 
 /**
@@ -207,8 +207,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			final FileInputStream configOriginal = new FileInputStream(
 				currentConfig);
 			try {
-				// in is buffered by copyStream.
-				Util.copyStream(configOriginal, configCopy);
+				IOUtils.copy(configOriginal, configCopy);
 			} finally {
 				configOriginal.close();
 			}
