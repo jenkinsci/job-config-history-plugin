@@ -26,6 +26,7 @@ package hudson.plugins.jobConfigHistory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -407,7 +408,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		final XmlFile xmlFile = getHistoryDao().getOldRevision(project,
 				timestamp);
 		final InputStream is = new ByteArrayInputStream(
-				xmlFile.asString().getBytes("UTF-8"));
+				xmlFile.asString().getBytes(StandardCharsets.UTF_8));
 
 		project.updateByXml((Source) new StreamSource(is));
 		project.save();

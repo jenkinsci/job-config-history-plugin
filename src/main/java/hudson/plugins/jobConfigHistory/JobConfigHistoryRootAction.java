@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -452,7 +453,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		final XmlFile configXml = getLastAvailableConfigXml(deletedName);
 
 		final InputStream is = new ByteArrayInputStream(
-				configXml.asString().getBytes("UTF-8"));
+				configXml.asString().getBytes(StandardCharsets.UTF_8));
 		final String calculatedNewName = findNewName(newName);
 
 		//TODO problem: this only creates Items with Jenkins.getInstance() as parent ItemGroup, which breaks the restoration of folders.
