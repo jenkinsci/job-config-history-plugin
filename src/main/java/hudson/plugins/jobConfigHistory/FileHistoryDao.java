@@ -762,11 +762,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	private File[] getJobFilesIncludingThoseInFolders(final FileFilter fileFilter) {
 		final List<File> folderFiles = getJobFilesIncludingThoseInFolders();
 
-		List<File> resultList = folderFiles.stream()
-			.filter(folderFile -> fileFilter.accept(folderFile))
-			.collect(Collectors.toList());
-
-		return resultList.toArray(new File[resultList.size()]);
+		return folderFiles.stream().filter(fileFilter::accept).toArray(File[]::new);
 	}
 
 	/**
