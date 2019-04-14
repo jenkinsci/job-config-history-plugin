@@ -9,10 +9,10 @@
       <script type="text/javascript">
 		   function showTooltip(nr) {
 		       document.getElementById('tooltip' + nr).style.visibility = 'visible';
-		   };
+		   }
 		   function hideTooltip(nr) {
 		       document.getElementById('tooltip' + nr).style.visibility = 'hidden';
-		   };
+		   }
 		</script>
         <j:set var="configs" value="${it.getJobConfigs()}" />
         <j:choose>
