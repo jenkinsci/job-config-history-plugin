@@ -246,7 +246,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet()
 				.iterator();
 		while (itr.hasNext()) {
-			if (itr.next().getValue().getTimestamp().equals((String) timestamp)
+			if (itr.next().getValue().getTimestamp().equals(timestamp)
 					&& itr.hasNext()) {
 				return itr.next().getValue().getTimestamp();
 			}
@@ -275,7 +275,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		String prevTimestamp = timestamp;
 		while (itr.hasNext()) {
 			final String checkTimestamp = itr.next().getValue().getTimestamp();
-			if (checkTimestamp.equals((String) timestamp)) {
+			if (checkTimestamp.equals(timestamp)) {
 				return prevTimestamp;
 			} else {
 				prevTimestamp = checkTimestamp;

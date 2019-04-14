@@ -261,7 +261,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * 		<b>false</b> else
      */
     public String getShowVersionDiffs() {
-        String showVersionDiffs = (String) (this.getRequestParameter("showVersionDiffs"));
+        String showVersionDiffs = this.getRequestParameter("showVersionDiffs");
         return (showVersionDiffs  == null) ? "True" : showVersionDiffs;
     }
 
