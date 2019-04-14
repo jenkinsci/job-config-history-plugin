@@ -1,7 +1,6 @@
-/**
+/*
  * Copyright 2010 Mirko Friedenhagen
  */
-
 package hudson.plugins.jobConfigHistory;
 
 import static org.hamcrest.CoreMatchers.containsString;
