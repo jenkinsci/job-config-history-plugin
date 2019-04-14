@@ -352,8 +352,7 @@ public class JobConfigHistoryRootActionIT
 				.getElementById("restore");
 		final HtmlPage reallyRestorePage = restoreLink.click();
 		final HtmlForm restoreForm = reallyRestorePage.getFormByName("restore");
-		final HtmlPage jobPage = submit(restoreForm, "Submit");
-		return jobPage;
+		return submit(restoreForm, "Submit");
 	}
 
 	/**

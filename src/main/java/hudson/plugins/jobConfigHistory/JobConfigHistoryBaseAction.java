@@ -243,13 +243,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             }
         };
 
-        Diff diff = DiffBuilder.compare(Input.fromString(file1Str)).withTest(Input.fromString(file2Str))
+        return DiffBuilder.compare(Input.fromString(file1Str)).withTest(Input.fromString(file2Str))
                 .ignoreWhitespace()
                 //the next line should be used if one wanted to use XMLUnit for the computing of all diffs.
                 //.withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, versionDifferenceEvaluator))
                 .withDifferenceEvaluator(versionDifferenceEvaluator)
                 .build();
-        return diff;
     }
 
 

@@ -80,9 +80,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 		}
 
 		public List<HtmlAnchor> getConfigOutputLinks(final String type) {
-			final List<HtmlAnchor> hrefs = historyPage.getByXPath(
-					"//a[contains(@href, \"configOutput?type=" + type + "\")]");
-			return hrefs;
+			return historyPage.getByXPath("//a[contains(@href, \"configOutput?type=" + type + "\")]");
 		}
 
 	}

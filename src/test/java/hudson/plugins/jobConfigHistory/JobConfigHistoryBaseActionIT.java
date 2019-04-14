@@ -88,7 +88,7 @@ public class JobConfigHistoryBaseActionIT
 	 * @return
 	 */
 	JobConfigHistoryBaseAction createJobConfigHistoryBaseAction() {
-		final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
+		return new JobConfigHistoryBaseAction() {
 
 			@Override
 			protected AccessControlled getAccessControlledObject() {
@@ -109,7 +109,6 @@ public class JobConfigHistoryBaseActionIT
 			}
 			public List<SideBySideView.Line> getLines(boolean useRegex) { throw new UnsupportedOperationException("Not supported yet."); }
 		};
-		return action;
 	}
 
 	/**

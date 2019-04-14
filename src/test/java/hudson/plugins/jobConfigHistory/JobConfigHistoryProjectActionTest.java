@@ -327,8 +327,7 @@ public class JobConfigHistoryProjectActionTest {
 		when(mockedProject.getRootDir())
 				.thenReturn(testConfigs.getResource("jobs/Test1"));
 		JobConfigHistoryProjectAction sut = createAction();
-		List<SideBySideView.Line> result = sut.getLines();
-		return result;
+		return sut.getLines();
 	}
 
 	/**

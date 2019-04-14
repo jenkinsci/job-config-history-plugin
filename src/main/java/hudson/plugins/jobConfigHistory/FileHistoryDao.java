@@ -1041,8 +1041,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	private File getHistoryDirForNode(final Node node) {
 		final String name = node.getNodeName();
 		final File configHistoryDir = getNodeHistoryRootDir();
-		final File configHistoryNodeDir = new File(configHistoryDir, name);
-		return configHistoryNodeDir;
+		return new File(configHistoryDir, name);
 	}
 
 	File getNodeHistoryRootDir() {

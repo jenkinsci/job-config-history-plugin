@@ -62,8 +62,7 @@ public class GetDiffLinesTest {
 	GetDiffLines createGetDiffLines() throws IOException {
 		final String resourceName = "diff.txt";
 		final List<String> lines = TUtils.readResourceLines(resourceName);
-		GetDiffLines sut = new GetDiffLines(lines);
-		return sut;
+		return new GetDiffLines(lines);
 	}
 
 }
