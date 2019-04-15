@@ -116,8 +116,10 @@ public class JobConfigHistoryTest {
 	public void testSetMaxHistoryEntries() {
 		JobConfigHistory sut = createSut();
 		assertNull(sut.getMaxHistoryEntries());
+		sut.setMaxHistoryEntries(null);
+		assertNull(sut.getMaxHistoryEntries());
 		sut.setMaxHistoryEntries("");
-		assertEquals("", sut.getMaxHistoryEntries());
+		assertNull(sut.getMaxHistoryEntries());
 		sut.setMaxHistoryEntries("4");
 		assertEquals("4", sut.getMaxHistoryEntries());
 		sut.setMaxHistoryEntries("-2");
@@ -144,8 +146,10 @@ public class JobConfigHistoryTest {
 	public void testSetMaxEntriesPerSite() {
 		JobConfigHistory sut = createSut();
 		assertNull(sut.getMaxEntriesPerPage());
+		sut.setMaxEntriesPerPage(null);
+		assertNull(sut.getMaxEntriesPerPage());
 		sut.setMaxEntriesPerPage("");
-		assertEquals("", sut.getMaxEntriesPerPage());
+		assertNull(sut.getMaxEntriesPerPage());
 		sut.setMaxEntriesPerPage("50");
 		assertEquals("50", sut.getMaxEntriesPerPage());
 		sut.setMaxEntriesPerPage("-2");
@@ -170,8 +174,10 @@ public class JobConfigHistoryTest {
 	public void testSetMaxDaysToKeepEntries() {
 		JobConfigHistory sut = createSut();
 		assertNull(sut.getMaxDaysToKeepEntries());
+		sut.setMaxDaysToKeepEntries(null);
+		assertNull(sut.getMaxDaysToKeepEntries());
 		sut.setMaxDaysToKeepEntries("");
-		assertEquals("", sut.getMaxDaysToKeepEntries());
+		assertNull(sut.getMaxDaysToKeepEntries());
 		sut.setMaxDaysToKeepEntries("4");
 		assertEquals("4", sut.getMaxDaysToKeepEntries());
 		sut.setMaxDaysToKeepEntries("-1");
@@ -356,8 +362,23 @@ public class JobConfigHistoryTest {
 		final FormValidation expectedResult = FormValidation.ok();
 		assertEquals(expectedResult, sut.doCheckMaxHistoryEntries(""));
 		assertEquals(expectedResult, sut.doCheckMaxHistoryEntries("5"));
+		assertEquals(expectedResult, sut.doCheckMaxHistoryEntries(" 5 "));
 		assertNotEquals(expectedResult, sut.doCheckMaxHistoryEntries("-1"));
 		assertNotEquals(expectedResult, sut.doCheckMaxHistoryEntries("A"));
+	}
+
+	/**
+	 * Test of doCheckMaxEntriesPerPage method, of class JobConfigHistory.
+	*/
+	@Test
+	public void testDoCheckMaxEntriesPerPage() {
+		JobConfigHistory sut = createSut();
+		final FormValidation expectedResult = FormValidation.ok();
+		assertEquals(expectedResult, sut.doCheckMaxEntriesPerPage(""));
+		assertEquals(expectedResult, sut.doCheckMaxEntriesPerPage("5"));
+		assertEquals(expectedResult, sut.doCheckMaxEntriesPerPage(" 5 "));
+		assertNotEquals(expectedResult, sut.doCheckMaxEntriesPerPage("-1"));
+		assertNotEquals(expectedResult, sut.doCheckMaxEntriesPerPage("A"));
 	}
 
 	/**
@@ -369,6 +390,7 @@ public class JobConfigHistoryTest {
 		final FormValidation expectedResult = FormValidation.ok();
 		assertEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries(""));
 		assertEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries("5"));
+		assertEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries(" 5 "));
 		assertNotEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries("-1"));
 		assertNotEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries("A"));
 	}
