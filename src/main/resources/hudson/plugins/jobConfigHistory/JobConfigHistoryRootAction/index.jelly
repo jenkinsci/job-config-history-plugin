@@ -5,14 +5,13 @@
     <l:side-panel>
       <l:tasks>
         <l:task icon="images/24x24/up.gif" href="${rootURL}/" title="${%Back to Dashboard}" />
-      	<l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=system" title="${%Show system configs only}" />
-      	<l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=jobs" title="${%Show job configs only}" />
-		<l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=created" title="${%Show created jobs only}" />
-      	<l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=deleted" title="${%Show deleted jobs only}" />
-      	<l:task icon="plugin/jobConfigHistory/img/all.png" href="?filter=all" title="${%Show all configs}" />
+        <l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=system" title="${%Show system configs only}" />
+        <l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=jobs" title="${%Show job configs only}" />
+        <l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=created" title="${%Show created jobs only}" />
+        <l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=deleted" title="${%Show deleted jobs only}" />
+        <l:task icon="plugin/jobConfigHistory/img/all.png" href="?filter=all" title="${%Show all configs}" />
       </l:tasks>
- 	</l:side-panel>
-    
+    </l:side-panel>
     <l:main-panel>
       <j:set var="filter" value="${request.getParameter('filter')}"/>
       <j:choose>
@@ -29,16 +28,14 @@
           <h1>${%Job Deletion History}</h1>
         </j:when>
         <j:otherwise>
-		  <h1>${%System Configuration History}</h1>
+          <h1>${%System Configuration History}</h1>
         </j:otherwise>
       </j:choose>
-      
       <a href="?filter=system">${%Show system configs only}</a> <br />
       <a href="?filter=jobs">${%Show job configs only}</a> <br />
       <a href="?filter=created">${%Show created jobs only}</a> <br />
       <a href="?filter=deleted">${%Show deleted jobs only}</a> <br />
       <a href="?filter=all">${%Show all configs}</a> <br />
-      
       <div>
         <j:set var="configs" value="${it.getConfigs()}" />
         <j:choose>
@@ -128,7 +125,7 @@
                               </a>
                             </j:if>
                           </j:if>
-						</j:if>
+                        </j:if>
                       </td>
                     </j:if>
                   </tr>

@@ -6,14 +6,14 @@
       <h1>${%Job Configuration History}</h1>
       <h2>${it.getProject().getName()}</h2>
       <div>
-      <script type="text/javascript">
-		   function showTooltip(nr) {
-		       document.getElementById('tooltip' + nr).style.visibility = 'visible';
-		   }
-		   function hideTooltip(nr) {
-		       document.getElementById('tooltip' + nr).style.visibility = 'hidden';
-		   }
-		</script>
+        <script type="text/javascript">
+          function showTooltip(nr) {
+            document.getElementById('tooltip' + nr).style.visibility = 'visible';
+          }
+          function hideTooltip(nr) {
+            document.getElementById('tooltip' + nr).style.visibility = 'hidden';
+          }
+        </script>
         <j:set var="configs" value="${it.getJobConfigs()}" />
         <j:choose>
           <j:when test="${configs.size() == 0}">
@@ -23,11 +23,11 @@
             <br/>
             <div>
               <f:form method="post" action="diffFiles" name="diffFiles">
-	            <j:if test="${configs.size() > 1}">
+                <j:if test="${configs.size() > 1}">
                   <div align="right">
                     <f:submit value="${%Show Diffs}" />
                   </div>
-      		    </j:if>
+                </j:if>
                 <st:adjunct includes="hudson.plugins.jobConfigHistory.table" />
                 <table id="confighistory" class="pane sortable">
                   <tr>
@@ -49,14 +49,14 @@
                     <tr>
                       <td>${config.date}</td>
                       <td>
-                      <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
- 	                       <span>${config.operation}</span>
- 	                       <img onmouseOver="showTooltip(${configNr})" onmouseLeave="hideTooltip(${configNr})" style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.png" alt="${%Info}" />
- 	                       <div style="margin-top: 15px;visibility: hidden; position: absolute; background-color: beige; padding: 3px; border: 1px solid black;" id="tooltip${configNr}">${%Old name}: ${config.oldName}<br />${%New name}: ${config.currentName}</div>
-                      	</j:if>
-                      	<j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">
-	                      	${config.operation}
-                      	</j:if>
+                        <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
+                          <span>${config.operation}</span>
+                          <img onmouseOver="showTooltip(${configNr})" onmouseLeave="hideTooltip(${configNr})" style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.png" alt="${%Info}" />
+                          <div style="margin-top: 15px;visibility: hidden; position: absolute; background-color: beige; padding: 3px; border: 1px solid black;" id="tooltip${configNr}">${%Old name}: ${config.oldName}<br />${%New name}: ${config.currentName}</div>
+                        </j:if>
+                        <j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">
+                          ${config.operation}
+                        </j:if>
                       </td>
                       <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                         <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
@@ -74,12 +74,13 @@
                         </j:if>
                       </td>
                       <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                          <td><j:if test="${configNr > 1 and !fileMissing}">
-                                <a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
-                                    <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
-                                </a>
-                              </j:if>
-                          </td>
+                        <td>
+                          <j:if test="${configNr > 1 and !fileMissing}">
+                            <a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
+                              <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
+                            </a>
+                          </j:if>
+                        </td>
                       </j:if>
                       <j:if test="${configNr == 2 and fileMissing}">
                         <j:set var="offsetIfFileMissing" value="1"/>
@@ -96,15 +97,15 @@
                       </td>
                     </tr>
                       <f:invisibleEntry>
-              	        <f:textbox name="name" value="${config.getJob()}" />
+                        <f:textbox name="name" value="${config.getJob()}" />
                       </f:invisibleEntry>
                   </j:forEach>
                 </table>
-	            <j:if test="${configs.size() > 1}">
+                <j:if test="${configs.size() > 1}">
                   <div align="right">
                     <f:submit value="${%Show Diffs}" />
                   </div>
-      		    </j:if>
+                </j:if>
               </f:form>
             </div>
           </j:otherwise>

@@ -1,10 +1,9 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <f:section title="${%Job Config History}">
-
-	<f:entry title="${%Use different history directory than default}:" help="/plugin/jobConfigHistory/help/help-historyRootDir.html">
- 		<f:textbox value="${it.historyRootDir}" name="historyRootDir"/>
-	</f:entry>
+    <f:entry title="${%Use different history directory than default}:" help="/plugin/jobConfigHistory/help/help-historyRootDir.html">
+      <f:textbox value="${it.historyRootDir}" name="historyRootDir"/>
+    </f:entry>
     <f:advanced>
       <f:entry title="${%Max number of history entries to keep}" help="/plugin/jobConfigHistory/help/help-maxHistoryEntries.html">
         <f:textbox name="maxHistoryEntries" value="${it.maxHistoryEntries}"
@@ -31,9 +30,9 @@
       <f:entry title="${%Show build badges}" help="/plugin/jobConfigHistory/help/help-showBuildBadges.html">
         <f:radio name="showBuildBadges" title="${%Never}" value="never" checked="${it.getShowBuildBadges() == 'never'}"/>
         <br />
-    	<f:radio name="showBuildBadges" title="${%Always}" value="always" checked="${it.getShowBuildBadges() == 'always'}"/>
+        <f:radio name="showBuildBadges" title="${%Always}" value="always" checked="${it.getShowBuildBadges() == 'always'}"/>
         <br />
-    	<f:radio name="showBuildBadges" title="${%Only for users with configuration permission}" value="userWithConfigPermission" checked="${it.getShowBuildBadges() == 'userWithConfigPermission'}"/>
+        <f:radio name="showBuildBadges" title="${%Only for users with configuration permission}" value="userWithConfigPermission" checked="${it.getShowBuildBadges() == 'userWithConfigPermission'}"/>
         <br />
         <f:radio name="showBuildBadges" title="${%Only for administrators}" value="adminUser" checked="${it.getShowBuildBadges() == 'adminUser'}"/>
       </f:entry>
