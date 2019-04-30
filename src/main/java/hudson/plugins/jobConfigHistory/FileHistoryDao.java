@@ -398,9 +398,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				// rename
 				// tasks.
 				try {
-					//final String fileMask, final String excludes, final FilePath target
 					fp.copyRecursiveTo("**/*", "**/lastHistory",new FilePath(currentHistoryDir));
-					//fp.copyRecursiveTo(new FilePath(currentHistoryDir));
 					fp.deleteRecursive();
 					LOG.log(FINEST,
 						"completed move of old history files on rename.{0}",
@@ -450,9 +448,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		} else {
 			for (File historyDir : historyDirsOfItem) {
 				final XmlFile historyXml = getHistoryXmlFile(historyDir);
-				final LazyHistoryDescr historyDescription = new LazyHistoryDescr(
-						historyXml);
-					map.put(historyDir.getName(), historyDescription);
+				final LazyHistoryDescr historyDescription = new LazyHistoryDescr(historyXml);
+				map.put(historyDir.getName(), historyDescription);
 			}
 			return map;
 		}
@@ -706,7 +703,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		boolean isDuplicated = false;
 		XmlFile lastRevision = null;
 
-		// Frist, we try to obtain the latest revision from the symblink
+		// First, we try to obtain the latest revision from the symblink
 		final File historiesDir = getHistoryDir(xmlFile.getFile());
 		File symblink = new File(historiesDir.getPath() + "/" + LAST_HISTORY);
 		if(symblink.exists()) {
@@ -714,6 +711,16 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				lastRevision = new XmlFile(getConfigFile(new File(Util.resolveSymlink(symblink))));
 			} catch (IOException | InterruptedException | NullPointerException e) {
 				LOGGER.log(Level.WARNING, String.format("Could not get access to the last revision %s", historiesDir.getPath() + "/" + LAST_HISTORY), e);
+
+				// In case there is any problem with the symblink
+				// we fall-back to the old model
+				final ArrayList<String> timeStamps = new ArrayList<String>(
+						getRevisions(xmlFile).keySet());
+				if (!timeStamps.isEmpty()) {
+					Collections.sort(timeStamps, Collections.reverseOrder());
+					lastRevision = getOldRevision(xmlFile,
+							timeStamps.get(0));
+				}
 			}
 		} else {
 			// In case symblink still does not exist we try to obtain the latest revision
@@ -1028,7 +1035,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 					historyDescription = (HistoryDescr) historyXml.read();
 				} catch (IOException ex) {
 					throw new RuntimeException("Unable to read history for "
-							+ node.getDisplayName(), ex);
+						+ node.getDisplayName(), ex);
 				}
 				map.put(historyDir.getName(), historyDescription);
 			}
@@ -1153,34 +1160,5 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		final XmlFile oldRevision = getOldRevision(node, identifier);
 		return oldRevision.getFile() != null && oldRevision.getFile().exists();
 	}
-
-	public static class JobConfigHistoryListFiles extends File {
-
-		public JobConfigHistoryListFiles(String pathname) {
-			super(pathname);
-		}
-
-		public JobConfigHistoryListFiles(String parent, String child) {
-			super(parent, child);
-		}
-
-		public JobConfigHistoryListFiles(File parent, String child) {
-			super(parent, child);
-		}
-
-		public JobConfigHistoryListFiles(URI uri) {
-			super(uri);
-		}
-
-		public File[] configHistoryListFiles(File file)  {
-			return file.listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return !name.matches("lastHistory");
-				}
-			});
-		}
-	}
-
 
 }

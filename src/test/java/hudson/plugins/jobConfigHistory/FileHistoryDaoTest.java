@@ -284,11 +284,14 @@ public class FileHistoryDaoTest {
 		final File lastHistory = new File(jenkinsHome,
 				"config-history/jobs/MyTest/lastHistory");
 
-		Files.isSymbolicLink(Paths.get(lastHistory.getAbsolutePath()));
+		assertTrue(Files.isSymbolicLink(Paths.get(lastHistory.getAbsolutePath())));
+
+		// We should have two files in the directory: the symblink and the one
+		// created for the item
 		assertEquals(2, historyDir.list().length);
 
-
-
+		// Filtering the symblink we should only have one file
+		assertEquals(1, historyDir.listFiles(HistoryFileFilter.INSTANCE).length);
 	}
 
 	/**
