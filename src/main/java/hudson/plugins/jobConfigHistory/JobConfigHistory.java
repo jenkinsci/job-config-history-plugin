@@ -531,7 +531,7 @@ public class JobConfigHistory extends Plugin {
 	 */
 	protected File getJenkinsHome() {
 		Jenkins jenkins = Jenkins.getInstance();
-		return jenkins != null ? jenkins.root : null;
+		return jenkins.getRootDir();
 	}
 
 	/**

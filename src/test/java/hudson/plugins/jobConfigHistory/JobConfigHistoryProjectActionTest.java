@@ -2,6 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -21,7 +22,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.jvnet.hudson.test.recipes.WithPlugin;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -95,9 +95,9 @@ public class JobConfigHistoryProjectActionTest {
 	/**
 	 * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
 	 */
-	@WithPlugin("maven-plugin.hpi")
 	@Test
 	public void testGetIconFileNameSaveMavenModules() {
+		assertNotNull(j.jenkins.getPlugin("maven-plugin"));
 		when(mockedMavenModule.hasPermission(AbstractProject.CONFIGURE))
 				.thenReturn(true);
 		when(mockedPlugin.getSaveModuleConfiguration()).thenReturn(true);
