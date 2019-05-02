@@ -23,8 +23,6 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import org.kohsuke.stapler.DataBoundConstructor;
-
 import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
