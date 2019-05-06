@@ -41,7 +41,6 @@ import org.apache.commons.lang.StringUtils;
 
 import hudson.Extension;
 import hudson.model.PeriodicWork;
-import jenkins.model.Jenkins;
 
 /**
  *

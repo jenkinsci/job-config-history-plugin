@@ -224,7 +224,7 @@ public class JobConfigHistoryRootActionTest {
 		assertEquals(expResult, createSut().createLinkToFiles(config, ""));
 		given(config.getJob())
 				.willReturn("Unknown_deleted_20130830_223932_072");
-		assertEquals(null, createSut().createLinkToFiles(config, ""));
+		assertNull(createSut().createLinkToFiles(config, ""));
 	}
 
 	/**

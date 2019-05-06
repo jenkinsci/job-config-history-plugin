@@ -243,13 +243,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             }
         };
 
-        Diff diff = DiffBuilder.compare(Input.fromString(file1Str)).withTest(Input.fromString(file2Str))
+        return DiffBuilder.compare(Input.fromString(file1Str)).withTest(Input.fromString(file2Str))
                 .ignoreWhitespace()
                 //the next line should be used if one wanted to use XMLUnit for the computing of all diffs.
                 //.withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, versionDifferenceEvaluator))
                 .withDifferenceEvaluator(versionDifferenceEvaluator)
                 .build();
-        return diff;
     }
 
 
@@ -262,7 +261,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * 		<b>false</b> else
      */
     public String getShowVersionDiffs() {
-        String showVersionDiffs = (String) (this.getRequestParameter("showVersionDiffs"));
+        String showVersionDiffs = this.getRequestParameter("showVersionDiffs");
         return (showVersionDiffs  == null) ? "True" : showVersionDiffs;
     }
 
@@ -282,7 +281,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
     public abstract List<Line> getLines(boolean useRegex) throws IOException;
 
-    private String reFormatAndconcatStringArray(String[] arr) {
+    private String reformatAndConcatStringArray(String[] arr) {
         String ret = "";
 
         //this needs to be done because the sorting  process writes the first line as:
@@ -327,7 +326,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
         if (hideVersionDiffs) {
             //calculate diffs to be excluded from the output.
-            Diff versionDiffs = getVersionDiffsOnly(reFormatAndconcatStringArray(file1Lines), reFormatAndconcatStringArray(file2Lines));
+            Diff versionDiffs = getVersionDiffsOnly(reformatAndConcatStringArray(file1Lines), reformatAndConcatStringArray(file2Lines));
             //feature in library: empty deltas are shown, too.
             List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
             for (Delta delta : patch.getDeltas()) {

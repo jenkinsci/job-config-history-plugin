@@ -58,8 +58,6 @@ public abstract class JobConfigHistoryStrategy
 	 */
 	public static DescriptorExtensionList<JobConfigHistoryStrategy, JobConfigHistoryDescriptor<JobConfigHistoryStrategy>> all() {
 		Jenkins jenkins = Jenkins.getInstance();
-		return jenkins
-				.<JobConfigHistoryStrategy, JobConfigHistoryDescriptor<JobConfigHistoryStrategy>>getDescriptorList(
-						JobConfigHistoryStrategy.class);
+		return jenkins.getDescriptorList(JobConfigHistoryStrategy.class);
 	}
 }

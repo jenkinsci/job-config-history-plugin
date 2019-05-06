@@ -40,7 +40,6 @@
                     document.getElementById("showHideVersionDiffsJsButton").value = "Show Version Changes";
                   }
                 }
-
               </script>
               <input id="showHideVersionDiffsJsButton" type="button" value="Hide Version Changes" onClick="toggleShowHideVersionDiffsJs();"/>
 
@@ -214,7 +213,7 @@
                   </tr>
                 </table>
               </div>
-            </div>         
+            </div>
           </j:otherwise>
         </j:choose>
       </div>

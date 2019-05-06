@@ -49,13 +49,11 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 
 import hudson.Extension;
 import hudson.FilePath;
-import hudson.Util;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
@@ -63,6 +61,7 @@ import hudson.model.Item;
 import hudson.model.Node;
 import hudson.model.User;
 import jenkins.model.Jenkins;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.SystemUtils;
 
 /**
@@ -207,8 +206,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			final FileInputStream configOriginal = new FileInputStream(
 				currentConfig);
 			try {
-				// in is buffered by copyStream.
-				Util.copyStream(configOriginal, configCopy);
+				IOUtils.copy(configOriginal, configCopy);
 			} finally {
 				configOriginal.close();
 			}
@@ -763,11 +761,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	private File[] getJobFilesIncludingThoseInFolders(final FileFilter fileFilter) {
 		final List<File> folderFiles = getJobFilesIncludingThoseInFolders();
 
-		List<File> resultList = folderFiles.stream()
-			.filter(folderFile -> fileFilter.accept(folderFile))
-			.collect(Collectors.toList());
-
-		return resultList.toArray(new File[resultList.size()]);
+		return folderFiles.stream().filter(fileFilter::accept).toArray(File[]::new);
 	}
 
 	/**
@@ -1046,8 +1040,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	private File getHistoryDirForNode(final Node node) {
 		final String name = node.getNodeName();
 		final File configHistoryDir = getNodeHistoryRootDir();
-		final File configHistoryNodeDir = new File(configHistoryDir, name);
-		return configHistoryNodeDir;
+		return new File(configHistoryDir, name);
 	}
 
 	File getNodeHistoryRootDir() {

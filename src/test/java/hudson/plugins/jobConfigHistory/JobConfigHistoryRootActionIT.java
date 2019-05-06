@@ -66,8 +66,8 @@ public class JobConfigHistoryRootActionIT
 		// check page with job history entries
 		final HtmlPage htmlPageJobs = webClient
 				.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=jobs");
-		Assert.assertTrue("Verify history entry for job is listed.",
-				htmlPageJobs.getAnchorByText("Test1") != null);
+		Assert.assertNotNull("Verify history entry for job is listed.",
+				htmlPageJobs.getAnchorByText("Test1"));
 		final String htmlPageJobsBody = htmlPageJobs.asXml();
 		Assert.assertTrue("Verify history entry for deleted job is listed.",
 				htmlPageJobsBody.contains(DeletedFileFilter.DELETED_MARKER));
@@ -80,8 +80,8 @@ public class JobConfigHistoryRootActionIT
 		// check page with 'created' history entries
 		final HtmlPage htmlPageCreated = webClient
 				.goTo("jobConfigHistory/?filter=created");
-		Assert.assertTrue("Verify history entry for job is listed.",
-				htmlPageCreated.getAnchorByText("Test1") != null);
+		Assert.assertNotNull("Verify history entry for job is listed.",
+				htmlPageCreated.getAnchorByText("Test1"));
 		Assert.assertFalse(
 				"Verify history entry for deleted job is not listed.",
 				htmlPageCreated.asText()
@@ -122,8 +122,8 @@ public class JobConfigHistoryRootActionIT
 	private void checkSystemPage(HtmlPage htmlPage) {
 		final String page = htmlPage.asXml();
 		System.out.println(page);
-		Assert.assertTrue("Verify history entry for system change is listed.",
-				htmlPage.getAnchorByText("config") != null);
+		Assert.assertNotNull("Verify history entry for system change is listed.",
+				htmlPage.getAnchorByText("config"));
 		Assert.assertFalse("Verify no job history entry is listed.",
 				page.contains("Test1"));
 		Assert.assertFalse("Verify history entry for deleted job is listed.",
@@ -352,8 +352,7 @@ public class JobConfigHistoryRootActionIT
 				.getElementById("restore");
 		final HtmlPage reallyRestorePage = restoreLink.click();
 		final HtmlForm restoreForm = reallyRestorePage.getFormByName("restore");
-		final HtmlPage jobPage = submit(restoreForm, "Submit");
-		return jobPage;
+		return submit(restoreForm, "Submit");
 	}
 
 	/**

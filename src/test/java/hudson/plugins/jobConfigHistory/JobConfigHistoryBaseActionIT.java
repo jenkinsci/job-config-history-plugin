@@ -1,7 +1,6 @@
-/**
+/*
  * Copyright 2010 Mirko Friedenhagen
  */
-
 package hudson.plugins.jobConfigHistory;
 
 import static org.hamcrest.CoreMatchers.not;
@@ -13,7 +12,7 @@ import java.util.List;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
-import org.jvnet.hudson.test.Bug;
+import org.jvnet.hudson.test.Issue;
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
@@ -88,7 +87,7 @@ public class JobConfigHistoryBaseActionIT
 	 * @return
 	 */
 	JobConfigHistoryBaseAction createJobConfigHistoryBaseAction() {
-		final JobConfigHistoryBaseAction action = new JobConfigHistoryBaseAction() {
+		return new JobConfigHistoryBaseAction() {
 
 			@Override
 			protected AccessControlled getAccessControlledObject() {
@@ -109,7 +108,6 @@ public class JobConfigHistoryBaseActionIT
 			}
 			public List<SideBySideView.Line> getLines(boolean useRegex) { throw new UnsupportedOperationException("Not supported yet."); }
 		};
-		return action;
 	}
 
 	/**
@@ -155,7 +153,7 @@ public class JobConfigHistoryBaseActionIT
 		}
 	}
 
-	@Bug(5534)
+	@Issue("JENKINS-5534")
 	public void testSecuredAccessToJobConfigHistoryPage()
 			throws IOException, SAXException {
 		// without security the jobConfigHistory-badge should show.
@@ -181,7 +179,7 @@ public class JobConfigHistoryBaseActionIT
 		}
 	}
 
-	@Bug(17124)
+	@Issue("JENKINS-17124")
 	public void testClearDuplicateLines() throws Exception {
 		final String jobName = "Test";
 

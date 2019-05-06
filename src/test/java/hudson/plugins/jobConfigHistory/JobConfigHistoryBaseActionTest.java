@@ -187,9 +187,7 @@ public class JobConfigHistoryBaseActionTest {
 		String[] file2Lines = TUtils.readResourceLines(file2txt)
 				.toArray(new String[]{});
 		JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
-		String result = sut.getDiffAsString(file1, file2, file1Lines,
-				file2Lines);
-		return result;
+		return sut.getDiffAsString(file1, file2, file1Lines, file2Lines);
 	}
 
 	public class JobConfigHistoryBaseActionImpl

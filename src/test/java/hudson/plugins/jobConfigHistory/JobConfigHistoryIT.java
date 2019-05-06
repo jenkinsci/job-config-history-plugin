@@ -88,9 +88,8 @@ public class JobConfigHistoryIT
 		Assert.assertTrue("Verify a system level configuration is saveable.",
 				jch.isSaveable(jenkins, jenkinsConfig));
 
-		Assert.assertTrue("Verify system configuration history location",
-				getHistoryDir(jenkinsConfig).getParentFile()
-						.equals(jch.getConfiguredHistoryRootDir()));
+		Assert.assertEquals("Verify system configuration history location",
+				getHistoryDir(jenkinsConfig).getParentFile(), jch.getConfiguredHistoryRootDir());
 		testCreateRenameDeleteProject(jch);
 		try {
 			getHistoryDir(new XmlFile(new File("/tmp")));
@@ -130,9 +129,8 @@ public class JobConfigHistoryIT
 		Assert.assertTrue("MavenModuleSet should be saved",
 				jch.isSaveable(mms, mms.getConfigFile()));
 
-		Assert.assertTrue("Verify system configuration history location",
-				getHistoryDir(jenkinsConfig).getParentFile()
-						.equals(jch.getConfiguredHistoryRootDir()));
+		Assert.assertEquals("Verify system configuration history location",
+				getHistoryDir(jenkinsConfig).getParentFile(), jch.getConfiguredHistoryRootDir());
 		testCreateRenameDeleteProject(jch);
 	}
 
@@ -228,7 +226,7 @@ public class JobConfigHistoryIT
 					form.getTextContent()
 							.contains("Enter a valid positive integer"));
 			Assert.assertFalse(
-					"Check no error messgae present for regexp excludePattern.",
+					"Check no error message present for regexp excludePattern.",
 					form.getTextContent().contains("Invalid regexp"));
 			form.getInputByName("excludePattern").setValueAttribute("**");
 			Assert.assertTrue(
@@ -376,9 +374,7 @@ public class JobConfigHistoryIT
 					break;
 				}
 			}
-			Assert.assertTrue(
-					"Verify config history directory of deleted job exists.",
-					deletedDir != null);
+			Assert.assertNotNull("Verify config history directory of deleted job exists.", deletedDir);
 			Assert.assertTrue(
 					"Verify config history directory of deleted job is not empty",
 					(new File(deletedDir)).listFiles().length > 0);

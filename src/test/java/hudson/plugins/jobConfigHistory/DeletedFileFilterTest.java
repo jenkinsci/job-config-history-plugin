@@ -24,7 +24,8 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
@@ -42,7 +43,7 @@ public class DeletedFileFilterTest {
 	@Test
 	public void testAcceptNoDeletedFile() {
 		File file = new File("123");
-		assertEquals(false, DeletedFileFilter.accepts(file));
+		assertFalse(DeletedFileFilter.accepts(file));
 	}
 
 	/**
@@ -51,7 +52,7 @@ public class DeletedFileFilterTest {
 	@Test
 	public void testAcceptDeletedFile() {
 		File file = new File("_deleted_");
-		assertEquals(true, DeletedFileFilter.accepts(file));
+		assertTrue(DeletedFileFilter.accepts(file));
 	}
 
 	/**
@@ -59,7 +60,7 @@ public class DeletedFileFilterTest {
 	 */
 	@Test
 	public void testAcceptDeletedFileName() {
-		assertEquals(true, DeletedFileFilter.accepts("_deleted_"));
+		assertTrue(DeletedFileFilter.accepts("_deleted_"));
 	}
 
 }

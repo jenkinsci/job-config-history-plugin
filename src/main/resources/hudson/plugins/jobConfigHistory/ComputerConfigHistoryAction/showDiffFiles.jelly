@@ -1,5 +1,5 @@
- <?jelly escape-by-default='true'?>
- <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="Job Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
     <st:include it="${app}" page="sidepanel.jelly" />
     <l:main-panel>
@@ -10,7 +10,7 @@
             ${%No permission to view config history}
           </j:when>
           <j:when test="${it.getSlaveConfigs().size() == 0}">
-              ${%No agent configuration history available}
+            ${%No agent configuration history available}
           </j:when>
           <j:otherwise>
             <div>
@@ -38,7 +38,6 @@
                     document.getElementById("showHideVersionDiffsJsButton").value = "Show Version Changes";
                   }
                 }
-
               </script>
               <input id="showHideVersionDiffsJsButton" type="button" value="Hide Version Changes" onClick="toggleShowHideVersionDiffsJs();"/>
 
@@ -69,7 +68,7 @@
                        </tr>
                       </table>
                     </td>
-                    <td colspan="2">  
+                    <td colspan="2">
                       <table style="width:100%; border-collapse: collapse;">
                         <tr>
                           <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(2)}">${it.getUser(2)}</a> </td>
@@ -80,7 +79,7 @@
                           </td>
                         </tr>
                       </table>
-                    </td>             
+                    </td>
                   </tr>
                 </thead>
 
@@ -149,7 +148,6 @@
                     </j:otherwise>
                   </j:choose>
                 </tbody>
-
               </table>
               <div align="middle">
                 <table>
@@ -199,7 +197,7 @@
                   </tr>
                 </table>
               </div>
-            </div>         
+            </div>
           </j:otherwise>
         </j:choose>
       </div>
