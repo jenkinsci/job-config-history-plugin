@@ -210,9 +210,8 @@ public class JobConfigHistoryTest {
 			throws IOException, ServletException, Descriptor.FormException {
 		JobConfigHistory sut = createSut();
 		sut.configure(null, createFormData());
-		String expResult = "5";
 		String result = sut.getExcludePattern();
-		assertEquals(expResult, result);
+		assertEquals(JobConfigHistoryConsts.DEFAULT_EXCLUDE, result);
 	}
 
 	/**
@@ -341,11 +340,28 @@ public class JobConfigHistoryTest {
 		assertTrue(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
 		assertTrue(sut.isSaveable(mock(MatrixProject.class), xmlFile));
 		assertTrue(sut.isSaveable(mock(MockFolder.class), xmlFile));
-		assertTrue(sut.isSaveable(null,
+		// item is null can not be saved
+		assertFalse(sut.isSaveable(null,
+				new XmlFile(unpackResourceZip.getResource("config.xml"))));
+		assertTrue(sut.isSaveable(mock(TopLevelItem.class),
 				new XmlFile(unpackResourceZip.getResource("config.xml"))));
 		assertFalse(sut.isSaveable(null, xmlFile));
 		assertFalse(sut.isSaveable(mock(MatrixConfiguration.class), xmlFile));
 	}
+
+	@Test
+	public void testIsSaveableWithExcludesPattern()
+			throws IOException, ServletException, Descriptor.FormException {
+		JobConfigHistory sut = createSut();
+		File jenkinsHome = sut.getJenkinsHome();
+		String filePath = String.join(File.separator, "jobs", "multiple-branch", "branches", "master", "config.xml");
+		XmlFile xmlFile = new XmlFile(new File(jenkinsHome, filePath));
+		assertTrue(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
+		JSONObject formData = createFormData();
+		formData.put("excludePattern", Pattern.quote(File.separator + "branches" + File.separator));
+		sut.configure(null, formData);
+		assertFalse(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
+    }
 
 	/**
 	 * Test of doCheckMaxHistoryEntries method, of class JobConfigHistory.
@@ -415,15 +431,17 @@ public class JobConfigHistoryTest {
 	}
 
 	JSONObject createFormData() {
-		return JSONObject.fromObject("{" + "\"historyRootDir\": \""
+
+		JSONObject obj=JSONObject.fromObject("{" + "\"historyRootDir\": \""
 				+ unpackResourceZip.getResource("config-history").getPath()
 				+ "\"," + "\"maxHistoryEntries\": \"5\","
 				+ "\"maxDaysToKeepEntries\": \"5\","
 				+ "\"maxEntriesPerPage\": \"50\","
 				+ "\"skipDuplicateHistory\": true,"
-				+ "\"excludePattern\": \"5\","
 				+ "\"saveModuleConfiguration\": true,"
 				+ "\"showBuildBadges\": \"5\"," + "\"excludedUsers\": \"\""
 				+ "}");
+		obj.put("excludePattern",JobConfigHistoryConsts.DEFAULT_EXCLUDE);
+		return obj;
 	}
 }

@@ -404,14 +404,16 @@ public class JobConfigHistory extends Plugin {
 	 * @return true if the item configuration should be saved.
 	 */
 	public boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
+
+		boolean canSave=checkRegex(xmlFile);
+		if (!canSave) {
+			LOG.log(Level.FINE, "skipped recording change history for job {0}", xmlFile.getFile().getAbsolutePath());
+			return false;
+		}
 		if (item instanceof TopLevelItem) {
+			// including FreeStyleProject, WorkflowJob
 			return true;
 		}
-
-		if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) {
-			return checkRegex(xmlFile);
-		}
-
 		if (PluginUtils.isMavenPluginAvailable() && item instanceof MavenModule
 				&& saveModuleConfiguration) {
 			return true;
@@ -429,8 +431,9 @@ public class JobConfigHistory extends Plugin {
 	 */
 	private boolean checkRegex(final XmlFile xmlFile) {
 		if (excludeRegexpPattern != null) {
+			String fullPath = xmlFile.getFile().getAbsolutePath();
 			final Matcher matcher = excludeRegexpPattern
-					.matcher(xmlFile.getFile().getName());
+					.matcher(fullPath);
 			return !matcher.find();
 		} else {
 			return true;
