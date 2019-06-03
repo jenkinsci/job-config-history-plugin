@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 
 import hudson.Plugin;
 import hudson.model.User;
+import hudson.security.ACL;
 import jenkins.model.Jenkins;
 
 /**
@@ -79,6 +80,19 @@ final public class PluginUtils {
 	}
 
 	/**
+	 * Like {@link #getHistoryDao()}, but with SYSTEM user. Avoids calling
+	 * {@link User#current()}.
+	 *
+	 * Only used to track changes when initLevel is not COMPLETED.
+	 * 
+	 * @return historyDao
+	 */
+	 static JobConfigHistoryStrategy getSystemHistoryDao() {
+		final JobConfigHistory plugin = getPlugin();
+		return getSystemHistoryDao(plugin);
+	}
+	
+	/**
 	 * For tests.
 	 * 
 	 * @param plugin
@@ -103,6 +117,21 @@ final public class PluginUtils {
 		return getHistoryDao(plugin, null);
 	}
 
+	/**
+	 * Like {@link #getHistoryDao(JobConfigHistory)}, but with SYSTEM user. Avoids
+	 * calling {@link User#current()}.
+	 *
+	 * Only used to track changes when initLevel is not COMPLETED.
+	 * 
+	 * @param plugin
+	 *            the plugin.
+	 * @return historyDao
+	 */
+	static JobConfigHistoryStrategy getSystemHistoryDao(
+			final JobConfigHistory plugin) {
+		return getHistoryDao(plugin, User.get(ACL.SYSTEM));
+	}
+	
 	public static JobConfigHistoryStrategy getHistoryDao(
 			final JobConfigHistory plugin, final User user) {
 		final String maxHistoryEntriesAsString = plugin.getMaxHistoryEntries();
