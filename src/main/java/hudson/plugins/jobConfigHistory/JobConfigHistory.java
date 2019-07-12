@@ -157,8 +157,9 @@ public class JobConfigHistory extends Plugin {
 	 *            The maximum number of history entries to keep
 	 */
 	public void setMaxHistoryEntries(String maxEntryInput) {
-		if (maxEntryInput.isEmpty() || isPositiveInteger(maxEntryInput)) {
-			maxHistoryEntries = maxEntryInput;
+		String trimmedValue = StringUtils.trimToNull(maxEntryInput);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
+			maxHistoryEntries = trimmedValue;
 		}
 	}
 
@@ -176,8 +177,9 @@ public class JobConfigHistory extends Plugin {
 	 *            The maximum number of history entries to show per site
 	 */
 	public void setMaxEntriesPerPage(String maxEntryInput) {
-		if (maxEntryInput.isEmpty() || isPositiveInteger(maxEntryInput)) {
-			maxEntriesPerPage = maxEntryInput;
+		String trimmedValue = StringUtils.trimToNull(maxEntryInput);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
+			maxEntriesPerPage = trimmedValue;
 		}
 	}
 
@@ -194,9 +196,10 @@ public class JobConfigHistory extends Plugin {
 	 * @param maxDaysInput
 	 *            For how long history entries should be kept (in days)
 	 */
-	public void setMaxDaysToKeepEntries(final String maxDaysInput) {
-		if (maxDaysInput.isEmpty() || isPositiveInteger(maxDaysInput)) {
-			maxDaysToKeepEntries = maxDaysInput;
+	public void setMaxDaysToKeepEntries(String maxDaysInput) {
+		String trimmedValue = StringUtils.trimToNull(maxDaysInput);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
+			maxDaysToKeepEntries = trimmedValue;
 		}
 	}
 
@@ -448,14 +451,11 @@ public class JobConfigHistory extends Plugin {
 	 *            The form input entered by the user.
 	 * @return ok if the entry is blank or a non-negative integer.
 	 */
-	public FormValidation doCheckMaxHistoryEntries(
-			@QueryParameter final String value) {
-		try {
-			if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
-				throw new NumberFormatException();
-			}
+	public FormValidation doCheckMaxHistoryEntries(@QueryParameter String value) {
+		String trimmedValue = StringUtils.trimToNull(value);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
 			return FormValidation.ok();
-		} catch (NumberFormatException ex) {
+		} else {
 			return FormValidation.error("Enter a valid positive integer");
 		}
 	}
@@ -468,14 +468,11 @@ public class JobConfigHistory extends Plugin {
 	 *            The form input entered by the user.
 	 * @return ok if the entry is blank or a non-negative integer.
 	 */
-	public FormValidation doCheckMaxEntriesPerPage(
-			@QueryParameter final String value) {
-		try {
-			if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
-				throw new NumberFormatException();
-			}
+	public FormValidation doCheckMaxEntriesPerPage(@QueryParameter String value) {
+		String trimmedValue = StringUtils.trimToNull(value);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
 			return FormValidation.ok();
-		} catch (NumberFormatException ex) {
+		} else {
 			return FormValidation.error("Enter a valid positive integer");
 		}
 	}
@@ -488,14 +485,11 @@ public class JobConfigHistory extends Plugin {
 	 *            The form input entered by the user.
 	 * @return ok if the entry is blank or a non-negative integer.
 	 */
-	public FormValidation doCheckMaxDaysToKeepEntries(
-			@QueryParameter final String value) {
-		try {
-			if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
-				throw new NumberFormatException();
-			}
+	public FormValidation doCheckMaxDaysToKeepEntries(@QueryParameter String value) {
+		String trimmedValue = StringUtils.trimToNull(value);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
 			return FormValidation.ok();
-		} catch (NumberFormatException ex) {
+		} else {
 			return FormValidation.error("Enter a valid positive integer");
 		}
 	}
