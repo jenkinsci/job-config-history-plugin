@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import hudson.model.Build;
@@ -92,9 +93,9 @@ public class JobConfigBadgeActionTest {
 
 	/**
 	 * Test of oldConfigsExist method, of class JobConfigBadgeAction.
-	 * 
-	 * @Test
 	 */
+	@Ignore("TODO: find out what is wrong")
+	@Test
 	public void testOldConfigsExist() {
 		when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(),
 				configDates[0])).thenReturn(true);

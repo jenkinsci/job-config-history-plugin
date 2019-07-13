@@ -29,7 +29,7 @@ import java.io.FileFilter;
 /**
  * A filter to return only those directories of a file listing that do not
  * represent deleted jobs history directories, the names of which do not contain
- * {@link JobConfigHistoryConsts#DELETED_MARKER}.
+ * {@link DeletedFileFilter#DELETED_MARKER}.
  *
  * @author Mirko Friedenhagen
  */

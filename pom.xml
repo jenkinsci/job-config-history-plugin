@@ -308,7 +308,7 @@
                     <quiet>true</quiet>
                     <aggregate>false</aggregate>
                     <links>
-                        <link>http://docs.oracle.com/javase/6/docs/api/</link>
+                        <link>http://docs.oracle.com/javase/8/docs/api/</link>
                         <link>http://javadoc.jenkins-ci.org/</link>
                         <link>http://stapler.kohsuke.org/apidocs/</link>
                     </links>

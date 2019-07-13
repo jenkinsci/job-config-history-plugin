@@ -75,7 +75,7 @@ public class JobConfigHistoryBaseActionIT
 
 	/**
 	 * Test method for
-	 * {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffFile(java.lang.String, java.lang.String)}.
+	 * {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffAsString(File, File, String[], String[])}.
 	 */
 	public void testGetDiffFileStringStringEmpty() {
 		final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
@@ -83,9 +83,6 @@ public class JobConfigHistoryBaseActionIT
 				.getDiffAsString(file1, file2, new String[0], new String[0])));
 	}
 
-	/**
-	 * @return
-	 */
 	JobConfigHistoryBaseAction createJobConfigHistoryBaseAction() {
 		return new JobConfigHistoryBaseAction() {
 

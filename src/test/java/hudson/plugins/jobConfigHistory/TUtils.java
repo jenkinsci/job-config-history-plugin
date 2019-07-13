@@ -105,9 +105,7 @@ public class TUtils {
 
 	/**
 	 * A suffix {@link Matcher}, which automatically handles file separators.
-	 * The method calls {@link #endsWith(java.lang.String)} method from
-	 * CoreMatchers.
-	 * 
+	 *
 	 * @since TODO: define a version
 	 */
 	public static class FilePathSuffixMatcher implements Matcher<String> {
