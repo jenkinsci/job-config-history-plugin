@@ -81,8 +81,8 @@ public class JobConfigHistoryPurger extends PeriodicWork {
 	 *
 	 * @param plugin
 	 *            injected plugin
-	 * @param historyDao
-	 *            injected HistoryDao
+	 * @param purgeable
+	 *            the value of purgeable
 	 * @param overviewHistoryDao
 	 *            the value of overviewHistoryDao
 	 */
