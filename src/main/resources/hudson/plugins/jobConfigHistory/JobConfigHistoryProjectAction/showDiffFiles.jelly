@@ -82,7 +82,12 @@
                         </table>
                       </div>
                       <div style="float:bottom" class="singleLineView description">
-                        <div><b>Date:</b> <span class="describedElement">${it.getTimestamp(1)}</span></div>
+                        <div>
+                          <b>Date:</b>
+                          <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(1)}">
+                            ${it.getTimestamp(1)}
+                          </a>
+                        </div>
                         <div><b>Operation:</b> <span class="describedElement">${it.getOperation(1)}</span></div>
                         <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                           <div>
@@ -111,7 +116,12 @@
                         </table>
                       </div>
                       <div style="float:bottom" class="singleLineView description">
-                        <div><b>Date:</b> <span class="describedElement">${it.getTimestamp(2)}</span></div>
+                        <div>
+                          <b>Date:</b>
+                          <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(2)}">
+                            ${it.getTimestamp(2)}
+                          </a>
+                        </div>
                         <div><b>Operation:</b> <span class="describedElement">${it.getOperation(2)}</span></div>
                         <div>
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
