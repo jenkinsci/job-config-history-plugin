@@ -58,13 +58,16 @@
 
               <table style="width:100%;" class="center jch">
                 <thead>
+                  <caption class="caption" style="text-align:center">
+                    ${it.getProject().getFullName()}
+                  </caption>
                   <tr>
-                    <th colspan="2" class="caption left-caption">
+                    <th colspan="2" class="subcaption">
 
                       <div style="float:top">
                         <table style="border:0px; width:100%">
                           <tr>
-                            <td class="caption" style="padding:0px;  width:60%;">
+                            <td class="subcaption" style="padding:0px;  width:60%;">
                               Older Change
                             </td>
                             <td style="width:40%; border:none; text-align:right; padding:0px">
@@ -89,11 +92,11 @@
                         </j:if>
                       </div>
                     </th>
-                    <th colspan="2" class="caption right-caption">
+                    <th colspan="2" class="subcaption">
                       <div style="float:top">
                         <table style="border:0px; width:100%">
                           <tr>
-                            <td class="caption" style="padding:0px;  width:60%;">
+                            <td class="subcaption" style="padding:0px;  width:60%;">
                               Newer Change
                             </td>
                             <td style="width:40%; border:none; text-align:right; padding:0px">
