@@ -90,7 +90,7 @@ table.jch .caption {
 
 	background-color: #383838;
     color:white;
-    text-align: left;
+    text-align: center;
 
     font-weight: bold;
     font-size: 20px;
@@ -104,14 +104,30 @@ table.jch .caption {
 	border-top-right-radius: 3px;
 }
 
-table.jch .caption.left-caption {
+table.jch .subcaption {
+
+	background-color: #383838;
+    color:rgba(255,255,255,0.9);
+    text-align: left;
+
+    font-weight: bold;
+    font-size: 16px;
+
+	padding: 12px;
+
+	border:none;
+}
+
+
+/*TODO currently not used */
+table.jch .subcaption.left-caption {
 
 	border-top-right-radius: 0px;
  	border-top-left-radius: 3px;
 
 }
-
-table.jch .caption.right-caption {
+/*TODO currently not used */
+table.jch .subcaption.right-caption {
 
  	border-top-right-radius: 3px;
     border-top-left-radius: 0px;
@@ -120,16 +136,16 @@ table.jch .caption.right-caption {
 
 table.jch  td {
     font-size: 12px;
-    text-align: center;
+    text-align: left;
     vertical-align: middle;
     border-right: 1px solid #ddd;
     border-top: 1px solid #ddd;
-    padding: 6px;
+    padding: 2px;
 }
 
 
 table.jch  th {
-    text-align: center;
+    text-align: left;
     color: #488cf9;
     background-color:#efefef;
 
@@ -211,28 +227,7 @@ a.download-arrow:hover{
 #####################################################################
 */
 
-.subcaption {
-    background-color:rgb(250, 250, 250);
-    color: rgba(0, 0, 0, 0.5);
 
-    text-align:center;
-    font-size: 16px;
-    font-weight: bold;
-
-    border: 1px solid rgb(232, 232, 232);
-    border-radius: 3px;
-
-    padding: 8px;
-}
-
-table.center.jch td.subcaption-wrap {
-    border-left: 5px solid white;
-    border-right: 5px solid white;
-}
-
-table.center.jch tr:first-child td.subcaption-wrap {
-    border-top:10px solid white;
-}
 
 
 /*
@@ -415,7 +410,7 @@ a.url-button:hover{
 
     padding: 6px;
 
-    font-size: 14px;
+    font-size: 12px;
     font-weight:bold;
     text-align:center;
 
