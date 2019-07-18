@@ -2,7 +2,16 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:g="glide" xmlns:y="wasauchimmeroa4">
 
-  <l:layout title="Job Configuration History" css="/plugin/jobConfigHistory/diff_highlight.css">
+  <l:layout title="Job Configuration History">
+
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/diff_highlight.css"></link>
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
+
+    <!--syntax highlighting-->
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/highlight.js/styles/purebasic.css"/>
+    <script src="${rootURL}/plugin/jobConfigHistory/highlight.js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
       <h1>${%Job Configuration Difference}</h1>
@@ -41,178 +50,239 @@
                   }
                 }
               </script>
-              <input id="showHideVersionDiffsJsButton" type="button" value="Hide Version Changes" onClick="toggleShowHideVersionDiffsJs();"/>
+              <div class="small-button-wrapper">
+                <input id="showHideVersionDiffsJsButton" class="small-button" type="button" value="Hide Version Changes" onClick="toggleShowHideVersionDiffsJs();"/>
+              </div>
+              <div style="padding:2px"/>
 
-              <table style="width:100%;">
+
+              <table style="width:100%;" class="center jch">
                 <thead>
                   <tr>
-                    <td colspan="2"> <font size="3"> Older Change </font></td>
-                    <td colspan="2"> <font size="3"> Newer Change </font></td>
-                  </tr>
-                  <tr>
-                    <td colspan="2"><b>Date:</b> ${it.getTimestamp(1)}</td>
-                    <td colspan="2"><b>Date:</b> ${it.getTimestamp(2)}</td>
-                  </tr>
-                  <tr>
-                    <td colspan="2"><b>Operation:</b> ${it.getOperation(1)}</td>
-                    <td colspan="2"><b>Operation:</b> ${it.getOperation(2)}</td>
-                  </tr>
-                  <tr>
-                    <td colspan="2">
-                      <table style="width:100%; border-collapse: collapse;">
-                        <tr>
-                          <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                            <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a> </td>
-                          </j:if>
-                          <j:if test="${it.hasConfigurePermission()}">
-                            <td align="right">
-                              <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" name="forward">
-                                <f:submit value="${%Restore this configuration}" />
-                              </f:form>
+                    <th colspan="2" class="caption left-caption">
+
+                      <div style="float:top">
+                        <table style="border:0px; width:100%">
+                          <tr>
+                            <td class="caption" style="padding:0px;  width:60%;">
+                              Older Change
                             </td>
-                          </j:if>
-                        </tr>
-                      </table>
-                    </td>
-                    <td colspan="2">
-                      <table style="width:100%; border-collapse: collapse;">
-                        <tr>
-                          <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                            <td><b>User:</b> <a style="margin-left: 2px;" href="${rootURL}/user/${it.getUser(2)}">${it.getUser(2)}</a> </td>
-                          </j:if>
-                          <j:if test="${it.hasConfigurePermission()}">
-                            <td align="right">
-                              <f:form method="post" action="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" name="forward">
-                                <f:submit value="${%Restore this configuration}" />
-                              </f:form>
+                            <td style="width:40%; border:none; text-align:right; padding:0px">
+                              <j:if test="${it.hasConfigurePermission()}">
+
+                                <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" style="text-decoration:none">
+                                  ${%Restore this configuration}
+                                </a>
+                              </j:if>
                             </td>
+                          </tr>
+                        </table>
+                      </div>
+                      <div style="float:bottom" class="singleLineView description">
+                        <div><b>Date:</b> <span class="describedElement">${it.getTimestamp(1)}</span></div>
+                        <div><b>Operation:</b> <span class="describedElement">${it.getOperation(1)}</span></div>
+                        <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                          <div>
+                            <b>User:</b>
+                            <a class="url-button" href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a>
+                          </div>
+                        </j:if>
+                      </div>
+                    </th>
+                    <th colspan="2" class="caption right-caption">
+                      <div style="float:top">
+                        <table style="border:0px; width:100%">
+                          <tr>
+                            <td class="caption" style="padding:0px;  width:60%;">
+                              Newer Change
+                            </td>
+                            <td style="width:40%; border:none; text-align:right; padding:0px">
+                              <j:if test="${it.hasConfigurePermission()}">
+
+                                <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" style="text-decoration:none">
+                                  ${%Restore this configuration}
+                                </a>
+                              </j:if>
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                      <div style="float:bottom" class="singleLineView description">
+                        <div><b>Date:</b> <span class="describedElement">${it.getTimestamp(2)}</span></div>
+                        <div><b>Operation:</b> <span class="describedElement">${it.getOperation(2)}</span></div>
+                        <div>
+                          <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                            <b>User:</b>
+                            <a class="url-button" href="${rootURL}/user/${it.getUser(1)}">${it.getUser(1)}</a>
                           </j:if>
-                        </tr>
-                      </table>
-                    </td>
+
+                        </div>
+                      </div>
+                    </th>
                   </tr>
                 </thead>
 
                 <!-- The following 2 tbodys are switched via a js button-->
                 <!-- First is default and shows version diffs, second doesn't.-->
-                <tbody style="outline: 1pt solid #B2B2B2; display:''" id="tbody_versionDiffsShown">
-                  <j:choose>
-                    <j:when test="${it.getLines().size() == 0}">
-                      <tr>
-                        <td colspan="4">
-                          <p>${%No lines changed}</p>
-                        </td>
-                      </tr>
-                    </j:when>
-                    <j:otherwise>
-
-                      <j:forEach items="${it.getLines(false)}" var="line">
-                        <tr>
-                          <j:choose>
-                            <j:when test="${line.skipping}">
-                              <th class="lineNum">...</th>
-                              <td class="skipping"></td>
-                              <th class="lineNum">...</th>
-                              <td class="skipping"></td>
-                            </j:when>
-                            <j:otherwise>
-                              <th class="lineNum">${line.left.lineNumber}</th>
-                              <td class="${line.left.cssClass}"><pre><j:out value="${line.left.text}"/></pre></td>
-                              <th class="lineNum">${line.right.lineNumber}</th>
-                              <td class="${line.right.cssClass}"><pre><j:out value="${line.right.text}"/></pre></td>
-                            </j:otherwise>
-                          </j:choose>
-                        </tr>
-                      </j:forEach>
-                    </j:otherwise>
-                  </j:choose>
-                </tbody>
-
-                <tbody style="outline: 1pt solid #B2B2B2; display:none" id="tbody_versionDiffsHidden">
-                  <j:choose>
-                    <j:when test="${it.getLines().size() == 0}">
-                      <tr>
-                        <td colspan="4">
-                          <p>${%No lines changed}</p>
-                        </td>
-                      </tr>
-                    </j:when>
-                    <j:otherwise>
-                      <!-- hide version diffs-->
-                      <j:forEach items="${it.getLines(true)}" var="line">
-                        <tr>
-                          <j:choose>
-                            <j:when test="${line.skipping}">
-                              <th class="lineNum">...</th>
-                              <td class="skipping"></td>
-                              <th class="lineNum">...</th>
-                              <td class="skipping"></td>
-                            </j:when>
-                            <j:otherwise>
-                              <th class="lineNum">${line.left.lineNumber}</th>
-                              <td class="${line.left.cssClass}"><pre><j:out value="${line.left.text}"/></pre></td>
-                              <th class="lineNum">${line.right.lineNumber}</th>
-                              <td class="${line.right.cssClass}"><pre><j:out value="${line.right.text}"/></pre></td>
-                            </j:otherwise>
-                          </j:choose>
-                        </tr>
-                      </j:forEach>
-                    </j:otherwise>
-                  </j:choose>
-                </tbody>
-
-
-
-
-              </table>
-              <div align="middle">
-                <table>
+                <tbody style="display:''" id="tbody_versionDiffsShown">
                   <tr>
-                    <td>
-                      <j:if test="${prev1 != timestamp1}">
-                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${timestamp2}" name="prevEntry" >
-                          <f:submit value="&lt; ${%Expand Diff}" />
-                        </f:form>
-                      </j:if>
-                    </td>
-                    <td>
-                      <j:if test="${next1 != timestamp1}">
-                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${timestamp2}" name="nextEntry" >
-                          <f:submit value="${%Shrink Diff} &gt;" />
-                        </f:form>
-                      </j:if>
-                    </td>
-                    <td>
-                      <j:if test="${prev1 != prev2}">
-                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${prev2}" name="prevEntry" >
-                          <f:submit value="&lt; ${%Prev}" />
-                        </f:form>
-                      </j:if>
-                    </td>
-                    <td>
-                      <j:if test="${next1 != next2}">
-                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${next2}" name="nextEntry" >
-                          <f:submit value="${%Next} &gt;" />
-                        </f:form>
-                      </j:if>
-                    </td>
-                    <td>
-                      <j:if test="${prev2 != timestamp2}">
-                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${prev2}" name="prevEntry" >
-                          <f:submit value="&lt; ${%Shrink Diff}" />
-                        </f:form>
-                      </j:if>
-                    </td>
-                    <td>
-                      <j:if test="${next2 != timestamp2}">
-                        <f:form method="post" action="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${next2}" name="nextEntry" >
-                          <f:submit value="${%Expand Diff} &gt;" />
-                        </f:form>
-                      </j:if>
+                    <td class="diffLineWrapper" colspan="4">
+                      <table class="center jch diffLineTable">
+                        <j:choose>
+                          <j:when test="${it.getLines().size() == 0}">
+                            <tr>
+                              <td colspan="4">
+                                <p>${%No lines changed}</p>
+                              </td>
+                            </tr>
+                          </j:when>
+                          <j:otherwise>
+                            <j:forEach items="${it.getLines(false)}" var="line">
+                              <tr>
+                                <j:choose>
+                                  <j:when test="${line.skipping}">
+                                    <th class="lineNum">...</th>
+                                    <td class="skipping"></td>
+                                    <th class="lineNum">...</th>
+                                    <td class="skipping"></td>
+                                  </j:when>
+                                  <j:otherwise>
+                                    <th class="lineNum ${line.left.cssClass}">${line.left.lineNumber}</th>
+                                    <td class="${line.left.cssClass}">
+                                      <pre>
+                                        <code>
+                                          <j:out value="${line.left.text}"/>
+                                        </code>
+                                      </pre>
+                                    </td>
+                                    <th class="lineNum ${line.right.cssClass}">${line.right.lineNumber}</th>
+                                    <td class="${line.right.cssClass}">
+                                      <pre>
+                                        <code>
+                                          <j:out value="${line.right.text}"/>
+                                        </code>
+                                      </pre>
+                                    </td>
+                                  </j:otherwise>
+                                </j:choose>
+                              </tr>
+                            </j:forEach>
+                          </j:otherwise>
+                        </j:choose>
+                      </table>
                     </td>
                   </tr>
-                </table>
-              </div>
+                </tbody>
+
+                <tbody style="display:none" id="tbody_versionDiffsHidden">
+                  <tr>
+                    <td class="diffLineWrapper" colspan="4">
+                      <table class="center jch diffLineTable">
+                        <j:choose>
+                          <j:when test="${it.getLines().size() == 0}">
+                            <tr>
+                              <td colspan="4">
+                                <p>${%No lines changed}</p>
+                              </td>
+                            </tr>
+                          </j:when>
+                          <j:otherwise>
+                            <j:forEach items="${it.getLines(true)}" var="line">
+                              <tr>
+                                <j:choose>
+                                  <j:when test="${line.skipping}">
+                                    <th class="lineNum">...</th>
+                                    <td class="skipping"></td>
+                                    <th class="lineNum">...</th>
+                                    <td class="skipping"></td>
+                                  </j:when>
+                                  <j:otherwise>
+                                    <th class="lineNum ${line.left.cssClass}">${line.left.lineNumber}</th>
+                                    <td class="${line.left.cssClass}">
+                                      <pre>
+                                        <code>
+                                          <j:out value="${line.left.text}"/>
+                                        </code>
+                                      </pre>
+                                    </td>
+                                    <th class="lineNum ${line.right.cssClass}">${line.right.lineNumber}</th>
+                                    <td class="${line.right.cssClass}">
+                                      <pre>
+                                        <code>
+                                          <j:out value="${line.right.text}"/>
+                                        </code>
+                                      </pre>
+                                    </td>
+                                  </j:otherwise>
+                                </j:choose>
+                              </tr>
+                            </j:forEach>
+                          </j:otherwise>
+                        </j:choose>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <table style="width:100%" class="small-button-wrapper">
+                <tr>
+                  <j:if test="${prev1 != timestamp1}">
+                    <td>
+                      <div class="menu-url-button">
+                        <a href="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${timestamp2}" style="text-decoration:none">
+                          &lt; ${%Expand Diff}
+                        </a>
+                      </div>
+                    </td>
+                  </j:if>
+                  <j:if test="${next1 != timestamp1}">
+                    <td>
+                      <div class="menu-url-button">
+                        <a href="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${timestamp2}" style="text-decoration:none">
+                          ${%Shrink Diff} &gt;
+                        </a>
+                      </div>
+                    </td>
+                  </j:if>
+                  <j:if test="${prev1 != prev2}">
+                  <td>
+                    <div class="menu-url-button">
+                      <a href="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${prev2}" style="text-decoration:none">
+                        &lt; ${%Prev}
+                      </a>
+                    </div>
+                  </td>
+                  </j:if>
+                  <j:if test="${next1 != next2}">
+                  <td>
+                    <div class="menu-url-button">
+                      <a href="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${next2}" style="text-decoration:none">
+                        ${%Next} &gt;
+                      </a>
+                    </div>
+                  </td>
+                  </j:if>
+                  <j:if test="${prev2 != timestamp2}">
+                    <td>
+                      <div class="menu-url-button">
+                        <a href="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${prev2}" style="text-decoration:none">
+                          &lt; ${%Shrink Diff}
+                        </a>
+                      </div>
+                    </td>
+                  </j:if>
+                  <j:if test="${next2 != timestamp2}">
+                    <td>
+                      <div class="menu-url-button">
+                        <a href="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${next2}" style="text-decoration:none">
+                          ${%Expand Diff} &gt;
+                        </a>
+                      </div>
+                    </td>
+                  </j:if>
+                </tr>
+              </table>
             </div>
           </j:otherwise>
         </j:choose>
