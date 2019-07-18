@@ -1,10 +1,12 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="Agent Configuration History">
+
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
+
     <st:include it="${it.slave.toComputer()}" page="sidepanel.jelly" />
     <l:main-panel>
       <h1>${%Agent Configuration History}</h1>
-      <h2>${it.getSlave().getNodeName()}</h2>
       <div>
         <script type="text/javascript">
           function showTooltip(nr) {
@@ -25,24 +27,32 @@
               <f:form method="post" action="diffFiles" name="diffFiles">
                 <j:if test="${configs.size() > 1}">
                   <div align="right">
-                    <f:submit value="${%Show Diffs}" />
+                    <div align="right">
+                      <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
+                    </div>
+                    <div style="padding:2px"/>
                   </div>
                 </j:if>
-                <st:adjunct includes="hudson.plugins.jobConfigHistory.table" />
-                <table id="confighistory" class="pane sortable">
-                  <tr>
-                    <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
-                    <td class="pane-header" align="left">${%Operation}</td>
-                    <td class="pane-header" align="left">${%User}</td>
-                    <td class="pane-header" align="left">${%Show File}</td>
-                    <td class="pane-header" align="left">${%Restore old config}</td>
-                    <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
-                    <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
-                  </tr>
+
+                <table id="confighistory" class="pane sortable jch">
+                  <thead>
+                    <caption class="caption">
+                      ${it.getSlave().getNodeName()}
+                    </caption>
+                    <tr>
+                      <th initialSortDir="up" align="left">${%Date}</th>
+                      <th>${%Operation}</th>
+                      <th>${%User}</th>
+                      <th>${%Show File}</th>
+                      <th style=" text-align:center">${%Restore old config}</th>
+                      <th style=" text-align:center">${%File A}</th>
+                      <th style=" text-align:center">${%File B}</th>
+                    </tr>
+                  </thead>
                   <j:set var="configNr" value="0"/>
                   <j:forEach var="config" items="${configs}">
                     <j:set var="configNr" value="${configNr + 1}"/>
-                    <tr>
+                    <tr class="alternate">
                       <td>${config.date}</td>
                       <td>
                       <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
@@ -67,7 +77,7 @@
                           </a>
                         </j:if>
                       </td>
-                      <td>
+                      <td style=" text-align:center">
                         <j:if test="${configNr > 1 and !fileMissing}">
                           <a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
                             <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
@@ -77,12 +87,12 @@
                       <j:if test="${configNr == 2 and fileMissing}">
                         <j:set var="offsetIfFileMissing" value="1"/>
                       </j:if>
-                      <td align="center" style="border-left: solid 1px #bbb;">
+                      <td style="border-left: solid 1px #bbb; text-align:center">
                         <j:if test="${!fileMissing}">
                           <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfFileMissing) ? true:false}" />
                         </j:if>
                       </td>
-                      <td align="center" style="border-left: solid 1px #bbb;">
+                      <td style="border-left: solid 1px #bbb; text-align:center">
                         <j:if test="${!fileMissing}">
                           <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" />
                         </j:if>
@@ -95,7 +105,10 @@
                 </table>
                 <j:if test="${configs.size() > 1}">
                   <div align="right">
-                    <f:submit value="${%Show Diffs}" />
+                    <div style="padding:2px"/>
+                    <div align="right">
+                      <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
+                    </div>
                   </div>
                 </j:if>
               </f:form>
