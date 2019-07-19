@@ -104,7 +104,7 @@
                     </j:if>
                     <th>${%File(raw)}</th>
                     <j:if test="${filter == 'deleted'}">
-                      <th>${%Restore project}</th>
+                      <th style="text-align:center">${%Restore project}</th>
                     </j:if>
                   </tr>
                 </thead>
@@ -150,7 +150,7 @@
                       </a>
                     </td>
                     <j:if test="${filter == 'deleted'}">
-                      <td>
+                      <td  style="text-align:center">
                         <j:if test="${it.getLastAvailableConfigXml(config.getJob()) != null}">
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                             <!--this prevents people from destroying their history by trying to restore deleted folder jobs
