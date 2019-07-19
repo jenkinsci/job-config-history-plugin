@@ -327,6 +327,12 @@ table.sortable.jch a.sortheader {
     font-size: 14px;
 }
 
+a.standard-button {
+    color: white;
+    outline:none;
+    text-decoration:none;
+}
+
 .standard-button:hover{
     background-color: #e8e8e8;
     color: #383838;
@@ -432,4 +438,30 @@ a.url-button:hover{
 
 .restore-button::-moz-focus-inner {
     border: 0;
+}
+
+div.jch-warning {
+    font-size:15px;
+    font-weight:bold;
+    /*display:inline-block;*/
+
+    padding:10px;
+    text-align:center;
+    border-radius:2px;
+
+    background-color:rgb(255, 169, 42);
+    color:white;
+}
+
+div.jch-warning span.describedElement:hover {
+    color:rgba(255,255,255,0.7)
+}
+
+div.jch-warning span.describedElement {
+    color:rgba(255,255,255,0.9);
+    background-color:rgba(217, 143, 35,0.9);
+    border-radius:3px;
+    padding:2px;
+    padding-top:0px;
+    padding-bottom:0px;
 }
