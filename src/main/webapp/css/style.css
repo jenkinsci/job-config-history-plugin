@@ -344,6 +344,25 @@ a.standard-button {
     color: #383838;
 }
 
+.delete-button {
+    background-color: #383838;
+    font-weight:bold;
+    color: white;
+    border: 1px solid #383838;
+    border-radius: 2px;
+    padding: 1px;
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 14px;
+}
+
+.delete-button:hover{
+    background-color: #e04f4f;
+    color: #383838;
+}
+
+
+
 .small-button {
     background-color: rgb(250,250,250);
     color: rgba(0, 0, 0, 0.7);

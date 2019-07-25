@@ -111,6 +111,9 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	}
 
 	@Override
+	public boolean hasAdminPermission() { return getAccessControlledObject().hasPermission(Jenkins.ADMINISTER); }
+
+	@Override
 	public boolean hasConfigurePermission() {
 		return getAccessControlledObject().hasPermission(Computer.CONFIGURE);
 	}

@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
+import jenkins.model.Jenkins;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
@@ -271,6 +272,11 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	@Override
 	public void checkConfigurePermission() {
 		getAccessControlledObject().checkPermission(Permission.CONFIGURE);
+	}
+
+	@Override
+	public boolean hasAdminPermission() {
+		return getAccessControlledObject().hasPermission(Jenkins.ADMINISTER);
 	}
 
 	@Override
