@@ -121,6 +121,14 @@ public interface HistoryDao {
 	XmlFile getOldRevision(String configFileName, String identifier);
 
 	/**
+	 * Permanently delete the given revision.
+	 *
+	 * @param item item
+	 * @param identifier timestamp or hash
+	 */
+	void deleteRevision(AbstractItem item, String identifier);
+
+	/**
 	 * Returns whether the revision exists.
 	 *
 	 * @param node

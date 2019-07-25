@@ -24,6 +24,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.FINEST;
+import static java.util.logging.Level.INFO;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -481,6 +482,28 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			throw new IllegalArgumentException("Could not find " + historyDir);
 		}
 		return new XmlFile(configFile);
+	}
+
+	@Override
+	public void deleteRevision(AbstractItem abstractItem, String identifier) {
+
+		final AbstractItem aItem = (AbstractItem) abstractItem;
+
+		final File configFile = aItem.getConfigFile().getFile();
+		final File currentHistoryDir = getHistoryDir(configFile);
+
+		final File timestampDir;
+		try {
+			timestampDir = getSubDirectory(currentHistoryDir, identifier);
+			try {
+				FileUtils.deleteDirectory(timestampDir);
+			} catch (IOException e) {
+				LOG.log(Level.WARNING, "unable to delete revision {0}: {1}", new Object[]{identifier, e.getMessage()});
+			}
+		} catch (FileNotFoundException e) {
+			LOG.log(Level.WARNING, "unable to delete revision {0}: file not found.", identifier);
+		}
+		LOG.log(FINEST, "{0} \'s revision {1} deleted.", new Object[]{abstractItem.getFullName(), identifier});
 	}
 
 	@Override

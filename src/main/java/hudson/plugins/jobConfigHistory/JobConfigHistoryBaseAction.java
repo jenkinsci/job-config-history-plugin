@@ -166,7 +166,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected abstract void checkConfigurePermission();
 
-    /**
+	public abstract boolean hasAdminPermission();
+
+	/**
      * Returns whether the current user may read configurations in the object
      * returned by {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
      *
