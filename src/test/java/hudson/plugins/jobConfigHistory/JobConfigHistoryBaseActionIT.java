@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import jenkins.model.Jenkins;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.jvnet.hudson.test.Issue;
@@ -95,6 +96,12 @@ public class JobConfigHistoryBaseActionIT
 				getAccessControlledObject()
 						.checkPermission(Permission.CONFIGURE);
 			}
+
+			@Override
+			public boolean hasAdminPermission() {
+				return getAccessControlledObject().hasPermission(Jenkins.ADMINISTER);
+			}
+
 			@Override
 			protected boolean hasConfigurePermission() {
 				return getAccessControlledObject()
