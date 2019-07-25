@@ -201,6 +201,11 @@ public class JobConfigHistoryBaseActionTest {
 		public void checkConfigurePermission() {
 		}
 
+		@Override
+		public boolean hasAdminPermission() {
+			return false;
+		}
+
 		public boolean hasConfigurePermission() {
 			return false;
 		}
