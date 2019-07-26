@@ -3,8 +3,6 @@
 	<!-- strip whitespace -->
 	<xsl:strip-space elements="*" />
 
-	<!-- pretty print -->
-	<xsl:output method="xml" indent="yes" />
 
 	<!-- sort tags -->
 	<xsl:template match="node()|@*">
@@ -19,7 +17,11 @@
 		</xsl:copy>
 	</xsl:template>
 
+	<!-- pretty print -->
+	<xsl:output method="xml" indent="yes" />
+
+	<!--Skip skipping empty node...-->
 	<!-- skip empty node -->
-	<xsl:template match="*[not(node())] | *[not(string())]" />
+	<!--xsl:template match="*[not(node())] | *[not(string())]" /-->
 
 </xsl:stylesheet>

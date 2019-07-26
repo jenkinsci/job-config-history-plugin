@@ -31,10 +31,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -48,6 +45,15 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.UnifiedDiffUtils;
+import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.Patch;
+import com.github.difflib.patch.PatchFailedException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.remoting.util.Charsets;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -55,10 +61,10 @@ import org.xml.sax.InputSource;
 
 import com.google.common.collect.Lists;
 
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
-import difflib.StringUtills;
+//import difflib.Delta;
+//import difflib.DiffUtils;
+//import difflib.Patch;
+//import difflib.StringUtills;
 
 import org.w3c.dom.Node;
 
@@ -331,17 +337,30 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
                                            final String[] file2Lines, final boolean hideVersionDiffs) {
+
+       //TODO remove this debug line
+        LOG.log(Level.INFO, "\n\n\n\n+++\n+++Debug getDiffAsString+++\n+++");
+        LOG.log(Level.INFO, "\nfile2Lines:\n" + Arrays.toString(file2Lines));
         //calculate all diffs.
-        final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
+        final Patch<String> patch;
+        try {
+            patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
+        } catch (DiffException e) {
+            //TODO handle error
+            LOG.log(Level.SEVERE, "TODO");
+            return "";
+        }
         if (hideVersionDiffs) {
             //calculate diffs to be excluded from the output.
             Diff versionDiffs = getVersionDiffsOnly(reformatAndConcatStringArray(file1Lines), reformatAndConcatStringArray(file2Lines));
             //feature in library: empty deltas are shown, too.
-            List<Delta> deltasToBeRemovedAfterTheMainLoop = new LinkedList<Delta>();
-            for (Delta delta : patch.getDeltas()) {
+            List<AbstractDelta<String>> deltasToBeRemovedAfterTheMainLoop = new LinkedList<>();
+
+            for (AbstractDelta<String> delta : patch.getDeltas()) {
                 // Modify both deltas and save the changes.
-                List<String> originalLines = Lists.newArrayList((List<String>) delta.getOriginal().getLines());
-                List<String> revisedLines = Lists.newArrayList((List<String>) delta.getRevised().getLines());
+
+                List<String> originalLines = Lists.newArrayList((List<String>) delta.getSource().getLines());
+                List<String> revisedLines = Lists.newArrayList((List<String>) delta.getTarget().getLines());
                 for (Difference versionDifference : versionDiffs.getDifferences()) {
                     //check for each calculated versionDifference where it occurred and delete it.
                     String controlValue = versionDifference.getComparison().getControlDetails().getValue().toString();
@@ -373,16 +392,25 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                     //remove the delta from the list.
                     deltasToBeRemovedAfterTheMainLoop.add(delta);
                 }
-                delta.getOriginal().setLines(originalLines);
-                delta.getRevised().setLines(revisedLines);
+                delta.getSource().setLines(originalLines);
+                delta.getTarget().setLines(revisedLines);
             }
             patch.getDeltas().removeAll(deltasToBeRemovedAfterTheMainLoop);
         }
 
-        final List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(file1.getPath(), file2.getPath(),
-                Arrays.asList(file1Lines), patch, 3);
+        //TODO remove debug line
+        patch.getDeltas().forEach(delta -> LOG.log(Level.INFO, "\n<\n    " + delta.getSource() + "\n    " + delta.getTarget() + "\n>"));
 
-        return StringUtills.join(unifiedDiff, "\n") + "\n";
+        return StringUtils.join(
+            UnifiedDiffUtils.generateUnifiedDiff(
+                file1.getPath(),
+                file2.getPath(),
+                Arrays.asList(file1Lines),
+                patch,
+                3
+            ),
+            "\n"
+        ) + "\n";
     }
 
     /**
