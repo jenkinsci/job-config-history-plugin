@@ -515,6 +515,22 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	}
 
 	@Override
+	public void deleteRevision(File historyDir, String identifier) {
+		final File timestampDir;
+		try {
+			timestampDir = getSubDirectory(historyDir, identifier);
+			try {
+				FileUtils.deleteDirectory(timestampDir);
+			} catch (IOException e) {
+				LOG.log(Level.WARNING, "unable to delete revision {0}: {1}", new Object[]{identifier, e.getMessage()});
+			}
+		} catch (FileNotFoundException e) {
+			LOG.log(Level.WARNING, "unable to delete revision {0}: file not found.", identifier);
+		}
+		LOG.log(FINEST, "{0} \'s revision {1} deleted.", new Object[]{historyDir.getName(), identifier});
+	}
+
+	@Override
 	public boolean hasOldRevision(final XmlFile xmlFile,
 								  final String identifier) {
 		final File configFile = xmlFile.getFile();

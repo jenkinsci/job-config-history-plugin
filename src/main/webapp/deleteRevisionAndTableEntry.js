@@ -1,4 +1,5 @@
-function removeEntryFromTable(id, timestamp) {
+//name is an optional parameter for job deletion history and system config history
+function removeEntryFromTable(id, timestamp, name) {
     if (confirm('Do you really want to delete this history entry?')) {
         var tableRow = document.getElementById(id);
         tableRow.parentNode.removeChild(tableRow);
@@ -6,6 +7,9 @@ function removeEntryFromTable(id, timestamp) {
         //redirect
         var xmlHttp = new XMLHttpRequest();
         var url = 'deleteRevision?timestamp=' + timestamp;
+        if (name != null) {
+            url += "&name=" + name;
+        }
         xmlHttp.open("GET", url, true);
         xmlHttp.send(null);
     } else {

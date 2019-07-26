@@ -30,6 +30,8 @@ import hudson.model.Descriptor;
 import hudson.model.Node;
 import jenkins.model.Jenkins;
 
+import java.io.File;
+
 /**
  * Master class for adding new backends to the history plugin.
  *
@@ -61,6 +63,4 @@ public abstract class JobConfigHistoryStrategy
 		Jenkins jenkins = Jenkins.getInstance();
 		return jenkins.getDescriptorList(JobConfigHistoryStrategy.class);
 	}
-
-	public abstract void deleteRevision(Node node, String identifier);
 }

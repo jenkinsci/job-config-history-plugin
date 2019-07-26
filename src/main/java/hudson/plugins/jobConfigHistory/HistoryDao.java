@@ -23,6 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import java.io.File;
 import java.util.SortedMap;
 
 import hudson.XmlFile;
@@ -127,6 +128,11 @@ public interface HistoryDao {
 	 * @param identifier timestamp or hash
 	 */
 	void deleteRevision(AbstractItem item, String identifier);
+
+
+	public abstract void deleteRevision(Node node, String identifier);
+
+	public abstract void deleteRevision(File historyDir, String identifier);
 
 	/**
 	 * Returns whether the revision exists.
