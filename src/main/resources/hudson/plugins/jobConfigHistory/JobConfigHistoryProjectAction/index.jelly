@@ -8,28 +8,14 @@
     <l:main-panel>
       <h1>${%Job Configuration History}</h1>
       <div>
+
+        <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"></script>
         <script type="text/javascript">
           function showTooltip(nr) {
             document.getElementById('tooltip' + nr).style.visibility = 'visible';
           }
           function hideTooltip(nr) {
             document.getElementById('tooltip' + nr).style.visibility = 'hidden';
-          }
-
-          function removeEntryFromTable(id, timestamp) {
-            if (confirm('Do you really want to delete this history entry?')) {
-              var tableRow = document.getElementById(id);
-              tableRow.parentNode.removeChild(tableRow);
-
-              //redirect
-              var xmlHttp = new XMLHttpRequest();
-              var url = 'deleteRevision?timestamp=' + timestamp;
-              xmlHttp.open("GET", url, true);
-              xmlHttp.send(null);
-
-            } else {
-              return false;
-            }
           }
         </script>
         <j:set var="configs" value="${it.getJobConfigs()}" />
