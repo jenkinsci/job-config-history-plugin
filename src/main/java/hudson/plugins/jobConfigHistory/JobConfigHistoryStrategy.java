@@ -27,6 +27,7 @@ import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+import hudson.model.Node;
 import jenkins.model.Jenkins;
 
 /**
@@ -60,4 +61,6 @@ public abstract class JobConfigHistoryStrategy
 		Jenkins jenkins = Jenkins.getInstance();
 		return jenkins.getDescriptorList(JobConfigHistoryStrategy.class);
 	}
+
+	public abstract void deleteRevision(Node node, String identifier);
 }

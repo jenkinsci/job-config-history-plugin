@@ -392,6 +392,12 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
 	}
 
+	public final void doDeleteRevision(StaplerRequest req, StaplerResponse rsp) {
+		final String timestamp = req.getParameter("timestamp");
+		PluginUtils.getHistoryDao().deleteRevision(this.getSlave(), timestamp);
+		//do nothing with the rsp
+	}
+
 	/**
 	 * Action when 'Show / hide Version Changes' button in showDiffFiles.jelly is pressed:
 	 * Reloads the page with "showVersionDiffs" parameter inversed.

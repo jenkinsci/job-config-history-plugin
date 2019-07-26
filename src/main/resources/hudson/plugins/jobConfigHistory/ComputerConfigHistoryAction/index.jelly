@@ -8,6 +8,8 @@
     <l:main-panel>
       <h1>${%Agent Configuration History}</h1>
       <div>
+
+        <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"></script>
         <script type="text/javascript">
           function showTooltip(nr) {
             document.getElementById('tooltip' + nr).style.visibility = 'visible';
@@ -52,12 +54,15 @@
                         <th style=" text-align:center">${%Restore old config}</th>
                         <th style=" text-align:center">${%File A}</th>
                         <th style=" text-align:center">${%File B}</th>
+                        <j:if test="${it.hasAdminPermission()}">
+                          <th style="text-align:center">Delete Entry</th>
+                        </j:if>
                       </tr>
                     </thead>
                     <j:set var="configNr" value="0"/>
                     <j:forEach var="config" items="${configs}">
                       <j:set var="configNr" value="${configNr + 1}"/>
-                      <tr class="alternate">
+                      <tr class="alternate" id="table-row-${configNr}">
                         <td>${config.date}</td>
                         <td>
                         <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
@@ -102,6 +107,15 @@
                             <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" />
                           </j:if>
                         </td>
+
+
+                        <j:if test="${it.hasAdminPermission()}">
+                          <td style="text-align:center">
+                            <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}')" value="X">
+                              X
+                            </button>
+                          </td>
+                        </j:if>
                       </tr>
                       <f:invisibleEntry>
                         <f:textbox name="name" value="${config.getJob()}" />
