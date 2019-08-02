@@ -107,13 +107,15 @@
                           </j:if>
                         </td>
 
-                        <j:if test="${it.hasAdminPermission()}">
-                          <td style="text-align:center">
-                            <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', '${config.getJob()}')" value="X">
-                              X
-                            </button>
-                          </td>
-                        </j:if>
+                        <td style="text-align:center">
+                          <j:if test="${it.hasAdminPermission()}">
+                            <j:if test="${!config.operation.toString().equals(&quot;Deleted&quot;)}">
+                              <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', '${config.getJob()}')" value="X">
+                                <img src="${resURL}/images/16x16/stop.png" alt="Delete Revision"/>
+                              </button>
+                            </j:if>
+                          </j:if>
+                        </td>
                       </tr>
                       <f:invisibleEntry>
                         <f:textbox name="name" value="${config.getJob()}" />
