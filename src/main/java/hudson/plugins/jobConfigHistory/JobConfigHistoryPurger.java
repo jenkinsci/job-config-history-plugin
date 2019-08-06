@@ -159,6 +159,10 @@ public class JobConfigHistoryPurger extends PeriodicWork {
 								LOG.log(FINEST, "Should delete: {0}",
 										historyDir);
 								deleteDirectory(historyDir);
+								File symblink = new File(historyDir.getParentFile().getPath() + "/" + FileHistoryDao.LAST_HISTORY);
+								if(symblink.exists() && symblink.getPath().equals(historyDir.getPath())) {
+									symblink.delete();
+								}
 							}
 						} else {
 							break;
@@ -247,4 +251,9 @@ public class JobConfigHistoryPurger extends PeriodicWork {
 	public HistoryDao getHistoryDao() {
 		return PluginUtils.getHistoryDao();
 	}
+
+	/**
+	 * Our logger.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(JobConfigHistoryPurger.class.getName());
 }

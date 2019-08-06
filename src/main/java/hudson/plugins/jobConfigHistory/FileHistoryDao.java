@@ -118,7 +118,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	private final boolean saveDuplicates;
 
 	/** Last history **/
-	private final static String LAST_HISTORY = "lastHistory";
+	public final static String LAST_HISTORY = "lastHistory";
 
 	public FileHistoryDao() {
 		this(null, null, null, 0, false);
