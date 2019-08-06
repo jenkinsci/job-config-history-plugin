@@ -268,6 +268,7 @@ public class JobConfigHistory extends Plugin {
 	 */
 	public String getDefaultMaxEntriesPerPage() {
 		return JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE;
+	}
 
 	/**
 	 * @return The regular expression for 'system' file names to exclude from
