@@ -334,9 +334,8 @@ public class JobConfigHistoryTest {
 		assertTrue(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
 		assertTrue(sut.isSaveable(mock(MatrixProject.class), xmlFile));
 		assertTrue(sut.isSaveable(mock(MockFolder.class), xmlFile));
-		// item is null can not be saved
-		assertFalse(sut.isSaveable(null,
-				new XmlFile(unpackResourceZip.getResource("config.xml"))));
+		assertTrue(sut.isSaveable(null,
+				new XmlFile(unpackResourceZip.getResource("config.xml"))));		
 		assertTrue(sut.isSaveable(mock(TopLevelItem.class),
 				new XmlFile(unpackResourceZip.getResource("config.xml"))));
 		assertFalse(sut.isSaveable(null, xmlFile));

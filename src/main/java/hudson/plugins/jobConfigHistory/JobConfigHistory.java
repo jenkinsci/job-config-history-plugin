@@ -407,6 +407,10 @@ public class JobConfigHistory extends Plugin {
 			// including FreeStyleProject, WorkflowJob
 			return true;
 		}
+		if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) {
+			// system configs
+			return canSave;
+		}
 		if (PluginUtils.isMavenPluginAvailable() && item instanceof MavenModule
 				&& saveModuleConfiguration) {
 			return true;
