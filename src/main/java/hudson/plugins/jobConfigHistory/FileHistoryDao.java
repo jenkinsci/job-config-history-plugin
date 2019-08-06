@@ -54,6 +54,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import hudson.Util;
 import hudson.model.TaskListener;
 import org.apache.commons.io.FileUtils;
 
