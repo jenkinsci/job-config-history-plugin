@@ -55,6 +55,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -64,7 +65,6 @@ import hudson.XmlFile;
 import hudson.model.AbstractItem;
 import hudson.model.Node;
 import hudson.model.User;
-import hudson.util.IOUtils;
 import jenkins.model.Jenkins;
 
 /**
@@ -272,8 +272,7 @@ public class FileHistoryDaoTest {
 	public void testCreateNewItem() throws IOException {
 		final File jobDir = new File(jenkinsHome, "jobs/MyTest");
 		jobDir.mkdirs();
-		IOUtils.copy(test1Config.getFile(),
-				new FileOutputStream(new File(jobDir, "config.xml")));
+		FileUtils.copyFile(test1Config.getFile(), new File(jobDir, "config.xml"));
 		when(mockedItem.getRootDir()).thenReturn(jobDir);
 		sutWithUserAndNoDuplicateHistory.createNewItem(mockedItem);
 		assertTrue(new File(jobDir, "config.xml").exists());
@@ -530,7 +529,7 @@ public class FileHistoryDaoTest {
 		IOUtils.write(xmlFile.asString(), new FileOutputStream(configFile));
 		boolean result = sutWithUserAndNoDuplicateHistory
 				.hasDuplicateHistory(new XmlFile(configFile));
-		assertEquals(false, result);
+		assertFalse(result);
 	}
 
 	/**
@@ -541,7 +540,7 @@ public class FileHistoryDaoTest {
 		final File configFile = new File(test1JobDirectory, "config.xml");
 		boolean result = sutWithUserAndNoDuplicateHistory
 				.hasDuplicateHistory(new XmlFile(configFile));
-		assertEquals(true, result);
+		assertTrue(result);
 	}
 
 	/**
@@ -552,7 +551,7 @@ public class FileHistoryDaoTest {
 		final File configFile = new File(jenkinsHome, "jobs/Test2/config.xml");
 		boolean result = sutWithUserAndNoDuplicateHistory
 				.hasDuplicateHistory(new XmlFile(configFile));
-		assertEquals(false, result);
+		assertFalse(result);
 	}
 
 	/**
@@ -564,7 +563,7 @@ public class FileHistoryDaoTest {
 				new File(test1JobDirectory, "config.xml"));
 		boolean result = sutWithoutUserAndDuplicateHistory
 				.checkDuplicate(xmlFile);
-		assertEquals(true, result);
+		assertTrue(result);
 	}
 
 	/**
@@ -576,7 +575,7 @@ public class FileHistoryDaoTest {
 				new File(test1JobDirectory, "config.xml"));
 		boolean result = sutWithUserAndNoDuplicateHistory
 				.checkDuplicate(xmlFile);
-		assertEquals(false, result);
+		assertFalse(result);
 	}
 
 	/**
@@ -588,7 +587,7 @@ public class FileHistoryDaoTest {
 				new File(jenkinsHome, "jobs/Test2/config.xml"));
 		boolean result = sutWithUserAndNoDuplicateHistory
 				.checkDuplicate(xmlFile);
-		assertEquals(true, result);
+		assertTrue(result);
 	}
 
 	/**
@@ -781,13 +780,13 @@ public class FileHistoryDaoTest {
 		createNodeRevision("2014-01-20_10-21-34", mockedNode);
 		SortedMap<String, HistoryDescr> revisions = sutWithUserAndNoDuplicateHistory
 				.getRevisions(mockedNode);
-		assertNotNull("Revisiosn 2014-01-18_10-12-34 should be returned.",
+		assertNotNull("Revision 2014-01-18_10-12-34 should be returned.",
 				revisions.get("2014-01-18_10-12-34"));
-		assertNotNull("Revisiosn 2014-01-19_10-12-34 should be returned.",
+		assertNotNull("Revision 2014-01-19_10-12-34 should be returned.",
 				revisions.get("2014-01-19_10-12-34"));
-		assertNotNull("Revisiosn 2014-01-20_10-12-34 should be returned.",
+		assertNotNull("Revision 2014-01-20_10-12-34 should be returned.",
 				revisions.get("2014-01-20_10-12-34"));
-		assertNotNull("Revisiosn 2014-01-20_10-21-34 should be returned.",
+		assertNotNull("Revision 2014-01-20_10-21-34 should be returned.",
 				revisions.get("2014-01-20_10-21-34"));
 	}
 

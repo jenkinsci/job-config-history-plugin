@@ -128,9 +128,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 		 */
 		List<HistoryDescr> getRevisions(final Job<?, ?> project) {
 			final HistoryDao historyDao = PluginUtils.getHistoryDao();
-			final ArrayList<HistoryDescr> historyDescriptions = new ArrayList<HistoryDescr>(
-					historyDao.getRevisions(project.getConfigFile()).values());
-			return historyDescriptions;
+			return new ArrayList<>(historyDao.getRevisions(project.getConfigFile()).values());
 		}
 
 		/**
@@ -204,7 +202,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 	 */
 	String getRootUrl() {
 		Jenkins jenkins = Jenkins.getInstance();
-		return jenkins != null ? jenkins.getRootUrl() : null;
+		return jenkins.getRootUrl();
 	}
 
 	/**

@@ -94,9 +94,9 @@ public class SideBySideView {
 	 */
 	public static class Line {
 
-		/** The left version of a modificated line. */
+		/** The left version of a modified line. */
 		private final Item left = new Item();
-		/** The right version of a modificated line. */
+		/** The right version of a modified line. */
 		private final Item right = new Item();
 		/** True when line should be skipped. */
 		private boolean skipping;
@@ -104,7 +104,7 @@ public class SideBySideView {
 		private DiffRow.Tag tag;
 
 		/**
-		 * Returns the left version of a modificated line.
+		 * Returns the left version of a modified line.
 		 *
 		 * @return left item.
 		 */
@@ -113,7 +113,7 @@ public class SideBySideView {
 		}
 
 		/**
-		 * Returns the right version of a modificated line.
+		 * Returns the right version of a modified line.
 		 *
 		 * @return right item.
 		 */
@@ -159,7 +159,7 @@ public class SideBySideView {
 		 * Simple representation of a diff element.
 		 *
 		 * Additional to the the text this includes the linenumber as well as
-		 * the corresponding cssClass which signals wether the item was
+		 * the corresponding cssClass which signals whether the item was
 		 * modified, added or deleted.
 		 */
 		public static class Item {

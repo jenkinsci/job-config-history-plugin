@@ -56,14 +56,12 @@ import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 /**
- *
  * @author Mirko Friedenhagen
  */
 public class JobConfigHistoryTest {
 
 	@Rule
-	public final UnpackResourceZip unpackResourceZip = UnpackResourceZip
-			.create();
+	public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.create();
 
 	private final User mockedUser = mock(User.class);
 
@@ -80,8 +78,7 @@ public class JobConfigHistoryTest {
 	 * Test of getHistoryRootDir method, of class JobConfigHistory.
 	 */
 	@Test
-	public void testGetHistoryRootDir()
-			throws IOException, ServletException, Descriptor.FormException {
+	public void testGetHistoryRootDir() throws Exception {
 		JobConfigHistory sut = createSut();
 		sut.configure(null, createFormData());
 		assertThat(sut.getHistoryRootDir(), endsWith("config-history"));
@@ -100,8 +97,7 @@ public class JobConfigHistoryTest {
 	 * Test of getMaxHistoryEntries method, of class JobConfigHistory.
 	 */
 	@Test
-	public void testGetMaxHistoryEntries()
-			throws IOException, ServletException, Descriptor.FormException {
+	public void testGetMaxHistoryEntries() throws Exception {
 		JobConfigHistory sut = createSut();
 		sut.configure(null, createFormData());
 		String expResult = "5";
@@ -116,8 +112,10 @@ public class JobConfigHistoryTest {
 	public void testSetMaxHistoryEntries() {
 		JobConfigHistory sut = createSut();
 		assertNull(sut.getMaxHistoryEntries());
+		sut.setMaxHistoryEntries(null);
+		assertNull(sut.getMaxHistoryEntries());
 		sut.setMaxHistoryEntries("");
-		assertEquals("", sut.getMaxHistoryEntries());
+		assertNull(sut.getMaxHistoryEntries());
 		sut.setMaxHistoryEntries("4");
 		assertEquals("4", sut.getMaxHistoryEntries());
 		sut.setMaxHistoryEntries("-2");
@@ -128,8 +126,7 @@ public class JobConfigHistoryTest {
 	 * Test of getEntriesPerSite method, of class JobConfigHistory.
 	 */
 	@Test
-	public void testGetEntriesPerSite()
-			throws IOException, ServletException, Descriptor.FormException {
+	public void testGetEntriesPerSite() throws Exception {
 		JobConfigHistory sut = createSut();
 		sut.configure(null, createFormData());
 		String expResult = "50";
@@ -144,8 +141,10 @@ public class JobConfigHistoryTest {
 	public void testSetMaxEntriesPerSite() {
 		JobConfigHistory sut = createSut();
 		assertNull(sut.getMaxEntriesPerPage());
+		sut.setMaxEntriesPerPage(null);
+		assertNull(sut.getMaxEntriesPerPage());
 		sut.setMaxEntriesPerPage("");
-		assertEquals("", sut.getMaxEntriesPerPage());
+		assertNull(sut.getMaxEntriesPerPage());
 		sut.setMaxEntriesPerPage("50");
 		assertEquals("50", sut.getMaxEntriesPerPage());
 		sut.setMaxEntriesPerPage("-2");
@@ -156,8 +155,7 @@ public class JobConfigHistoryTest {
 	 * Test of getMaxDaysToKeepEntries method, of class JobConfigHistory.
 	 */
 	@Test
-	public void testGetMaxDaysToKeepEntries()
-			throws IOException, ServletException, Descriptor.FormException {
+	public void testGetMaxDaysToKeepEntries() throws Exception {
 		JobConfigHistory sut = createSut();
 		sut.configure(null, createFormData());
 		assertEquals("5", sut.getMaxDaysToKeepEntries());
@@ -170,8 +168,10 @@ public class JobConfigHistoryTest {
 	public void testSetMaxDaysToKeepEntries() {
 		JobConfigHistory sut = createSut();
 		assertNull(sut.getMaxDaysToKeepEntries());
+		sut.setMaxDaysToKeepEntries(null);
+		assertNull(sut.getMaxDaysToKeepEntries());
 		sut.setMaxDaysToKeepEntries("");
-		assertEquals("", sut.getMaxDaysToKeepEntries());
+		assertNull(sut.getMaxDaysToKeepEntries());
 		sut.setMaxDaysToKeepEntries("4");
 		assertEquals("4", sut.getMaxDaysToKeepEntries());
 		sut.setMaxDaysToKeepEntries("-1");
@@ -188,7 +188,6 @@ public class JobConfigHistoryTest {
 		assertFalse(sut.isPositiveInteger("-1"));
 		assertTrue(sut.isPositiveInteger("0"));
 		assertTrue(sut.isPositiveInteger("1"));
-
 	}
 
 	/**
@@ -206,13 +205,11 @@ public class JobConfigHistoryTest {
 	 * Test of getExcludePattern method, of class JobConfigHistory.
 	 */
 	@Test
-	public void testGetExcludePattern()
-			throws IOException, ServletException, Descriptor.FormException {
+	public void testGetExcludePattern() throws Exception {
 		JobConfigHistory sut = createSut();
 		sut.configure(null, createFormData());
-		String expResult = "5";
 		String result = sut.getExcludePattern();
-		assertEquals(expResult, result);
+		assertEquals(JobConfigHistoryConsts.DEFAULT_EXCLUDE, result);
 	}
 
 	/**
@@ -264,8 +261,7 @@ public class JobConfigHistoryTest {
 	@Test
 	public void testShowBuildBadgesUserWithConfigPermission() {
 		AbstractProject<?, ?> mockedProject = mock(AbstractProject.class);
-		when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
-				.thenReturn(true, false);
+		when(mockedProject.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true, false);
 		JobConfigHistory sut = createSut();
 		sut.setShowBuildBadges("userWithConfigPermission");
 		assertTrue(sut.showBuildBadges(mockedProject));
@@ -279,9 +275,8 @@ public class JobConfigHistoryTest {
 	public void testShowBuildBadgesAdminUser() {
 		JobConfigHistory sut = createSut();
 		AbstractProject<?, ?> mockedProject = mock(AbstractProject.class);
-		final ACL mockedACL = mock(ACL.class);
-		when(mockedACL.hasPermission(Jenkins.ADMINISTER)).thenReturn(true,
-				false);
+		ACL mockedACL = mock(ACL.class);
+		when(mockedACL.hasPermission(Jenkins.ADMINISTER)).thenReturn(true, false);
 		when(sut.getJenkins().getACL()).thenReturn(mockedACL, mockedACL);
 		sut.setShowBuildBadges("adminUser");
 		assertTrue(sut.showBuildBadges(mockedProject));
@@ -303,13 +298,12 @@ public class JobConfigHistoryTest {
 	 * Test of getConfiguredHistoryRootDir method, of class JobConfigHistory.
 	 */
 	@Test
-	public void testGetConfiguredHistoryRootDir()
-			throws IOException, ServletException, Descriptor.FormException {
+	public void testGetConfiguredHistoryRootDir() throws Exception {
 		JobConfigHistory sut = createSut();
 		assertEquals(
 				new File(sut.getConfiguredHistoryRootDir().getPath()).getName(),
 				"config-history");
-		final JSONObject formData = createFormData();
+		JSONObject formData = createFormData();
 		sut.configure(null, formData);
 		assertEquals(
 				new File(sut.getConfiguredHistoryRootDir().getPath()).getName(),
@@ -330,22 +324,37 @@ public class JobConfigHistoryTest {
 	 * Test of isSaveable method, of class JobConfigHistory.
 	 */
 	@Test
-	public void testIsSaveable()
-			throws IOException, ServletException, Descriptor.FormException {
+	public void testIsSaveable() throws Exception {
 		XmlFile xmlFile = new XmlFile(
 				unpackResourceZip.getResource("jobs/Test1/config.xml"));
 		JobConfigHistory sut = createSut();
-		final JSONObject formData = createFormData();
+		JSONObject formData = createFormData();
 
 		sut.configure(null, formData);
 		assertTrue(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
 		assertTrue(sut.isSaveable(mock(MatrixProject.class), xmlFile));
 		assertTrue(sut.isSaveable(mock(MockFolder.class), xmlFile));
 		assertTrue(sut.isSaveable(null,
+				new XmlFile(unpackResourceZip.getResource("config.xml"))));		
+		assertTrue(sut.isSaveable(mock(TopLevelItem.class),
 				new XmlFile(unpackResourceZip.getResource("config.xml"))));
 		assertFalse(sut.isSaveable(null, xmlFile));
 		assertFalse(sut.isSaveable(mock(MatrixConfiguration.class), xmlFile));
 	}
+
+	@Test
+	public void testIsSaveableWithExcludesPattern()
+			throws IOException, ServletException, Descriptor.FormException {
+		JobConfigHistory sut = createSut();
+		File jenkinsHome = sut.getJenkinsHome();
+		String filePath = String.join(File.separator, "jobs", "multiple-branch", "branches", "master", "config.xml");
+		XmlFile xmlFile = new XmlFile(new File(jenkinsHome, filePath));
+		assertTrue(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
+		JSONObject formData = createFormData();
+		formData.put("excludePattern", Pattern.quote(File.separator + "branches" + File.separator));
+		sut.configure(null, formData);
+		assertFalse(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
+    }
 
 	/**
 	 * Test of doCheckMaxHistoryEntries method, of class JobConfigHistory.
@@ -353,11 +362,26 @@ public class JobConfigHistoryTest {
 	@Test
 	public void testDoCheckMaxHistoryEntries() {
 		JobConfigHistory sut = createSut();
-		final FormValidation expectedResult = FormValidation.ok();
+		FormValidation expectedResult = FormValidation.ok();
 		assertEquals(expectedResult, sut.doCheckMaxHistoryEntries(""));
 		assertEquals(expectedResult, sut.doCheckMaxHistoryEntries("5"));
+		assertEquals(expectedResult, sut.doCheckMaxHistoryEntries(" 5 "));
 		assertNotEquals(expectedResult, sut.doCheckMaxHistoryEntries("-1"));
 		assertNotEquals(expectedResult, sut.doCheckMaxHistoryEntries("A"));
+	}
+
+	/**
+	 * Test of doCheckMaxEntriesPerPage method, of class JobConfigHistory.
+	*/
+	@Test
+	public void testDoCheckMaxEntriesPerPage() {
+		JobConfigHistory sut = createSut();
+		FormValidation expectedResult = FormValidation.ok();
+		assertEquals(expectedResult, sut.doCheckMaxEntriesPerPage(""));
+		assertEquals(expectedResult, sut.doCheckMaxEntriesPerPage("5"));
+		assertEquals(expectedResult, sut.doCheckMaxEntriesPerPage(" 5 "));
+		assertNotEquals(expectedResult, sut.doCheckMaxEntriesPerPage("-1"));
+		assertNotEquals(expectedResult, sut.doCheckMaxEntriesPerPage("A"));
 	}
 
 	/**
@@ -366,9 +390,10 @@ public class JobConfigHistoryTest {
 	@Test
 	public void testDoCheckMaxDaysToKeepEntries() {
 		JobConfigHistory sut = createSut();
-		final FormValidation expectedResult = FormValidation.ok();
+		FormValidation expectedResult = FormValidation.ok();
 		assertEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries(""));
 		assertEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries("5"));
+		assertEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries(" 5 "));
 		assertNotEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries("-1"));
 		assertNotEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries("A"));
 	}
@@ -379,15 +404,15 @@ public class JobConfigHistoryTest {
 	@Test
 	public void testDoCheckExcludePattern() {
 		JobConfigHistory sut = createSut();
-		FormValidation expResult = FormValidation.ok();
-		assertEquals(expResult, sut.doCheckExcludePattern(""));
-		assertNotEquals(expResult, sut.doCheckExcludePattern("[.*"));
+		FormValidation expectedResult = FormValidation.ok();
+		assertEquals(expectedResult, sut.doCheckExcludePattern(""));
+		assertNotEquals(expectedResult, sut.doCheckExcludePattern("[.*"));
 	}
 
 	private JobConfigHistory createSut() {
 		return new JobConfigHistory() {
 
-			final Jenkins mockedJenkins = mock(Jenkins.class);
+			Jenkins mockedJenkins = mock(Jenkins.class);
 
 			@Override
 			protected HistoryDao getHistoryDao() {
@@ -407,23 +432,24 @@ public class JobConfigHistoryTest {
 			}
 
 			@Override
-			public void save() throws IOException {
+			public void save() {
 				//
 			}
 
 		};
 	}
 
-	JSONObject createFormData() {
-		return JSONObject.fromObject("{" + "\"historyRootDir\": \""
-				+ unpackResourceZip.getResource("config-history").getPath()
-				+ "\"," + "\"maxHistoryEntries\": \"5\","
-				+ "\"maxDaysToKeepEntries\": \"5\","
-				+ "\"maxEntriesPerPage\": \"50\","
-				+ "\"skipDuplicateHistory\": true,"
-				+ "\"excludePattern\": \"5\","
-				+ "\"saveModuleConfiguration\": true,"
-				+ "\"showBuildBadges\": \"5\"," + "\"excludedUsers\": \"\""
-				+ "}");
+	private JSONObject createFormData() {
+		JSONObject obj = new JSONObject();
+		obj.put("historyRootDir", unpackResourceZip.getResource("config-history").getPath());
+		obj.put("maxHistoryEntries", "5");
+		obj.put("maxDaysToKeepEntries", "5");
+		obj.put("maxEntriesPerPage", "50");
+		obj.put("skipDuplicateHistory", true);
+		obj.put("saveModuleConfiguration", true);
+		obj.put("showBuildBadges", "5");
+		obj.put("excludedUsers", "user1,user2");
+		obj.put("excludePattern", JobConfigHistoryConsts.DEFAULT_EXCLUDE);
+		return obj;
 	}
 }

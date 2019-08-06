@@ -10,5 +10,5 @@
     <j:otherwise>
       <st:contentType value="text/plain;charset=UTF-8" /><j:out value="${it.getFile()}"/>
     </j:otherwise>
-  </j:choose>    
+  </j:choose>
 </st:compress>

@@ -66,8 +66,8 @@ public class JobConfigHistoryRootActionIT
 		// check page with job history entries
 		final HtmlPage htmlPageJobs = webClient
 				.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=jobs");
-		Assert.assertTrue("Verify history entry for job is listed.",
-				htmlPageJobs.getAnchorByText("Test1") != null);
+		Assert.assertNotNull("Verify history entry for job is listed.",
+				htmlPageJobs.getAnchorByText("Test1"));
 		final String htmlPageJobsBody = htmlPageJobs.asXml();
 		Assert.assertTrue("Verify history entry for deleted job is listed.",
 				htmlPageJobsBody.contains(DeletedFileFilter.DELETED_MARKER));
@@ -80,8 +80,8 @@ public class JobConfigHistoryRootActionIT
 		// check page with 'created' history entries
 		final HtmlPage htmlPageCreated = webClient
 				.goTo("jobConfigHistory/?filter=created");
-		Assert.assertTrue("Verify history entry for job is listed.",
-				htmlPageCreated.getAnchorByText("Test1") != null);
+		Assert.assertNotNull("Verify history entry for job is listed.",
+				htmlPageCreated.getAnchorByText("Test1"));
 		Assert.assertFalse(
 				"Verify history entry for deleted job is not listed.",
 				htmlPageCreated.asText()
@@ -122,8 +122,8 @@ public class JobConfigHistoryRootActionIT
 	private void checkSystemPage(HtmlPage htmlPage) {
 		final String page = htmlPage.asXml();
 		System.out.println(page);
-		Assert.assertTrue("Verify history entry for system change is listed.",
-				htmlPage.getAnchorByText("config") != null);
+		Assert.assertNotNull("Verify history entry for system change is listed.",
+				htmlPage.getAnchorByText("config"));
 		Assert.assertFalse("Verify no job history entry is listed.",
 				page.contains("Test1"));
 		Assert.assertFalse("Verify history entry for deleted job is listed.",
@@ -180,7 +180,7 @@ public class JobConfigHistoryRootActionIT
 					page.split("Changed").length > 2);
 
 			final HtmlForm diffFilesForm = htmlPage.getFormByName("diffFiles");
-			final HtmlPage diffPage = (HtmlPage) last(diffFilesForm.getHtmlElementsByTagName("button")).click();
+			final HtmlPage diffPage = last(diffFilesForm.getElementsByTagName("button")).click();
 			assertStringContains(diffPage.asText(), firstMessage);
 			assertStringContains(diffPage.asText(), secondMessage);
 		} catch (Exception ex) {
@@ -249,8 +249,7 @@ public class JobConfigHistoryRootActionIT
 
 		final HtmlPage htmlPage = webClient
 				.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
-		final HtmlAnchor rawLink = (HtmlAnchor) htmlPage
-				.getAnchorByText("(RAW)");
+		final HtmlAnchor rawLink = htmlPage.getAnchorByText("(RAW)");
 		final String rawPage = ((TextPage) rawLink.click()).getContent();
 		Assert.assertTrue("Verify config file is shown",
 				rawPage.contains(description));
@@ -280,7 +279,7 @@ public class JobConfigHistoryRootActionIT
 		System.out.println(historyAsXml);
 		Assert.assertTrue("History page should contain 'Deleted' entry",
 				historyAsXml.contains("Deleted"));
-		final List<HtmlAnchor> hrefs = (List<HtmlAnchor>) historyPage
+		final List<HtmlAnchor> hrefs = historyPage
 				.getByXPath("//a[contains(@href, \"configOutput?type=xml\")]");
 		Assert.assertTrue(hrefs.size() > 2);
 	}
@@ -351,10 +350,9 @@ public class JobConfigHistoryRootActionIT
 				.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
 		final HtmlAnchor restoreLink = (HtmlAnchor) htmlPage
 				.getElementById("restore");
-		final HtmlPage reallyRestorePage = (HtmlPage) restoreLink.click();
+		final HtmlPage reallyRestorePage = restoreLink.click();
 		final HtmlForm restoreForm = reallyRestorePage.getFormByName("restore");
-		final HtmlPage jobPage = submit(restoreForm, "Submit");
-		return jobPage;
+		return submit(restoreForm, "Submit");
 	}
 
 	/**
@@ -373,9 +371,9 @@ public class JobConfigHistoryRootActionIT
 
 		final HtmlPage htmlPage = webClient
 				.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
-		final List<HtmlAnchor> hrefs = (List<HtmlAnchor>) htmlPage
+		final List<HtmlAnchor> hrefs = htmlPage
 				.getByXPath("//a[contains(@href, \"TestProject_deleted_\")]");
-		final HtmlPage historyPage = (HtmlPage) hrefs.get(0).click();
+		final HtmlPage historyPage = hrefs.get(0).click();
 		final HtmlPage reallyRestorePage = submit(
 				historyPage.getFormByName("forward"), "Submit");
 		final HtmlPage jobPage = submit(

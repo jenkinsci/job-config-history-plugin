@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 
 import hudson.Plugin;
 import hudson.model.User;
+import hudson.security.ACL;
 import jenkins.model.Jenkins;
 
 /**
@@ -54,7 +55,7 @@ final public class PluginUtils {
 	 */
 	public static JobConfigHistory getPlugin() {
 		Jenkins jenkins = Jenkins.getInstance();
-		return jenkins != null ? jenkins.getPlugin(JobConfigHistory.class) : null;
+		return jenkins.getPlugin(JobConfigHistory.class);
 	}
 
 	/**
@@ -78,6 +79,19 @@ final public class PluginUtils {
 		return getAnonymousHistoryDao(plugin);
 	}
 
+	/**
+	 * Like {@link #getHistoryDao()}, but with SYSTEM user. Avoids calling
+	 * {@link User#current()}.
+	 *
+	 * Only used to track changes when initLevel is not COMPLETED.
+	 * 
+	 * @return historyDao
+	 */
+	 static JobConfigHistoryStrategy getSystemHistoryDao() {
+		final JobConfigHistory plugin = getPlugin();
+		return getSystemHistoryDao(plugin);
+	}
+	
 	/**
 	 * For tests.
 	 * 
@@ -103,6 +117,21 @@ final public class PluginUtils {
 		return getHistoryDao(plugin, null);
 	}
 
+	/**
+	 * Like {@link #getHistoryDao(JobConfigHistory)}, but with SYSTEM user. Avoids
+	 * calling {@link User#current()}.
+	 *
+	 * Only used to track changes when initLevel is not COMPLETED.
+	 * 
+	 * @param plugin
+	 *            the plugin.
+	 * @return historyDao
+	 */
+	static JobConfigHistoryStrategy getSystemHistoryDao(
+			final JobConfigHistory plugin) {
+		return getHistoryDao(plugin, User.get(ACL.SYSTEM));
+	}
+	
 	public static JobConfigHistoryStrategy getHistoryDao(
 			final JobConfigHistory plugin, final User user) {
 		final String maxHistoryEntriesAsString = plugin.getMaxHistoryEntries();
@@ -113,8 +142,6 @@ final public class PluginUtils {
 			maxHistoryEntries = 0;
 		}
 		Jenkins jenkins = Jenkins.getInstance();
-		if(jenkins == null)
-			return null;
 		return new FileHistoryDao(plugin.getConfiguredHistoryRootDir(),
 				new File(jenkins.root.getPath()), user,
 				maxHistoryEntries, !plugin.getSkipDuplicateHistory());
@@ -158,11 +185,9 @@ final public class PluginUtils {
 	 */
 	public static boolean isMavenPluginAvailable() {
 		Jenkins jenkins = Jenkins.getInstance();
-		if(jenkins == null)
-			return false;
 		try {
 			Plugin plugin = jenkins.getPlugin("maven-plugin");
-			return plugin.getWrapper().isActive();
+			return plugin != null && plugin.getWrapper().isActive();
 		} catch (Exception e) {
 			return false;
 		}

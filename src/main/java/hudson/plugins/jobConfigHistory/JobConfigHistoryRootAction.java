@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -226,7 +227,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	}
 
 	/**
-	 * Creates links to the correct configOutput.jellys for job history vs.
+	 * Creates links to the correct configOutput.jelly for job history vs.
 	 * system history and for xml vs. plain text.
 	 *
 	 * @param config
@@ -321,7 +322,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	/**
 	 * Takes the two timestamp request parameters and returns the diff between
 	 * the corresponding config files of this project as a list of single lines.
-	 * Filters lines that contain plugin version infomation.
+	 * Filters lines that contain plugin version information.
 	 *
 	 * @param hideVersionDiffs determines whether lines that match the
 	 *                 <i>ignoredLinesPattern</i> shall be hidden or not.
@@ -452,7 +453,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		final XmlFile configXml = getLastAvailableConfigXml(deletedName);
 
 		final InputStream is = new ByteArrayInputStream(
-				configXml.asString().getBytes("UTF-8"));
+				configXml.asString().getBytes(StandardCharsets.UTF_8));
 		final String calculatedNewName = findNewName(newName);
 
 		//TODO problem: this only creates Items with Jenkins.getInstance() as parent ItemGroup, which breaks the restoration of folders.

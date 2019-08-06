@@ -26,10 +26,10 @@ package hudson.plugins.jobConfigHistory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -306,7 +306,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet()
 				.iterator();
 		while (itr.hasNext()) {
-			if (itr.next().getValue().getTimestamp().equals((String) timestamp)
+			if (itr.next().getValue().getTimestamp().equals(timestamp)
 					&& itr.hasNext()) {
 				return itr.next().getValue().getTimestamp();
 			}
@@ -322,7 +322,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 * 
 	 * @param timestampNumber
 	 *            1 for File A, 2 for File B
-	 * @return the timestamp of the preious entry as String.
+	 * @return the timestamp of the previous entry as String.
 	 */
 	public final String getPrevTimestamp(int timestampNumber) {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
@@ -338,7 +338,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		String prevTimestamp = timestamp;
 		while (itr.hasNext()) {
 			final String checkTimestamp = itr.next().getValue().getTimestamp();
-			if (checkTimestamp.equals((String) timestamp)) {
+			if (checkTimestamp.equals(timestamp)) {
 				return prevTimestamp;
 			} else {
 				prevTimestamp = checkTimestamp;
@@ -408,7 +408,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		final XmlFile xmlFile = getHistoryDao().getOldRevision(project,
 				timestamp);
 		final InputStream is = new ByteArrayInputStream(
-				xmlFile.asString().getBytes("UTF-8"));
+				xmlFile.asString().getBytes(StandardCharsets.UTF_8));
 
 		project.updateByXml((Source) new StreamSource(is));
 		project.save();

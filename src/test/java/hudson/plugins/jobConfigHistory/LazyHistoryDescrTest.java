@@ -69,7 +69,7 @@ public class LazyHistoryDescrTest {
 	}
 
 	/**
-	 * File is not {@link HistoryDescr).
+	 * File is not {@link HistoryDescr}.
 	 */
 	@Test(expected = RuntimeException.class)
 	public void testInvalidHistoryDescr() {

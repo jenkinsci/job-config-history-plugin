@@ -23,8 +23,6 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import org.kohsuke.stapler.DataBoundConstructor;
-
 import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
@@ -50,7 +48,7 @@ public abstract class JobConfigHistoryStrategy
 	@SuppressWarnings("unchecked")
 	public final Descriptor<JobConfigHistoryStrategy> getDescriptor() {
 		Jenkins jenkins = Jenkins.getInstance();
-		return jenkins != null ? jenkins.getDescriptorOrDie(getClass()) : null;
+		return jenkins.getDescriptorOrDie(getClass());
 	}
 
 	/**
@@ -60,10 +58,6 @@ public abstract class JobConfigHistoryStrategy
 	 */
 	public static DescriptorExtensionList<JobConfigHistoryStrategy, JobConfigHistoryDescriptor<JobConfigHistoryStrategy>> all() {
 		Jenkins jenkins = Jenkins.getInstance();
-		if(jenkins == null)
-			return null;
-		return jenkins
-				.<JobConfigHistoryStrategy, JobConfigHistoryDescriptor<JobConfigHistoryStrategy>>getDescriptorList(
-						JobConfigHistoryStrategy.class);
+		return jenkins.getDescriptorList(JobConfigHistoryStrategy.class);
 	}
 }

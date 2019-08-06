@@ -30,32 +30,28 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import javax.servlet.ServletException;
-
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
-
 import hudson.Plugin;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractProject;
+import hudson.model.Descriptor.FormException;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Saveable;
 import hudson.model.TopLevelItem;
-import hudson.model.Descriptor.FormException;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * Class supporting global configuration settings, along with methods associated
  * with the plugin itself.
  *
  * @author John Borghi
- *
  */
 public class JobConfigHistory extends Plugin {
 
@@ -101,8 +97,7 @@ public class JobConfigHistory extends Plugin {
 	private String showBuildBadges = "always";
 
 	/** our logger. */
-	private static final Logger LOG = Logger
-			.getLogger(JobConfigHistory.class.getName());
+	private static final Logger LOG = Logger.getLogger(JobConfigHistory.class.getName());
 
 	@Override
 	public void start() throws Exception {
@@ -116,13 +111,11 @@ public class JobConfigHistory extends Plugin {
 
 		historyRootDir = formData.getString("historyRootDir").trim();
 		setMaxHistoryEntries(formData.getString("maxHistoryEntries").trim());
-		setMaxDaysToKeepEntries(
-				formData.getString("maxDaysToKeepEntries").trim());
+		setMaxDaysToKeepEntries(formData.getString("maxDaysToKeepEntries").trim());
 		setMaxEntriesPerPage(formData.getString("maxEntriesPerPage").trim());
 		skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
 		excludePattern = formData.getString("excludePattern");
-		saveModuleConfiguration = formData
-				.getBoolean("saveModuleConfiguration");
+		saveModuleConfiguration = formData.getBoolean("saveModuleConfiguration");
 		showBuildBadges = formData.getString("showBuildBadges");
 		excludedUsers = formData.getString("excludedUsers");
 		save();
@@ -130,17 +123,17 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * @return The configured history root directory.
-	 */
-	public String getHistoryRootDir() {
-		return historyRootDir;
-	}
-
-	/**
 	 * @return The default history root directory.
 	 */
 	public String getDefaultRootDir() {
 		return JobConfigHistoryConsts.DEFAULT_HISTORY_DIR;
+	}
+
+	/**
+	 * @return The configured history root directory.
+	 */
+	public String getHistoryRootDir() {
+		return historyRootDir;
 	}
 
 	/**
@@ -152,13 +145,14 @@ public class JobConfigHistory extends Plugin {
 
 	/**
 	 * Set the maximum number of history entries per item.
-	 * 
+	 *
 	 * @param maxEntryInput
 	 *            The maximum number of history entries to keep
 	 */
 	public void setMaxHistoryEntries(String maxEntryInput) {
-		if (maxEntryInput.isEmpty() || isPositiveInteger(maxEntryInput)) {
-			maxHistoryEntries = maxEntryInput;
+		String trimmedValue = StringUtils.trimToNull(maxEntryInput);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
+			maxHistoryEntries = trimmedValue;
 		}
 	}
 
@@ -171,13 +165,14 @@ public class JobConfigHistory extends Plugin {
 
 	/**
 	 * Set the maximum number of history entries to show per site.
-	 * 
+	 *
 	 * @param maxEntryInput
 	 *            The maximum number of history entries to show per site
 	 */
 	public void setMaxEntriesPerPage(String maxEntryInput) {
-		if (maxEntryInput.isEmpty() || isPositiveInteger(maxEntryInput)) {
-			maxEntriesPerPage = maxEntryInput;
+		String trimmedValue = StringUtils.trimToNull(maxEntryInput);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
+			maxEntriesPerPage = trimmedValue;
 		}
 	}
 
@@ -190,13 +185,14 @@ public class JobConfigHistory extends Plugin {
 
 	/**
 	 * Set allowed age of history entries.
-	 * 
+	 *
 	 * @param maxDaysInput
 	 *            For how long history entries should be kept (in days)
 	 */
-	public void setMaxDaysToKeepEntries(final String maxDaysInput) {
-		if (maxDaysInput.isEmpty() || isPositiveInteger(maxDaysInput)) {
-			maxDaysToKeepEntries = maxDaysInput;
+	public void setMaxDaysToKeepEntries(String maxDaysInput) {
+		String trimmedValue = StringUtils.trimToNull(maxDaysInput);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
+			maxDaysToKeepEntries = trimmedValue;
 		}
 	}
 
@@ -206,11 +202,10 @@ public class JobConfigHistory extends Plugin {
 	 * @param numberString
 	 *            The number in question (as String)
 	 * @return Whether the number is a positive integer
-	 *
 	 */
 	public boolean isPositiveInteger(String numberString) {
 		try {
-			final int number = Integer.parseInt(numberString);
+			int number = Integer.parseInt(numberString);
 			if (number < 0) {
 				throw new NumberFormatException();
 			}
@@ -239,16 +234,8 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * @return The regular expression for 'system' file names to exclude from
-	 *         saving.
-	 */
-	public String getExcludePattern() {
-		return excludePattern;
-	}
-
-	/**
 	 * Used by the configuration page.
-	 * 
+	 *
 	 * @return The default regular expression for 'system' file names to exclude
 	 *         from saving.
 	 */
@@ -281,6 +268,13 @@ public class JobConfigHistory extends Plugin {
 	 */
 	public String getDefaultMaxEntriesPerPage() {
 		return JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE;
+
+	/**
+	 * @return The regular expression for 'system' file names to exclude from
+	 *         saving.
+	 */
+	public String getExcludePattern() {
+		return excludePattern;
 	}
 
 	/**
@@ -300,12 +294,12 @@ public class JobConfigHistory extends Plugin {
 
 	/**
 	 * Used for testing only.
-	 * 
-	 * @param showBadges
-	 *            Never, always, userWithConfigPermission or adminUser.
+	 *
+	 * @param showBuildBadges
+	 *            possible values: "never", "always", "userWithConfigPermission" or "adminUser".
 	 */
-	public void setShowBuildBadges(String showBadges) {
-		showBuildBadges = showBadges;
+	public void setShowBuildBadges(String showBuildBadges) {
+		this.showBuildBadges = showBuildBadges;
 	}
 
 	/**
@@ -320,11 +314,11 @@ public class JobConfigHistory extends Plugin {
 	public boolean showBuildBadges(Job<?, ?> project) {
 		if ("always".equals(showBuildBadges)) {
 			return true;
-		} else if ("userWithConfigPermission".equals(showBuildBadges)
-				&& project.hasPermission(Item.CONFIGURE)) {
+		}
+		if ("userWithConfigPermission".equals(showBuildBadges) && project.hasPermission(Item.CONFIGURE)) {
 			return true;
-		} else if ("adminUser".equals(showBuildBadges)
-				&& getJenkins().hasPermission(Jenkins.ADMINISTER)) {
+		}
+		if ("adminUser".equals(showBuildBadges) && getJenkins().hasPermission(Jenkins.ADMINISTER)) {
 			return true;
 		}
 		return false;
@@ -332,7 +326,7 @@ public class JobConfigHistory extends Plugin {
 
 	/**
 	 * Used for testing to verify invalid pattern not loaded.
-	 * 
+	 *
 	 * @return The loaded regexp pattern, or null if pattern was invalid.
 	 */
 	public Pattern getExcludeRegexpPattern() {
@@ -348,13 +342,13 @@ public class JobConfigHistory extends Plugin {
 
 	/**
 	 * Loads a regular expression pattern for the given string.
-	 * 
+	 *
 	 * @param patternString
 	 *            The string representing the regular expression.
 	 * @return The {@link Pattern} for the given expression, or null if the
 	 *         pattern cannot be loaded.
 	 */
-	private Pattern loadRegex(final String patternString) {
+	private Pattern loadRegex(String patternString) {
 		if (patternString != null) {
 			try {
 				return Pattern.compile(patternString);
@@ -373,9 +367,9 @@ public class JobConfigHistory extends Plugin {
 	 */
 	public File getConfiguredHistoryRootDir() {
 		File rootDir;
-		final File jenkinsHome = getJenkinsHome();
+		File jenkinsHome = getJenkinsHome();
 
-		if (historyRootDir == null || historyRootDir.isEmpty()) {
+		if (historyRootDir == null) {
 			rootDir = new File(jenkinsHome,
 					JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
 		} else {
@@ -397,13 +391,13 @@ public class JobConfigHistory extends Plugin {
 	 *            The history directory to look under.
 	 * @return The configuration file or null if no file is found.
 	 */
-	public File getConfigFile(final File historyDir) {
+	public File getConfigFile(File historyDir) {
 		// TODO: refactor away from 'File'
 		return FileHistoryDao.getConfigFile(historyDir);
 	}
 
 	/**
-	 * 
+	 *
 	 * @return comma separated list of usernames, whose changes should not get
 	 *         detected.
 	 */
@@ -414,7 +408,6 @@ public class JobConfigHistory extends Plugin {
 	/**
 	 * Returns true if configuration for this item should be saved, based on the
 	 * plugin settings, the type of item and the configuration file specified.
-	 *
 	 * <p>
 	 * If the item is an instance of {@link AbstractProject} or the
 	 * configuration file is stored directly in JENKINS_ROOT, it is considered
@@ -430,15 +423,20 @@ public class JobConfigHistory extends Plugin {
 	 *            The configuration file for the above item.
 	 * @return true if the item configuration should be saved.
 	 */
-	public boolean isSaveable(final Saveable item, final XmlFile xmlFile) {
+	public boolean isSaveable(Saveable item, XmlFile xmlFile) {
+		boolean canSave = checkRegex(xmlFile);
+		if (!canSave) {
+			LOG.log(Level.FINE, "skipped recording change history for job {0}", xmlFile.getFile().getAbsolutePath());
+			return false;
+		}
 		if (item instanceof TopLevelItem) {
+			// including FreeStyleProject, WorkflowJob
 			return true;
 		}
-
 		if (xmlFile.getFile().getParentFile().equals(getJenkinsHome())) {
-			return checkRegex(xmlFile);
+			// system configs
+			return canSave;
 		}
-
 		if (PluginUtils.isMavenPluginAvailable() && item instanceof MavenModule
 				&& saveModuleConfiguration) {
 			return true;
@@ -449,15 +447,15 @@ public class JobConfigHistory extends Plugin {
 
 	/**
 	 * Check whether config file should not be saved because of regex pattern.
-	 * 
+	 *
 	 * @param xmlFile
 	 *            The config file
 	 * @return True if it should be saved
 	 */
-	private boolean checkRegex(final XmlFile xmlFile) {
+	private boolean checkRegex(XmlFile xmlFile) {
 		if (excludeRegexpPattern != null) {
-			final Matcher matcher = excludeRegexpPattern
-					.matcher(xmlFile.getFile().getName());
+			String fullPath = xmlFile.getFile().getAbsolutePath();
+			Matcher matcher = excludeRegexpPattern.matcher(fullPath);
 			return !matcher.find();
 		} else {
 			return true;
@@ -467,19 +465,16 @@ public class JobConfigHistory extends Plugin {
 	/**
 	 * Validates the user entry for the maximum number of history items to keep.
 	 * Must be blank or a non-negative integer.
-	 * 
+	 *
 	 * @param value
 	 *            The form input entered by the user.
 	 * @return ok if the entry is blank or a non-negative integer.
 	 */
-	public FormValidation doCheckMaxHistoryEntries(
-			@QueryParameter final String value) {
-		try {
-			if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
-				throw new NumberFormatException();
-			}
+	public FormValidation doCheckMaxHistoryEntries(@QueryParameter String value) {
+		String trimmedValue = StringUtils.trimToNull(value);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
 			return FormValidation.ok();
-		} catch (NumberFormatException ex) {
+		} else {
 			return FormValidation.error("Enter a valid positive integer");
 		}
 	}
@@ -487,19 +482,16 @@ public class JobConfigHistory extends Plugin {
 	/**
 	 * Validates the user entry for the maximum number of history items to show
 	 * per site. Must be blank or a non-negative integer.
-	 * 
+	 *
 	 * @param value
 	 *            The form input entered by the user.
 	 * @return ok if the entry is blank or a non-negative integer.
 	 */
-	public FormValidation doCheckMaxEntriesPerPage(
-			@QueryParameter final String value) {
-		try {
-			if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
-				throw new NumberFormatException();
-			}
+	public FormValidation doCheckMaxEntriesPerPage(@QueryParameter String value) {
+		String trimmedValue = StringUtils.trimToNull(value);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
 			return FormValidation.ok();
-		} catch (NumberFormatException ex) {
+		} else {
 			return FormValidation.error("Enter a valid positive integer");
 		}
 	}
@@ -507,19 +499,16 @@ public class JobConfigHistory extends Plugin {
 	/**
 	 * Validates the user entry for the maximum number of days to keep history
 	 * items. Must be blank or a non-negative integer.
-	 * 
+	 *
 	 * @param value
 	 *            The form input entered by the user.
 	 * @return ok if the entry is blank or a non-negative integer.
 	 */
-	public FormValidation doCheckMaxDaysToKeepEntries(
-			@QueryParameter final String value) {
-		try {
-			if (StringUtils.isNotBlank(value) && Integer.parseInt(value) < 0) {
-				throw new NumberFormatException();
-			}
+	public FormValidation doCheckMaxDaysToKeepEntries(@QueryParameter String value) {
+		String trimmedValue = StringUtils.trimToNull(value);
+		if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
 			return FormValidation.ok();
-		} catch (NumberFormatException ex) {
+		} else {
 			return FormValidation.error("Enter a valid positive integer");
 		}
 	}
@@ -527,24 +516,23 @@ public class JobConfigHistory extends Plugin {
 	/**
 	 * Validates the user entry for the regular expression of system file names
 	 * to exclude from saving.
-	 * 
+	 *
 	 * @param value
 	 *            The form input entered by the user.
 	 * @return ok if the entry is a valid regular expression.
 	 */
-	public FormValidation doCheckExcludePattern(
-			@QueryParameter final String value) {
+	public FormValidation doCheckExcludePattern(@QueryParameter String value) {
 		try {
 			Pattern.compile(value);
 			return FormValidation.ok();
 		} catch (PatternSyntaxException e) {
-			return FormValidation.error("Invalid regexp:\n" + e);
+			return FormValidation.error("Enter a valid regular expression");
 		}
 	}
 
 	/**
 	 * For tests.
-	 * 
+	 *
 	 * @return the historyDao
 	 */
 	protected HistoryDao getHistoryDao() {
@@ -553,22 +541,21 @@ public class JobConfigHistory extends Plugin {
 
 	/**
 	 * For tests.
-	 * 
+	 *
 	 * @return JENKINS_HOME
 	 */
 	protected File getJenkinsHome() {
 		Jenkins jenkins = Jenkins.getInstance();
-		return jenkins != null ? jenkins.root : null;
+		return jenkins.getRootDir();
 	}
 
 	/**
 	 * For tests.
-	 * 
+	 *
 	 * @return Jenkins instance.
 	 */
 	@Deprecated
 	public Jenkins getJenkins() {
 		return Jenkins.getInstance();
 	}
-
 }

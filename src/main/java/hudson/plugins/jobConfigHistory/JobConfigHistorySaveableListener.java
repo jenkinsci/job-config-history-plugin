@@ -87,10 +87,8 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
 	 */
 	HistoryDao getHistoryDao(JobConfigHistory plugin) {
 		Jenkins jenkins = Jenkins.getInstance();
-		if(jenkins == null)
-			return null;
 		return (COMPLETED == jenkins.getInitLevel())
 				? PluginUtils.getHistoryDao(plugin)
-				: PluginUtils.getAnonymousHistoryDao(plugin);
+				: PluginUtils.getSystemHistoryDao(plugin);
 	}
 }

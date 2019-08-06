@@ -41,7 +41,6 @@ import org.apache.commons.lang.StringUtils;
 
 import hudson.Extension;
 import hudson.model.PeriodicWork;
-import jenkins.model.Jenkins;
 
 /**
  *
@@ -70,15 +69,11 @@ public class JobConfigHistoryPurger extends PeriodicWork {
 	 * Standard constructor using instance.
 	 */
 	public JobConfigHistoryPurger() {
-		Jenkins jenkins = Jenkins.getInstance();
-		if(jenkins == null)
-			return;
-		JobConfigHistory plugin = jenkins.getPlugin(JobConfigHistory.class);
-		assignValue(plugin, 
-				(PluginUtils.getHistoryDao(plugin, null) instanceof Purgeable
-				? (Purgeable) PluginUtils.getHistoryDao(plugin, null)
-				: null), 
-				PluginUtils.getHistoryDao(plugin, null));
+		JobConfigHistory plugin = PluginUtils.getPlugin();
+		JobConfigHistoryStrategy historyDao = PluginUtils.getAnonymousHistoryDao(plugin);
+		assignValue(plugin,
+				historyDao instanceof Purgeable ? (Purgeable) historyDao : null,
+				historyDao);
 	}
 
 	/**
@@ -86,8 +81,8 @@ public class JobConfigHistoryPurger extends PeriodicWork {
 	 *
 	 * @param plugin
 	 *            injected plugin
-	 * @param historyDao
-	 *            injected HistoryDao
+	 * @param purgeable
+	 *            the value of purgeable
 	 * @param overviewHistoryDao
 	 *            the value of overviewHistoryDao
 	 */
