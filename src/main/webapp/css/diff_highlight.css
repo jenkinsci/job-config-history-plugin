@@ -147,16 +147,16 @@ div.diffLine_Modifier.minus_style {
 div.singleLineView.description {
     font-size:13px;
     padding-top:8px;
-    color:rgba(255,255,255,0.2);
+    color:rgba(0,0,0,0.8);
 }
 
 .describedElement:hover {
-    color:rgba(255,255,255,0.3)
+    color: rgba(0, 0, 0, 0.4);
 }
 
 .describedElement {
-    color:rgba(255,255,255,0.5);
-    background-color:#4f4f4f;
+    background-color: rgba(56,56,56, 0.14);
+    color: rgba(0, 0, 0, 0.7);
     border-radius:3px;
     padding:2px;
 }
@@ -203,6 +203,7 @@ table.diffLineTable th {
 table.jch.diffLineTable td {
     padding:0px;
     height:20px;
+    max-height:40px;
     border-top: 0px;
     text-align:left;
     width:100%;

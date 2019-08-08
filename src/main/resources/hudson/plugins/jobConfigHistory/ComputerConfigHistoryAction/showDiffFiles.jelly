@@ -64,7 +64,7 @@
                       <div style="float:top">
                         <table style="border:0px; width:100%">
                           <tr>
-                            <td class="subcaption" style="padding:0px;  width:60%;">
+                            <td class="subcaption" style="padding:0px;  width:60%;  background-color:inherit;">
                               Older Change
                             </td>
                             <td style="width:40%; border:none; text-align:right; padding:0px">
@@ -94,7 +94,7 @@
                       <div style="float:top">
                         <table style="border:0px; width:100%">
                           <tr>
-                            <td class="subcaption" style="padding:0px;  width:60%;">
+                            <td class="subcaption" style="padding:0px;  width:60%; background-color:inherit;">
                               Newer Change
                             </td>
                             <td style="width:40%; border:none; text-align:right; padding:0px">

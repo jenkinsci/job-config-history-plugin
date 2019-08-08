@@ -91,6 +91,7 @@ table.jch {
     height:100%;
 }
 
+
 table.jch .caption {
 
 	background-color: #383838;
@@ -111,8 +112,8 @@ table.jch .caption {
 
 table.jch .subcaption {
 
-	background-color: #383838;
-    color:rgba(255,255,255,0.9);
+	background-color: rgba(56, 56, 56, 0.05);
+    color:black;
     text-align: left;
 
     font-weight: bold;
@@ -121,22 +122,6 @@ table.jch .subcaption {
 	padding: 12px;
 
 	border:none;
-}
-
-
-/*TODO currently not used */
-table.jch .subcaption.left-caption {
-
-	border-top-right-radius: 0px;
- 	border-top-left-radius: 3px;
-
-}
-/*TODO currently not used */
-table.jch .subcaption.right-caption {
-
- 	border-top-right-radius: 3px;
-    border-top-left-radius: 0px;
-
 }
 
 table.jch  td {
@@ -244,7 +229,7 @@ a.download-arrow:hover{
 .resizeWrapper {
     resize: vertical;
     overflow: auto;
-    height:59vh;
+    max-height:59vh;
 }
 
 .collapseButton {
@@ -392,8 +377,8 @@ span.small-button button {
 
 a.url-button {
 
-    background-color: rgb(79, 79, 79);
-    color: rgba(255,255,255,0.5);
+    background-color: rgba(56,56,56, 0.08);
+    color: rgba(0, 0, 0, 0.7);
 
     border: 1px solid rgba(56, 56, 56, 0.05);
     border-radius: 2px;
@@ -407,8 +392,7 @@ a.url-button {
 }
 
 a.url-button:hover{
-    background-color: rgba(250,250,250, 0.5);
-    color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(56,56,56, 0.4);
 }
 
 .menu-url-button {
