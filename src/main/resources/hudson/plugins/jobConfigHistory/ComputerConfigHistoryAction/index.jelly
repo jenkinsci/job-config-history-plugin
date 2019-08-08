@@ -74,7 +74,7 @@
                           <j:set var="fileMissing" value="${!config.hasConfig()}"/>
                           <j:if test="${!fileMissing}">
                             <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}">
-                              <img src="${imagesURL}/24x24/document.png" alt="" />${%View as XML}
+                              <img src="${imagesURL}/24x24/document.png"/>${%View as XML}
                             </a>
                             <st:nbsp />
                             <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}">

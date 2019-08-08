@@ -147,7 +147,7 @@
                       <td>
                         <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
                         <a href="${it.createLinkToFiles(config,'xml')}">
-                          <img src="${imagesURL}/24x24/document.png" alt="" />${%View as XML}
+                          <img src="${imagesURL}/24x24/document.png"/>${%View as XML}
                         </a>
                         <st:nbsp />
                         <a href="${it.createLinkToFiles(config,'raw')}">

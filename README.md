@@ -11,3 +11,9 @@ Links
 Continuous builds
 ----------------
 * Jenkins own CI: [![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins/jobConfigHistory-plugin/master)](https://ci.jenkins.io/job/plugins/job/jobConfigHistory-plugin/)
+
+Notes
+---------------------------------------
+* This plugin uses highlight.js for syntax highlighting (code and diffs). See
+    + [github](https://github.com/highlightjs/highlight.js/)
+    + [homepage](https://highlightjs.org/)
