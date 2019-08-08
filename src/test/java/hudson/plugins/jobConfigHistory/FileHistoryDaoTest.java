@@ -65,12 +65,16 @@ import hudson.model.AbstractItem;
 import hudson.model.Node;
 import hudson.model.User;
 import jenkins.model.Jenkins;
+import org.jvnet.hudson.test.JenkinsRule;
 
 /**
  *
  * @author Mirko Friedenhagen
  */
 public class FileHistoryDaoTest {
+
+	@Rule
+	public JenkinsRule jenkinsRule = new JenkinsRule();
 
 	@Rule
 	public final UnpackResourceZip unpackResourceZip = UnpackResourceZip

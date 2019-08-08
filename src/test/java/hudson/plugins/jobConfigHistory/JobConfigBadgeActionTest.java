@@ -119,6 +119,7 @@ public class JobConfigBadgeActionTest {
 		assertEquals(expResult, result);
 	}
 
+
 	/**
 	 * Test of createLink method, of class JobConfigBadgeAction.
 	 */
