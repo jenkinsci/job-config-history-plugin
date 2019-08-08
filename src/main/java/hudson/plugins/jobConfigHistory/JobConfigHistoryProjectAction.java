@@ -268,6 +268,12 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 				.get(getTimestamp(timestampNumber)).getUser();
 	}
 
+	public final String getUserID(int timestamp) {
+		checkConfigurePermission();
+		return getHistoryDao().getRevisions(this.project.getConfigFile())
+			.get(getTimestamp(timestamp)).getUserID();
+	}
+
 	/**
 	 * Used in the Difference jelly only. Returns the operation made on one of
 	 * the two Files A and B. timestampNumber decides which file exactly.
