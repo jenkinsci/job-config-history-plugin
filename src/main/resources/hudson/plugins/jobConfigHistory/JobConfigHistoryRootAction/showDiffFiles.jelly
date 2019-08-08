@@ -114,7 +114,7 @@
                     <tbody style="display:''" id="tbody_versionDiffsShown">
                         <tr>
                           <td class="diffLineWrapper" colspan="4">
-                            <div class="resizeWrapper" style="overflow-y:scroll;max-height:50vh;">
+                            <div class="resizeWrapper" style="overflow-y:scroll;">
                               <table class="center jch diffLineTable">
                                 <j:choose>
                                   <j:when test="${it.getLines().size() == 0}">
@@ -166,7 +166,7 @@
                     <tbody style="width:100%; display:none" id="tbody_versionDiffsHidden">
                       <tr>
                         <td class="diffLineWrapper" colspan="4">
-                          <div class="resizeWrapper" style="overflow-y:scroll;max-height:50vh;">
+                          <div class="resizeWrapper" style="overflow-y:scroll;">
                             <table class="center jch diffLineTable">
                               <j:choose>
                                 <j:when test="${it.getLines().size() == 0}">

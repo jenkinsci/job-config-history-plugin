@@ -244,7 +244,7 @@ a.download-arrow:hover{
 .resizeWrapper {
     resize: vertical;
     overflow: auto;
-    max-height:58vh;
+    height:59vh;
 }
 
 .collapseButton {
