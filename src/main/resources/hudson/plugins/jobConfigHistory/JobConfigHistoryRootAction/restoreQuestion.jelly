@@ -10,7 +10,7 @@
       <div style="text-align:center">
         <div class="jch-warning">
           <div style="float:left; font-size:30px; font-weight:bold">
-            ⚠️
+              &#x26A0;
           </div>
           <span style="font-size:20px;">${%Restore the deleted project}
             <span class="describedElement">${name}</span>
@@ -18,7 +18,7 @@
           </span>
 
           <div style="float:right; font-size:30px; font-weight:bold">
-            ⚠️
+              &#x26A0;
           </div>
           <div style="padding:10px;"/>
 
