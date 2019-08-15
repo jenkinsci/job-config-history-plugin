@@ -17,9 +17,6 @@
     <j:set var="syntaxCheck2" value="${it.checkXmlSyntax(it.getTimestamp(2))}"/>
     <l:main-panel>
       <h1>${%Job Configuration Difference}</h1>
-
-
-      <!--TODO this is the non-radical option-->
       <j:if test="${!syntaxCheck1.isWellFormatted() || !syntaxCheck2.isWellFormatted()}">
         <div class="jch-warning">
           <table class="no-borders-warning">
@@ -32,6 +29,9 @@
               </td>
               <td>
                 ${!syntaxCheck1.isWellFormatted() ? "Revision " + it.getTimestamp(1) + ": " + syntaxCheck1.getMessage() : ""}
+                <j:if test="${!syntaxCheck2.isWellFormatted()}">
+                  <j:if test="${!syntaxCheck1.isWellFormatted()}"><br/><br/></j:if>
+                </j:if>
                 ${!syntaxCheck2.isWellFormatted() ? "Revision " + it.getTimestamp(2) + ": " + syntaxCheck2.getMessage() : ""}
               </td>
               <td>
@@ -44,8 +44,6 @@
         </div>
         <br/>
       </j:if>
-      <!--TODO non-radical option end-->
-
 
       <div>
         <j:choose>
@@ -55,36 +53,6 @@
           <j:when test="${it.getJobConfigs().size() == 0}">
             ${%No job configuration history available}
           </j:when>
-
-
-          <!--TODO this is the radical option-->
-<!--          <j:when test="${!syntaxCheck1.isWellFormatted() || !syntaxCheck2.isWellFormatted()}">-->
-<!--            <div class="jch-warning">-->
-<!--              <table class="no-borders-warning">-->
-<!--                <caption style="">Warning: Corrupt xml file(s): </caption>-->
-<!--                <tr>-->
-<!--                  <td>-->
-<!--                    <div style="font-size:30px" class="jch-warning">-->
-<!--                      &#x26A0;-->
-<!--                    </div>-->
-<!--                  </td>-->
-<!--                  <td>-->
-<!--                    ${!syntaxCheck1.isWellFormatted() ? "Revision " + it.getTimestamp(1) + ": " + syntaxCheck1.getMessage() : ""}-->
-<!--                    ${!syntaxCheck2.isWellFormatted() ? "Revision " + it.getTimestamp(2) + ": " + syntaxCheck2.getMessage() : ""}-->
-<!--                  </td>-->
-<!--                  <td>-->
-<!--                    <div style="font-size:30px;" class="jch-warning">-->
-<!--                      &#x26A0;-->
-<!--                    </div>-->
-<!--                  </td>-->
-<!--                </tr>-->
-<!--              </table>-->
-<!--            </div>-->
-<!--          </j:when>-->
-          <!--TODO radical option end-->
-
-
-
           <j:otherwise>
             <div>
               <j:set var="prev1" value="${it.getPrevTimestamp(1)}"/>

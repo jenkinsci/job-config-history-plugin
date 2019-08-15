@@ -11,8 +11,39 @@
     <script>hljs.initHighlightingOnLoad();</script>
 
     <st:include it="${app}" page="sidepanel.jelly" />
+    <j:set var="syntaxCheck1" value="${it.checkXmlSyntax(it.getTimestamp(1))}"/>
+    <j:set var="syntaxCheck2" value="${it.checkXmlSyntax(it.getTimestamp(2))}"/>
     <l:main-panel>
       <h1>${%Agent Configuration Difference}</h1>
+
+      <j:if test="${!syntaxCheck1.isWellFormatted() || !syntaxCheck2.isWellFormatted()}">
+        <div class="jch-warning">
+          <table class="no-borders-warning">
+            <caption style="">Warning: Corrupt xml file(s): </caption>
+            <tr>
+              <td>
+                <div style="font-size:30px" class="jch-warning">
+                  &#x26A0;
+                </div>
+              </td>
+              <td>
+                ${!syntaxCheck1.isWellFormatted() ? "Revision " + it.getTimestamp(1) + ": " + syntaxCheck1.getMessage() : ""}
+                <j:if test="${!syntaxCheck2.isWellFormatted()}">
+                  <j:if test="${!syntaxCheck1.isWellFormatted()}"><br/><br/></j:if>
+                </j:if>
+                ${!syntaxCheck2.isWellFormatted() ? "Revision " + it.getTimestamp(2) + ": " + syntaxCheck2.getMessage() : ""}
+              </td>
+              <td>
+                <div style="font-size:30px;" class="jch-warning">
+                  &#x26A0;
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <br/>
+      </j:if>
+
       <div>
         <j:choose>
           <j:when test="${!it.hasConfigurePermission()}">
