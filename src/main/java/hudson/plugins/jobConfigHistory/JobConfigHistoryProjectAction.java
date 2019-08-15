@@ -373,8 +373,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2), hideVersionDiffs);
 	}
 
-	public XmlSyntaxChecker.Answer isSyntacticallyWellFormattedXml(String timestamp) {
-		return  XmlSyntaxChecker.isSyntacticallyWellFormattedXml(getOldConfigXml(timestamp).getFile());
+	public XmlSyntaxChecker.Answer checkXmlSyntax(String timestamp) {
+		return  XmlSyntaxChecker.check(getOldConfigXml(timestamp).getFile());
 	}
 
 	/**

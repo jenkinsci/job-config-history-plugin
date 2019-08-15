@@ -315,8 +315,8 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2), hideVersionDiffs);
 	}
 
-	public boolean isSyntacticallyWellFormattedXml(String timestamp) {
-		return isSyntacticallyWellFormattedXml(getOldConfigXml(timestamp).getFile());
+	public XmlSyntaxChecker.Answer checkXmlSyntax(String timestamp) {
+		return  XmlSyntaxChecker.check(getOldConfigXml(timestamp).getFile());
 	}
 
 	/**

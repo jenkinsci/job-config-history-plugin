@@ -13,8 +13,8 @@
     <script>hljs.initHighlightingOnLoad();</script>
 
     <st:include it="${it.project}" page="sidepanel.jelly" />
-    <j:set var="syntaxCheck1" value="${it.isSyntacticallyWellFormattedXml(it.getTimestamp(1))}"/>
-    <j:set var="syntaxCheck2" value="${it.isSyntacticallyWellFormattedXml(it.getTimestamp(2))}"/>
+    <j:set var="syntaxCheck1" value="${it.checkXmlSyntax(it.getTimestamp(1))}"/>
+    <j:set var="syntaxCheck2" value="${it.checkXmlSyntax(it.getTimestamp(2))}"/>
     <l:main-panel>
       <h1>${%Job Configuration Difference}</h1>
 

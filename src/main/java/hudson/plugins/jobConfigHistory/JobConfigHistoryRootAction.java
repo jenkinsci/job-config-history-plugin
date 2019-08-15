@@ -354,8 +354,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		}
 	}
 
-	public boolean isSyntacticallyWellFormattedXml(String name, String timestamp) {
-		return isSyntacticallyWellFormattedXml(getOldConfigXml(name, timestamp).getFile());
+	public XmlSyntaxChecker.Answer checkXmlSyntax(String name, String timestamp) {
+		return XmlSyntaxChecker.check(getOldConfigXml(name, timestamp).getFile());
 	}
 
 	/**

@@ -13,7 +13,7 @@ import java.util.logging.Level;
 
 public class XmlSyntaxChecker {
 
-	public static Answer isSyntacticallyWellFormattedXml(File xmlFile) {
+	public static Answer check(File xmlFile) {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(false);
 		factory.setNamespaceAware(true);

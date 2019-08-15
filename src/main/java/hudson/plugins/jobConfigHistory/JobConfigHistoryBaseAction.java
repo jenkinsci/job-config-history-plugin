@@ -51,7 +51,6 @@ import javax.xml.transform.stream.StreamSource;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import org.w3c.dom.Document;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 
@@ -326,17 +325,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
                                            final String[] file2Lines, final boolean hideVersionDiffs) {
-        //check well-formedness
-        System.out.println("\n\n+++Validation Results+++");
-        System.out.println("    file1: " + isSyntacticallyWellFormattedXml(file1));
-        System.out.println("    file2: " + isSyntacticallyWellFormattedXml(file2));
-        //check well-formed-ness
-        if (!isSyntacticallyWellFormattedXml(file1) || !isSyntacticallyWellFormattedXml(file2)) {
-            //todo log
-        }
-
-
-
         //calculate all diffs.
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
         if (hideVersionDiffs) {
@@ -389,55 +377,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 Arrays.asList(file1Lines), patch, 3);
 
         return StringUtills.join(unifiedDiff, "\n") + "\n";
-    }
-
-    protected boolean isSyntacticallyWellFormattedXml(File xmlFile) {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(false);
-        factory.setNamespaceAware(true);
-
-        final boolean[] wellFormed = {true};
-        try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setErrorHandler(new ErrorHandler() {
-                private static final String ERROR_STR = "Error occured while checking xml parsability: ";
-                private static final String WARNING_STR = "Warning occured while checking xml parsability: ";
-                private static final String FATAL_ERROR_STR = "Fatal error occured while checking xml parsability: ";
-                private void log(String prefix, Exception exception) { LOG.log(Level.WARNING, prefix + exception.getMessage()); }
-
-                @Override
-                public void warning(SAXParseException exception) throws SAXException { log(WARNING_STR, exception); }
-
-                @Override
-                public void error(SAXParseException exception) throws SAXException {
-                    log(ERROR_STR, exception);
-                    //TODO check necessity.
-                    wellFormed[0] =false;
-                }
-
-                @Override
-                public void fatalError(SAXParseException exception) throws SAXException {
-                    log(FATAL_ERROR_STR, exception);
-                    wellFormed[0] =false;
-                }
-            });
-            try {
-                builder.parse(xmlFile);
-            } catch (SAXException | IOException e) {
-                LOG.log(
-                    Level.FINEST,
-                    "{0} occured while checking xml parsability: {1}",
-                    new Object[]{e.getClass().getSimpleName(), e.getMessage()}
-                );
-                return false;
-            }
-
-        } catch (ParserConfigurationException e) {
-            LOG.log(Level.FINEST, "ParserConfigurationException occured while checking xml parsability: {0}",
-                e.getMessage());
-            return false;
-        }
-        return wellFormed[0];
     }
 
     /**
