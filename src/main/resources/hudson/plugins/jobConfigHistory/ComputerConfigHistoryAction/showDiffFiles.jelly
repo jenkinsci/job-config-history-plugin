@@ -78,7 +78,7 @@
                       <div style="float:bottom" class="singleLineView description">
                         <div>
                           <b>Date:</b>
-                          <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(1)}">
+                          <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/computer/${it.getSlave().getNodeName()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(1)}">
                             ${it.getTimestamp(1)}
                           </a>
                         </div>
@@ -108,7 +108,7 @@
                       <div style="float:bottom" class="singleLineView description">
                         <div>
                           <b>Date:</b>
-                          <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(2)}">
+                          <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/computer/${it.getSlave().getNodeName()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(2)}">
                             ${it.getTimestamp(2)}
                           </a>
                         </div>
