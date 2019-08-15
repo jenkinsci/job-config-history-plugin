@@ -354,6 +354,10 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		}
 	}
 
+	public boolean isSyntacticallyWellFormattedXml(String name, String timestamp) {
+		return isSyntacticallyWellFormattedXml(getOldConfigXml(name, timestamp).getFile());
+	}
+
 	/**
 	 * Used in the Difference jelly only. Returns one of the two timestamps that
 	 * have been passed to the Difference page as parameter. timestampNumber

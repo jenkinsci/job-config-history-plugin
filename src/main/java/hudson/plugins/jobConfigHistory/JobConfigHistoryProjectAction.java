@@ -373,6 +373,10 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2), hideVersionDiffs);
 	}
 
+	public XmlSyntaxChecker.Answer isSyntacticallyWellFormattedXml(String timestamp) {
+		return  XmlSyntaxChecker.isSyntacticallyWellFormattedXml(getOldConfigXml(timestamp).getFile());
+	}
+
 	/**
 	 * Gets the version of the config.xml that was saved at a certain time.
 	 *

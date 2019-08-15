@@ -315,6 +315,10 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2), hideVersionDiffs);
 	}
 
+	public boolean isSyntacticallyWellFormattedXml(String timestamp) {
+		return isSyntacticallyWellFormattedXml(getOldConfigXml(timestamp).getFile());
+	}
+
 	/**
 	 * Gets the version of the config.xml that was saved at a certain time.
 	 *

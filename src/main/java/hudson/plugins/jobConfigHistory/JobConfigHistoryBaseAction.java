@@ -40,10 +40,10 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -51,6 +51,8 @@ import javax.xml.transform.stream.StreamSource;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.w3c.dom.Document;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 
 import com.google.common.collect.Lists;
@@ -68,6 +70,8 @@ import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
 import jenkins.model.Jenkins;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.*;
@@ -213,7 +217,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             //takes the comparison and the result that a possible previous DifferenceEvaluator created for this node
             // and compares the node based on whether there was a version change or not.
             // if there wasn't, "comparisonResult" is returned.
-            //TODO find the name of this software pattern
             @Override
             public ComparisonResult evaluate(Comparison comparison, ComparisonResult comparisonResult) {
                 if (comparison.getType() != ComparisonType.ATTR_VALUE) {
@@ -245,6 +248,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
         return DiffBuilder.compare(Input.fromString(file1Str)).withTest(Input.fromString(file2Str))
                 .ignoreWhitespace()
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
                 //the next line should be used if one wanted to use XMLUnit for the computing of all diffs.
                 //.withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, versionDifferenceEvaluator))
                 .withDifferenceEvaluator(versionDifferenceEvaluator)
@@ -322,6 +326,17 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
                                            final String[] file2Lines, final boolean hideVersionDiffs) {
+        //check well-formedness
+        System.out.println("\n\n+++Validation Results+++");
+        System.out.println("    file1: " + isSyntacticallyWellFormattedXml(file1));
+        System.out.println("    file2: " + isSyntacticallyWellFormattedXml(file2));
+        //check well-formed-ness
+        if (!isSyntacticallyWellFormattedXml(file1) || !isSyntacticallyWellFormattedXml(file2)) {
+            //todo log
+        }
+
+
+
         //calculate all diffs.
         final Patch patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
         if (hideVersionDiffs) {
@@ -374,6 +389,55 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                 Arrays.asList(file1Lines), patch, 3);
 
         return StringUtills.join(unifiedDiff, "\n") + "\n";
+    }
+
+    protected boolean isSyntacticallyWellFormattedXml(File xmlFile) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(false);
+        factory.setNamespaceAware(true);
+
+        final boolean[] wellFormed = {true};
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setErrorHandler(new ErrorHandler() {
+                private static final String ERROR_STR = "Error occured while checking xml parsability: ";
+                private static final String WARNING_STR = "Warning occured while checking xml parsability: ";
+                private static final String FATAL_ERROR_STR = "Fatal error occured while checking xml parsability: ";
+                private void log(String prefix, Exception exception) { LOG.log(Level.WARNING, prefix + exception.getMessage()); }
+
+                @Override
+                public void warning(SAXParseException exception) throws SAXException { log(WARNING_STR, exception); }
+
+                @Override
+                public void error(SAXParseException exception) throws SAXException {
+                    log(ERROR_STR, exception);
+                    //TODO check necessity.
+                    wellFormed[0] =false;
+                }
+
+                @Override
+                public void fatalError(SAXParseException exception) throws SAXException {
+                    log(FATAL_ERROR_STR, exception);
+                    wellFormed[0] =false;
+                }
+            });
+            try {
+                builder.parse(xmlFile);
+            } catch (SAXException | IOException e) {
+                LOG.log(
+                    Level.FINEST,
+                    "{0} occured while checking xml parsability: {1}",
+                    new Object[]{e.getClass().getSimpleName(), e.getMessage()}
+                );
+                return false;
+            }
+
+        } catch (ParserConfigurationException e) {
+            LOG.log(Level.FINEST, "ParserConfigurationException occured while checking xml parsability: {0}",
+                e.getMessage());
+            return false;
+        }
+        return wellFormed[0];
     }
 
     /**
@@ -476,7 +540,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 		final String[] leftLines = sort(leftConfig.getFile()).toString().split("\\n");
 		final String[] rightLines = sort(rightConfig.getFile()).toString().split("\\n");
 
-		//TODO: INCONSISTENCY: leftConfig and rightConfig (XmlFile) are NOT sorted!!! fix this!
 		final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines,
                 rightLines, hideVersionDiffs);
 		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
