@@ -31,7 +31,11 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -50,21 +54,13 @@ import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Patch;
-import com.github.difflib.patch.PatchFailedException;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.remoting.util.Charsets;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.xml.sax.InputSource;
 
 import com.google.common.collect.Lists;
-
-//import difflib.Delta;
-//import difflib.DiffUtils;
-//import difflib.Patch;
-//import difflib.StringUtills;
 
 import org.w3c.dom.Node;
 
@@ -79,10 +75,10 @@ import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Comparison;
 import org.xmlunit.diff.ComparisonResult;
 import org.xmlunit.diff.ComparisonType;
-import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.Difference;
 import org.xmlunit.diff.DifferenceEvaluator;
+import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 
 /**
@@ -206,7 +202,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * config files does not succeed.
      */
     public final List<Line> getDiffLines(List<String> diffLines) {
-        return new GetDiffLines(diffLines).get();
+        try {
+            return new GetDiffLines(diffLines).get();
+        } catch (DiffException e) {
+            LOG.log(Level.SEVERE, "DiffException occurred while trying to get diffs: {0}" + e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -338,16 +339,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
                                            final String[] file2Lines, final boolean hideVersionDiffs) {
 
-       //TODO remove this debug line
-        LOG.log(Level.INFO, "\n\n\n\n+++\n+++Debug getDiffAsString+++\n+++");
-        LOG.log(Level.INFO, "\nfile2Lines:\n" + Arrays.toString(file2Lines));
         //calculate all diffs.
         final Patch<String> patch;
         try {
             patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
         } catch (DiffException e) {
-            //TODO handle error
-            LOG.log(Level.SEVERE, "TODO");
+            LOG.log(Level.SEVERE, "DiffException occurred while trying to calculate diffs: {0}" + e.getMessage());
             return "";
         }
         if (hideVersionDiffs) {
@@ -397,9 +394,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             }
             patch.getDeltas().removeAll(deltasToBeRemovedAfterTheMainLoop);
         }
-
-        //TODO remove debug line
-        patch.getDeltas().forEach(delta -> LOG.log(Level.INFO, "\n<\n    " + delta.getSource() + "\n    " + delta.getTarget() + "\n>"));
 
         return StringUtils.join(
             UnifiedDiffUtils.generateUnifiedDiff(

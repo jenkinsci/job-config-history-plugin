@@ -26,8 +26,9 @@ package hudson.plugins.jobConfigHistory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.AbstractDelta;
@@ -37,13 +38,6 @@ import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
 import org.apache.commons.lang.StringUtils;
 
-//import difflib.Chunk;
-//import difflib.Delta;
-//import difflib.DiffRow;
-//import difflib.DiffRowGenerator;
-//import difflib.DiffUtils;
-//import difflib.Patch;
-
 /**
  * Returns side-by-side (i.e. human-readable) diff view lines.
  *
@@ -51,6 +45,8 @@ import org.apache.commons.lang.StringUtils;
  * @author Kojima Takanori
  */
 public class GetDiffLines {
+
+	private static final Logger LOG = Logger.getLogger(GetDiffLines.class.getName());
 
 	/**
 	 * Lines.
@@ -85,17 +81,12 @@ public class GetDiffLines {
 	 *
 	 * @return list of {@link SideBySideView} lines.
 	 */
-	public List<SideBySideView.Line> get() {
+	public List<SideBySideView.Line> get() throws DiffException {
 
 		final Patch<String> diff = UnifiedDiffUtils.parseUnifiedDiff(diffLines);
 		int previousLeftPos = 0;
 		for (final AbstractDelta delta : diff.getDeltas()) {
-			try {
 				previousLeftPos = deltaLoop(delta, previousLeftPos);
-			} catch (DiffException e) {
-				//TODO implement logging
-				return Collections.EMPTY_LIST;
-			}
 		}
 		view.clearDuplicateLines();
 		return view.getLines();
