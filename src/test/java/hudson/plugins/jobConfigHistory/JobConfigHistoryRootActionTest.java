@@ -511,12 +511,24 @@ public class JobConfigHistoryRootActionTest {
 	 * Test of doRestore method, of class JobConfigHistoryRootAction.
 	 */
 	@Test
-	@Ignore
 	public void testDoRestore() throws Exception {
-		StaplerRequest req = null;
-		StaplerResponse rsp = null;
+		final StaplerRequest req = mock(StaplerRequest.class);
+		final StaplerResponse rsp = mock(StaplerResponse.class);
+
 		JobConfigHistoryRootAction sut = createSut();
+
+		FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
+		assertNotNull(jenkinsRule.getInstance().getItem("Test1"));
+		assertEquals("Test1", jenkinsRule.getInstance().getItem("Test1").getName());
+
+		freeStyleProject.delete();
+		assertNull(jenkinsRule.getInstance().getItem("Test1"));
+		final String deletedTestProjectName = PluginUtils.getHistoryDao().getDeletedJobs()[0].getName();
+
+		given(req.getParameter("name")).willReturn(deletedTestProjectName);
 		sut.doRestore(req, rsp);
+		assertNotNull(jenkinsRule.getInstance().getItem("Test1"));
+		assertEquals("Test1", jenkinsRule.getInstance().getItem("Test1").getName());
 	}
 
 	/**
