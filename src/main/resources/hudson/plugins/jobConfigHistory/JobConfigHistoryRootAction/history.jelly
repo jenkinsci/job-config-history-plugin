@@ -46,7 +46,7 @@
           <j:otherwise>
             <br/>
             <div>
-              <f:form method="post" action="diffFiles" enctype="multipart/form-data">
+              <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
                 <j:if test="${configs.size() > 1}">
                   <div align="right">
                     <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
@@ -110,7 +110,8 @@
                         <td style="text-align:center">
                           <j:if test="${it.hasAdminPermission()}">
                             <j:if test="${!config.operation.toString().equals(&quot;Deleted&quot;)}">
-                              <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', '${config.getJob()}')" value="X">
+                              <j:set var="message" value="${%Do you really want to delete the history entry }"/>
+                              <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', '${config.getJob()}', '${message}')" value="X">
                                 <img src="${resURL}/images/16x16/stop.png" alt="Delete Revision"/>
                               </button>
                             </j:if>

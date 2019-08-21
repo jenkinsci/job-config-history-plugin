@@ -27,10 +27,7 @@ import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
-import hudson.model.Node;
 import jenkins.model.Jenkins;
-
-import java.io.File;
 
 /**
  * Master class for adding new backends to the history plugin.
