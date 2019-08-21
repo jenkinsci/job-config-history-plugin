@@ -106,11 +106,6 @@
                                   </span>
                                 </j:if>
                               </j:if>
-<!--                              <j:if test="${configNr > 1 and !fileMissing}">-->
-<!--                                <a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">-->
-<!--                                  <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />-->
-<!--                                </a>-->
-<!--                              </j:if>-->
                             </td>
                           </j:if>
                           <j:if test="${configNr == 2 and fileMissing}">
