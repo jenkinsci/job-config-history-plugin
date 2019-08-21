@@ -44,6 +44,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -225,18 +227,29 @@ public class FileHistoryDaoTest {
 	 * Test of createNewHistoryDir method, of class FileHistoryDao.
 	 */
 	@Test
-	public void testCreateNewHistoryDir() throws IOException {
+	public void testCreateNewHistoryDir() throws IOException, InterruptedException {
 		final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
 		final File first = FileHistoryDao.createNewHistoryDir(historyRoot,
 				timestampHolder);
 		assertTrue(first.exists());
 		assertTrue(first.isDirectory());
+		assertTrue(Files.isSymbolicLink(Paths.get(historyRoot.getAbsolutePath() + "/lastHistory")));
+		// Check that symblink points to the first history dir created
+		File firstSymblink = new File(Paths.get(historyRoot.getAbsolutePath() + "/lastHistory").toString());
+		File firstLastRevision = new File(Util.resolveSymlink(firstSymblink));
+		assertEquals(first.getAbsolutePath(), firstLastRevision.getAbsolutePath());
 		// Should provoke clash
 		final File second = FileHistoryDao.createNewHistoryDir(historyRoot,
 				timestampHolder);
 		assertTrue(second.exists());
 		assertTrue(second.isDirectory());
 		assertNotEquals(first.getAbsolutePath(), second.getAbsolutePath());
+		assertTrue(Files.isSymbolicLink(Paths.get(historyRoot.getAbsolutePath() + "/lastHistory")));
+		// Check that symblink now points to the second history dir created
+		File secondSymblink = new File(Paths.get(historyRoot.getAbsolutePath() + "/lastHistory").toString());
+		File secondlastRevision = new File(Util.resolveSymlink(secondSymblink));
+		assertEquals(second.getAbsolutePath(), secondlastRevision.getAbsolutePath());
+
 	}
 
 	/**
@@ -266,7 +279,18 @@ public class FileHistoryDaoTest {
 		final File historyDir = new File(jenkinsHome,
 				"config-history/jobs/MyTest");
 		assertTrue(historyDir.exists());
-		assertEquals(1, historyDir.list().length);
+
+		final File lastHistory = new File(jenkinsHome,
+				"config-history/jobs/MyTest/lastHistory");
+
+		assertTrue(Files.isSymbolicLink(Paths.get(lastHistory.getAbsolutePath())));
+
+		// We should have two files in the directory: the symblink and the one
+		// created for the item
+		assertEquals(2, historyDir.list().length);
+
+		// Filtering the symblink we should only have one file
+		assertEquals(1, historyDir.listFiles(HistoryFileFilter.INSTANCE).length);
 	}
 
 	/**
@@ -298,7 +322,7 @@ public class FileHistoryDaoTest {
 	}
 
 	private int getHistoryLength() {
-		return test1History.list().length;
+		return test1History.listFiles(HistoryFileFilter.INSTANCE).length;
 	}
 
 	/**
@@ -325,7 +349,7 @@ public class FileHistoryDaoTest {
 				"NewName");
 		final File newHistoryDir = new File(historyRoot, "jobs/" + newName);
 		assertTrue(newHistoryDir.exists());
-		assertEquals(6, newHistoryDir.list().length);
+		assertEquals(6, newHistoryDir.listFiles(HistoryFileFilter.INSTANCE).length);
 	}
 
 	/**
@@ -679,11 +703,12 @@ public class FileHistoryDaoTest {
 		sutWithUserAndNoDuplicateHistory.createNewNode(mockedNode);
 		File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
 		File revisions = new File(file, "slave1");
+		File[] revisionsList = revisions.listFiles(HistoryFileFilter.INSTANCE);
 		assertEquals("Slave1 should have only one save history.", 1,
-				revisions.list().length);
-		File config = new File(revisions.listFiles()[0], "config.xml");
+				revisionsList.length);
+		File config = new File(revisionsList[0], "config.xml");
 		assertTrue("File config.xml should be saved.", config.exists());
-		File history = new File(revisions.listFiles()[0],
+		File history = new File(revisionsList[0],
 				JobConfigHistoryConsts.HISTORY_FILE);
 		assertTrue("File history.xml should be saved.", history.exists());
 	}
@@ -787,7 +812,7 @@ public class FileHistoryDaoTest {
 		File revisions = new File(file, "slave1");
 		sutWithUserAndNoDuplicateHistory.saveNode(mockedNode);
 		assertEquals("New revision should be saved.", 1,
-				revisions.list().length);
+				revisions.listFiles(HistoryFileFilter.INSTANCE).length);
 	}
 
 	@Test

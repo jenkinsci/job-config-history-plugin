@@ -244,6 +244,33 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
+	 * Used by the configuration page.
+	 *
+	 * @return The default max number of history entries to keep
+	 */
+	public String getDefaultMaxHistoryEntries() {
+		return JobConfigHistoryConsts.DEFAULT_MAX_HISTORY_ENTRIES;
+	}
+
+	/**
+	 * Used by the configuration page.
+	 *
+	 * @return The default max number of days to keep history entries
+	 */
+	public String getDefaultMaxDaysToKeepEntries() {
+		return JobConfigHistoryConsts.DEFAULT_MAX_DAYS_TO_KEEP_ENTRIES;
+	}
+
+	/**
+	 * Used by the configuration page.
+	 *
+	 * @return The default max number of history entries to show per page
+	 */
+	public String getDefaultMaxEntriesPerPage() {
+		return JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE;
+	}
+
+	/**
 	 * @return The regular expression for 'system' file names to exclude from
 	 *         saving.
 	 */

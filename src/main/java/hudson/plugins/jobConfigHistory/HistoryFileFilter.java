@@ -25,6 +25,8 @@ package hudson.plugins.jobConfigHistory;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * A filter to return only those directories of a file listing that represent
@@ -40,7 +42,8 @@ public class HistoryFileFilter implements FileFilter {
 	@Override
 	public boolean accept(File file) {
 		return file.exists()
-				&& new File(file, JobConfigHistoryConsts.HISTORY_FILE).exists();
+				&& new File(file, JobConfigHistoryConsts.HISTORY_FILE).exists()
+				&& !Files.isSymbolicLink(Paths.get(file.getAbsolutePath()));
 	}
 
 	/**

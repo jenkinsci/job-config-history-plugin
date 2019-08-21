@@ -24,14 +24,18 @@
 package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.FINEST;
+import static org.kohsuke.stapler.Facet.LOGGER;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
+
 import java.io.FileFilter;
 
 import java.text.SimpleDateFormat;
@@ -50,6 +54,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import hudson.Util;
+import hudson.model.TaskListener;
 import org.apache.commons.io.FileUtils;
 
 import hudson.Extension;
@@ -110,6 +116,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 * Should we save duplicate entries?
 	 */
 	private final boolean saveDuplicates;
+
+	/** Last history **/
+	public final static String LAST_HISTORY = "lastHistory";
 
 	public FileHistoryDao() {
 		this(null, null, null, 0, false);
@@ -260,6 +269,13 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		if (!(f.mkdirs() || f.exists())) {
 			throw new RuntimeException("Could not create rootDir " + f);
 		}
+		// Create a symlink pointing to the last change
+		try {
+			Util.createSymlink(itemHistoryDir, f.toPath().toString(), "lastHistory", TaskListener.NULL);
+		} catch (InterruptedException e) {
+			LOGGER.log(Level.WARNING, String.format("Could not create symblink for %s",  itemHistoryDir.toPath()), e);
+		}
+
 		return f;
 	}
 
@@ -346,7 +362,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				final FilePath newHistoryFilePath = new FilePath(newHistoryDir);
 				final FilePath oldHistoryFilePath = new FilePath(oldHistoryDir);
 				try {
-					oldHistoryFilePath.copyRecursiveTo(newHistoryFilePath);
+					oldHistoryFilePath.copyRecursiveTo("**/*", "**/lastHistory/**",newHistoryFilePath);
 					oldHistoryFilePath.deleteRecursive();
 					LOG.log(FINEST,
 						"completed move of old history files on location change {0}{1}",
@@ -381,7 +397,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				// rename
 				// tasks.
 				try {
-					fp.copyRecursiveTo(new FilePath(currentHistoryDir));
+					fp.copyRecursiveTo("**/*", "**/lastHistory",new FilePath(currentHistoryDir));
 					fp.deleteRecursive();
 					LOG.log(FINEST,
 						"completed move of old history files on rename.{0}",
@@ -431,8 +447,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		} else {
 			for (File historyDir : historyDirsOfItem) {
 				final XmlFile historyXml = getHistoryXmlFile(historyDir);
-				final LazyHistoryDescr historyDescription = new LazyHistoryDescr(
-					historyXml);
+				final LazyHistoryDescr historyDescription = new LazyHistoryDescr(historyXml);
 				map.put(historyDir.getName(), historyDescription);
 			}
 			return map;
@@ -685,12 +700,40 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 */
 	boolean hasDuplicateHistory(final XmlFile xmlFile) {
 		boolean isDuplicated = false;
-		final ArrayList<String> timeStamps = new ArrayList<String>(
-			getRevisions(xmlFile).keySet());
-		if (!timeStamps.isEmpty()) {
-			Collections.sort(timeStamps, Collections.reverseOrder());
-			final XmlFile lastRevision = getOldRevision(xmlFile,
-				timeStamps.get(0));
+		XmlFile lastRevision = null;
+
+		// First, we try to obtain the latest revision from the symblink
+		final File historiesDir = getHistoryDir(xmlFile.getFile());
+		File symblink = new File(historiesDir.getPath() + "/" + LAST_HISTORY);
+		if(symblink.exists()) {
+			try {
+				lastRevision = new XmlFile(getConfigFile(new File(Util.resolveSymlink(symblink))));
+			} catch (IOException | InterruptedException | NullPointerException e) {
+				LOGGER.log(Level.WARNING, String.format("Could not get access to the last revision %s", historiesDir.getPath() + "/" + LAST_HISTORY), e);
+
+				// In case there is any problem with the symblink
+				// we fall-back to the old model
+				final ArrayList<String> timeStamps = new ArrayList<String>(
+						getRevisions(xmlFile).keySet());
+				if (!timeStamps.isEmpty()) {
+					Collections.sort(timeStamps, Collections.reverseOrder());
+					lastRevision = getOldRevision(xmlFile,
+							timeStamps.get(0));
+				}
+			}
+		} else {
+			// In case symblink still does not exist we try to obtain the latest revision
+			// using the old way
+			final ArrayList<String> timeStamps = new ArrayList<String>(
+					getRevisions(xmlFile).keySet());
+			if (!timeStamps.isEmpty()) {
+				Collections.sort(timeStamps, Collections.reverseOrder());
+				lastRevision = getOldRevision(xmlFile,
+						timeStamps.get(0));
+			}
+		}
+
+		if (lastRevision != null) {
 			try {
 				if (xmlFile.asString().equals(lastRevision.asString())) {
 					isDuplicated = true;
@@ -948,7 +991,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				// rename
 				// tasks.
 				try {
-					fp.copyRecursiveTo(new FilePath(currentHistoryDir));
+					fp.copyRecursiveTo("**/*", "**/lastHistory/**",new FilePath(currentHistoryDir));
 					fp.deleteRecursive();
 					LOG.log(Level.FINEST,
 						"completed move of old history files on rename.{0}",
@@ -1111,4 +1154,5 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		final XmlFile oldRevision = getOldRevision(node, identifier);
 		return oldRevision.getFile() != null && oldRevision.getFile().exists();
 	}
+
 }
