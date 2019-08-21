@@ -134,9 +134,7 @@ public class JobConfigBadgeActionTest {
 	 */
 	@Test
 	public void testCreateLink() throws Exception {
-//		String expResult = "http://example.org/jenkins/jobs/jobnamejobConfigHistory/showDiffFiles?timestamp1=2013_01_02&timestamp2=2013_01_01";
 		String timestampRegex = "[0-9\\-_]+";
-//		String actual = "http://localhost:44829/jenkins/job/Test1/jobConfigHistory/showDiffFiles?timestamp1=2013_01_02&timestamp2=2013_01_01";
 
 		String expectedRegex =
 			"http://localhost:[0-9]{1,5}?/jenkins/job/Test1/jobConfigHistory/showDiffFiles\\?timestamp1=" + timestampRegex
@@ -146,8 +144,6 @@ public class JobConfigBadgeActionTest {
 		Run build = project.getBuilds().get(0);
 
 		sut.onAttached(build);
-//		assertEquals(expectedRegex, sut.createLink());
-
 		assertTrue(sut.createLink().matches(expectedRegex));
 	}
 
@@ -247,24 +243,7 @@ public class JobConfigBadgeActionTest {
 	}
 
 	JobConfigBadgeAction createSut() {
-		return new JobConfigBadgeAction(configDates) {
-
-//			@Override
-//			JobConfigHistory getPlugin() {
-//				return mockedPlugin;
-//			}
-//
-//			@Override
-//			HistoryDao getHistoryDao() {
-//				return mockedHistoryDao;
-//			}
-//
-//			@Override
-//			String getRootUrl() {
-//				return ROOT_URL;
-//			}
-
-		};
+		return new JobConfigBadgeAction(configDates);
 	}
 
 	JobConfigBadgeAction createSut(String timestamp1, String timestamp2) {

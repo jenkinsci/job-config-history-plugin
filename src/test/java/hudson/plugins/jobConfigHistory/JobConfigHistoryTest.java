@@ -273,15 +273,6 @@ public class JobConfigHistoryTest {
 	 */
 	@Test
 	public void testShowBuildBadgesAdminUser() throws IOException {
-//		JobConfigHistory sut = createSut();
-//		AbstractProject<?, ?> mockedProject = mock(AbstractProject.class);
-//		ACL mockedACL = mock(ACL.class);
-//		when(mockedACL.hasPermission(Jenkins.ADMINISTER)).thenReturn(true, false);
-//		when(sut.getJenkins().getACL()).thenReturn(mockedACL, mockedACL);
-//		sut.setShowBuildBadges("adminUser");
-//		assertTrue(sut.showBuildBadges(mockedProject));
-//		assertFalse(sut.showBuildBadges(mockedProject));
-
 		FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
 
 		JobConfigHistory sut = createSut();
@@ -438,10 +429,10 @@ public class JobConfigHistoryTest {
 	}
 
 	private JobConfigHistory createNonSavingSut() {
-		return new JobConfigHistory() {//
+		return new JobConfigHistory() {
 			@Override
 			public void save() {
-				//
+				//do nothing
 			}
 		};
 	}

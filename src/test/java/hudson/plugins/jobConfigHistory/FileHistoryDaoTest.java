@@ -754,11 +754,6 @@ public class FileHistoryDaoTest {
 	@Test
 	public void testGetRevisions() throws Exception {
 		when(mockedNode.getNodeName()).thenReturn("slave1");
-//		createNodeRevision("2014-01-18_10-12-34", mockedNode);
-//		createNodeRevision("2014-01-19_10-12-34", mockedNode);
-//		createNodeRevision("2014-01-20_10-12-34", mockedNode);
-//		createNodeRevision("2014-01-20_10-21-34", mockedNode);
-
 		createNodeRevisionManually("2014-01-18_10-12-34", getRandomConfigXml(),getHistoryXmlFromTimestamp("2014-01-18_10-12-34"));
 		createNodeRevisionManually("2014-01-19_10-12-34", getRandomConfigXml(),getHistoryXmlFromTimestamp("2014-01-19_10-12-34"));
 		createNodeRevisionManually("2014-01-20_10-12-34", getRandomConfigXml(),getHistoryXmlFromTimestamp("2014-01-20_10-12-34"));
