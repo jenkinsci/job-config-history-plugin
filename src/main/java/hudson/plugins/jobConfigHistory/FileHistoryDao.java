@@ -24,7 +24,6 @@
 package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.FINEST;
-import static java.util.logging.Level.INFO;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -51,7 +50,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import hudson.model.*;
+import hudson.model.AbstractItem;
+import hudson.model.Item;
+import hudson.model.Node;
+import hudson.model.User;
 import org.apache.commons.io.FileUtils;
 
 import hudson.Extension;
