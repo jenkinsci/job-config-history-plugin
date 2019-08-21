@@ -398,6 +398,11 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		//do nothing with the rsp
 	}
 
+	public boolean revisionEqualsCurrent(String timestamp) {
+		//going over Jenkins.get().getNode(..) is necessary because this.getSlave returns an old version of the node.
+		return PluginUtils.getHistoryDao().revisionEqualsCurrent(Jenkins.get().getNode(this.getSlave().getNodeName()), timestamp);
+	}
+
 	/**
 	 * Action when 'Show / hide Version Changes' button in showDiffFiles.jelly is pressed:
 	 * Reloads the page with "showVersionDiffs" parameter inversed.

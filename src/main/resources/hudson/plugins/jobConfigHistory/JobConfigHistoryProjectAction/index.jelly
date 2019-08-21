@@ -93,11 +93,24 @@
                           </td>
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                             <td style="text-align:center">
-                              <j:if test="${configNr > 1 and !fileMissing}">
+                              <j:set var="revisionEqualsCurrent" value="${it.revisionEqualsCurrent(config.getDate())}"/>
+                              <j:if test="${!revisionEqualsCurrent and !fileMissing}">
                                 <a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
                                   <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
                                 </a>
+                                <j:if test="${configNr == 1}">
+                                  <!--The current version is not present in history!-->
+                                  <br/>
+                                  <span style="color: rgb(196, 109, 0); font-weight:bold;">
+                                    ${%Warning: this is the latest revision in history, but not the current config. Save config to create a current entry.}
+                                  </span>
+                                </j:if>
                               </j:if>
+<!--                              <j:if test="${configNr > 1 and !fileMissing}">-->
+<!--                                <a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">-->
+<!--                                  <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />-->
+<!--                                </a>-->
+<!--                              </j:if>-->
                             </td>
                           </j:if>
                           <j:if test="${configNr == 2 and fileMissing}">

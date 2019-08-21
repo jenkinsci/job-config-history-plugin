@@ -452,6 +452,10 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		//do nothing with the rsp
 	}
 
+	public boolean revisionEqualsCurrent(String timestamp) {
+		return PluginUtils.getHistoryDao().revisionEqualsCurrent(this.getProject(), timestamp);
+	}
+
 	/**
 	 * For tests.
 	 *

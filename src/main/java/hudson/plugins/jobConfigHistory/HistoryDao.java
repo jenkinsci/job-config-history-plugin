@@ -134,6 +134,10 @@ public interface HistoryDao {
 
 	public abstract void deleteRevision(File historyDir, String identifier);
 
+	public abstract boolean revisionEqualsCurrent(AbstractItem project, String identifier1);
+
+	public abstract boolean revisionEqualsCurrent(Node node, String identifier1);
+
 	/**
 	 * Returns whether the revision exists.
 	 *

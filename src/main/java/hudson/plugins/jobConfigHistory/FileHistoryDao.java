@@ -62,6 +62,7 @@ import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 
 /**
@@ -530,6 +531,36 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			LOG.log(Level.WARNING, "unable to delete revision {0}: file not found.", identifier);
 		}
 		LOG.log(FINEST, "{0} \'s revision {1} deleted.", new Object[]{historyDir.getName(), identifier});
+	}
+
+	@Override
+	public boolean revisionEqualsCurrent(AbstractItem project, String identifier1) {
+
+		try {
+			return FileUtils.contentEquals(
+				getConfigFile(getSubDirectory(getHistoryDir(project), identifier1)),
+				project.getConfigFile().getFile()
+			);
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, " could not access config file while trying to check revision equality.");
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	@Override
+	public boolean revisionEqualsCurrent(Node node, String identifier1) {
+		String currentContent = Jenkins.XSTREAM2.toXML(node);
+		try {
+			return StringUtils.equals(
+				FileUtils.readFileToString(getOldRevision(node, identifier1).getFile()),
+				currentContent
+			);
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, " could not access config file while trying to check revision equality.");
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
