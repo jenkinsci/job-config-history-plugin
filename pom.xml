@@ -115,6 +115,7 @@
 
     <properties>
 <!--        <jenkins.version>2.60.3</jenkins.version>-->
+        <!--TODO before PR and MERGE: determine version!-->
         <maven-surefire-report-plugin.version>2.20</maven-surefire-report-plugin.version>
         <maven-hpi-plugin.injectedTestName>InjectedIT</maven-hpi-plugin.injectedTestName>
         <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
