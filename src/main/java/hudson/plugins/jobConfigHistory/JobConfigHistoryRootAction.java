@@ -354,6 +354,10 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		}
 	}
 
+	public XmlSyntaxChecker.Answer checkXmlSyntax(String name, String timestamp) {
+		return XmlSyntaxChecker.check(getOldConfigXml(name, timestamp).getFile());
+	}
+
 	/**
 	 * Used in the Difference jelly only. Returns one of the two timestamps that
 	 * have been passed to the Difference page as parameter. timestampNumber

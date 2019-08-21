@@ -214,6 +214,12 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 				.get(getTimestamp(timestampNumber)).getUser();
 	}
 
+	public final String getUserID(int timestamp) {
+		checkConfigurePermission();
+		return getHistoryDao().getRevisions(this.slave)
+			.get(getTimestamp(timestamp)).getUserID();
+	}
+
 	/**
 	 * Used in the Difference jelly only. Returns the operation made on one of
 	 * the two Files A and B. timestampNumber decides which file exactly.
@@ -307,6 +313,10 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		final String timestamp1 = getRequestParameter("timestamp1");
 		final String timestamp2 = getRequestParameter("timestamp2");
 		return getLines(getOldConfigXml(timestamp1), getOldConfigXml(timestamp2), hideVersionDiffs);
+	}
+
+	public XmlSyntaxChecker.Answer checkXmlSyntax(String timestamp) {
+		return  XmlSyntaxChecker.check(getOldConfigXml(timestamp).getFile());
 	}
 
 	/**

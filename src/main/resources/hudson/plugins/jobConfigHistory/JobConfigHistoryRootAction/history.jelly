@@ -1,6 +1,9 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="Job Configuration History">
+
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
+
     <j:set var="name" value="${request.getParameter('name')}"/>
     <j:set var="isDeleted" value="${name.contains('_deleted_')}"/>
     <l:side-panel>
@@ -26,7 +29,6 @@
           <h1>${%System Configuration History}</h1>
         </j:otherwise>
       </j:choose>
-      <h2>${name}</h2>
       <j:set var="configs" value="${it.getSingleConfigs(name)}" />
       <div>
         <j:choose>
@@ -45,59 +47,71 @@
               <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
                 <j:if test="${configs.size() > 1}">
                   <div align="right">
-                    <f:submit value="${%Show Diffs}" />
+                    <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
                   </div>
+                  <div style="padding:2px"/>
                 </j:if>
-                <st:adjunct includes="hudson.plugins.jobConfigHistory.table" />
-                <table id="confighistory" class="pane sortable">
-                  <tr>
-                    <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
-                    <td class="pane-header" align="left">${%Operation}</td>
-                    <td class="pane-header" align="left">${%User}</td>
-                    <td class="pane-header" align="left">${%Show File}</td>
-                    <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File A}</td>
-                    <td class="pane-header" align="center" style="border-left: solid 1px #bbb;">${%File B}</td>
-                  </tr>
-                  <j:set var="configNr" value="0"/>
-                  <j:forEach var="config" items="${configs}">
-                    <j:set var="configNr" value="${configNr + 1}"/>
-                    <tr>
-                      <td>${config.date}</td>
-                      <td>${config.operation}</td>
-                      <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                      <td>
-                        <j:if test="${config.operation != 'Deleted'}">
-                          <a href="configOutput?type=xml&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
-                            <img src="${imagesURL}/24x24/document.png" alt="" />${%View as XML}
-                          </a>
-                          <st:nbsp />
-                          <a href="configOutput?type=raw&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
-                            (${%RAW})
-                          </a>
-                        </j:if>
-                      </td>
-                      <j:if test="${isDeleted}">
-                        <j:set var="offsetIfDeleted" value="1"/>
-                      </j:if>
-                      <td align="center" style="border-left: solid 1px #bbb;">
-                        <j:if test="${config.operation != 'Deleted'}">
-                          <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfDeleted) ? true:false}" />
-                        </j:if>
-                      </td>
-                      <td align="center" style="border-left: solid 1px #bbb;">
-                        <j:if test="${config.operation != 'Deleted'}">
-                          <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == (1 + offsetIfDeleted) ? true:false}" />
-                        </j:if>
-                      </td>
-                    </tr>
-                    <f:invisibleEntry>
-                      <f:textbox name="name" value="${config.getJob()}" />
-                    </f:invisibleEntry>
-                  </j:forEach>
+
+                <table class="jch" style="width:100%">
+                  <thead>
+                    <caption class="caption">${name}</caption>
+                  </thead>
                 </table>
+                <div class="resizeWrapper" style="overflow-y:scroll; height:100%; max-height:52vh;">
+                  <table id="confighistory"  class="pane sortable jch" style="width:100%">
+                    <thead>
+                      <tr>
+                        <th initialSortDir="up">${%Date}</th>
+                        <th>${%Operation}</th>
+                        <th>${%User}</th>
+                        <th>${%Show File}</th>
+                        <th style="text-align:center">${%File A}</th>
+                        <th style="text-align:center">${%File B}</th>
+                      </tr>
+                    </thead>
+
+                    <j:set var="configNr" value="0"/>
+                    <j:forEach var="config" items="${configs}">
+                      <j:set var="configNr" value="${configNr + 1}"/>
+                      <tr class="alternate">
+                        <td>${config.date}</td>
+                        <td>${config.operation}</td>
+                        <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                        <td>
+                          <j:if test="${config.operation != 'Deleted'}">
+                            <a href="configOutput?type=xml&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
+                              <img src="${imagesURL}/24x24/document.png" alt="" />${%View as XML}
+                            </a>
+                            <st:nbsp />
+                            <a href="configOutput?type=raw&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
+                              (${%RAW})
+                            </a>
+                          </j:if>
+                        </td>
+                        <j:if test="${isDeleted}">
+                          <j:set var="offsetIfDeleted" value="1"/>
+                        </j:if>
+                        <td style="text-align:center">
+                          <j:if test="${config.operation != 'Deleted'}">
+                            <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfDeleted) ? true:false}" />
+                          </j:if>
+                        </td>
+                        <td style="text-align:center">
+                          <j:if test="${config.operation != 'Deleted'}">
+                            <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == (1 + offsetIfDeleted) ? true:false}" />
+                          </j:if>
+                        </td>
+                      </tr>
+                      <f:invisibleEntry>
+                        <f:textbox name="name" value="${config.getJob()}" />
+                      </f:invisibleEntry>
+                    </j:forEach>
+                  </table>
+                </div>
                 <j:if test="${configs.size() > 1}">
+                  <div style="padding:2px"/>
                   <div align="right">
-                    <f:submit value="${%Show Diffs}" />
+                    <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
                   </div>
                 </j:if>
               </f:form>
@@ -105,11 +119,12 @@
             <!--this prevents people from destroying their history by trying to restore deleted folder jobs
              TODO Fix that. (see code)-->
             <j:if test="${isDeleted and (configs.size() > 1) and configs.get(0).job.replace('/jobs', '/job').equals(configs.get(0).job)}">
-              <f:form method="post" action="forwardToRestoreQuestion?name=${name}" name="forward">
+              <div style="padding:2px"/>
+              <form method="post" action="forwardToRestoreQuestion?name=${name}" name="forward">
                 <div align="right">
-                  <f:submit value="${%Restore project}" />
+                  <input class="jch standard-button" type="submit" value="${%Restore project}"/>
                 </div>
-              </f:form>
+              </form>
             </j:if>
           </j:otherwise>
         </j:choose>

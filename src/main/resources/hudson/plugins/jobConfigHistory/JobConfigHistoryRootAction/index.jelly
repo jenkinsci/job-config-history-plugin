@@ -2,6 +2,9 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
   <l:layout title="${%All Configuration History}">
+
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
+
     <l:side-panel>
       <l:tasks>
         <l:task icon="images/24x24/up.gif" href="${rootURL}/" title="${%Back to Dashboard}" />
@@ -31,11 +34,37 @@
           <h1>${%System Configuration History}</h1>
         </j:otherwise>
       </j:choose>
-      <a href="?filter=system">${%Show system configs only}</a> <br />
-      <a href="?filter=jobs">${%Show job configs only}</a> <br />
-      <a href="?filter=created">${%Show created jobs only}</a> <br />
-      <a href="?filter=deleted">${%Show deleted jobs only}</a> <br />
-      <a href="?filter=all">${%Show all configs}</a> <br />
+
+      <table style="width:100%" class="small-button-wrapper">
+        <tr>
+          <td>
+            <div class="menu-url-button">
+              <a href="?filter=system" style="text-decoration:none">${%Show system configs only}</a>
+            </div>
+          </td>
+          <td>
+            <div class="menu-url-button">
+              <a href="?filter=jobs" style="text-decoration:none">${%Show job configs only}</a>
+            </div>
+          </td>
+          <td>
+            <div class="menu-url-button">
+              <a href="?filter=created" style="text-decoration:none">${%Show created jobs only}</a>
+            </div>
+          </td>
+          <td>
+            <div class="menu-url-button">
+              <a href="?filter=deleted" style="text-decoration:none">${%Show deleted jobs only}</a>
+            </div>
+          </td>
+          <td>
+            <div class="menu-url-button">
+              <a href="?filter=all" style="text-decoration:none">${%Show all configs}</a>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div style="padding:2px"/>
       <div>
         <j:set var="configs" value="${it.getConfigs()}" />
         <j:choose>
@@ -50,87 +79,100 @@
           </j:when>
           <j:otherwise>
             <div>
-              <table class="pane sortable" style="width:100%">
-                <tr>
-                  <td class="pane-header" initialSortDir="up" align="left">${%Date}</td>
-                  <j:choose>
-                    <j:when test="${filter == 'jobs' || filter == 'deleted' || filter == 'created'}">
-                      <td class="pane-header" align="left">${%Job configuration}</td>
-                    </j:when>
-                    <j:when test="${filter == 'all'}">
-                      <td class="pane-header" align="left">${%Job/System configuration}</td>
-                    </j:when>
-                    <j:otherwise>
-                      <td class="pane-header" align="left">${%System configuration}</td>
-                    </j:otherwise>
-                  </j:choose>
-                  <td class="pane-header" align="left">${%Operation}</td>
-                  <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                    <td class="pane-header" align="left">${%User}</td>
-                  </j:if>
-                  <td class="pane-header" align="left">${%File(raw)}</td>
-                  <j:if test="${filter == 'deleted'}">
-                    <td class="pane-header" align="left">${%Restore project}</td>
-                  </j:if>
-                </tr>
-                <j:set var="configNr" value="0"/>
-                <j:forEach var="config" items="${configs}">
-                  <j:set var="configNr" value="${configNr + 1}"/>
-                  <tr>
-                    <td>${config.date}</td>
-                    <j:choose>
-                      <j:when test="${config.getIsJob()}">
-                        <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
-                        <td>
-                          <a href="${rootURL}/job/${config.job.replace('/jobs', '/job')}/jobConfigHistory">
-                            <!-- Adding breadcrumbs and deleting irrelevant information about the jobs subdirectory -->
-                            ${config.job.replace('/jobs', '').replace('/', ' » ')}
-                          </a>
-                        </td>
-                      </j:when>
-                      <j:otherwise>
-                        <j:choose>
-                          <j:when test="${config.job.contains('_deleted_')}">
-                            <td><a href="history?name=${config.job}" id="deleted">${config.job}</a></td>
-                          </j:when>
-                          <j:otherwise>
-                            <td><a href="history?name=${config.job}">${config.job}</a>&amp;nbsp;(system)</td>
-                          </j:otherwise>
-                        </j:choose>
-                      </j:otherwise>
-                    </j:choose>
-                    <td>${config.operation}</td>
-                    <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                      <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                    </j:if>
-                    <td>
-                      <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
-                      <a href="${it.createLinkToFiles(config,'xml')}">
-                        <img src="${imagesURL}/24x24/document.png" alt="" />${%View as XML}
-                      </a>
-                      <st:nbsp />
-                      <a href="${it.createLinkToFiles(config,'raw')}">
-                        (${%RAW})
-                      </a>
-                    </td>
-                    <j:if test="${filter == 'deleted'}">
+
+              <table class="jch" style="width:100%">
+                <thead>
+                  <caption class="caption">
+                    filter: ${filter == null ? 'system' : filter}
+                  </caption>
+                </thead>
+              </table>
+              <div class="resizeWrapper" style="overflow-y:scroll;  height:100%; max-height:65vh;">
+                <table class="pane sortable jch" style="width:100%;">
+                  <thead>
+                    <tr>
+                      <th initialSortDir="up">${%Date}</th>
+                      <j:choose>
+                        <j:when test="${filter == 'jobs' || filter == 'deleted' || filter == 'created'}">
+                          <th>${%Job configuration}</th>
+                        </j:when>
+                        <j:when test="${filter == 'all'}">
+                          <th>${%Job/System configuration}</th>
+                        </j:when>
+                        <j:otherwise>
+                          <th>${%System configuration}</th>
+                        </j:otherwise>
+                      </j:choose>
+                      <th>${%Operation}</th>
+                      <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                        <th>${%User}</th>
+                      </j:if>
+                      <th>${%File(raw)}</th>
+                      <j:if test="${filter == 'deleted'}">
+                        <th style="text-align:center">${%Restore project}</th>
+                      </j:if>
+                    </tr>
+                  </thead>
+
+                  <j:set var="configNr" value="0"/>
+                  <j:forEach var="config" items="${configs}">
+                    <j:set var="configNr" value="${configNr + 1}"/>
+                    <tr class="alternate">
+                      <td>${config.date}</td>
+                      <j:choose>
+                        <j:when test="${config.getIsJob()}">
+                          <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
+                          <td>
+                            <a href="${rootURL}/job/${config.job.replace('/jobs', '/job')}/jobConfigHistory">
+                              <!-- Adding breadcrumbs and deleting irrelevant information about the jobs subdirectory -->
+                              ${config.job.replace('/jobs', '').replace('/', ' » ')}
+                            </a>
+                          </td>
+                        </j:when>
+                        <j:otherwise>
+                          <j:choose>
+                            <j:when test="${config.job.contains('_deleted_')}">
+                              <td><a href="history?name=${config.job}" id="deleted">${config.job}</a></td>
+                            </j:when>
+                            <j:otherwise>
+                              <td><a href="history?name=${config.job}">${config.job}</a>&amp;nbsp;(system)</td>
+                            </j:otherwise>
+                          </j:choose>
+                        </j:otherwise>
+                      </j:choose>
+                      <td>${config.operation}</td>
+                      <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                        <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                      </j:if>
                       <td>
-                        <j:if test="${it.getLastAvailableConfigXml(config.getJob()) != null}">
-                          <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                            <!--this prevents people from destroying their history by trying to restore deleted folder jobs
-                             TODO Fix that. (see code)-->
-                            <j:if test="${config.job.replace('/jobs', '/job').equals(config.job)}">
-                              <a id="restore" href="restoreQuestion?name=${config.getJob()}">
-                                <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
-                              </a>
+                        <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
+                        <a href="${it.createLinkToFiles(config,'xml')}">
+                          <img src="${imagesURL}/24x24/document.png"/>${%View as XML}
+                        </a>
+                        <st:nbsp />
+                        <a href="${it.createLinkToFiles(config,'raw')}">
+                          (${%RAW})
+                        </a>
+                      </td>
+                      <j:if test="${filter == 'deleted'}">
+                        <td  style="text-align:center">
+                          <j:if test="${it.getLastAvailableConfigXml(config.getJob()) != null}">
+                            <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                              <!--this prevents people from destroying their history by trying to restore deleted folder jobs
+                               TODO Fix that. (see code)-->
+                              <j:if test="${config.job.replace('/jobs', '/job').equals(config.job)}">
+                                <a id="restore" href="restoreQuestion?name=${config.getJob()}">
+                                  <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
+                                </a>
+                              </j:if>
                             </j:if>
                           </j:if>
-                        </j:if>
-                      </td>
-                    </j:if>
-                  </tr>
-                </j:forEach>
-              </table>
+                        </td>
+                      </j:if>
+                    </tr>
+                  </j:forEach>
+                </table>
+              </div>
             </div>
           </j:otherwise>
         </j:choose>

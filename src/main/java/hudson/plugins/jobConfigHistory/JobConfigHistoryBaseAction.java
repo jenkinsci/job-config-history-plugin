@@ -70,7 +70,14 @@ import hudson.util.MultipartFormDataParser;
 import jenkins.model.Jenkins;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
-import org.xmlunit.diff.*;
+import org.xmlunit.diff.Comparison;
+import org.xmlunit.diff.ComparisonResult;
+import org.xmlunit.diff.ComparisonType;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.Difference;
+import org.xmlunit.diff.DifferenceEvaluator;
+import org.xmlunit.diff.ElementSelectors;
 
 /**
  * Implements some basic methods needed by the
@@ -213,7 +220,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             //takes the comparison and the result that a possible previous DifferenceEvaluator created for this node
             // and compares the node based on whether there was a version change or not.
             // if there wasn't, "comparisonResult" is returned.
-            //TODO find the name of this software pattern
             @Override
             public ComparisonResult evaluate(Comparison comparison, ComparisonResult comparisonResult) {
                 if (comparison.getType() != ComparisonType.ATTR_VALUE) {
@@ -245,6 +251,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
         return DiffBuilder.compare(Input.fromString(file1Str)).withTest(Input.fromString(file2Str))
                 .ignoreWhitespace()
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
                 //the next line should be used if one wanted to use XMLUnit for the computing of all diffs.
                 //.withDifferenceEvaluator(DifferenceEvaluators.chain(DifferenceEvaluators.Default, versionDifferenceEvaluator))
                 .withDifferenceEvaluator(versionDifferenceEvaluator)
@@ -476,7 +483,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 		final String[] leftLines = sort(leftConfig.getFile()).toString().split("\\n");
 		final String[] rightLines = sort(rightConfig.getFile()).toString().split("\\n");
 
-		//TODO: INCONSISTENCY: leftConfig and rightConfig (XmlFile) are NOT sorted!!! fix this!
 		final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines,
                 rightLines, hideVersionDiffs);
 		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));

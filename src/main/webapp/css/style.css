@@ -1,0 +1,477 @@
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2019, Robin Schulz
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+
+/*
+#####################################################################
+###                     general modification                      ###
+#####################################################################
+###   TODO: cleanse this document of this abomination!
+*/
+
+h1 {
+    text-align:center;
+    font-size:28px;
+}
+
+table {
+    margin-top: 0px;
+    border-spacing: 0;
+    border: 1px solid #ddd;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+
+/*
+#####################################################################
+###                        center class                           ###
+#####################################################################
+*/
+
+table.center {
+    margin-left:auto;
+    margin-right:auto;
+
+    /*experiment*/
+    table-layout:fixed;
+    width:100%;
+    border:none;
+}
+
+table.center th {
+    width:100%;
+}
+
+table.center td {
+    padding:0px;
+    width:100%
+}
+
+/*
+#####################################################################
+###                         pch class                             ###
+###    General class for ensuring not to harm non-pcm elements    ###
+#####################################################################
+*/
+
+input.jch {
+    text-align:center;
+}
+
+
+table.jch body {
+    line-height: 1.42857143;
+    color: #333;
+}
+
+table.jch {
+    width:100%;
+    height:100%;
+}
+
+
+table.jch .caption {
+
+	background-color: #383838;
+    color:white;
+    text-align: center;
+
+    font-weight: bold;
+    font-size: 20px;
+
+	padding: 12px;
+
+	border:1px solid #383838;
+	border-bottom: 0px solid #ddd;
+
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+}
+
+table.jch .subcaption {
+
+	background-color: rgba(56, 56, 56, 0.05);
+    color:black;
+    text-align: left;
+
+    font-weight: bold;
+    font-size: 16px;
+
+	padding: 12px;
+
+	border:none;
+}
+
+table.jch  td {
+    font-size: 12px;
+    text-align: left;
+    vertical-align: middle;
+    border-right: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    padding: 2px;
+}
+
+
+table.jch  th {
+    text-align: left;
+    color: #488cf9;
+    background-color:#efefef;
+
+    font-size: 16px;
+    border-bottom:1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 8px;
+}
+
+
+table.jch tr.alternate:nth-child(even) {
+    background-color: #fbfbfb;
+}
+
+table.jch th:first-child {
+    border-left: 0px;
+}
+
+table.jch th:last-child {
+    border-right: 0px;
+}
+
+table.jch tr td:first-child {
+    border-left:0px;
+}
+
+table.jch tr td:last-child {
+    border-right:0px;
+}
+
+table.jch groupBody td:last-child {
+    border-right:21px;
+}
+
+
+/*
+#####################################################################
+###                      download button                          ###
+#####################################################################
+*/
+
+a.download-arrow {
+
+    font-weight:bold;
+    background-color: #383838;
+    color: white;
+
+    text-decoration:none;
+    border:1px solid #383838;
+    border-radius:3px;
+}
+
+a.download-arrow.big {
+    padding-left:30px;
+    padding-right:30px;
+
+    font-size:30px;
+}
+
+.downloadArrowWrapper {
+    padding-top: 15px;
+}
+
+a.download-arrow.small {
+    padding-left:14px;
+    padding-right:14px;
+
+}
+
+a.download-arrow:hover{
+    background-color: #e8e8e8;
+    color: #383838;
+}
+
+
+/*
+#####################################################################
+###                      table subcaptions                        ###
+#####################################################################
+*/
+
+
+
+
+/*
+#####################################################################
+###                      resize and collapse                      ###
+#####################################################################
+*/
+
+.resizeWrapper {
+    resize: vertical;
+    overflow: auto;
+    max-height:59vh;
+}
+
+.collapseButton {
+  /*background-color:#488cf9;
+  border:1px solid #488cf9;*/
+  background-color: inherit;
+    border:1px solid rgba(56, 56, 56, 0.4);
+
+  border-radius: 3px;
+  height:25px;
+  width:25px;
+  padding:0px;
+
+  display: table-cell;
+  vertical-align: middle;
+
+  color: rgba(0, 0, 0, 0.7);
+  font-weight:bold;
+  text-align:center;
+  float:left;
+  font-size: 8px;
+}
+
+.collapseButtonWrapper {
+    padding-bottom: 8px;
+}
+
+.collapseButton:hover {
+  /*background-color:#4870f9;
+  border:1px solid #4870f9;*/
+  color: grey;
+}
+
+/*No ugly frame around the text*/
+.collapseButton {
+   outline:none;
+}
+.collapseButton::-moz-focus-inner {
+   border: 0;
+}
+
+.collapseableContent {
+  padding: 0 0px;
+  background-color: white;
+  max-height: 0;
+  overflow: hidden;
+}
+
+
+/*
+#####################################################################
+###                        other stuff                            ###
+#####################################################################
+*/
+
+.screenFillingDiv {
+    /*max-height: 70vh; /* For 100% screen height */
+    height: 70vh;
+    width:100%;
+}
+
+table.sortable.jch a.sortheader {
+    color: #488cf9;
+    background-color:#efefef;
+}
+
+.button-wrapper {
+    text-align:center;
+}
+
+.target {
+    color: #287bff;
+}
+
+.button {
+    font-size: 12px;
+}
+
+.standard-button {
+    background-color: #383838;
+    font-weight:bold;
+    color: white;
+    border: 1px solid #383838;
+    border-radius: 2px;
+    padding: 12px;
+    font-size: 14px;
+}
+
+a.standard-button {
+    color: white;
+    outline:none;
+    text-decoration:none;
+}
+
+.standard-button:hover{
+    background-color: #e8e8e8;
+    color: #383838;
+}
+
+.small-button {
+    background-color: rgb(250,250,250);
+    color: rgba(0, 0, 0, 0.7);
+
+    border: 1px solid rgba(56, 56, 56, 0.05);
+    border-radius: 2px;
+
+    padding: 3px;
+
+    font-size: 12px;
+    font-weight:bold;
+
+    outline:none;
+}
+
+span.small-button button {
+    background-color: rgb(250,250,250);
+    color: rgba(0, 0, 0, 0.7);
+
+    border: 1px solid rgba(56, 56, 56, 0.05);
+    border-radius: 2px;
+
+    padding: 3px;
+
+    font-size: 12px;
+    font-weight:bold;
+
+    outline:none;
+}
+
+.small-button::-moz-focus-inner {
+    border: 0;
+}
+
+.small-button:hover{
+    background-color: rgb(200, 200, 200);
+    color: #383838;
+}
+
+.small-button-wrapper {
+    padding: 2px;
+    background-color: rgb(250,250,250);
+    border: 1px solid rgb(232, 232, 232);
+    border-radius:2px;
+}
+
+a.url-button {
+
+    background-color: rgba(56,56,56, 0.08);
+    color: rgba(0, 0, 0, 0.7);
+
+    border: 1px solid rgba(56, 56, 56, 0.05);
+    border-radius: 2px;
+
+    padding: 3px;
+
+    font-size: 13px;
+    font-weight:bold;
+
+    outline:none;
+}
+
+a.url-button:hover{
+    background-color: rgba(56,56,56, 0.4);
+}
+
+.menu-url-button {
+    width:100%;
+
+    background-color: rgb(230,230,230);
+    color: rgba(0, 0, 0, 0.7);
+
+    border: 1px solid rgba(56, 56, 56, 0.05);
+    border-radius: 2px;
+
+    padding: 6px;
+
+    font-size: 12px;
+    font-weight:bold;
+    text-align:center;
+
+    outline:none;
+}
+
+.menu-url-button:hover {
+
+    background-color: rgb(200,200,200);
+}
+
+.menu-url-button a {
+    width:100%;
+    display:block;
+    color: rgba(0, 0, 0, 0.7);
+}
+.menu-url-button a:link {
+}
+
+.restore-button::-moz-focus-inner {
+    border: 0;
+}
+
+div.jch-warning {
+    font-size:15px;
+    font-weight:bold;
+    /*display:inline-block;*/
+
+    padding:10px;
+    text-align:center;
+    border-radius:2px;
+
+    background-color:rgb(255, 169, 42);
+    color:white;
+}
+
+div.jch-warning span.describedElement:hover {
+    color:rgba(255,255,255,0.7)
+}
+
+div.jch-warning span.describedElement {
+    color:rgba(255,255,255,0.9);
+    background-color:rgba(217, 143, 35,0.9);
+    border-radius:3px;
+    padding:2px;
+    padding-top:0px;
+    padding-bottom:0px;
+}
+
+table.no-borders-warning {
+    border: 0;
+}
+table.no-borders-warning td {
+    font-size:14px;
+    color:rgba(0, 0, 0, 0.85);
+    padding-top:5px;
+    text-align:left;
+}
+
+table.no-borders-warning caption {
+    font-size:18px;
+    font-weight:bold;
+    color:rgba(0, 0, 0, 1.0);
+    background-color:rgba(255, 216, 158, 1.0);
+    padding:10px;
+
+    border-radius:2px;
+}
