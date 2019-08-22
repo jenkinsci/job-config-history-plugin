@@ -517,8 +517,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			// but continues as if it did.
 			// Reference https://issues.jenkins-ci.org/browse/JENKINS-8318
 			throw new RuntimeException(
-				"Unable to create history entry for configuration file: "
-					+ xmlFile.getFile().getAbsolutePath(),
+				"Unable to create history entry for configuration file "
+					+ "\"" + xmlFile.getFile().getAbsolutePath() + "\": "
+					+ e.getMessage(),
 				e);
 		}
 	}
@@ -1024,7 +1025,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			// Reference https://issues.jenkins-ci.org/browse/JENKINS-8318
 			throw new RuntimeException(
 				"Unable to create history entry for configuration file of node "
-					+ node.getDisplayName(),
+					+ "\"" + node.getDisplayName() + "\": "
+					+ e.getMessage(),
 				e);
 		}
 	}
