@@ -332,17 +332,19 @@ public class JobConfigHistoryTest {
 	public void testIsSaveable() throws Exception {
 		XmlFile xmlFile = new XmlFile(
 				unpackResourceZip.getResource("jobs/Test1/config.xml"));
+		XmlFile sysConfig = new XmlFile(new File(jenkinsRule.getInstance().getRootDir(), "config.xml"));
+		FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
+		MatrixProject matrixProject = jenkinsRule.createProject(MatrixProject.class, "MatrixProjectTest1");
+
 		JobConfigHistory sut = createNonSavingSut();
 		JSONObject formData = createFormData();
 
 		sut.configure(null, formData);
-		assertTrue(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
-		assertTrue(sut.isSaveable(mock(MatrixProject.class), xmlFile));
+		assertTrue(sut.isSaveable(freeStyleProject, xmlFile));
+		assertTrue(sut.isSaveable(matrixProject, xmlFile));
 		assertTrue(sut.isSaveable(mock(MockFolder.class), xmlFile));
-		assertTrue(sut.isSaveable(null,
-				new XmlFile(unpackResourceZip.getResource("config.xml"))));		
-		assertTrue(sut.isSaveable(mock(TopLevelItem.class),
-				new XmlFile(unpackResourceZip.getResource("config.xml"))));
+		assertTrue(sut.isSaveable(null, sysConfig));
+		assertTrue(sut.isSaveable(freeStyleProject, sysConfig));
 		assertFalse(sut.isSaveable(null, xmlFile));
 		assertFalse(sut.isSaveable(mock(MatrixConfiguration.class), xmlFile));
 	}
