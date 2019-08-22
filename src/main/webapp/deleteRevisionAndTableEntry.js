@@ -1,6 +1,5 @@
 //name is an optional parameter for job deletion history and system config history
 function removeEntryFromTable(id, timestamp, name, message) {
-    console.log("tedst");
     var confirmPhrase = message + timestamp + '?';
     if (confirm(confirmPhrase)) {
         var tableRow = document.getElementById(id);
