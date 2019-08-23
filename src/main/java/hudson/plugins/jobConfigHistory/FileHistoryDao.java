@@ -50,18 +50,19 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import hudson.model.AbstractItem;
+import hudson.model.Item;
+import hudson.model.Node;
+import hudson.model.User;
 import org.apache.commons.io.FileUtils;
 
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
-import hudson.model.AbstractItem;
-import hudson.model.Item;
-import hudson.model.Node;
-import hudson.model.User;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 
 /**
@@ -481,6 +482,85 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			throw new IllegalArgumentException("Could not find " + historyDir);
 		}
 		return new XmlFile(configFile);
+	}
+
+	@Override
+	public void deleteRevision(AbstractItem abstractItem, String identifier) {
+
+		final AbstractItem aItem = (AbstractItem) abstractItem;
+
+		final File configFile = aItem.getConfigFile().getFile();
+		final File currentHistoryDir = getHistoryDir(configFile);
+
+		final File timestampDir;
+		try {
+			timestampDir = getSubDirectory(currentHistoryDir, identifier);
+			try {
+				FileUtils.deleteDirectory(timestampDir);
+			} catch (IOException e) {
+				LOG.log(Level.WARNING, "unable to delete revision {0}: {1}", new Object[]{identifier, e.getMessage()});
+			}
+		} catch (FileNotFoundException e) {
+			LOG.log(Level.WARNING, "unable to delete revision {0}: file not found.", identifier);
+		}
+		LOG.log(FINEST, "{0} \'s revision {1} deleted.", new Object[]{abstractItem.getFullName(), identifier});
+	}
+
+	@Override
+	public void deleteRevision(Node node, String identifier) {
+		final File timestampDir = getOldRevision(node, identifier).getFile().getParentFile();
+		try {
+			FileUtils.deleteDirectory(timestampDir);
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, "unable to delete revision {0}: {1}", new Object[]{identifier, e.getMessage()});
+		}
+		LOG.log(FINEST, "{0} \'s revision {1} deleted.", new Object[]{node.getDisplayName(), identifier});
+	}
+
+	@Override
+	public void deleteRevision(File historyDir, String identifier) {
+		final File timestampDir;
+		try {
+			timestampDir = getSubDirectory(historyDir, identifier);
+			try {
+				FileUtils.deleteDirectory(timestampDir);
+			} catch (IOException e) {
+				LOG.log(Level.WARNING, "unable to delete revision {0}: {1}", new Object[]{identifier, e.getMessage()});
+			}
+		} catch (FileNotFoundException e) {
+			LOG.log(Level.WARNING, "unable to delete revision {0}: file not found.", identifier);
+		}
+		LOG.log(FINEST, "{0} \'s revision {1} deleted.", new Object[]{historyDir.getName(), identifier});
+	}
+
+	@Override
+	public boolean revisionEqualsCurrent(AbstractItem project, String identifier1) {
+
+		try {
+			return FileUtils.contentEquals(
+				getConfigFile(getSubDirectory(getHistoryDir(project), identifier1)),
+				project.getConfigFile().getFile()
+			);
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, " could not access config file while trying to check revision equality.");
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	@Override
+	public boolean revisionEqualsCurrent(Node node, String identifier1) {
+		String currentContent = Jenkins.XSTREAM2.toXML(node);
+		try {
+			return StringUtils.equals(
+				FileUtils.readFileToString(getOldRevision(node, identifier1).getFile()),
+				currentContent
+			);
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, " could not access config file while trying to check revision equality.");
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override

@@ -24,6 +24,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.FINEST;
+import static java.util.logging.Level.WARNING;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -33,13 +34,16 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 
+import jenkins.model.Jenkins;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
@@ -271,6 +275,11 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	@Override
 	public void checkConfigurePermission() {
 		getAccessControlledObject().checkPermission(Permission.CONFIGURE);
+	}
+
+	@Override
+	public boolean hasAdminPermission() {
+		return getAccessControlledObject().hasPermission(Jenkins.ADMINISTER);
 	}
 
 	@Override
@@ -532,6 +541,22 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 			StaplerResponse rsp) throws IOException {
 		final String name = req.getParameter("name");
 		rsp.sendRedirect("restoreQuestion?name=" + name);
+	}
+
+	public final void doDeleteRevision(StaplerRequest req, StaplerResponse rsp) {
+		final String timestamp = req.getParameter("timestamp");
+		final String name = req.getParameter("name");
+		final File[] candidatesArray = (name.contains(DeletedFileFilter.DELETED_MARKER)) ? getOverviewHistoryDao().getDeletedJobs() : getOverviewHistoryDao().getSystemConfigs();
+		final List<File> candidates = Arrays.stream(candidatesArray).filter(file -> file.getName().equals(name)).collect(Collectors.toList());
+
+		if (candidates.size() == 1) {
+			getHistoryDao().deleteRevision(candidates.get(0), timestamp);
+		} else {
+			LOG.log(WARNING, "there should be only one entry for \"{0}\". Instead there are {1}",
+				new Object[]{name, candidates.size()}
+			);
+		}
+
 	}
 
 	/**

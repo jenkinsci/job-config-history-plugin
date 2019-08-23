@@ -111,6 +111,9 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	}
 
 	@Override
+	public boolean hasAdminPermission() { return getAccessControlledObject().hasPermission(Jenkins.ADMINISTER); }
+
+	@Override
 	public boolean hasConfigurePermission() {
 		return getAccessControlledObject().hasPermission(Computer.CONFIGURE);
 	}
@@ -387,6 +390,17 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 			StaplerResponse rsp) throws IOException {
 		final String timestamp = req.getParameter("timestamp");
 		rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
+	}
+
+	public final void doDeleteRevision(StaplerRequest req, StaplerResponse rsp) {
+		final String timestamp = req.getParameter("timestamp");
+		PluginUtils.getHistoryDao().deleteRevision(this.getSlave(), timestamp);
+		//do nothing with the rsp
+	}
+
+	public boolean revisionEqualsCurrent(String timestamp) {
+		//going over Jenkins.get().getNode(..) is necessary because this.getSlave returns an old version of the node.
+		return PluginUtils.getHistoryDao().revisionEqualsCurrent(Jenkins.getInstance().getNode(this.getSlave().getNodeName()), timestamp);
 	}
 
 	/**

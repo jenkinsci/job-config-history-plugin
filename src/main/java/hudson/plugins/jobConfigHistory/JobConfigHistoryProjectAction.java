@@ -39,6 +39,7 @@ import java.util.SortedMap;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import hudson.security.Permission;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
@@ -214,6 +215,9 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	public void checkConfigurePermission() {
 		getAccessControlledObject().checkPermission(Item.CONFIGURE);
 	}
+
+	@Override
+	public boolean hasAdminPermission() { return getAccessControlledObject().hasPermission(Jenkins.ADMINISTER); }
 
 	@Override
 	public boolean hasConfigurePermission() {
@@ -440,6 +444,16 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 			StaplerResponse rsp) throws IOException {
 		final String timestamp = req.getParameter("timestamp");
 		rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
+	}
+
+	public final void doDeleteRevision(StaplerRequest req, StaplerResponse rsp) {
+		final String timestamp = req.getParameter("timestamp");
+		PluginUtils.getHistoryDao().deleteRevision(this.getProject(), timestamp);
+		//do nothing with the rsp
+	}
+
+	public boolean revisionEqualsCurrent(String timestamp) {
+		return PluginUtils.getHistoryDao().revisionEqualsCurrent(this.getProject(), timestamp);
 	}
 
 	/**

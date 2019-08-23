@@ -29,6 +29,8 @@
           <h1>${%System Configuration History}</h1>
         </j:otherwise>
       </j:choose>
+
+      <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"></script>
       <j:set var="configs" value="${it.getSingleConfigs(name)}" />
       <div>
         <j:choose>
@@ -67,13 +69,16 @@
                         <th>${%Show File}</th>
                         <th style="text-align:center">${%File A}</th>
                         <th style="text-align:center">${%File B}</th>
+                        <j:if test="${it.hasAdminPermission()}">
+                          <th style="text-align:center">Delete Entry</th>
+                        </j:if>
                       </tr>
                     </thead>
 
                     <j:set var="configNr" value="0"/>
                     <j:forEach var="config" items="${configs}">
                       <j:set var="configNr" value="${configNr + 1}"/>
-                      <tr class="alternate">
+                      <tr class="alternate" id="table-row-${configNr}">
                         <td>${config.date}</td>
                         <td>${config.operation}</td>
                         <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
@@ -99,6 +104,17 @@
                         <td style="text-align:center">
                           <j:if test="${config.operation != 'Deleted'}">
                             <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == (1 + offsetIfDeleted) ? true:false}" />
+                          </j:if>
+                        </td>
+
+                        <td style="text-align:center">
+                          <j:if test="${it.hasAdminPermission()}">
+                            <j:if test="${!config.operation.toString().equals(&quot;Deleted&quot;)}">
+                              <j:set var="message" value="${%Do you really want to delete the history entry }"/>
+                              <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', '${config.getJob()}', '${message}')" value="X">
+                                <img src="${resURL}/images/16x16/stop.png" alt="Delete Revision"/>
+                              </button>
+                            </j:if>
                           </j:if>
                         </td>
                       </tr>

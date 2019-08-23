@@ -23,6 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import java.io.File;
 import java.util.SortedMap;
 
 import hudson.XmlFile;
@@ -119,6 +120,23 @@ public interface HistoryDao {
 	 * @return old configuration.
 	 */
 	XmlFile getOldRevision(String configFileName, String identifier);
+
+	/**
+	 * Permanently delete the given revision.
+	 *
+	 * @param item item
+	 * @param identifier timestamp or hash
+	 */
+	void deleteRevision(AbstractItem item, String identifier);
+
+
+	public abstract void deleteRevision(Node node, String identifier);
+
+	public abstract void deleteRevision(File historyDir, String identifier);
+
+	public abstract boolean revisionEqualsCurrent(AbstractItem project, String identifier1);
+
+	public abstract boolean revisionEqualsCurrent(Node node, String identifier1);
 
 	/**
 	 * Returns whether the revision exists.

@@ -8,6 +8,8 @@
     <l:main-panel>
       <h1>${%Job Configuration History}</h1>
       <div>
+
+        <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"></script>
         <script type="text/javascript">
           function showTooltip(nr) {
             document.getElementById('tooltip' + nr).style.visibility = 'visible';
@@ -53,13 +55,16 @@
                         </j:if>
                         <th style="text-align:center">${%File A}</th>
                         <th style="text-align:center">${%File B}</th>
+                        <j:if test="${it.hasAdminPermission()}">
+                          <th style="text-align:center">Delete Entry</th>
+                        </j:if>
                       </tr>
                     </thead>
                     <tbody>
                       <j:set var="configNr" value="0"/>
                       <j:forEach var="config" items="${configs}">
                         <j:set var="configNr" value="${configNr + 1}"/>
-                        <tr class="alternate">
+                        <tr class="alternate" id="table-row-${configNr}">
                           <td>${config.date}</td>
                           <td>
                             <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
@@ -88,10 +93,18 @@
                           </td>
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                             <td style="text-align:center">
-                              <j:if test="${configNr > 1 and !fileMissing}">
+                              <j:set var="revisionEqualsCurrent" value="${it.revisionEqualsCurrent(config.getDate())}"/>
+                              <j:if test="${!revisionEqualsCurrent and !fileMissing}">
                                 <a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
                                   <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
                                 </a>
+                                <j:if test="${configNr == 1}">
+                                  <!--The current version is not present in history!-->
+                                  <br/>
+                                  <span style="color: rgb(196, 109, 0); font-weight:bold;">
+                                    ${%Warning: this is the latest revision in history, but not the current config. Save config to create a current entry.}
+                                  </span>
+                                </j:if>
                               </j:if>
                             </td>
                           </j:if>
@@ -106,6 +119,15 @@
                           <td style="border-left: solid 1px #bbb; text-align:center">
                             <j:if test="${!fileMissing}">
                               <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" />
+                            </j:if>
+                          </td>
+
+                          <td style="text-align:center">
+                            <j:if test="${it.hasAdminPermission()}">
+                              <j:set var="message" value="${%Do you really want to delete the history entry }"/>
+                              <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
+                                <img src="${resURL}/images/16x16/stop.png" alt="Delete Revision"/>
+                              </button>
                             </j:if>
                           </td>
                         </tr>
