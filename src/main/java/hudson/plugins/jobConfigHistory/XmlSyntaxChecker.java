@@ -23,9 +23,12 @@ public class XmlSyntaxChecker {
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			builder.setErrorHandler(new ErrorHandler() {
-				private static final String ERROR_STR = "Error occured while checking xml parsability: ";
-				private static final String WARNING_STR = "Warning occured while checking xml parsability: ";
-				private static final String FATAL_ERROR_STR = "Fatal error occured while checking xml parsability: ";
+
+
+
+				private final String ERROR_STR = Messages.XmlSyntaxChecker_error();
+				private final String WARNING_STR = Messages.XmlSyntaxChecker_warning();
+				private final String FATAL_ERROR_STR = Messages.XmlSyntaxChecker_fatalError();
 				private String getMessage(String prefix, Exception exception) { return prefix + exception.getMessage(); }
 
 				@Override
@@ -48,13 +51,13 @@ public class XmlSyntaxChecker {
 				builder.parse(xmlFile);
 			} catch (SAXException | IOException exception) {
 
-				message[0] = exception.getClass().getSimpleName() + " occured while checking xml parsability: " + exception.getMessage();
+				message[0] = exception.getClass().getSimpleName() + Messages.XmlSyntaxChecker_occuredWhile() + exception.getMessage();
 				wellFormatted[0] = false;
 			}
 
 		} catch (ParserConfigurationException exception) {
 
-			message[0] = "ParserConfigurationException occured while checking xml parsability: " + exception.getMessage();
+			message[0] = "ParserConfigurationException" + Messages.XmlSyntaxChecker_occuredWhile() + exception.getMessage();
 			wellFormatted[0] = false;
 		}
 		return new Answer(message[0], wellFormatted[0]);
