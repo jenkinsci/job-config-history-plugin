@@ -205,7 +205,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         try {
             return new GetDiffLines(diffLines).get();
         } catch (DiffException e) {
-            LOG.log(Level.SEVERE, "DiffException occurred while trying to get diffs: {0}" + e.getMessage());
+            LOG.log(Level.SEVERE, "DiffException occurred while trying to get diffs: {0}", e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -344,7 +344,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         try {
             patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
         } catch (DiffException e) {
-            LOG.log(Level.SEVERE, "DiffException occurred while trying to calculate diffs: {0}" + e.getMessage());
+            LOG.log(Level.SEVERE, "DiffException occurred while trying to calculate diffs: {0}", e.getMessage());
             return "";
         }
         if (hideVersionDiffs) {
