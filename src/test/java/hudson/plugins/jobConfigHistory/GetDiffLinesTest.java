@@ -29,6 +29,7 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.util.List;
 
+import com.github.difflib.algorithm.DiffException;
 import org.junit.Test;
 
 /**
@@ -41,7 +42,7 @@ public class GetDiffLinesTest {
 	 * Test of get method, of class GetDiffLines.
 	 */
 	@Test
-	public void testGet() throws IOException {
+	public void testGet() throws IOException, DiffException {
 		GetDiffLines sut = createGetDiffLines();
 		List<SideBySideView.Line> result = sut.get();
 		assertEquals(24, result.size());

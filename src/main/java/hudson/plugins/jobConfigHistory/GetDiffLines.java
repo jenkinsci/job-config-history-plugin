@@ -23,16 +23,20 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.github.difflib.UnifiedDiffUtils;
+import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.Chunk;
+import com.github.difflib.patch.Patch;
+import com.github.difflib.text.DiffRow;
+import com.github.difflib.text.DiffRowGenerator;
 import org.apache.commons.lang.StringUtils;
-
-import difflib.Chunk;
-import difflib.Delta;
-import difflib.DiffRow;
-import difflib.DiffRowGenerator;
-import difflib.DiffUtils;
-import difflib.Patch;
 
 /**
  * Returns side-by-side (i.e. human-readable) diff view lines.
@@ -41,6 +45,8 @@ import difflib.Patch;
  * @author Kojima Takanori
  */
 public class GetDiffLines {
+
+	private static final Logger LOG = Logger.getLogger(GetDiffLines.class.getName());
 
 	/**
 	 * Lines.
@@ -62,7 +68,8 @@ public class GetDiffLines {
 	 *            to construct the {@link SideBySideView} for.
 	 */
 	public GetDiffLines(List<String> diffLines) {
-		final DiffRowGenerator.Builder builder = new DiffRowGenerator.Builder();
+
+		final DiffRowGenerator.Builder builder = DiffRowGenerator.create();
 		builder.columnWidth(Integer.MAX_VALUE);
 		dfg = builder.build();
 		this.diffLines = diffLines;
@@ -74,11 +81,12 @@ public class GetDiffLines {
 	 *
 	 * @return list of {@link SideBySideView} lines.
 	 */
-	public List<SideBySideView.Line> get() {
-		final Patch diff = DiffUtils.parseUnifiedDiff(diffLines);
+	public List<SideBySideView.Line> get() throws DiffException {
+
+		final Patch<String> diff = UnifiedDiffUtils.parseUnifiedDiff(diffLines);
 		int previousLeftPos = 0;
-		for (final Delta delta : diff.getDeltas()) {
-			previousLeftPos = deltaLoop(delta, previousLeftPos);
+		for (final AbstractDelta delta : diff.getDeltas()) {
+				previousLeftPos = deltaLoop(delta, previousLeftPos);
 		}
 		view.clearDuplicateLines();
 		return view.getLines();
@@ -100,7 +108,7 @@ public class GetDiffLines {
 		/**
 		 * delta.
 		 */
-		private final Delta delta;
+		private final AbstractDelta delta;
 		/**
 		 * Current leftPos.
 		 */
@@ -120,7 +128,7 @@ public class GetDiffLines {
 		 *            delta
 		 */
 		public DeltaLoop(SideBySideView view, DiffRowGenerator dfg,
-				Delta delta) {
+				AbstractDelta delta) {
 			this.view = view;
 			this.dfg = dfg;
 			this.delta = delta;
@@ -133,9 +141,9 @@ public class GetDiffLines {
 		 *            previous indentation
 		 * @return current indentation
 		 */
-		int loop(int previousLeftPos) {
-			final Chunk original = delta.getOriginal();
-			final Chunk revised = delta.getRevised();
+		int loop(int previousLeftPos) throws DiffException {
+			final Chunk original = delta.getSource();
+			final Chunk revised = delta.getTarget();
 			@SuppressWarnings("unchecked")
 			final List<DiffRow> diffRows = dfg.generateDiffRows(
 					(List<String>) original.getLines(),
@@ -219,7 +227,7 @@ public class GetDiffLines {
 	 *
 	 * @return new previousLeftPos
 	 */
-	int deltaLoop(final Delta delta, int previousLeftPos) {
+	int deltaLoop(final AbstractDelta<String> delta, int previousLeftPos) throws DiffException {
 		return new DeltaLoop(view, dfg, delta).loop(previousLeftPos);
 	}
 
