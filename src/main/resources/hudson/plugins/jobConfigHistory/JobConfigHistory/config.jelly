@@ -21,11 +21,16 @@
         <f:textbox name="excludePattern" value="${it.excludePattern}" default="${it.defaultExcludePattern}"
            checkUrl="'${rootURL}/plugin/jobConfigHistory/checkExcludePattern?value='+escape(this.value)"/>
       </f:entry>
-      <f:entry title="${%Do not save duplicate history}" help="/plugin/jobConfigHistory/help/help-skipDuplicateHistory.html">
-        <f:checkbox name="skipDuplicateHistory" checked="${it.skipDuplicateHistory}"/>
+      <f:entry help="/plugin/jobConfigHistory/help/help-skipDuplicateHistory.html">
+        <f:checkbox name="skipDuplicateHistory"
+            title="${%Do not save duplicate history}"
+            checked="${it.skipDuplicateHistory}"/>
       </f:entry>
-      <f:entry title="${%Save Maven module configuration changes}" help="/plugin/jobConfigHistory/help/help-saveModuleConfiguration.html">
-        <f:checkbox name="saveModuleConfiguration" checked="${it.saveModuleConfiguration}"/>
+      <f:entry help="/plugin/jobConfigHistory/help/help-saveModuleConfiguration.html">
+        <f:checkbox
+            title="${%Save Maven module configuration changes}"
+            name="saveModuleConfiguration"
+            checked="${it.saveModuleConfiguration}"/>
       </f:entry>
       <f:entry title="${%Show build badges}" help="/plugin/jobConfigHistory/help/help-showBuildBadges.html">
         <f:radio name="showBuildBadges" title="${%Never}" value="never" checked="${it.getShowBuildBadges() == 'never'}"/>
