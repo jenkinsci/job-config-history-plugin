@@ -39,7 +39,10 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
-import hudson.model.*;
+import hudson.model.AbstractProject;
+import hudson.model.Descriptor;
+import hudson.model.FreeStyleProject;
+import hudson.model.TopLevelItem;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -48,11 +51,9 @@ import org.jvnet.hudson.test.MockFolder;
 import hudson.XmlFile;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
-import hudson.security.ACL;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.StaplerRequest;
 
 /**
  * @author Mirko Friedenhagen

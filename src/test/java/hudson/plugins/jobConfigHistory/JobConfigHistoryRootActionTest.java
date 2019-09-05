@@ -25,7 +25,6 @@ package hudson.plugins.jobConfigHistory;
 
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -43,12 +42,12 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import hudson.XmlFile;
 import hudson.model.FreeStyleProject;
 import hudson.model.JDK;
-import org.junit.*;
+import org.junit.Rule;
+import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
-import hudson.security.ACL;
 import jenkins.model.Jenkins;
 
 /**

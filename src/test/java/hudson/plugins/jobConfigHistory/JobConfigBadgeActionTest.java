@@ -27,22 +27,22 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.SortedMap;
 
-import hudson.model.*;
-import jenkins.util.TimeDuration;
-import org.junit.Ignore;
+import hudson.model.Build;
+import hudson.model.FreeStyleProject;
+import hudson.model.ItemGroup;
+import hudson.model.Job;
+import hudson.model.Project;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import org.junit.Rule;
 import org.junit.Test;
 
 import org.jvnet.hudson.test.JenkinsRule;
-import org.mockito.Matchers;
-
-import javax.servlet.ServletException;
 
 /**
  *
