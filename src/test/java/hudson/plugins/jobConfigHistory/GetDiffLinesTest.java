@@ -65,5 +65,4 @@ public class GetDiffLinesTest {
 		final List<String> lines = TUtils.readResourceLines(resourceName);
 		return new GetDiffLines(lines);
 	}
-
 }

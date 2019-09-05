@@ -25,27 +25,35 @@ package hudson.plugins.jobConfigHistory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
-
-import org.junit.Ignore;
-import org.junit.Test;
+import java.util.SortedMap;
 
 import hudson.model.Build;
+import hudson.model.FreeStyleProject;
 import hudson.model.ItemGroup;
 import hudson.model.Job;
 import hudson.model.Project;
+import hudson.model.Run;
 import hudson.model.TaskListener;
+import org.junit.Rule;
+import org.junit.Test;
+
+import org.jvnet.hudson.test.JenkinsRule;
 
 /**
  *
  * @author Mirko Friedenhagen
  */
 public class JobConfigBadgeActionTest {
+
+	@Rule
+	public JenkinsRule jenkinsRule = new JenkinsRule();
 
 	private static final String ROOT_URL = "http://example.org/jenkins";
 	private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
@@ -83,51 +91,62 @@ public class JobConfigBadgeActionTest {
 	 * Test of showBadge method, of class JobConfigBadgeAction.
 	 */
 	@Test
-	public void testShowBadge() {
-		boolean expResult = false;
-		when(mockedPlugin.showBuildBadges(mockedProject)).thenReturn(expResult);
-		sut.onAttached(mockedBuild);
-		boolean result = sut.showBadge();
-		assertEquals(expResult, result);
+	public void testShowBadge() throws Exception {
+		FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
+		jenkinsRule.buildAndAssertSuccess(project);
+		Run build = project.getBuilds().get(0);
+
+		sut.onAttached(build);
+		assertEquals(true, sut.showBadge());
 	}
 
 	/**
 	 * Test of oldConfigsExist method, of class JobConfigBadgeAction.
 	 */
-	@Ignore("TODO: find out what is wrong")
 	@Test
-	public void testOldConfigsExist() {
-		when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(),
-				configDates[0])).thenReturn(true);
-		when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(),
-				configDates[1])).thenReturn(true);
-		boolean expResult = true;
-		sut.onAttached(mockedBuild);
-		boolean result = sut.oldConfigsExist();
-		assertEquals(expResult, result);
+	public void testOldConfigsExist() throws Exception {
+		FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
+		jenkinsRule.buildAndAssertSuccess(project);
+		Run build = project.getBuilds().get(0);
+
+		SortedMap<String, HistoryDescr> revisions = PluginUtils.getHistoryDao().getJobHistory(project.getFullName());
+		assertEquals(2, revisions.size());
+
+		JobConfigBadgeAction customSut = createSut(revisions.lastKey(), revisions.firstKey());
+		customSut.onAttached(build);
+		assertEquals(true, customSut.oldConfigsExist());
 	}
 
 	@Test
-	public void testOldConfigsExistFalse() {
-		when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(),
-				configDates[0])).thenReturn(true);
-		when(mockedHistoryDao.hasOldRevision(mockedProject.getConfigFile(),
-				configDates[1])).thenReturn(false);
-		boolean expResult = false;
-		sut.onAttached(mockedBuild);
-		boolean result = sut.oldConfigsExist();
-		assertEquals(expResult, result);
+	public void testOldConfigsExistFalse() throws Exception {
+		FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
+		jenkinsRule.buildAndAssertSuccess(project);
+		Run build = project.getBuilds().get(0);
+
+		SortedMap<String, HistoryDescr> revisions = PluginUtils.getHistoryDao().getJobHistory(project.getFullName());
+		assertEquals(2, revisions.size());
+
+		sut.onAttached(build);
+		assertEquals(false, sut.oldConfigsExist());
 	}
+
 
 	/**
 	 * Test of createLink method, of class JobConfigBadgeAction.
 	 */
 	@Test
-	public void testCreateLink() {
-		String expResult = "http://example.org/jenkins/jobs/jobnamejobConfigHistory/showDiffFiles?timestamp1=2013_01_02&timestamp2=2013_01_01";
-		sut.onAttached(mockedBuild);
-		String result = sut.createLink();
-		assertEquals(expResult, result);
+	public void testCreateLink() throws Exception {
+		String timestampRegex = "[0-9\\-_]+";
+
+		String expectedRegex =
+			"http://localhost:[0-9]{1,5}?/jenkins/job/Test1/jobConfigHistory/showDiffFiles\\?timestamp1=" + timestampRegex
+			+ "&timestamp2=" + timestampRegex;
+		FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
+		jenkinsRule.buildAndAssertSuccess(project);
+		Run build = project.getBuilds().get(0);
+
+		sut.onAttached(build);
+		assertTrue(sut.createLink().matches(expectedRegex));
 	}
 
 	/**
@@ -226,23 +245,10 @@ public class JobConfigBadgeActionTest {
 	}
 
 	JobConfigBadgeAction createSut() {
-		return new JobConfigBadgeAction(configDates) {
+		return new JobConfigBadgeAction(configDates);
+	}
 
-			@Override
-			JobConfigHistory getPlugin() {
-				return mockedPlugin;
-			}
-
-			@Override
-			HistoryDao getHistoryDao() {
-				return mockedHistoryDao;
-			}
-
-			@Override
-			String getRootUrl() {
-				return ROOT_URL;
-			}
-
-		};
+	JobConfigBadgeAction createSut(String timestamp1, String timestamp2) {
+		return new JobConfigBadgeAction(new String[]{timestamp1, timestamp2});
 	}
 }

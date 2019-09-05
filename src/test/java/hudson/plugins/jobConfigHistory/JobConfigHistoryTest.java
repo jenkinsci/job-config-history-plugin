@@ -39,18 +39,18 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
+import hudson.model.AbstractProject;
+import hudson.model.Descriptor;
+import hudson.model.FreeStyleProject;
+import hudson.model.TopLevelItem;
 import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.MockFolder;
 
 import hudson.XmlFile;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
-import hudson.model.AbstractProject;
-import hudson.model.Descriptor;
-import hudson.model.TopLevelItem;
-import hudson.model.User;
-import hudson.security.ACL;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
@@ -61,16 +61,17 @@ import net.sf.json.JSONObject;
 public class JobConfigHistoryTest {
 
 	@Rule
-	public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.create();
+	public JenkinsRule jenkinsRule = new JenkinsRule();
 
-	private final User mockedUser = mock(User.class);
+	@Rule
+	public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.create();
 
 	/**
 	 * Test of configure method, of class JobConfigHistory.
 	 */
 	@Test
 	public void testConfigure() throws Exception {
-		JobConfigHistory sut = createSut();
+		JobConfigHistory sut = createNonSavingSut();
 		sut.configure(null, createFormData());
 	}
 
@@ -79,7 +80,7 @@ public class JobConfigHistoryTest {
 	 */
 	@Test
 	public void testGetHistoryRootDir() throws Exception {
-		JobConfigHistory sut = createSut();
+		JobConfigHistory sut = createNonSavingSut();
 		sut.configure(null, createFormData());
 		assertThat(sut.getHistoryRootDir(), endsWith("config-history"));
 	}
@@ -98,7 +99,7 @@ public class JobConfigHistoryTest {
 	 */
 	@Test
 	public void testGetMaxHistoryEntries() throws Exception {
-		JobConfigHistory sut = createSut();
+		JobConfigHistory sut = createNonSavingSut();
 		sut.configure(null, createFormData());
 		String expResult = "5";
 		String result = sut.getMaxHistoryEntries();
@@ -127,7 +128,7 @@ public class JobConfigHistoryTest {
 	 */
 	@Test
 	public void testGetEntriesPerSite() throws Exception {
-		JobConfigHistory sut = createSut();
+		JobConfigHistory sut = createNonSavingSut();
 		sut.configure(null, createFormData());
 		String expResult = "50";
 		String result = sut.getMaxEntriesPerPage();
@@ -156,7 +157,7 @@ public class JobConfigHistoryTest {
 	 */
 	@Test
 	public void testGetMaxDaysToKeepEntries() throws Exception {
-		JobConfigHistory sut = createSut();
+		JobConfigHistory sut = createNonSavingSut();
 		sut.configure(null, createFormData());
 		assertEquals("5", sut.getMaxDaysToKeepEntries());
 	}
@@ -206,7 +207,7 @@ public class JobConfigHistoryTest {
 	 */
 	@Test
 	public void testGetExcludePattern() throws Exception {
-		JobConfigHistory sut = createSut();
+		JobConfigHistory sut = createNonSavingSut();
 		sut.configure(null, createFormData());
 		String result = sut.getExcludePattern();
 		assertEquals(JobConfigHistoryConsts.DEFAULT_EXCLUDE, result);
@@ -272,15 +273,20 @@ public class JobConfigHistoryTest {
 	 * Test of showBuildBadges method, of class JobConfigHistory.
 	 */
 	@Test
-	public void testShowBuildBadgesAdminUser() {
+	public void testShowBuildBadgesAdminUser() throws IOException {
+		FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
+
 		JobConfigHistory sut = createSut();
-		AbstractProject<?, ?> mockedProject = mock(AbstractProject.class);
-		ACL mockedACL = mock(ACL.class);
-		when(mockedACL.hasPermission(Jenkins.ADMINISTER)).thenReturn(true, false);
-		when(sut.getJenkins().getACL()).thenReturn(mockedACL, mockedACL);
+		JobConfigHistory unauthorizedSut = createUnauthorizedSut();
+
+		//default: always
+		assertTrue(sut.showBuildBadges(freeStyleProject));
+		assertTrue(unauthorizedSut.showBuildBadges(freeStyleProject));
+
 		sut.setShowBuildBadges("adminUser");
-		assertTrue(sut.showBuildBadges(mockedProject));
-		assertFalse(sut.showBuildBadges(mockedProject));
+		unauthorizedSut.setShowBuildBadges("adminUser");
+		assertTrue(sut.showBuildBadges(freeStyleProject));
+		assertFalse(unauthorizedSut.showBuildBadges(freeStyleProject));
 	}
 
 	/**
@@ -299,7 +305,7 @@ public class JobConfigHistoryTest {
 	 */
 	@Test
 	public void testGetConfiguredHistoryRootDir() throws Exception {
-		JobConfigHistory sut = createSut();
+		JobConfigHistory sut = createNonSavingSut();
 		assertEquals(
 				new File(sut.getConfiguredHistoryRootDir().getPath()).getName(),
 				"config-history");
@@ -327,17 +333,19 @@ public class JobConfigHistoryTest {
 	public void testIsSaveable() throws Exception {
 		XmlFile xmlFile = new XmlFile(
 				unpackResourceZip.getResource("jobs/Test1/config.xml"));
-		JobConfigHistory sut = createSut();
+		XmlFile sysConfig = new XmlFile(new File(jenkinsRule.getInstance().getRootDir(), "config.xml"));
+		FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
+		MatrixProject matrixProject = jenkinsRule.createProject(MatrixProject.class, "MatrixProjectTest1");
+
+		JobConfigHistory sut = createNonSavingSut();
 		JSONObject formData = createFormData();
 
 		sut.configure(null, formData);
-		assertTrue(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
-		assertTrue(sut.isSaveable(mock(MatrixProject.class), xmlFile));
+		assertTrue(sut.isSaveable(freeStyleProject, xmlFile));
+		assertTrue(sut.isSaveable(matrixProject, xmlFile));
 		assertTrue(sut.isSaveable(mock(MockFolder.class), xmlFile));
-		assertTrue(sut.isSaveable(null,
-				new XmlFile(unpackResourceZip.getResource("config.xml"))));		
-		assertTrue(sut.isSaveable(mock(TopLevelItem.class),
-				new XmlFile(unpackResourceZip.getResource("config.xml"))));
+		assertTrue(sut.isSaveable(null, sysConfig));
+		assertTrue(sut.isSaveable(freeStyleProject, sysConfig));
 		assertFalse(sut.isSaveable(null, xmlFile));
 		assertFalse(sut.isSaveable(mock(MatrixConfiguration.class), xmlFile));
 	}
@@ -345,7 +353,7 @@ public class JobConfigHistoryTest {
 	@Test
 	public void testIsSaveableWithExcludesPattern()
 			throws IOException, ServletException, Descriptor.FormException {
-		JobConfigHistory sut = createSut();
+		JobConfigHistory sut = createNonSavingSut();
 		File jenkinsHome = sut.getJenkinsHome();
 		String filePath = String.join(File.separator, "jobs", "multiple-branch", "branches", "master", "config.xml");
 		XmlFile xmlFile = new XmlFile(new File(jenkinsHome, filePath));
@@ -409,33 +417,26 @@ public class JobConfigHistoryTest {
 		assertNotEquals(expectedResult, sut.doCheckExcludePattern("[.*"));
 	}
 
-	private JobConfigHistory createSut() {
+	private JobConfigHistory createUnauthorizedSut() {
 		return new JobConfigHistory() {
-
-			Jenkins mockedJenkins = mock(Jenkins.class);
-
-			@Override
-			protected HistoryDao getHistoryDao() {
-				return new FileHistoryDao(
-						unpackResourceZip.getResource("config-history"),
-						getJenkinsHome(), mockedUser, 0, false);
-			}
-
-			@Override
-			protected File getJenkinsHome() {
-				return unpackResourceZip.getRoot();
-			}
-
 			@Override
 			public Jenkins getJenkins() {
-				return mockedJenkins;
+				Jenkins ret = mock(Jenkins.class);
+				return mock(Jenkins.class);
 			}
+		};
+	}
 
+	private JobConfigHistory createSut() {
+		return new JobConfigHistory();
+	}
+
+	private JobConfigHistory createNonSavingSut() {
+		return new JobConfigHistory() {
 			@Override
 			public void save() {
-				//
+				//do nothing
 			}
-
 		};
 	}
 

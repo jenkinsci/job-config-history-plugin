@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -64,12 +65,16 @@ import hudson.model.AbstractItem;
 import hudson.model.Node;
 import hudson.model.User;
 import jenkins.model.Jenkins;
+import org.jvnet.hudson.test.JenkinsRule;
 
 /**
  *
  * @author Mirko Friedenhagen
  */
 public class FileHistoryDaoTest {
+
+	@Rule
+	public JenkinsRule jenkinsRule = new JenkinsRule();
 
 	@Rule
 	public final UnpackResourceZip unpackResourceZip = UnpackResourceZip
@@ -749,10 +754,11 @@ public class FileHistoryDaoTest {
 	@Test
 	public void testGetRevisions() throws Exception {
 		when(mockedNode.getNodeName()).thenReturn("slave1");
-		createNodeRevision("2014-01-18_10-12-34", mockedNode);
-		createNodeRevision("2014-01-19_10-12-34", mockedNode);
-		createNodeRevision("2014-01-20_10-12-34", mockedNode);
-		createNodeRevision("2014-01-20_10-21-34", mockedNode);
+		createNodeRevisionManually("2014-01-18_10-12-34", getRandomConfigXml(),getHistoryXmlFromTimestamp("2014-01-18_10-12-34"));
+		createNodeRevisionManually("2014-01-19_10-12-34", getRandomConfigXml(),getHistoryXmlFromTimestamp("2014-01-19_10-12-34"));
+		createNodeRevisionManually("2014-01-20_10-12-34", getRandomConfigXml(),getHistoryXmlFromTimestamp("2014-01-20_10-12-34"));
+		createNodeRevisionManually("2014-01-20_10-21-34", getRandomConfigXml(),getHistoryXmlFromTimestamp("2014-01-20_10-21-34"));
+
 		SortedMap<String, HistoryDescr> revisions = sutWithUserAndNoDuplicateHistory
 				.getRevisions(mockedNode);
 		assertNotNull("Revision 2014-01-18_10-12-34 should be returned.",
@@ -763,6 +769,44 @@ public class FileHistoryDaoTest {
 				revisions.get("2014-01-20_10-12-34"));
 		assertNotNull("Revision 2014-01-20_10-21-34 should be returned.",
 				revisions.get("2014-01-20_10-21-34"));
+	}
+
+	private File createNodeRevisionManually(String timestamp, String configXmlContent, String historyXmlContent) throws IOException {
+		File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
+		File revisions = new File(file, "slave1");
+		File revision = new File(revisions, timestamp);
+		revision.mkdirs();
+		FileUtils.writeStringToFile(
+			new File(revision, "config.xml"),
+			configXmlContent,
+			StandardCharsets.UTF_8
+		);
+		FileUtils.writeStringToFile(
+			new File(revision, "history.xml"),
+			historyXmlContent,
+			StandardCharsets.UTF_8
+		);
+		return revision;
+	}
+
+	private String getRandomConfigXml()  {
+		return "<?xml version='1.0' encoding='UTF-8'?>" + System.lineSeparator() +
+			"<randomField>" + Math.random() + "</randomField>";
+	}
+
+	private String getHistoryXmlFromTimestamp(String timestamp) {
+		return
+			"<?xml version='1.0' encoding='UTF-8'?>" + System.lineSeparator() +
+				"<hudson.plugins.jobConfigHistory.HistoryDescr plugin=\"jobConfigHistory@2.20-SNAPSHOT\">" + System.lineSeparator() +
+				"  <user>unknown</user>" + System.lineSeparator() +
+				"  <userId>unknown</userId>" + System.lineSeparator() +
+				"  <operation>Deleted</operation>" + System.lineSeparator() +
+
+				"  <timestamp>" + timestamp + "</timestamp>" + System.lineSeparator() +
+
+				"  <currentName></currentName>" + System.lineSeparator() +
+				"  <oldName></oldName>" + System.lineSeparator() +
+				"</hudson.plugins.jobConfigHistory.HistoryDescr>";
 	}
 
 	private File createNodeRevision(String timestamp, Node mockedNode)
