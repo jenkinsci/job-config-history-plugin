@@ -469,4 +469,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		return new Api(this);
 	}
 
+	public int getLeadingWhitespace(String str) {
+		return str == null ? 0 : str.indexOf(str.trim());
+	}
 }

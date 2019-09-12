@@ -579,4 +579,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	public Api getApi() {
 		return new Api(this);
 	}
+
+	public int getLeadingWhitespace(String str) {
+		return str == null ? 0 : str.indexOf(str.trim());
+	}
 }
