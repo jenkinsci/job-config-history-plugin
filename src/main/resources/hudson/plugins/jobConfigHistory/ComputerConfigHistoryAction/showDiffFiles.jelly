@@ -187,19 +187,24 @@
                                     <j:otherwise>
                                       <th class="lineNum ${line.left.cssClass}">${line.left.lineNumber}</th>
                                       <td class="${line.left.cssClass}">
-                                        <pre>
-                                          <code>
-                                            <j:out value="${line.left.text}"/>
-                                          </code>
-                                        </pre>
+                                        <div style="margin-left: ${it.getLeadingWhitespace(line.left.text)*0.5}em;">
+                                          <pre>
+                                            <code>
+                                              <j:out value="${line.left.text.trim()}"/>
+                                            </code>
+                                          </pre>
+                                        </div>
                                       </td>
                                       <th class="lineNum ${line.right.cssClass}">${line.right.lineNumber}</th>
                                       <td class="${line.right.cssClass}">
-                                        <pre>
-                                          <code>
-                                            <j:out value="${line.right.text}"/>
-                                          </code>
-                                        </pre>
+                                        <!--For correct indentation in case of line-breaks.-->
+                                        <div style="margin-left: ${it.getLeadingWhitespace(line.right.text)*0.5}em;">
+                                          <pre>
+                                            <code>
+                                              <j:out value="${line.right.text.trim()}"/>
+                                            </code>
+                                          </pre>
+                                        </div>
                                       </td>
                                     </j:otherwise>
                                   </j:choose>
@@ -239,19 +244,24 @@
                                     <j:otherwise>
                                       <th class="lineNum ${line.left.cssClass}">${line.left.lineNumber}</th>
                                       <td class="${line.left.cssClass}">
-                                        <pre>
-                                          <code>
-                                            <j:out value="${line.left.text}"/>
-                                          </code>
-                                        </pre>
+                                        <div style="margin-left: ${it.getLeadingWhitespace(line.left.text)*0.5}em;">
+                                          <pre>
+                                            <code>
+                                              <j:out value="${line.left.text.trim()}"/>
+                                            </code>
+                                          </pre>
+                                        </div>
                                       </td>
                                       <th class="lineNum ${line.right.cssClass}">${line.right.lineNumber}</th>
                                       <td class="${line.right.cssClass}">
-                                        <pre>
-                                          <code>
-                                            <j:out value="${line.right.text}"/>
-                                          </code>
-                                        </pre>
+                                        <!--For correct indentation in case of line-breaks.-->
+                                        <div style="margin-left: ${it.getLeadingWhitespace(line.right.text)*0.5}em;">
+                                          <pre>
+                                            <code>
+                                              <j:out value="${line.right.text.trim()}"/>
+                                            </code>
+                                          </pre>
+                                        </div>
                                       </td>
                                     </j:otherwise>
                                   </j:choose>
