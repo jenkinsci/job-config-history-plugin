@@ -24,6 +24,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.FINEST;
+import static java.util.logging.Level.WARNING;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.FileFilter;
 
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 
 import java.util.List;
@@ -45,11 +47,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.common.collect.Iterators;
 import hudson.model.AbstractItem;
 import hudson.model.Item;
 import hudson.model.Node;
@@ -142,7 +146,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 * @return timestamped directory where to store one history entry.
 	 */
 	File getRootDir(final XmlFile xmlFile,
-					final AtomicReference<Calendar> timestampHolder) {
+					final AtomicReference<Calendar> timestampHolder) throws IOException {
 		final File configFile = xmlFile.getFile();
 		final File itemHistoryDir = getHistoryDir(configFile);
 		// perform check for purge here, when we are actually going to create
@@ -237,13 +241,14 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 */
 	@SuppressWarnings("SleepWhileInLoop")
 	static File createNewHistoryDir(final File itemHistoryDir,
-									final AtomicReference<Calendar> timestampHolder) {
+									final AtomicReference<Calendar> timestampHolder) throws IOException {
 		Calendar timestamp;
 		File f;
 		while (true) {
 			timestamp = new GregorianCalendar();
 			f = new File(itemHistoryDir,
 				getIdFormatter().format(timestamp.getTime()));
+
 			if (f.isDirectory()) {
 				LOG.log(Level.FINE, "clash on {0}, will wait a moment", f);
 				try {
@@ -256,6 +261,29 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				break;
 			}
 		}
+
+		//determine write permission for not-yet-existing f.
+		final File rootDir = Jenkins.get().getRootDir();
+		boolean hasWritePermission = false;
+		File currentFile = f;
+		while (!f.getParentFile().equals(rootDir) && f != null) {
+			//walk from f's directory up to the first existing directory.
+			if (currentFile.exists()) {
+				hasWritePermission = currentFile.canWrite();
+				break;
+			}
+			currentFile = f.getParentFile();
+		}
+		if (!hasWritePermission) {
+			//TODO nachfragen was sinnvoller:
+			/*
+				1. Nur IOException werfen (wird als RuntimeException weitergeworfen)		(swt-methodisch besser, dafür kein log)
+				2. Warnung anzeigen und IOException werfen
+			 */
+			//LOG.log(WARNING, "Could not create history entry directory \"{0}\": no write rights on \"{1}\"", new Object[]{f, currentFile});
+			throw new IOException("Could not create history entry's root directory \"" + f + "\": no write rights on \"" + currentFile + "\"");
+		}
+
 		// mkdirs sometimes fails although the directory exists afterwards,
 		// so check for existence as well and just be happy if it does.
 		if (!(f.mkdirs() || f.exists())) {
@@ -1077,7 +1105,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	}
 
 	private File getRootDir(final Node node,
-							final AtomicReference<Calendar> timestampHolder) {
+							final AtomicReference<Calendar> timestampHolder) throws IOException {
 		final File itemHistoryDir = getHistoryDirForNode(node);
 		// perform check for purge here, when we are actually going to create
 		// a new directory, rather than just when we scan it in above method.
