@@ -269,7 +269,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				hasWritePermission = currentFile.canWrite();
 				break;
 			}
-			currentFile = f.getParentFile();
+			currentFile = currentFile.getParentFile();
 		}
 		if (!hasWritePermission) {
 			String msg = "Could not create history entry's root directory \"" + f + "\": no write rights on \"" + currentFile + "\".";
