@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.FileFilter;
 
-import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 
 import java.util.List;
@@ -47,13 +46,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
-import java.util.Stack;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.common.collect.Iterators;
 import hudson.model.AbstractItem;
 import hudson.model.Item;
 import hudson.model.Node;
@@ -266,7 +263,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		final File rootDir = Jenkins.get().getRootDir();
 		boolean hasWritePermission = false;
 		File currentFile = f;
-		while (!f.getParentFile().equals(rootDir) && f != null) {
+		while (currentFile != null && !currentFile.equals(rootDir)) {
 			//walk from f's directory up to the first existing directory.
 			if (currentFile.exists()) {
 				hasWritePermission = currentFile.canWrite();
