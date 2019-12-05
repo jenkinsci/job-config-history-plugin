@@ -275,12 +275,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			currentFile = f.getParentFile();
 		}
 		if (!hasWritePermission) {
-			//TODO nachfragen was sinnvoller:
-			/*
-				1. Nur IOException werfen (wird als RuntimeException weitergeworfen)		(swt-methodisch besser, dafür kein log)
-				2. Warnung anzeigen und IOException werfen
-			 */
-			//LOG.log(WARNING, "Could not create history entry directory \"{0}\": no write rights on \"{1}\"", new Object[]{f, currentFile});
+			LOG.log(WARNING, "Could not create history entry's root directory \"{0}\": no write rights on \"{1}\"", new Object[]{f, currentFile});
 			throw new IOException("Could not create history entry's root directory \"" + f + "\": no write rights on \"" + currentFile + "\"");
 		}
 
