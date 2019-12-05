@@ -272,8 +272,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			currentFile = f.getParentFile();
 		}
 		if (!hasWritePermission) {
-			LOG.log(WARNING, "Could not create history entry's root directory \"{0}\": no write rights on \"{1}\"", new Object[]{f, currentFile});
-			throw new IOException("Could not create history entry's root directory \"" + f + "\": no write rights on \"" + currentFile + "\"");
+			String msg = "Could not create history entry's root directory \"" + f + "\": no write rights on \"" + currentFile + "\".";
+			LOG.log(WARNING, msg);
+			throw new IOException(msg);
 		}
 
 		// mkdirs sometimes fails although the directory exists afterwards,
