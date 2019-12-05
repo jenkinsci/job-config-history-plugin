@@ -283,6 +283,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	}
 
 	@Override
+	public boolean hasDeleteEntryPermission() { return getAccessControlledObject().hasPermission(JobConfigHistory.DELETEENTRY_PERMISSION);}
+
+	@Override
 	public boolean hasConfigurePermission() {
 		return getAccessControlledObject().hasPermission(Permission.CONFIGURE);
 	}

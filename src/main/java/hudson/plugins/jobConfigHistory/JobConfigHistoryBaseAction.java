@@ -170,6 +170,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 
 	public abstract boolean hasAdminPermission();
 
+	public abstract boolean hasDeleteEntryPermission();
+
 	/**
      * Returns whether the current user may read configurations in the object
      * returned by {@link JobConfigHistoryBaseAction#getAccessControlledObject()}.
