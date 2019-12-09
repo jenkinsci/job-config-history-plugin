@@ -206,6 +206,12 @@ public class JobConfigHistoryBaseActionTest {
 			return false;
 		}
 
+		@Override
+		public boolean hasDeleteEntryPermission() {	return getAccessControlledObject().hasPermission(JobConfigHistory.DELETEENTRY_PERMISSION); }
+
+		@Override
+		protected void checkDeleteEntryPermission() { getAccessControlledObject().checkPermission(JobConfigHistory.DELETEENTRY_PERMISSION); }
+
 		public boolean hasConfigurePermission() {
 			return false;
 		}

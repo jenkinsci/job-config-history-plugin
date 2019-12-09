@@ -103,6 +103,12 @@ public class JobConfigHistoryBaseActionIT
 			}
 
 			@Override
+			public boolean hasDeleteEntryPermission() {	return getAccessControlledObject().hasPermission(JobConfigHistory.DELETEENTRY_PERMISSION); }
+
+			@Override
+			protected void checkDeleteEntryPermission() { getAccessControlledObject().checkPermission(JobConfigHistory.DELETEENTRY_PERMISSION); }
+
+			@Override
 			protected boolean hasConfigurePermission() {
 				return getAccessControlledObject()
 						.hasPermission(Permission.CONFIGURE);
