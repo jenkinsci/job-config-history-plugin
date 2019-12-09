@@ -260,19 +260,25 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		}
 
 		//determine write permission for not-yet-existing f.
-		final File rootDir = Jenkins.get().getRootDir();
+		final File jenkinsRootDir = Jenkins.get().getRootDir();
 		boolean hasWritePermission = false;
+
+		File firstExistingFile = null;
+		boolean foundfirstExistingFile = false;
 		File currentFile = f;
-		while (currentFile != null && !currentFile.equals(rootDir)) {
+
+		//jenkins folder itself does not need to be written...
+		while (currentFile != null && !currentFile.equals(jenkinsRootDir.getParentFile())) {
 			//walk from f's directory up to the first existing directory.
-			if (currentFile.exists()) {
+			if (currentFile.exists() && !foundfirstExistingFile) {
+				foundfirstExistingFile = true;
 				hasWritePermission = currentFile.canWrite();
-				break;
+				firstExistingFile = currentFile;
 			}
 			currentFile = currentFile.getParentFile();
 		}
 		if (!hasWritePermission) {
-			String msg = "Could not create history entry's root directory \"" + f + "\": no write rights on \"" + currentFile + "\".";
+			String msg = "Could not create history entry's root directory \"" + f + "\": no write rights on \"" + firstExistingFile + "\".";
 			LOG.log(WARNING, msg);
 			throw new IOException(msg);
 		}
