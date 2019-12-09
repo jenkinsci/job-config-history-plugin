@@ -217,6 +217,9 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	}
 
 	@Override
+	protected void checkDeleteEntryPermission() { getAccessControlledObject().checkPermission(JobConfigHistory.DELETEENTRY_PERMISSION); }
+
+	@Override
 	public boolean hasAdminPermission() { return getAccessControlledObject().hasPermission(Jenkins.ADMINISTER); }
 
 	@Override
@@ -450,6 +453,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	}
 
 	public final void doDeleteRevision(StaplerRequest req, StaplerResponse rsp) {
+		checkDeleteEntryPermission();
 		final String timestamp = req.getParameter("timestamp");
 		PluginUtils.getHistoryDao().deleteRevision(this.getProject(), timestamp);
 		//do nothing with the rsp

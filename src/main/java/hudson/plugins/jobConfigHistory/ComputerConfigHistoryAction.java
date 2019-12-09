@@ -111,10 +111,13 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	}
 
 	@Override
+	protected void checkDeleteEntryPermission() { getAccessControlledObject().checkPermission(JobConfigHistory.DELETEENTRY_PERMISSION); }
+
+	@Override
 	public boolean hasAdminPermission() { return getAccessControlledObject().hasPermission(Jenkins.ADMINISTER); }
 
 	@Override
-	public boolean hasDeleteEntryPermission() { return getAccessControlledObject().hasPermission(JobConfigHistory.DELETEENTRY_PERMISSION);}
+	public boolean hasDeleteEntryPermission() { return getAccessControlledObject().hasPermission(JobConfigHistory.DELETEENTRY_PERMISSION); }
 
 	@Override
 	public boolean hasConfigurePermission() {
@@ -396,6 +399,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	}
 
 	public final void doDeleteRevision(StaplerRequest req, StaplerResponse rsp) {
+		checkDeleteEntryPermission();
 		final String timestamp = req.getParameter("timestamp");
 		PluginUtils.getHistoryDao().deleteRevision(this.getSlave(), timestamp);
 		//do nothing with the rsp

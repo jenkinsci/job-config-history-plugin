@@ -278,6 +278,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	}
 
 	@Override
+	protected void checkDeleteEntryPermission() { getAccessControlledObject().checkPermission(JobConfigHistory.DELETEENTRY_PERMISSION); }
+
+	@Override
 	public boolean hasAdminPermission() {
 		return getAccessControlledObject().hasPermission(Jenkins.ADMINISTER);
 	}
@@ -547,6 +550,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	}
 
 	public final void doDeleteRevision(StaplerRequest req, StaplerResponse rsp) {
+		checkDeleteEntryPermission();
 		final String timestamp = req.getParameter("timestamp");
 		final String name = req.getParameter("name");
 		final File[] candidatesArray = (name.contains(DeletedFileFilter.DELETED_MARKER)) ? getOverviewHistoryDao().getDeletedJobs() : getOverviewHistoryDao().getSystemConfigs();
