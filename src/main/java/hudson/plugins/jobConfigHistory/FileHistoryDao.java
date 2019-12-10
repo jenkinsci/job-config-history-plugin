@@ -468,6 +468,20 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	}
 
 	@Override
+	public int getRevisionAmount(XmlFile xmlFile) {
+		final File configFile = xmlFile.getFile();
+		final File historiesDir = getHistoryDir(configFile);
+		final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
+		return historiesDir.listFiles(HistoryFileFilter.INSTANCE).length;
+	}
+
+	@Override
+	public int getRevisionAmount(Node node) {
+		//TODO implement
+		return -1;
+	}
+
+	@Override
 	public XmlFile getOldRevision(final AbstractItem item,
 								  final String identifier) {
 		final File configFile = item.getConfigFile().getFile();

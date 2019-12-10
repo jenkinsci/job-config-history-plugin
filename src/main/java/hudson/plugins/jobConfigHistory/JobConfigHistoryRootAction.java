@@ -138,6 +138,11 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		return configs;
 	}
 
+	//TODO do this.
+//	public final List<ConfigInfo> getConfigs(int from, int to) {
+//
+//	}
+
 	/**
 	 * Returns the configuration history entries for all system files in this
 	 * Jenkins instance.

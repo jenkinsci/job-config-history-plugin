@@ -18,7 +18,52 @@
             document.getElementById('tooltip' + nr).style.visibility = 'hidden';
           }
         </script>
-        <j:set var="configs" value="${it.getJobConfigs()}" />
+
+
+        <!--TODO test area-->
+        <j:set var="pageNum" value="${request.getParameter('pageNum')}"/>
+        <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}"/>
+        <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}"/>
+        <j:if test="${pageNum == null or pageNum.equals(&quot;&quot;)}">
+          <j:set var="pageNum" value="0"/>
+        </j:if>
+        <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
+          <!--todo default: 100-->
+          <j:set var="entriesPerPage" value="100"/>
+
+        </j:if>
+        <j:set var="maxPageNum" value="${it.getMaxPageNum()}"/>
+        <j:set var="configs" value="${it.getJobConfigs(pageNum*entriesPerPage, pageNum*entriesPerPage+entriesPerPage)}" />
+<!--        <h3>Gesamtanzahl Einträge: ${totalEntriesNumber}</h3>-->
+<!--        <h3>pageNum: ${pageNum}</h3>-->
+<!--        <h3>entriesPerPage: ${entriesPerPage}</h3>-->
+<!--        <h3>maxPageNum: ${maxPageNum}</h3>-->
+        <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
+        <table  class="jch navigation">
+          <thead><caption class="caption">NAVIGATION</caption></thead>
+          <tr>
+            <j:if test="${pageNum > 0}">
+              <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a></div></td>
+            </j:if>
+            <j:forEach var="currentPageNum" items="${relevantPageNums}">
+              <j:choose>
+                <j:when test="${currentPageNum == -1}">
+                  <td><div class="menu-url-button-dead>">&#8230;</div></td>
+                </j:when>
+                <j:otherwise>
+                  <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum}</a></div></td>
+                </j:otherwise>
+              </j:choose>
+            </j:forEach>
+            <j:if test="${maxPageNum > pageNum}">
+              <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a></div></td>
+            </j:if>
+          </tr>
+        </table>
+        <!--TODO test area-->
+
+
+
         <j:choose>
           <j:when test="${configs.size() == 0}">
               ${%No job configuration history available}

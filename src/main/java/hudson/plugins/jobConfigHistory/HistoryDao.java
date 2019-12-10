@@ -77,6 +77,10 @@ public interface HistoryDao {
 	 */
 	SortedMap<String, HistoryDescr> getRevisions(Node node);
 
+	int getRevisionAmount(XmlFile xmlFile);
+
+	int getRevisionAmount(Node node);
+
 	/**
 	 * Returns one old configuration of item.
 	 *

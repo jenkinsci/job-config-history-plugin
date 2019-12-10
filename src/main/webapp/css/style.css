@@ -170,6 +170,33 @@ table.jch groupBody td:last-child {
     border-right:21px;
 }
 
+/*
+#####################################################################
+###                          navigation                           ###
+#####################################################################
+*/
+.navigation {
+    padding: 2px;
+    background-color: rgb(250,250,250);
+    border: 1px solid rgb(232, 232, 232);
+    border-radius:2px;
+}
+
+table.jch.navigation tr td {
+    border:none;
+    text-align:center;
+    font-size:18px;
+}
+
+table.jch.navigation tr td a {
+
+    text-decoration:none;
+    font-size:14px;
+}
+
+table.jch.navigation tr.caption {
+    font-size:40px;
+}
 
 /*
 #####################################################################
@@ -432,6 +459,8 @@ a.url-button:hover{
 
     outline:none;
 }
+
+
 
 .menu-url-button:hover {
 

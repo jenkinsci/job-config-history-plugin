@@ -30,7 +30,10 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -122,7 +125,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 			checkConfigurePermission();
 			return null;
 		}
-		final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
 		final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(
 				getHistoryDao().getRevisions(project.getConfigFile()).values());
 		final String maxEntriesPerPageAsString = getPlugin()
@@ -135,20 +137,103 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		} else {
 			maxEntriesPerPage = values.size();
 		}
-		for (final HistoryDescr historyDescr : values
-				.subList(values.size() - maxEntriesPerPage, values.size())) {
-			final String timestamp = historyDescr.getTimestamp();
-			final XmlFile oldRevision = getHistoryDao().getOldRevision(project,
-					timestamp);
-			if (oldRevision.getFile() != null) {
-				configs.add(ConfigInfo.create(project.getFullName(), true,
-						historyDescr, true));
-			} else if ("Deleted".equals(historyDescr.getOperation())) {
-				configs.add(ConfigInfo.create(project.getFullName(), false,
-						historyDescr, true));
+
+		final List<ConfigInfo> configs = toConfigInfoList(values, values.size() - maxEntriesPerPage, values.size());
+		Collections.sort(configs, ParsedDateComparator.DESCENDING);
+		return configs;
+	}
+
+	public final List<ConfigInfo> getJobConfigs(int from, int to) {
+		if (from > to) throw new IllegalArgumentException("start index is greater than end index: (" + from + ", " + to + ")");
+		final int revisionAmount = getRevisionAmount();
+		if (from > revisionAmount) {
+			throw new IllegalArgumentException("start index is greater than revision amount: (" + from + ", " + revisionAmount + ")");
+			//todo do sth better
+		}
+
+		if (to > revisionAmount) {
+			to = revisionAmount;
+		}
+
+		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
+			checkConfigurePermission();
+			return Collections.emptyList();
+		}
+		//load historydescrs lazily
+		final SortedMap<String, HistoryDescr> historyDescrSortedMap = getHistoryDao().getRevisions(project.getConfigFile());
+		//todo maybe implement a boolean parameter for ascending order
+
+		//get them values in DESCENDING order (newest revision first)
+		ArrayList<HistoryDescr> mapValues = new ArrayList<>(historyDescrSortedMap.values());
+		Collections.reverse(mapValues);
+
+		final List<HistoryDescr> cuttedHistoryDescrs = mapValues.subList(from, to);
+		//only after selecting the entries to be displayed, the files are read (if the HistoryDao uses LazyHistoryDescr, of course).
+		return toConfigInfoList(cuttedHistoryDescrs, 0, cuttedHistoryDescrs.size());
+	}
+
+	public int getRevisionAmount() { return  getHistoryDao().getRevisionAmount(project.getConfigFile()); }
+
+	public int getMaxPageNum() {
+		String entriesPerPageStr = getCurrentRequest().getParameter("entriesPerPage");
+		//TODO magic number!
+		int entriesPerPage = (entriesPerPageStr != null && !entriesPerPageStr.equals("")) ? Integer.parseInt(entriesPerPageStr) : 100;
+		return getRevisionAmount()/ entriesPerPage;
+	}
+
+	public List<Integer> getRelevantPageNums(int currentPageNum) {
+		final int maxPageNum = getMaxPageNum();
+		//todo good epsilon?
+		final int epsilon = 2;
+		final HashSet<Integer> pageNumsSet = new HashSet<>();
+		pageNumsSet.add(0);
+		pageNumsSet.add(maxPageNum);
+
+		if (maxPageNum > 10) {
+			pageNumsSet.add(currentPageNum);
+			//add everything in epsilon around current pageNum
+			for (int i = currentPageNum; i <= Math.min(currentPageNum+epsilon, maxPageNum); i++) {
+				pageNumsSet.add(i);
+			}
+			for (int i = currentPageNum; i >= Math.max(0, currentPageNum-epsilon); i--) {
+				pageNumsSet.add(i);
+			}
+		} else {
+			for (int i = 0; i <= maxPageNum; i++) {
+				pageNumsSet.add(i);
 			}
 		}
-		Collections.sort(configs, ParsedDateComparator.DESCENDING);
+		ArrayList<Integer> pageNumsList = new ArrayList<>(pageNumsSet);
+		pageNumsList.sort(Comparator.naturalOrder());
+		//add code for dots:
+		int lastNumber = pageNumsList.get(0);
+		for (int i = 1; i < pageNumsList.size(); i++) {
+			int thisNumber = pageNumsList.get(i);
+			System.out.println("it: (" + lastNumber + ", " + thisNumber + ")");
+			if (lastNumber+1 != thisNumber) {
+				//add dots before thisNumber. -1 stands for dots (easier than defining a special class etc)
+				pageNumsList.add(i++, -1);
+			}
+
+			lastNumber = thisNumber;
+		}
+		return pageNumsList;
+	}
+
+	private List<ConfigInfo> toConfigInfoList(List<HistoryDescr> historyDescrs, int from, int to) {
+		ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+		for (final HistoryDescr historyDescr : historyDescrs.subList(from, to)) {
+			final String timestamp = historyDescr.getTimestamp();
+			final XmlFile oldRevision = getHistoryDao().getOldRevision(project,
+				timestamp);
+			if (oldRevision.getFile() != null) {
+				configs.add(ConfigInfo.create(project.getFullName(), true,
+					historyDescr, true));
+			} else if ("Deleted".equals(historyDescr.getOperation())) {
+				configs.add(ConfigInfo.create(project.getFullName(), false,
+					historyDescr, true));
+			}
+		}
 		return configs;
 	}
 
