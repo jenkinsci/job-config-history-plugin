@@ -39,6 +39,7 @@
 <!--        <h3>entriesPerPage: ${entriesPerPage}</h3>-->
 <!--        <h3>maxPageNum: ${maxPageNum}</h3>-->
         <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
+        <j:if test="${maxPageNum != 0}">
         <table  class="jch navigation">
           <thead><caption class="caption">NAVIGATION</caption></thead>
           <tr>
@@ -60,6 +61,7 @@
             </j:if>
           </tr>
         </table>
+        </j:if>
         <!--TODO test area-->
 
 
