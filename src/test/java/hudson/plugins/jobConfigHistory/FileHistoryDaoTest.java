@@ -248,7 +248,7 @@ public class FileHistoryDaoTest {
 	 * Test of getRootDir method, of class FileHistoryDao.
 	 */
 	@Test
-	public void testGetRootDir() {
+	public void testGetRootDir() throws IOException {
 		AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
 		File result = sutWithoutUserAndDuplicateHistory.getRootDir(test1Config,
 				timestampHolder);

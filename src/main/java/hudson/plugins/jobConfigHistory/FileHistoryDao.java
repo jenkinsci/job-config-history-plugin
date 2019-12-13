@@ -24,6 +24,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.FINEST;
+import static java.util.logging.Level.WARNING;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -142,7 +143,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 * @return timestamped directory where to store one history entry.
 	 */
 	File getRootDir(final XmlFile xmlFile,
-					final AtomicReference<Calendar> timestampHolder) {
+					final AtomicReference<Calendar> timestampHolder) throws IOException {
 		final File configFile = xmlFile.getFile();
 		final File itemHistoryDir = getHistoryDir(configFile);
 		// perform check for purge here, when we are actually going to create
@@ -237,13 +238,14 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 */
 	@SuppressWarnings("SleepWhileInLoop")
 	static File createNewHistoryDir(final File itemHistoryDir,
-									final AtomicReference<Calendar> timestampHolder) {
+									final AtomicReference<Calendar> timestampHolder) throws IOException {
 		Calendar timestamp;
 		File f;
 		while (true) {
 			timestamp = new GregorianCalendar();
 			f = new File(itemHistoryDir,
 				getIdFormatter().format(timestamp.getTime()));
+
 			if (f.isDirectory()) {
 				LOG.log(Level.FINE, "clash on {0}, will wait a moment", f);
 				try {
@@ -256,6 +258,31 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				break;
 			}
 		}
+
+		//determine write permission for not-yet-existing f.
+		final File jenkinsRootDir = Jenkins.get().getRootDir();
+		boolean hasWritePermission = false;
+
+		File firstExistingFile = null;
+		boolean foundfirstExistingFile = false;
+		File currentFile = f;
+
+		//jenkins folder itself does not need to be written...
+		while (currentFile != null && !currentFile.equals(jenkinsRootDir.getParentFile())) {
+			//walk from f's directory up to the first existing directory.
+			if (currentFile.exists() && !foundfirstExistingFile) {
+				foundfirstExistingFile = true;
+				hasWritePermission = currentFile.canWrite();
+				firstExistingFile = currentFile;
+			}
+			currentFile = currentFile.getParentFile();
+		}
+		if (!hasWritePermission) {
+			String msg = "Could not create history entry's root directory \"" + f + "\": no write rights on \"" + firstExistingFile + "\".";
+			LOG.log(WARNING, msg);
+			throw new IOException(msg);
+		}
+
 		// mkdirs sometimes fails although the directory exists afterwards,
 		// so check for existence as well and just be happy if it does.
 		if (!(f.mkdirs() || f.exists())) {
@@ -1077,7 +1104,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	}
 
 	private File getRootDir(final Node node,
-							final AtomicReference<Calendar> timestampHolder) {
+							final AtomicReference<Calendar> timestampHolder) throws IOException {
 		final File itemHistoryDir = getHistoryDirForNode(node);
 		// perform check for purge here, when we are actually going to create
 		// a new directory, rather than just when we scan it in above method.
