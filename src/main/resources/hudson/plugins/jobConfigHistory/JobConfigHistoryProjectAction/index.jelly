@@ -55,7 +55,7 @@
                         </j:if>
                         <th style="text-align:center">${%File A}</th>
                         <th style="text-align:center">${%File B}</th>
-                        <j:if test="${it.hasAdminPermission()}">
+                        <j:if test="${it.hasDeleteEntryPermission()}">
                           <th style="text-align:center">Delete Entry</th>
                         </j:if>
                       </tr>
@@ -121,15 +121,14 @@
                               <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" />
                             </j:if>
                           </td>
-
-                          <td style="text-align:center">
-                            <j:if test="${it.hasAdminPermission()}">
-                              <j:set var="message" value="${%Do you really want to delete the history entry }"/>
-                              <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
-                                <img src="${resURL}/images/16x16/stop.png" alt="Delete Revision"/>
-                              </button>
-                            </j:if>
-                          </td>
+                          <j:if test="${it.hasDeleteEntryPermission()}">
+                            <td style="text-align:center">
+                                <j:set var="message" value="${%Do you really want to delete the history entry }"/>
+                                <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
+                                  <img src="${resURL}/images/16x16/stop.png" alt="Delete Revision"/>
+                                </button>
+                            </td>
+                          </j:if>
                         </tr>
                         <f:invisibleEntry>
                           <f:textbox name="name" value="${config.getJob()}" />

@@ -40,6 +40,9 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Saveable;
 import hudson.model.TopLevelItem;
+import hudson.security.Permission;
+import hudson.security.PermissionGroup;
+import hudson.security.PermissionScope;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
@@ -95,6 +98,16 @@ public class JobConfigHistory extends Plugin {
 	 * users with config permission.
 	 */
 	private String showBuildBadges = "always";
+
+	private static final PermissionGroup PERMISSION_GROUP = new PermissionGroup(JobConfigHistory.class, Messages._displayName());
+
+	protected static final Permission DELETEENTRY_PERMISSION =
+		new Permission(
+			PERMISSION_GROUP,
+			Messages.JobConfigHistory_deleteEntryPermission(),
+			Messages._JobConfigHistory_deleteEntryPermissionDescription(),
+			Jenkins.ADMINISTER,
+			PermissionScope.JENKINS);
 
 	/** our logger. */
 	private static final Logger LOG = Logger.getLogger(JobConfigHistory.class.getName());
