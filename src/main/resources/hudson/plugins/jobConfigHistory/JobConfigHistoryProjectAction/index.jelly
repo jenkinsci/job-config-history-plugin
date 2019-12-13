@@ -21,6 +21,7 @@
 
 
         <!--TODO test area-->
+        <j:set var="defaultEntriesPerPage" value="25"/> <!--todo get this from JAVA!!!-->
         <j:set var="pageNum" value="${request.getParameter('pageNum')}"/>
         <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}"/>
         <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}"/>
@@ -28,40 +29,30 @@
           <j:set var="pageNum" value="0"/>
         </j:if>
         <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
-          <!--todo default: 100-->
-          <j:set var="entriesPerPage" value="100"/>
+          <j:set var="entriesPerPage" value="${defaultEntriesPerPage}"/>
+        </j:if>
+        <j:choose>
+          <j:when test="${entriesPerPage.equals(&quot;all&quot;)}">
+            <j:set var="configs" value="${it.getJobConfigs()}" />
+            <j:set var="maxPageNum" value="${0}"/>
+          </j:when>
+          <j:otherwise>
+            <j:set var="configs" value="${it.getJobConfigs(pageNum*entriesPerPage, pageNum*entriesPerPage+entriesPerPage)}" />
+            <j:set var="maxPageNum" value="${it.getMaxPageNum()}"/>
+          </j:otherwise>
+        </j:choose>
 
-        </j:if>
-        <j:set var="maxPageNum" value="${it.getMaxPageNum()}"/>
-        <j:set var="configs" value="${it.getJobConfigs(pageNum*entriesPerPage, pageNum*entriesPerPage+entriesPerPage)}" />
-<!--        <h3>Gesamtanzahl Einträge: ${totalEntriesNumber}</h3>-->
-<!--        <h3>pageNum: ${pageNum}</h3>-->
-<!--        <h3>entriesPerPage: ${entriesPerPage}</h3>-->
-<!--        <h3>maxPageNum: ${maxPageNum}</h3>-->
-        <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
-        <j:if test="${maxPageNum != 0}">
-        <table  class="jch navigation">
-          <thead><caption class="caption">NAVIGATION</caption></thead>
-          <tr>
-            <j:if test="${pageNum > 0}">
-              <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a></div></td>
-            </j:if>
-            <j:forEach var="currentPageNum" items="${relevantPageNums}">
-              <j:choose>
-                <j:when test="${currentPageNum == -1}">
-                  <td><div class="menu-url-button-dead>">&#8230;</div></td>
-                </j:when>
-                <j:otherwise>
-                  <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum}</a></div></td>
-                </j:otherwise>
-              </j:choose>
-            </j:forEach>
-            <j:if test="${maxPageNum > pageNum}">
-              <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a></div></td>
-            </j:if>
-          </tr>
-        </table>
-        </j:if>
+
+<!--        <form action="asdf" method="post" onsubmit="console.log(this.childNodes[0]); this.action='${request.getRequestURL().toString()}?'+this.childNodes[0].value;" novalidate="novalidate">-->
+<!--          <select name='PreviousReceiver' onchange='if(this.value != 0) { this.form.onsubmit(); this.form.submit(); }' novalidate="novalidate">-->
+<!--            <option value='0'>Entries per page: ${entriesPerPage}</option>-->
+<!--            <option value='entriesPerPage=${defaultEntriesPerPage}'>Entries per page: default (${defaultEntriesPerPage})</option>-->
+<!--            <option value='pageNum=${pageNum}&amp;entriesPerPage=${10}'>Entries per page: 10</option>-->
+<!--            <option value='pageNum=${pageNum}&amp;entriesPerPage=${25}'>Entries per page: 25</option>-->
+<!--            <option value='pageNum=${pageNum}&amp;entriesPerPage=${100}'>Entries per page: 100</option>-->
+<!--            <option value='entriesPerPage=${&quot;all&quot;}'>Entries per page: all</option>-->
+<!--          </select>-->
+<!--        </form>-->
         <!--TODO test area-->
 
 
@@ -74,12 +65,12 @@
             <br/>
             <div>
               <form method="post" action="diffFiles" name="diffFiles">
-                <j:if test="${configs.size() > 1}">
-                  <div align="right">
-                    <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
-                  </div>
-                  <div style="padding:2px"/>
-                </j:if>
+<!--                <j:if test="${configs.size() > 1}">-->
+<!--                  <div align="right">-->
+<!--                    <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>-->
+<!--                  </div>-->
+<!--                  <div style="padding:2px"/>-->
+<!--                </j:if>-->
                 <table class="jch" style="width:100%">
                   <thead>
                     <caption class="caption">
@@ -87,7 +78,7 @@
                     </caption>
                   </thead>
                 </table>
-                <div class="resizeWrapper" style="overflow-y:scroll; height:100%; max-height:59vh;">
+                <div class="resizeWrapper" style="overflow-y:scroll;">
                   <table id="confighistory" class="pane sortable jch">
                     <thead>
                       <tr>
@@ -145,7 +136,7 @@
                                 <a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
                                   <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
                                 </a>
-                                <j:if test="${configNr == 1}">
+                                <j:if test="${configNr == 1 and pageNum == 0}">
                                   <!--The current version is not present in history!-->
                                   <br/>
                                   <span style="color: rgb(196, 109, 0); font-weight:bold;">
@@ -192,6 +183,53 @@
                 </j:if>
               </form>
             </div>
+            <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
+
+
+              <div>
+                <div style="float:left; width:29%">
+                  <table class="jch navigation">
+                    <tr>
+                      <td style="width:150px; font-weight:bold;">Entries per page:</td>
+                      <td><div class="menu-url-button current">${entriesPerPage}</div></td>
+                      <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${10}">10</a></div></td>
+                      <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${25}">25</a></div></td>
+                      <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${100}">100</a></div></td>
+                      <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${250}">250</a></div></td>
+                      <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?entriesPerPage=${&quot;all&quot;}">all</a></div></td>
+                    </tr>
+                  </table>
+                </div>
+                <j:if test="${maxPageNum != 0}">
+                  <div style="float:right; width:70%">
+                    <table  class="jch navigation">
+      <!--                <thead><caption class="caption">Navigation</caption></thead>-->
+                      <tr>
+                        <td style="width:150px; font-weight:bold;">Page:</td>
+                        <j:if test="${pageNum > 0}">
+                          <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a></div></td>
+                        </j:if>
+                        <j:forEach var="currentPageNum" items="${relevantPageNums}">
+                          <j:choose>
+                            <j:when test="${currentPageNum == -1}">
+                              <td><div class="menu-url-button-dead>">&#8230;</div></td>
+                            </j:when>
+                            <j:when test="${currentPageNum == pageNum}">
+                              <td><div class="menu-url-button current">${currentPageNum}</div></td>
+                            </j:when>
+                            <j:otherwise>
+                              <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum}</a></div></td>
+                            </j:otherwise>
+                          </j:choose>
+                        </j:forEach>
+                        <j:if test="${maxPageNum > pageNum}">
+                          <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a></div></td>
+                        </j:if>
+                      </tr>
+                    </table>
+                  </div>
+                </j:if>
+              </div>
           </j:otherwise>
         </j:choose>
       </div>
