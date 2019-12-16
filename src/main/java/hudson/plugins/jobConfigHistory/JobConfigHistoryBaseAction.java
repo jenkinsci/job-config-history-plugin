@@ -31,8 +31,11 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -80,6 +83,8 @@ import org.xmlunit.diff.Difference;
 import org.xmlunit.diff.DifferenceEvaluator;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
+
+import static java.util.logging.Level.WARNING;
 
 /**
  * Implements some basic methods needed by the
@@ -409,6 +414,54 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             ),
             "\n"
         ) + "\n";
+    }
+
+    public List<Integer> getRelevantPageNums(int currentPageNum, int maxPageNum) {
+        final int epsilon = JobConfigHistoryConsts.PAGING_EPSILON;
+        final HashSet<Integer> pageNumsSet = new HashSet<>();
+        pageNumsSet.add(0);
+        pageNumsSet.add(maxPageNum);
+
+        if (maxPageNum > 10) {
+            pageNumsSet.add(currentPageNum);
+            //add everything in epsilon around current pageNum
+            for (int i = currentPageNum; i <= Math.min(currentPageNum+epsilon, maxPageNum); i++) {
+                pageNumsSet.add(i);
+            }
+            for (int i = currentPageNum; i >= Math.max(0, currentPageNum-epsilon); i--) {
+                pageNumsSet.add(i);
+            }
+        } else {
+            for (int i = 0; i <= maxPageNum; i++) {
+                pageNumsSet.add(i);
+            }
+        }
+        ArrayList<Integer> pageNumsList = new ArrayList<>(pageNumsSet);
+        pageNumsList.sort(Comparator.naturalOrder());
+        //add code for dots:
+        int lastNumber = pageNumsList.get(0);
+        for (int i = 1; i < pageNumsList.size(); i++) {
+            int thisNumber = pageNumsList.get(i);
+            if (lastNumber+1 != thisNumber) {
+                //add dots before thisNumber. -1 stands for dots (easier than defining a special class etc)
+                pageNumsList.add(i++, -1);
+            }
+
+            lastNumber = thisNumber;
+        }
+        return pageNumsList;
+    }
+
+    public int getMaxEntriesPerPage() {
+        final String maxEntriesPerPage = getPlugin().getMaxEntriesPerPage();
+        try {
+            return (maxEntriesPerPage == null || maxEntriesPerPage.equals(""))
+                ? JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE
+                : Integer.parseInt(maxEntriesPerPage);
+        } catch (NumberFormatException e) {
+            LOG.log(WARNING, "Configured MaxEntriesPerPage does not represent an integer: {0}. Falling back to default.", maxEntriesPerPage);
+            return JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE;
+        }
     }
 
     /**

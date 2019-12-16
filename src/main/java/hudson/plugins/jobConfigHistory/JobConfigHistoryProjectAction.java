@@ -161,7 +161,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		}
 		//load historydescrs lazily
 		final SortedMap<String, HistoryDescr> historyDescrSortedMap = getHistoryDao().getRevisions(project.getConfigFile());
-		//todo maybe implement a boolean parameter for ascending order
 
 		//get them values in DESCENDING order (newest revision first)
 		ArrayList<HistoryDescr> mapValues = new ArrayList<>(historyDescrSortedMap.values());
@@ -176,47 +175,13 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
 	public int getMaxPageNum() {
 		String entriesPerPageStr = getCurrentRequest().getParameter("entriesPerPage");
-		//TODO magic number!
-		int entriesPerPage = (entriesPerPageStr != null && !entriesPerPageStr.equals("")) ? Integer.parseInt(entriesPerPageStr) : 100;
+		if (entriesPerPageStr != null && entriesPerPageStr.equals("all")) return 0;
+		int entriesPerPage = (entriesPerPageStr != null && !entriesPerPageStr.equals("")) ? Integer.parseInt(entriesPerPageStr) : getMaxEntriesPerPage();
 		return getRevisionAmount()/ entriesPerPage;
 	}
 
 	public List<Integer> getRelevantPageNums(int currentPageNum) {
-		final int maxPageNum = getMaxPageNum();
-		//todo good epsilon?
-		final int epsilon = 2;
-		final HashSet<Integer> pageNumsSet = new HashSet<>();
-		pageNumsSet.add(0);
-		pageNumsSet.add(maxPageNum);
-
-		if (maxPageNum > 10) {
-			pageNumsSet.add(currentPageNum);
-			//add everything in epsilon around current pageNum
-			for (int i = currentPageNum; i <= Math.min(currentPageNum+epsilon, maxPageNum); i++) {
-				pageNumsSet.add(i);
-			}
-			for (int i = currentPageNum; i >= Math.max(0, currentPageNum-epsilon); i--) {
-				pageNumsSet.add(i);
-			}
-		} else {
-			for (int i = 0; i <= maxPageNum; i++) {
-				pageNumsSet.add(i);
-			}
-		}
-		ArrayList<Integer> pageNumsList = new ArrayList<>(pageNumsSet);
-		pageNumsList.sort(Comparator.naturalOrder());
-		//add code for dots:
-		int lastNumber = pageNumsList.get(0);
-		for (int i = 1; i < pageNumsList.size(); i++) {
-			int thisNumber = pageNumsList.get(i);
-			if (lastNumber+1 != thisNumber) {
-				//add dots before thisNumber. -1 stands for dots (easier than defining a special class etc)
-				pageNumsList.add(i++, -1);
-			}
-
-			lastNumber = thisNumber;
-		}
-		return pageNumsList;
+		return getRelevantPageNums(currentPageNum, getMaxPageNum());
 	}
 
 	private List<ConfigInfo> toConfigInfoList(List<HistoryDescr> historyDescrs, int from, int to) {

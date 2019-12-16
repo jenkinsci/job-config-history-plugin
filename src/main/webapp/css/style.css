@@ -27,7 +27,7 @@
 #####################################################################
 ###                     general modification                      ###
 #####################################################################
-###   TODO: cleanse this document of this abomination!
+###
 */
 
 h1 {
@@ -179,9 +179,8 @@ table.jch groupBody td:last-child {
     padding: 2px;
     background-color: rgb(250,250,250);
     border: 1px solid rgb(232, 232, 232);
+    border:0px;
     border-radius:2px;
-    margin-top:5px;
-    margin-bottom:5px;
 }
 
 table.jch.navigation tr td {
@@ -277,9 +276,31 @@ a.download-arrow:hover{
 #####################################################################
 */
 
+.jch-footer {
+    position: sticky;
+    //left:0;
+    bottom: 0px;
+    width:100%;
+}
+
+.footer-content-wrapper {
+    background-color:rgb(250, 250, 250);
+    width:100%;
+    padding:0px;
+    border: 1px solid rgb(232, 232, 232);
+    border: 1px solid rgb(190, 190, 190);
+}
+
+.header-content-wrapper {
+    padding: 2px;
+    background-color: rgb(250,250,250);
+    border: 1px solid rgb(190, 190, 190);
+    border-radius:2px;
+}
+
 .resizeWrapper {
     resize: vertical;
-    overflow: auto;
+    overflow-y: auto;
     max-height:65vh;
     border-bottom:1px solid rgb(187, 187, 187);;
     border-radius:2px;

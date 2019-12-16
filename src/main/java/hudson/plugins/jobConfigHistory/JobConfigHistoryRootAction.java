@@ -207,7 +207,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 				throw new IllegalStateException("this shouldn happen.");
 			}
 
-			//todo if filter not system or all
 			ConfigType configType = timestampNameToConfigTypeMap.get(timestampAndName);
 			switch (configType) {
 			case JOB:
@@ -375,18 +374,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		} else return -1;
 	}
 
-	public int getMaxEntriesPerPage() {
-		final String maxEntriesPerPage = getPlugin().getMaxEntriesPerPage();
-		try {
-			return (maxEntriesPerPage == null || maxEntriesPerPage.equals(""))
-				? JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE
-				: Integer.parseInt(maxEntriesPerPage);
-		} catch (NumberFormatException e) {
-			LOG.log(WARNING, "Configured MaxEntriesPerPage does not represent an integer: {0}. Falling back to default.", maxEntriesPerPage);
-			return JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE;
-		}
-	}
-
 	public int getMaxPageNum() {
 		String entriesPerPageStr = getCurrentRequest().getParameter("entriesPerPage");
 		if (entriesPerPageStr != null && entriesPerPageStr.equals("all")) return 0;
@@ -395,42 +382,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	}
 
 	public List<Integer> getRelevantPageNums(int currentPageNum) {
-		//TODO DUPLICATED CODE IN PROJECTACTION. FIX THIS!
-		final int maxPageNum = getMaxPageNum();
-		//todo good epsilon?
-		final int epsilon = 2;
-		final HashSet<Integer> pageNumsSet = new HashSet<>();
-		pageNumsSet.add(0);
-		pageNumsSet.add(maxPageNum);
-
-		if (maxPageNum > 10) {
-			pageNumsSet.add(currentPageNum);
-			//add everything in epsilon around current pageNum
-			for (int i = currentPageNum; i <= Math.min(currentPageNum+epsilon, maxPageNum); i++) {
-				pageNumsSet.add(i);
-			}
-			for (int i = currentPageNum; i >= Math.max(0, currentPageNum-epsilon); i--) {
-				pageNumsSet.add(i);
-			}
-		} else {
-			for (int i = 0; i <= maxPageNum; i++) {
-				pageNumsSet.add(i);
-			}
-		}
-		ArrayList<Integer> pageNumsList = new ArrayList<>(pageNumsSet);
-		pageNumsList.sort(Comparator.naturalOrder());
-		//add code for dots:
-		int lastNumber = pageNumsList.get(0);
-		for (int i = 1; i < pageNumsList.size(); i++) {
-			int thisNumber = pageNumsList.get(i);
-			if (lastNumber+1 != thisNumber) {
-				//add dots before thisNumber. -1 stands for dots (easier than defining a special class etc)
-				pageNumsList.add(i++, -1);
-			}
-
-			lastNumber = thisNumber;
-		}
-		return pageNumsList;
+		return getRelevantPageNums(currentPageNum, getMaxPageNum());
 	}
 
 	/**
