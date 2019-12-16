@@ -175,7 +175,7 @@
 
 
             <div>
-              <div style="float:left; width:29%">
+              <div style="float:left; width:34%">
                 <table class="jch navigation">
                   <tr>
                     <td style="width:150px; font-weight:bold;">Entries per page:</td>
@@ -189,11 +189,11 @@
                 </table>
               </div>
               <j:if test="${maxPageNum != 0}">
-                <div style="float:right; width:70%">
+                <div style="float:right; width:65%">
                   <table  class="jch navigation">
     <!--                <thead><caption class="caption">Navigation</caption></thead>-->
                     <tr>
-                      <td style="width:150px; font-weight:bold;">Page:</td>
+                      <td style="font-weight:bold;">Page:</td>
                       <j:if test="${pageNum > 0}">
                         <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a></div></td>
                       </j:if>

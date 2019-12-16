@@ -209,7 +209,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		int lastNumber = pageNumsList.get(0);
 		for (int i = 1; i < pageNumsList.size(); i++) {
 			int thisNumber = pageNumsList.get(i);
-			System.out.println("it: (" + lastNumber + ", " + thisNumber + ")");
 			if (lastNumber+1 != thisNumber) {
 				//add dots before thisNumber. -1 stands for dots (easier than defining a special class etc)
 				pageNumsList.add(i++, -1);
