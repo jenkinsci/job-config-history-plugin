@@ -123,7 +123,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	public final List<ConfigInfo> getJobConfigs() throws IOException {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
 			checkConfigurePermission();
-			return null;
+			return Collections.emptyList();
 		}
 		final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(
 				getHistoryDao().getRevisions(project.getConfigFile()).values());

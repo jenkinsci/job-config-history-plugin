@@ -476,9 +476,34 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	}
 
 	@Override
+	public int getSystemRevisionAmount() {
+		return countSubDirs(getSystemConfigs());
+	}
+
+	@Override
+	public int getJobRevisionAmount() {
+		return countSubDirs(getJobs()) + getDeletedJobRevisionAmount();
+	}
+
+	@Override
+	public int getDeletedJobRevisionAmount() {
+		return countSubDirs(getDeletedJobs());
+	}
+
+	@Override
+	public int getTotalRevisionAmount() {
+		return getJobRevisionAmount() + getSystemRevisionAmount();
+	}
+
+	private int countSubDirs(File[] files) {
+
+		return (Arrays.asList(files)).stream().map(file -> file.listFiles(HistoryFileFilter.INSTANCE).length).reduce(Integer::sum).get();
+	}
+
+	@Override
 	public int getRevisionAmount(Node node) {
 		//TODO implement
-		return -1;
+		throw new IllegalStateException("not yet implemented!");
 	}
 
 	@Override
@@ -957,6 +982,25 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	public File[] getSystemConfigs() {
 		return returnEmptyFileArrayForNull(
 			historyRootDir.listFiles(NonJobsDirectoryFileFilter.INSTANCE));
+	}
+
+	@Override
+	public SortedMap<String, HistoryDescr> getSystemConfigsMap() {
+		File[] systemConfigsArr = getSystemConfigs();
+		final TreeMap<String, HistoryDescr> map = new TreeMap<String, HistoryDescr>();
+
+		if (systemConfigsArr == null) {
+			return map;
+		} else {
+			for (File historyDir : systemConfigsArr) {
+				final XmlFile historyXml = getHistoryXmlFile(historyDir);
+				final LazyHistoryDescr historyDescription = new LazyHistoryDescr(
+					historyXml);
+				map.put(historyDir.getName(), historyDescription);
+			}
+			return map;
+		}
+
 	}
 
 	/**

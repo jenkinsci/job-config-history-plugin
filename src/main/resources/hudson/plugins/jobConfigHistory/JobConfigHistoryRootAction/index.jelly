@@ -35,6 +35,39 @@
         </j:otherwise>
       </j:choose>
 
+
+
+
+      <!--TODO test area-->
+      <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}"/>
+      <j:set var="pageNum" value="${request.getParameter('pageNum')}"/>
+      <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}"/>
+      <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}"/>
+      <j:set var="defaultEntriesPerPage" value="${(defaultEntriesPerPage > totalEntriesNumber) ? &quot;all&quot; : defaultEntriesPerPage}"/>
+      <j:if test="${pageNum == null or pageNum.equals(&quot;&quot;)}">
+        <j:set var="pageNum" value="0"/>
+      </j:if>
+      <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
+        <j:set var="entriesPerPage" value="${defaultEntriesPerPage}"/>
+      </j:if>
+      <j:choose>
+        <j:when test="${entriesPerPage.equals(&quot;all&quot;) or filter.equals(&quot;created&quot;)}">
+          <j:set var="configs" value="${it.getConfigs()}" />
+          <j:set var="maxPageNum" value="${0}"/>
+        </j:when>
+        <j:otherwise>
+          <j:set var="configs" value="${it.getConfigs(pageNum*entriesPerPage, pageNum*entriesPerPage+entriesPerPage)}" />
+          <!--todo remove!-\/-->
+<!--          <j:set var="configs" value="${it.getConfigs()}" />-->
+          <!--todo remove!-/\-->
+          <j:set var="maxPageNum" value="${it.getMaxPageNum()}"/>
+        </j:otherwise>
+      </j:choose>
+
+
+
+
+
       <table style="width:100%" class="small-button-wrapper">
         <tr>
           <td>
@@ -66,7 +99,10 @@
       </table>
       <div style="padding:2px"/>
       <div>
-        <j:set var="configs" value="${it.getConfigs()}" />
+<!--        <j:set var="configs" value="${it.getConfigs(0,it.getConfigs().size())}" />-->
+<!--        <j:set var="configs" value="${it.getConfigs(0,10)}" />-->
+<!--        <j:set var="configs" value="${it.getConfigs()}" />-->
+
         <j:choose>
           <j:when test="${!it.hasConfigurePermission() and (filter == 'system' || filter == null)}">
             ${%No permission to view system changes}
@@ -174,6 +210,60 @@
                 </table>
               </div>
             </div>
+
+
+            <!--todo newu-->
+            <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
+            <div>
+              <j:if test="${!filter.equals(&quot;created&quot;)}">
+                <div style="float:left; width:29%">
+                  <table class="jch navigation">
+                    <tr>
+                      <td style="width:150px; font-weight:bold;">Entries per page:</td>
+                      <td><div class="menu-url-button current">${entriesPerPage}</div></td>
+                      <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${10}">10</a></div></td>
+                      <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${25}">25</a></div></td>
+                      <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${100}">100</a></div></td>
+                      <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${250}">250</a></div></td>
+                      <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;entriesPerPage=${&quot;all&quot;}">all</a></div></td>
+                    </tr>
+                  </table>
+                </div>
+              </j:if>
+              <j:if test="${maxPageNum != 0}">
+                <div style="float:right; width:70%">
+                  <table  class="jch navigation">
+                    <!--                <thead><caption class="caption">Navigation</caption></thead>-->
+                    <tr>
+                      <td style="width:150px; font-weight:bold;">Page:</td>
+                      <j:if test="${pageNum > 0}">
+                        <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a></div></td>
+                      </j:if>
+                      <j:forEach var="currentPageNum" items="${relevantPageNums}">
+                        <j:choose>
+                          <j:when test="${currentPageNum == -1}">
+                            <td><div class="menu-url-button-dead>">&#8230;</div></td>
+                          </j:when>
+                          <j:when test="${currentPageNum == pageNum}">
+                            <td><div class="menu-url-button current">${currentPageNum}</div></td>
+                          </j:when>
+                          <j:otherwise>
+                            <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum}</a></div></td>
+                          </j:otherwise>
+                        </j:choose>
+                      </j:forEach>
+                      <j:if test="${maxPageNum > pageNum}">
+                        <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a></div></td>
+                      </j:if>
+                    </tr>
+                  </table>
+                </div>
+              </j:if>
+            </div>
+            <!--todo newu-->
+
+
+
           </j:otherwise>
         </j:choose>
       </div>

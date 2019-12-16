@@ -43,6 +43,14 @@ public interface OverviewHistoryDao {
 	 */
 	File[] getDeletedJobs(String folderName);
 
+	int getSystemRevisionAmount();
+
+	int getJobRevisionAmount();
+
+	int getDeletedJobRevisionAmount();
+
+	int getTotalRevisionAmount();
+
 	/**
 	 * Returns a list of deleted jobs with a history, including all those
 	 * contained in folders.
@@ -75,6 +83,8 @@ public interface OverviewHistoryDao {
 	 *         no history exists.
 	 */
 	File[] getSystemConfigs();
+
+	SortedMap<String, HistoryDescr> getSystemConfigsMap();
 
 	/**
 	 * Returns a sorted map of all HistoryDescr for a given job.

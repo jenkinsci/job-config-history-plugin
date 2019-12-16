@@ -37,7 +37,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -138,10 +143,94 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		return configs;
 	}
 
-	//TODO do this.
-//	public final List<ConfigInfo> getConfigs(int from, int to) {
-//
-//	}
+	private enum ConfigType {
+		SYSTEM, JOB, JOB_DELETED, JOB_UNKNOWN;
+	}
+
+	public final List<ConfigInfo> getConfigs(int from, int to) throws IOException {
+
+		if (from > to) throw new IllegalArgumentException("start index is greater than end index: (" + from + ", " + to + ")");
+		final int revisionAmount = getRevisionAmount();
+		if (from > revisionAmount) {
+			throw new IllegalArgumentException("start index is greater than revision amount: (" + from + ", " + revisionAmount + ")");
+			//todo do sth better
+		}
+
+		if (to > revisionAmount) {
+			to = revisionAmount;
+		}
+		final String filter = getRequestParameter("filter");
+
+		HashMap<String, ConfigType> timestampNameToConfigTypeMap = new HashMap<>();
+
+		SortedMap<String, Pair<String, HistoryDescr>> historyDescrSortedMap;
+		if (filter == null || filter.equals("")|| filter.equals("system")) {
+			historyDescrSortedMap = getSystemConfigsHistoryDescr();
+			historyDescrSortedMap.keySet().forEach(timestampAndName -> timestampNameToConfigTypeMap.put(timestampAndName, ConfigType.SYSTEM));
+		} else if (filter.equals("all")) {
+			historyDescrSortedMap = getJobConfigsHistoryDescr("jobs");
+			historyDescrSortedMap.keySet().forEach(timestampAndName -> timestampNameToConfigTypeMap.put(timestampAndName, ConfigType.JOB_UNKNOWN));
+
+			final SortedMap<String, Pair<String, HistoryDescr>> deletedJobsMap = getJobConfigsHistoryDescr("deleted");
+			historyDescrSortedMap.putAll(deletedJobsMap);
+			deletedJobsMap.keySet().forEach(timestampAndName -> timestampNameToConfigTypeMap.put(timestampAndName, ConfigType.JOB_DELETED));
+
+			final SortedMap<String, Pair<String, HistoryDescr>> sysConfigsMap = getSystemConfigsHistoryDescr();
+			historyDescrSortedMap.putAll(sysConfigsMap);
+			sysConfigsMap.keySet().forEach(timestampAndName -> timestampNameToConfigTypeMap.put(timestampAndName, ConfigType.SYSTEM));
+		} else if (filter.equals("deleted")) {
+			historyDescrSortedMap = getJobConfigsHistoryDescr("deleted");
+			historyDescrSortedMap.keySet().forEach(timestampAndName -> timestampNameToConfigTypeMap.put(timestampAndName, ConfigType.JOB_DELETED));
+		} else if (filter.equals("jobs")) {
+			historyDescrSortedMap = getJobConfigsHistoryDescr("jobs");
+			historyDescrSortedMap.keySet().forEach(timestampAndName -> timestampNameToConfigTypeMap.put(timestampAndName, ConfigType.JOB_UNKNOWN));
+
+			final SortedMap<String, Pair<String, HistoryDescr>> deletedJobsMap = getJobConfigsHistoryDescr("deleted");
+			historyDescrSortedMap.putAll(deletedJobsMap);
+			deletedJobsMap.keySet().forEach(timestampAndName -> timestampNameToConfigTypeMap.put(timestampAndName, ConfigType.JOB_DELETED));
+		} else {
+			//hand this over to getConfigs(). The case "created" or "changed" can't be handled since that would require opening the history.xml.
+			return getConfigs();
+		}
+
+
+		//apply the from-to filter
+		final List<ConfigInfo> configs = new ArrayList<>();
+		final ArrayList<String> keyList =  new ArrayList<>(historyDescrSortedMap.keySet());
+		Collections.reverse(keyList);
+		for (String timestampAndName : keyList.subList(from, to-1)) {
+			Pair<String, HistoryDescr> entry = historyDescrSortedMap.get(timestampAndName);
+			//create configs
+			//differ between job and not job
+			//TODO case where both or none contain it
+			if (!timestampNameToConfigTypeMap.containsKey(timestampAndName)) {
+				throw new IllegalStateException("this shouldn happen.");
+			}
+
+			//todo if filter not system or all
+			ConfigType configType = timestampNameToConfigTypeMap.get(timestampAndName);
+			switch (configType) {
+			case JOB:
+				configs.add(ConfigInfo.create(entry.first, true, entry.second, true));
+				break;
+			case JOB_DELETED:
+				configs.add(ConfigInfo.create(entry.first, false, entry.second, true));
+				break;
+			case JOB_UNKNOWN:
+				HistoryDescr historyDescr = entry.second;
+				configs.add(ConfigInfo.create(entry.first, !historyDescr.getOperation().equals("deleted"), entry.second, true));
+				break;
+			case SYSTEM:
+				configs.add(ConfigInfo.create(entry.first, true, entry.second, false));
+				break;
+			default:
+				throw new IllegalStateException("Unexpected config type: " + configType);
+			}
+
+		}
+		return configs;
+	}
+
 
 	/**
 	 * Returns the configuration history entries for all system files in this
@@ -168,6 +257,28 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		return configs;
 	}
 
+	/*
+	Maps "Timestamp#ProjectName" to <ProjectName, HistoryDescr>
+	 */
+	public SortedMap<String, Pair<String, HistoryDescr>> getSystemConfigsHistoryDescr() {
+		SortedMap configsMap = new TreeMap<String, Pair<String,HistoryDescr>>();
+		if (!hasConfigurePermission()) {
+			return Collections.emptySortedMap();
+		}
+
+		final File[] itemDirs = getOverviewHistoryDao().getSystemConfigs();
+		for (final File itemDir : itemDirs) {
+			final String itemName = itemDir.getName();
+			configsMap.putAll(getOverviewHistoryDao().getSystemHistory(itemName).entrySet().stream()
+				.map(entry -> {
+					String timestamp = entry.getKey();
+					HistoryDescr historyDescr = entry.getValue();
+					return new Pair(timestamp + "#" + itemName, new Pair(itemName, historyDescr));
+				}).collect(Collectors.toMap((pair) -> pair.first, (pair) -> pair.second)));
+		}
+		return configsMap;
+	}
+
 	/**
 	 * Returns the configuration history entries for all jobs or deleted jobs in
 	 * this Jenkins instance.
@@ -185,6 +296,42 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 			return new ConfigInfoCollector(type, getOverviewHistoryDao())
 					.collect();
 		}
+	}
+
+	/**
+	 *
+	 * @param type only all or deleted!
+	 * @return
+	 */
+	public SortedMap<String, Pair<String, HistoryDescr>> getJobConfigsHistoryDescr(String type) {
+
+		SortedMap configsMap = new TreeMap<String, Pair<String,HistoryDescr>>();
+		if (!hasConfigurePermission()) {
+			return Collections.emptySortedMap();
+		}
+
+		ArrayList<File> itemDirs = new ArrayList<>();
+		if (type.equals("deleted")) {
+			itemDirs.addAll(Arrays.asList(getOverviewHistoryDao().getDeletedJobs()));
+		} else if (type.equals("jobs")) {
+			itemDirs.addAll(Arrays.asList(getOverviewHistoryDao().getJobs()));
+			itemDirs.addAll(Arrays.asList(getOverviewHistoryDao().getDeletedJobs()));
+		}
+
+		for (final File itemDir : itemDirs) {
+			final String itemName =
+				new File(this.getPlugin().getConfiguredHistoryRootDir(), JobConfigHistoryConsts.JOBS_HISTORY_DIR)
+					.toPath()
+					.relativize(itemDir.toPath()).toString();
+			configsMap.putAll(getOverviewHistoryDao().getJobHistory(itemName).entrySet().stream()
+				.map(entry -> {
+					String timestamp = entry.getKey();
+					HistoryDescr historyDescr = entry.getValue();
+					return new Pair<String, Pair<String, HistoryDescr>>(timestamp + "#" + itemName, new Pair<String, HistoryDescr>(itemName, (HistoryDescr) historyDescr));
+				}).collect(Collectors.toMap((pair) -> pair.first, (pair) -> pair.second)));
+		}
+
+		return configsMap;
 	}
 
 	/**
@@ -211,6 +358,79 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 				true, historyDescriptions, false);
 		Collections.sort(configs, ParsedDateComparator.DESCENDING);
 		return configs;
+	}
+
+	public int getRevisionAmount() {
+		//TODO put all these values in a Paging Wrapper class!
+		final String filter = getRequestParameter("filter");
+
+		if (filter == null || filter.equals("") || filter.equals("system")) {
+			return getOverviewHistoryDao().getSystemRevisionAmount();
+		} else if (filter.equals("jobs")) {
+			return getOverviewHistoryDao().getJobRevisionAmount();
+		} else if (filter.equals("all")) {
+			return getOverviewHistoryDao().getTotalRevisionAmount();
+		} else if (filter.equals("deleted")) {
+			return getOverviewHistoryDao().getDeletedJobRevisionAmount();
+		} else return -1;
+	}
+
+	public int getMaxEntriesPerPage() {
+		final String maxEntriesPerPage = getPlugin().getMaxEntriesPerPage();
+		try {
+			return (maxEntriesPerPage == null || maxEntriesPerPage.equals(""))
+				? JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE
+				: Integer.parseInt(maxEntriesPerPage);
+		} catch (NumberFormatException e) {
+			LOG.log(WARNING, "Configured MaxEntriesPerPage does not represent an integer: {0}. Falling back to default.", maxEntriesPerPage);
+			return JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE;
+		}
+	}
+
+	public int getMaxPageNum() {
+		String entriesPerPageStr = getCurrentRequest().getParameter("entriesPerPage");
+		if (entriesPerPageStr != null && entriesPerPageStr.equals("all")) return 0;
+		int entriesPerPage = (entriesPerPageStr != null && !entriesPerPageStr.equals("")) ? Integer.parseInt(entriesPerPageStr) : getMaxEntriesPerPage();
+		return getRevisionAmount()/ entriesPerPage;
+	}
+
+	public List<Integer> getRelevantPageNums(int currentPageNum) {
+		//TODO DUPLICATED CODE IN PROJECTACTION. FIX THIS!
+		final int maxPageNum = getMaxPageNum();
+		//todo good epsilon?
+		final int epsilon = 2;
+		final HashSet<Integer> pageNumsSet = new HashSet<>();
+		pageNumsSet.add(0);
+		pageNumsSet.add(maxPageNum);
+
+		if (maxPageNum > 10) {
+			pageNumsSet.add(currentPageNum);
+			//add everything in epsilon around current pageNum
+			for (int i = currentPageNum; i <= Math.min(currentPageNum+epsilon, maxPageNum); i++) {
+				pageNumsSet.add(i);
+			}
+			for (int i = currentPageNum; i >= Math.max(0, currentPageNum-epsilon); i--) {
+				pageNumsSet.add(i);
+			}
+		} else {
+			for (int i = 0; i <= maxPageNum; i++) {
+				pageNumsSet.add(i);
+			}
+		}
+		ArrayList<Integer> pageNumsList = new ArrayList<>(pageNumsSet);
+		pageNumsList.sort(Comparator.naturalOrder());
+		//add code for dots:
+		int lastNumber = pageNumsList.get(0);
+		for (int i = 1; i < pageNumsList.size(); i++) {
+			int thisNumber = pageNumsList.get(i);
+			if (lastNumber+1 != thisNumber) {
+				//add dots before thisNumber. -1 stands for dots (easier than defining a special class etc)
+				pageNumsList.add(i++, -1);
+			}
+
+			lastNumber = thisNumber;
+		}
+		return pageNumsList;
 	}
 
 	/**

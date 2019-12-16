@@ -60,4 +60,6 @@ public final class JobConfigHistoryConsts {
 
 	/** Format for timestamped dirs. */
 	public static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
+
+	public static final int DEFAULT_MAX_ENTRIES_PER_PAGE = Integer.MAX_VALUE;
 }
