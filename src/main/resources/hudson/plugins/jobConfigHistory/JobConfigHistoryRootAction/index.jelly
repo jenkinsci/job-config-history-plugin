@@ -36,10 +36,6 @@
         </j:otherwise>
       </j:choose>
 
-
-
-
-      <!--TODO test area-->
       <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}"/>
       <j:set var="pageNum" value="${request.getParameter('pageNum')}"/>
       <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}"/>
@@ -61,10 +57,6 @@
           <j:set var="maxPageNum" value="${it.getMaxPageNum()}"/>
         </j:otherwise>
       </j:choose>
-
-
-
-
 
       <div style="position:sticky; top:26px;">
         <table style="width:100%" class="header-content-wrapper">

@@ -149,8 +149,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		if (from > to) throw new IllegalArgumentException("start index is greater than end index: (" + from + ", " + to + ")");
 		final int revisionAmount = getRevisionAmount();
 		if (from > revisionAmount) {
-			throw new IllegalArgumentException("start index is greater than revision amount: (" + from + ", " + revisionAmount + ")");
-			//todo do sth better
+			LOG.log(FINEST,"Unexpected arguments while generating overview page: start index ({0}) is greater than total revision amount ({1})!",
+				new Object[]{from, revisionAmount});
+			return Collections.emptyList();
 		}
 
 		if (to > revisionAmount) {
@@ -199,7 +200,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 			Pair<String, HistoryDescr> entry = historyDescrSortedMap.get(timestampAndName);
 			//create configs
 			//differ between job and not job
-			//TODO case where both or none contain it
 			if (!timestampNameToConfigTypeMap.containsKey(timestampAndName)) {
 				throw new IllegalStateException("this shouldn happen.");
 			}
@@ -342,7 +342,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	 */
 	public final List<ConfigInfo> getSingleConfigs(String name)
 			throws IOException {
-		//TODO make this paging-able
 		final Collection<HistoryDescr> historyDescriptions;
 		if (name.contains(DeletedFileFilter.DELETED_MARKER)) {
 			historyDescriptions = getOverviewHistoryDao().getJobHistory(name)
@@ -361,8 +360,9 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		if (from > to) throw new IllegalArgumentException("start index is greater than end index: (" + from + ", " + to + ")");
 		final int revisionAmount = getRevisionAmount();
 		if (from > revisionAmount) {
-			throw new IllegalArgumentException("start index is greater than revision amount: (" + from + ", " + revisionAmount + ")");
-			//todo do sth better
+			LOG.log(FINEST,"Unexpected arguments while generating overview page: start index ({0}) is greater than total revision amount ({1})!",
+				new Object[]{from, revisionAmount});
+			return Collections.emptyList();
 		}
 
 		if (to > revisionAmount) {

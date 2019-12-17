@@ -38,6 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
+import java.util.logging.Logger;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -58,11 +59,17 @@ import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import jenkins.model.Jenkins;
 
+import static java.util.logging.Level.FINEST;
+
 /**
  * @author Stefan Brausch
  */
 @ExportedBean(defaultVisibility = -1)
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
+
+	/** Our logger. */
+	private static final Logger LOG = Logger
+		.getLogger(JobConfigHistoryProjectAction.class.getName());
 
 	/** The project. */
 	private final transient AbstractItem project;
@@ -147,8 +154,9 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		if (from > to) throw new IllegalArgumentException("start index is greater than end index: (" + from + ", " + to + ")");
 		final int revisionAmount = getRevisionAmount();
 		if (from > revisionAmount) {
-			throw new IllegalArgumentException("start index is greater than revision amount: (" + from + ", " + revisionAmount + ")");
-			//todo do sth better
+			LOG.log(FINEST,"Unexpected arguments while generating overview page: start index ({0}) is greater than total revision amount ({1})!",
+				new Object[]{from, revisionAmount});
+			return Collections.emptyList();
 		}
 
 		if (to > revisionAmount) {

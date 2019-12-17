@@ -19,9 +19,7 @@
           }
         </script>
 
-
-        <!--TODO test area-->
-        <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}"/> <!--todo get this from JAVA!!!-->
+        <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}"/>
         <j:set var="pageNum" value="${request.getParameter('pageNum')}"/>
         <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}"/>
         <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}"/>
@@ -154,7 +152,6 @@
                     </tbody>
                   </table>
                 </div>
-                <!--todo:copied! unten-->
                 <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
                 <div class="jch-footer">
                   <table class="footer-content-wrapper"><tr><td style="padding:0px;">
@@ -235,8 +232,6 @@
                     </j:if>
                   </td></tr></table>
                 </div>
-                <!--todo:copied! oben-->
-
               </form>
             </div>
           </j:otherwise>
