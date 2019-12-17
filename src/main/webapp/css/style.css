@@ -528,6 +528,7 @@ a.url-button:hover{
     width:100%;
     display:block;
     color: rgba(0, 0, 0, 0.7);
+    outline:none;
 }
 .menu-url-button a:link {
 }

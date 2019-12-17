@@ -17,6 +17,7 @@
     </l:side-panel>
     <l:main-panel>
       <j:set var="filter" value="${request.getParameter('filter')}"/>
+      <j:set var="filter" value="${filter == null ? 'system' : filter}"/>
       <j:choose>
         <j:when test="${filter == 'all'}">
           <h1>${%All Configuration History}</h1>
@@ -72,28 +73,29 @@
         <table style="width:100%" class="header-content-wrapper">
           <tr>
             <td>
-              <div class="menu-url-button">
-                <a href="?filter=system" style="text-decoration:none">${%Show system configs only}</a>
+
+              <div class="${(filter.equalsIgnoreCase(&quot;system&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
+                <a href="?filter=system&amp;pageNum=0&amp;entriesPerPage=${entriesPerPage}" style="text-decoration:none">${%Show system configs only}</a>
               </div>
             </td>
             <td>
-              <div class="menu-url-button">
-                <a href="?filter=jobs" style="text-decoration:none">${%Show job configs only}</a>
+              <div class="${(filter.equalsIgnoreCase(&quot;jobs&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
+                <a href="?filter=jobs&amp;pageNum=0&amp;entriesPerPage=${entriesPerPage}" style="text-decoration:none">${%Show job configs only}</a>
               </div>
             </td>
             <td>
-              <div class="menu-url-button">
-                <a href="?filter=created" style="text-decoration:none">${%Show created jobs only}</a>
+              <div class="${(filter.equalsIgnoreCase(&quot;created&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
+                <a href="?filter=created&amp;pageNum=0&amp;entriesPerPage=${entriesPerPage}" style="text-decoration:none">${%Show created jobs only}</a>
               </div>
             </td>
             <td>
-              <div class="menu-url-button">
-                <a href="?filter=deleted" style="text-decoration:none">${%Show deleted jobs only}</a>
+              <div class="${(filter.equalsIgnoreCase(&quot;deleted&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
+                <a href="?filter=deleted&amp;pageNum=0&amp;entriesPerPage=${entriesPerPage}" style="text-decoration:none">${%Show deleted jobs only}</a>
               </div>
             </td>
             <td>
-              <div class="menu-url-button">
-                <a href="?filter=all" style="text-decoration:none">${%Show all configs}</a>
+              <div class="${(filter.equalsIgnoreCase(&quot;all&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
+                <a href="?filter=all&amp;pageNum=0&amp;entriesPerPage=${entriesPerPage}" style="text-decoration:none">${%Show all configs}</a>
               </div>
             </td>
           </tr>
@@ -117,98 +119,90 @@
           </j:when>
           <j:otherwise>
             <div>
-
-              <table class="jch" style="width:100%">
+              <table class="pane sortable jch" style="width:100%;">
                 <thead>
-                  <caption class="caption">
-                    filter: ${filter == null ? 'system' : filter}
-                  </caption>
+                  <tr style="position:sticky; top:68px;">
+                    <th initialSortDir="up">${%Date}</th>
+                    <j:choose>
+                      <j:when test="${filter == 'jobs' || filter == 'deleted' || filter == 'created'}">
+                        <th>${%Job configuration}</th>
+                      </j:when>
+                      <j:when test="${filter == 'all'}">
+                        <th>${%Job/System configuration}</th>
+                      </j:when>
+                      <j:otherwise>
+                        <th>${%System configuration}</th>
+                      </j:otherwise>
+                    </j:choose>
+                    <th>${%Operation}</th>
+                    <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                      <th>${%User}</th>
+                    </j:if>
+                    <th>${%File(raw)}</th>
+                    <j:if test="${filter == 'deleted'}">
+                      <th style="text-align:center">${%Restore project}</th>
+                    </j:if>
+                  </tr>
                 </thead>
-              </table>
-                <table class="pane sortable jch" style="width:100%;">
-                  <thead>
-                    <tr>
-                      <th initialSortDir="up">${%Date}</th>
-                      <j:choose>
-                        <j:when test="${filter == 'jobs' || filter == 'deleted' || filter == 'created'}">
-                          <th>${%Job configuration}</th>
-                        </j:when>
-                        <j:when test="${filter == 'all'}">
-                          <th>${%Job/System configuration}</th>
-                        </j:when>
-                        <j:otherwise>
-                          <th>${%System configuration}</th>
-                        </j:otherwise>
-                      </j:choose>
-                      <th>${%Operation}</th>
-                      <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                        <th>${%User}</th>
-                      </j:if>
-                      <th>${%File(raw)}</th>
-                      <j:if test="${filter == 'deleted'}">
-                        <th style="text-align:center">${%Restore project}</th>
-                      </j:if>
-                    </tr>
-                  </thead>
 
-                  <j:set var="configNr" value="0"/>
-                  <j:forEach var="config" items="${configs}">
-                    <j:set var="configNr" value="${configNr + 1}"/>
-                    <tr class="alternate">
-                      <td>${config.date}</td>
-                      <j:choose>
-                        <j:when test="${config.getIsJob()}">
-                          <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
-                          <td>
-                            <a href="${rootURL}/job/${config.job.replace('/jobs', '/job')}/jobConfigHistory">
-                              <!-- Adding breadcrumbs and deleting irrelevant information about the jobs subdirectory -->
-                              ${config.job.replace('/jobs', '').replace('/', ' » ')}
-                            </a>
-                          </td>
-                        </j:when>
-                        <j:otherwise>
-                          <j:choose>
-                            <j:when test="${config.job.contains('_deleted_')}">
-                              <td><a href="history?name=${config.job}" id="deleted">${config.job}</a></td>
-                            </j:when>
-                            <j:otherwise>
-                              <td><a href="history?name=${config.job}">${config.job}</a>&amp;nbsp;(system)</td>
-                            </j:otherwise>
-                          </j:choose>
-                        </j:otherwise>
-                      </j:choose>
-                      <td>${config.operation}</td>
-                      <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                        <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                      </j:if>
-                      <td>
+                <j:set var="configNr" value="0"/>
+                <j:forEach var="config" items="${configs}">
+                  <j:set var="configNr" value="${configNr + 1}"/>
+                  <tr class="alternate">
+                    <td>${config.date}</td>
+                    <j:choose>
+                      <j:when test="${config.getIsJob()}">
                         <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
-                        <a href="${it.createLinkToFiles(config,'xml')}">
-                          <img src="${imagesURL}/24x24/document.png"/>${%View as XML}
-                        </a>
-                        <st:nbsp />
-                        <a href="${it.createLinkToFiles(config,'raw')}">
-                          (${%RAW})
-                        </a>
-                      </td>
-                      <j:if test="${filter == 'deleted'}">
-                        <td  style="text-align:center">
-                          <j:if test="${it.getLastAvailableConfigXml(config.getJob()) != null}">
-                            <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                              <!--this prevents people from destroying their history by trying to restore deleted folder jobs
-                               TODO Fix that. (see code)-->
-                              <j:if test="${config.job.replace('/jobs', '/job').equals(config.job)}">
-                                <a id="restore" href="restoreQuestion?name=${config.getJob()}">
-                                  <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
-                                </a>
-                              </j:if>
+                        <td>
+                          <a href="${rootURL}/job/${config.job.replace('/jobs', '/job')}/jobConfigHistory">
+                            <!-- Adding breadcrumbs and deleting irrelevant information about the jobs subdirectory -->
+                            ${config.job.replace('/jobs', '').replace('/', ' » ')}
+                          </a>
+                        </td>
+                      </j:when>
+                      <j:otherwise>
+                        <j:choose>
+                          <j:when test="${config.job.contains('_deleted_')}">
+                            <td><a href="history?name=${config.job}" id="deleted">${config.job}</a></td>
+                          </j:when>
+                          <j:otherwise>
+                            <td><a href="history?name=${config.job}">${config.job}</a>&amp;nbsp;(system)</td>
+                          </j:otherwise>
+                        </j:choose>
+                      </j:otherwise>
+                    </j:choose>
+                    <td>${config.operation}</td>
+                    <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                      <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                    </j:if>
+                    <td>
+                      <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
+                      <a href="${it.createLinkToFiles(config,'xml')}">
+                        <img src="${imagesURL}/24x24/document.png"/>${%View as XML}
+                      </a>
+                      <st:nbsp />
+                      <a href="${it.createLinkToFiles(config,'raw')}">
+                        (${%RAW})
+                      </a>
+                    </td>
+                    <j:if test="${filter == 'deleted'}">
+                      <td  style="text-align:center">
+                        <j:if test="${it.getLastAvailableConfigXml(config.getJob()) != null}">
+                          <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                            <!--this prevents people from destroying their history by trying to restore deleted folder jobs
+                             TODO Fix that. (see code)-->
+                            <j:if test="${config.job.replace('/jobs', '/job').equals(config.job)}">
+                              <a id="restore" href="restoreQuestion?name=${config.getJob()}">
+                                <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
+                              </a>
                             </j:if>
                           </j:if>
-                        </td>
-                      </j:if>
-                    </tr>
-                  </j:forEach>
-                </table>
+                        </j:if>
+                      </td>
+                    </j:if>
+                  </tr>
+                </j:forEach>
+              </table>
               <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
               <div class="jch-footer">
                 <table class="footer-content-wrapper"><tr><td style="padding:0px;">
@@ -238,9 +232,9 @@
                     </div>
                   </j:if>
                   <j:if test="${maxPageNum != 0}">
+                    <!--page navigation-->
                     <div style="float:right; width:65%">
                       <table  class="jch navigation">
-                        <!--                <thead><caption class="caption">Navigation</caption></thead>-->
                         <tr>
                           <td style=" font-weight:bold; width:60px">Page:</td>
                           <j:if test="${pageNum > 0}">
@@ -252,10 +246,10 @@
                                 <td><div class="menu-url-button-dead>">&#8230;</div></td>
                               </j:when>
                               <j:when test="${currentPageNum == pageNum}">
-                                <td><div class="menu-url-button current">${currentPageNum}</div></td>
+                                <td><div class="menu-url-button current">${currentPageNum+1}</div></td>
                               </j:when>
                               <j:otherwise>
-                                <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum}</a></div></td>
+                                <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum+1}</a></div></td>
                               </j:otherwise>
                             </j:choose>
                           </j:forEach>
@@ -269,18 +263,6 @@
                 </td></tr></table>
               </div>
             </div>
-
-
-            <!--todo newu-->
-
-            <!--todo newu-->
-<!--            <H1>hae</H1>-->
-<!--            <div class="jch-footer">-->
-<!--              <H1>FOOTER</H1>-->
-<!--            </div>-->
-
-
-
           </j:otherwise>
         </j:choose>
       </div>
