@@ -23,9 +23,6 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import static java.util.logging.Level.FINEST;
-import static java.util.logging.Level.WARNING;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -37,9 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -65,6 +60,8 @@ import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.security.Permission;
 import hudson.util.MultipartFormDataParser;
+
+import static java.util.logging.Level.*;
 
 /**
  *
@@ -198,7 +195,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		final List<ConfigInfo> configs = new ArrayList<>();
 		final ArrayList<String> keyList =  new ArrayList<>(historyDescrSortedMap.keySet());
 		Collections.reverse(keyList);
-		for (String timestampAndName : keyList.subList(from, to-1)) {
+		for (String timestampAndName : keyList.subList(from, to)) {
 			Pair<String, HistoryDescr> entry = historyDescrSortedMap.get(timestampAndName);
 			//create configs
 			//differ between job and not job
@@ -213,11 +210,11 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 				configs.add(ConfigInfo.create(entry.first, true, entry.second, true));
 				break;
 			case JOB_DELETED:
-				configs.add(ConfigInfo.create(entry.first, false, entry.second, true));
+				if (entry.second.getOperation().equalsIgnoreCase("deleted")) configs.add(ConfigInfo.create(entry.first, false, entry.second, false));
 				break;
 			case JOB_UNKNOWN:
 				HistoryDescr historyDescr = entry.second;
-				configs.add(ConfigInfo.create(entry.first, !historyDescr.getOperation().equals("deleted"), entry.second, true));
+				configs.add(ConfigInfo.create(entry.first, !historyDescr.getOperation().equalsIgnoreCase("deleted"), entry.second, true));
 				break;
 			case SYSTEM:
 				configs.add(ConfigInfo.create(entry.first, true, entry.second, false));
@@ -345,6 +342,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	 */
 	public final List<ConfigInfo> getSingleConfigs(String name)
 			throws IOException {
+		//TODO make this paging-able
 		final Collection<HistoryDescr> historyDescriptions;
 		if (name.contains(DeletedFileFilter.DELETED_MARKER)) {
 			historyDescriptions = getOverviewHistoryDao().getJobHistory(name)
@@ -352,6 +350,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		} else {
 			historyDescriptions = getOverviewHistoryDao().getSystemHistory(name)
 					.values();
+			System.out.println("syshis values size: " + historyDescriptions.size());
 		}
 		final List<ConfigInfo> configs = HistoryDescrToConfigInfo.convert(name,
 				true, historyDescriptions, false);
@@ -359,10 +358,69 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		return configs;
 	}
 
+	public final List<ConfigInfo> getSingleConfigs(String name, int from, int to) {
+		if (from > to) throw new IllegalArgumentException("start index is greater than end index: (" + from + ", " + to + ")");
+		final int revisionAmount = getRevisionAmount();
+		if (from > revisionAmount) {
+			throw new IllegalArgumentException("start index is greater than revision amount: (" + from + ", " + revisionAmount + ")");
+			//todo do sth better
+		}
+
+		if (to > revisionAmount) {
+			to = revisionAmount;
+		}
+
+		final ArrayList<HistoryDescr> historyDescriptions;
+		if (name.contains(DeletedFileFilter.DELETED_MARKER)) {
+			historyDescriptions = new ArrayList<>(getOverviewHistoryDao().getJobHistory(name).values());
+		} else {
+			historyDescriptions = new ArrayList<>(getOverviewHistoryDao().getSystemHistory(name).values());
+			System.out.println("syshis values size: " + historyDescriptions.size());
+		}
+		Collections.reverse(historyDescriptions);
+
+//		return toConfigInfoList(historyDescriptions, name.contains(DeletedFileFilter.DELETED_MARKER), name, from, to);
+		final List<HistoryDescr> cuttedHistoryDescrs = historyDescriptions.subList(from, to);
+
+		final List configs = HistoryDescrToConfigInfo.convert(name, true, cuttedHistoryDescrs, false);
+		Collections.sort(configs, ParsedDateComparator.DESCENDING);
+		return configs;
+	}
+
+//	private List<ConfigInfo> toConfigInfoList(List<HistoryDescr> historyDescrs, boolean isDeletedJob, String name, int from, int to) {
+//		ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+//		for (final HistoryDescr historyDescr : historyDescrs.subList(from, to)) {
+//			final String timestamp = historyDescr.getTimestamp();
+//			if (isDeletedJob) {
+//				configs.add(ConfigInfo.create(name, false,
+//					historyDescr, true));
+//			} else {
+//				configs.add(ConfigInfo.create(name, true,
+//					historyDescr, true));
+//			}
+//		}
+//		return configs;
+//	}
+
 	public int getRevisionAmount() {
 		//TODO put all these values in a Paging Wrapper class!
 		final String filter = getRequestParameter("filter");
+		final String historyRequestURI = "/jenkins/" + JobConfigHistoryConsts.URLNAME + "/history";
+		if (getCurrentRequest().getRequestURI().equals(historyRequestURI)) {
+			//history diff page handling
+			final String name = getRequestParameter("name");
+			if (name != null) {
+				return (name.contains(DeletedFileFilter.DELETED_MARKER))
+					? getOverviewHistoryDao().getJobRevisionAmount(name)
+					: getOverviewHistoryDao().getSystemRevisionAmount(name);
+			}
+			else {
+				LOG.log(FINEST, "system config not given.");
+				return -1;
+			}
+		}
 
+		//overview page handling
 		if (filter == null || filter.equals("") || filter.equals("system")) {
 			return getOverviewHistoryDao().getSystemRevisionAmount();
 		} else if (filter.equals("jobs")) {

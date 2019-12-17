@@ -58,9 +58,6 @@
         </j:when>
         <j:otherwise>
           <j:set var="configs" value="${it.getConfigs(pageNum*entriesPerPage, pageNum*entriesPerPage+entriesPerPage)}" />
-          <!--todo remove!-\/-->
-<!--          <j:set var="configs" value="${it.getConfigs()}" />-->
-          <!--todo remove!-/\-->
           <j:set var="maxPageNum" value="${it.getMaxPageNum()}"/>
         </j:otherwise>
       </j:choose>

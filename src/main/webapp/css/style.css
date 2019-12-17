@@ -390,6 +390,9 @@ table.sortable.jch a.sortheader {
     border: 1px solid #383838;
     border-radius: 2px;
     padding: 12px;
+    padding-top:7px;
+    padding-bottom:7px;
+    margin-top:3px;
     font-size: 14px;
 }
 

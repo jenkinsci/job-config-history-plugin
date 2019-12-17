@@ -47,7 +47,11 @@ public interface OverviewHistoryDao {
 
 	int getJobRevisionAmount();
 
+	int getSystemRevisionAmount(String jobName);
+
 	int getDeletedJobRevisionAmount();
+
+	int getJobRevisionAmount(String jobName);
 
 	int getTotalRevisionAmount();
 

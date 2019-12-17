@@ -476,6 +476,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	}
 
 	@Override
+	public int getSystemRevisionAmount(String sysConfigName) { return getSystemHistory(sysConfigName).size(); }
+
+	@Override
 	public int getSystemRevisionAmount() {
 		return countSubDirs(getSystemConfigs());
 	}
@@ -487,8 +490,11 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
 	@Override
 	public int getDeletedJobRevisionAmount() {
-		return countSubDirs(getDeletedJobs());
+		return getDeletedJobs().length;	//not counting subdirs since only one entry is to be displayed
 	}
+
+	@Override
+	public int getJobRevisionAmount(String jobName) { return getJobHistory(jobName).size(); }
 
 	@Override
 	public int getTotalRevisionAmount() {

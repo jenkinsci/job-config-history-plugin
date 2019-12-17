@@ -30,8 +30,31 @@
         </j:otherwise>
       </j:choose>
 
+      <!--TODO test area-->
+      <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}"/>
+      <j:set var="pageNum" value="${request.getParameter('pageNum')}"/>
+      <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}"/>
+      <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}"/>
+      <j:set var="defaultEntriesPerPage" value="${(defaultEntriesPerPage > totalEntriesNumber) ? &quot;all&quot; : defaultEntriesPerPage}"/>
+      <j:if test="${pageNum == null or pageNum.equals(&quot;&quot;)}">
+        <j:set var="pageNum" value="0"/>
+      </j:if>
+      <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
+        <j:set var="entriesPerPage" value="${defaultEntriesPerPage}"/>
+      </j:if>
+      <j:choose>
+        <j:when test="${entriesPerPage.equals(&quot;all&quot;)}">
+          <j:set var="configs" value="${it.getSingleConfigs(name)}" />
+          <j:set var="maxPageNum" value="${0}"/>
+        </j:when>
+        <j:otherwise>
+          <j:set var="configs" value="${it.getSingleConfigs(name, pageNum*entriesPerPage, pageNum*entriesPerPage+entriesPerPage)}" />
+          <j:set var="maxPageNum" value="${it.getMaxPageNum()}"/>
+        </j:otherwise>
+      </j:choose>
+
+
       <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"></script>
-      <j:set var="configs" value="${it.getSingleConfigs(name)}" />
       <div>
         <j:choose>
           <j:when test="${!it.hasConfigurePermission() and !isDeleted}">
@@ -46,23 +69,16 @@
           <j:otherwise>
             <br/>
             <div>
-              <f:form method="post" action="diffFiles" name="diffFiles" enctype="multipart/form-data">
-                <j:if test="${configs.size() > 1}">
-                  <div align="right">
-                    <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
-                  </div>
-                  <div style="padding:2px"/>
-                </j:if>
-
+              <f:form method="post" action="diffFiles" enctype="multipart/form-data">
                 <table class="jch" style="width:100%">
                   <thead>
                     <caption class="caption">${name}</caption>
                   </thead>
                 </table>
-                <div class="resizeWrapper" style="overflow-y:scroll; height:100%; max-height:52vh;">
+                <div>
                   <table id="confighistory"  class="pane sortable jch" style="width:100%">
                     <thead>
-                      <tr>
+                      <tr style="position:sticky; top:27px;">
                         <th initialSortDir="up">${%Date}</th>
                         <th>${%Operation}</th>
                         <th>${%User}</th>
@@ -123,12 +139,71 @@
                     </j:forEach>
                   </table>
                 </div>
-                <j:if test="${configs.size() > 1}">
-                  <div style="padding:2px"/>
-                  <div align="right">
-                    <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
-                  </div>
-                </j:if>
+                <!--todo:copied! unten-->
+                <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
+                <div class="jch-footer">
+                  <table class="footer-content-wrapper"><tr><td style="padding:0px;">
+                    <j:if test="${!filter.equals(&quot;created&quot;)}">
+                      <div style="float:left; width:34%">
+                        <table class="jch navigation">
+                          <tr>
+                            <td style="width:150px; font-weight:bold;">Entries per page:</td>
+                            <!--                          <td><div class="menu-url-button current">${entriesPerPage}</div></td>-->
+                            <td><div class="${(entriesPerPage.equals(&quot;10&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
+                              <a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${10}">10</a>
+                            </div></td>
+                            <td><div class="${(entriesPerPage.equals(&quot;25&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
+                              <a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${25}">25</a>
+                            </div></td>
+                            <td><div class="${(entriesPerPage.equals(&quot;100&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
+                              <a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${100}">100</a>
+                            </div></td>
+                            <td><div class="${(entriesPerPage.equals(&quot;250&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
+                              <a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${250}">250</a>
+                            </div></td>
+                            <td><div class="${(entriesPerPage == &quot;all&quot;) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
+                              <a href="${request.getRequestURL().toString()}?name=${name}&amp;entriesPerPage=${&quot;all&quot;}">all</a>
+                            </div></td>
+                          </tr>
+                        </table>
+                      </div>
+                    </j:if>
+                    <j:if test="${maxPageNum != 0}">
+                      <!--page navigation-->
+                      <div style="float:left; width:55%">
+                        <table  class="jch navigation">
+                          <tr>
+                            <td style=" font-weight:bold; width:60px">Page:</td>
+                            <j:if test="${pageNum > 0}">
+                              <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a></div></td>
+                            </j:if>
+                            <j:forEach var="currentPageNum" items="${relevantPageNums}">
+                              <j:choose>
+                                <j:when test="${currentPageNum == -1}">
+                                  <td><div class="menu-url-button-dead>">&#8230;</div></td>
+                                </j:when>
+                                <j:when test="${currentPageNum == pageNum}">
+                                  <td><div class="menu-url-button current">${currentPageNum+1}</div></td>
+                                </j:when>
+                                <j:otherwise>
+                                  <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum+1}</a></div></td>
+                                </j:otherwise>
+                              </j:choose>
+                            </j:forEach>
+                            <j:if test="${maxPageNum > pageNum}">
+                              <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a></div></td>
+                            </j:if>
+                          </tr>
+                        </table>
+                      </div>
+                    </j:if>
+                    <j:if test="${configs.size() > 1}">
+                      <div style="float:right">
+                        <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
+                      </div>
+                    </j:if>
+                  </td></tr></table>
+                </div>
               </f:form>
             </div>
             <!--this prevents people from destroying their history by trying to restore deleted folder jobs
