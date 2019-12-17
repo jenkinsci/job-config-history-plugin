@@ -510,6 +510,15 @@ a.url-button:hover{
     outline:none;
 }
 
+.menu-url-button.dead {
+    color:grey;
+}
+
+.menu-url-button.dead:hover {
+    cursor: default;
+    background-color: rgb(230,230,230);
+}
+
 .menu-url-button:hover {
 
     background-color: rgb(200,200,200);

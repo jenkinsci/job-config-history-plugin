@@ -350,7 +350,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		} else {
 			historyDescriptions = getOverviewHistoryDao().getSystemHistory(name)
 					.values();
-			System.out.println("syshis values size: " + historyDescriptions.size());
 		}
 		final List<ConfigInfo> configs = HistoryDescrToConfigInfo.convert(name,
 				true, historyDescriptions, false);
@@ -375,7 +374,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 			historyDescriptions = new ArrayList<>(getOverviewHistoryDao().getJobHistory(name).values());
 		} else {
 			historyDescriptions = new ArrayList<>(getOverviewHistoryDao().getSystemHistory(name).values());
-			System.out.println("syshis values size: " + historyDescriptions.size());
 		}
 		Collections.reverse(historyDescriptions);
 
