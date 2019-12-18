@@ -472,7 +472,10 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		final File configFile = xmlFile.getFile();
 		final File historiesDir = getHistoryDir(configFile);
 		final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
-		return historiesDir.listFiles(HistoryFileFilter.INSTANCE).length;
+		if (historyDirsOfItem == null) {
+			LOG.log(WARNING, "Error occurred while trying to calculate the current revision amount: {0}.listFiles(..) returned null.", historiesDir);
+		}
+		return historyDirsOfItem != null ? historyDirsOfItem.length : -1;
 	}
 
 	@Override
@@ -993,11 +996,11 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	@Override
 	public SortedMap<String, HistoryDescr> getSystemConfigsMap() {
 		File[] systemConfigsArr = getSystemConfigs();
-		final TreeMap<String, HistoryDescr> map = new TreeMap<String, HistoryDescr>();
 
-		if (systemConfigsArr == null) {
-			return map;
+		if (systemConfigsArr.length == 0) {
+			return Collections.emptySortedMap();
 		} else {
+			final TreeMap<String, HistoryDescr> map = new TreeMap();
 			for (File historyDir : systemConfigsArr) {
 				final XmlFile historyXml = getHistoryXmlFile(historyDir);
 				final LazyHistoryDescr historyDescription = new LazyHistoryDescr(
@@ -1006,7 +1009,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			}
 			return map;
 		}
-
 	}
 
 	/**
