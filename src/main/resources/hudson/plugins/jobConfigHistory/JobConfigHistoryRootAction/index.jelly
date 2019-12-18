@@ -119,7 +119,7 @@
               <table class="pane sortable jch" style="width:100%;">
                 <thead>
                   <tr style="position:sticky; top:66px;">
-                    <th initialSortDir="up">${%Date}</th>
+                    <th initialSortDir="up" >${%Date}</th>
                     <j:choose>
                       <j:when test="${filter == 'jobs' || filter == 'deleted' || filter == 'created'}">
                         <th>${%Job configuration}</th>
