@@ -77,7 +77,7 @@
                 <div>
                   <table id="confighistory"  class="pane sortable jch" style="width:100%">
                     <thead>
-                      <tr style="position:sticky; top:27px;">
+                      <tr style="position:sticky; top:26px;">
                         <th initialSortDir="up">${%Date}</th>
                         <th>${%Operation}</th>
                         <th>${%User}</th>

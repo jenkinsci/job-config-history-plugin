@@ -58,7 +58,7 @@
         </j:otherwise>
       </j:choose>
 
-      <div style="position:sticky; top:26px;">
+      <div style="position:sticky; top:26px; z-index:1">
         <table style="width:100%" class="header-content-wrapper">
           <j:set var="selectedStyleEntry" value="font-size:14px"/>
           <j:set var="unSelectedStyleEntry" value=""/>
@@ -118,7 +118,7 @@
             <div>
               <table class="pane sortable jch" style="width:100%;">
                 <thead>
-                  <tr style="position:sticky; top:68px;">
+                  <tr style="position:sticky; top:66px;">
                     <th initialSortDir="up">${%Date}</th>
                     <j:choose>
                       <j:when test="${filter == 'jobs' || filter == 'deleted' || filter == 'created'}">
