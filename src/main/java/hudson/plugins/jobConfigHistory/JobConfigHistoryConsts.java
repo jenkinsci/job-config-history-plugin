@@ -65,4 +65,8 @@ public final class JobConfigHistoryConsts {
 
 	/** Amount of neighbors displayed around the current page number in the page navigation bar. Example (epsilon=2, currentPage=6): [0 ... 4 5 <b>6</b> 7 8  ... 204] */
 	public static final int PAGING_EPSILON = 2;
+
+	public static final String UNKNOWN_USER_NAME = "unknown";
+
+	public static final String UNKNOWN_USER_ID = "unknown";
 }

@@ -165,8 +165,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		oldName = ((oldName == null) ? "" : oldName);
 
 		// Mimicking User.getUnknown() that can not be instantiated here as a lot of tests are run without Jenkins
-		final String user = currentUser != null ? currentUser.getFullName() : "unknown";
-		final String userId = currentUser != null ? currentUser.getId() : "unknown";
+		final String user = currentUser != null ? currentUser.getFullName() : JobConfigHistoryConsts.UNKNOWN_USER_NAME;
+		final String userId = currentUser != null ? currentUser.getId() : JobConfigHistoryConsts.UNKNOWN_USER_ID;
+		System.out.println("user=" + user + ", userId=" + userId);
 
 		final XmlFile historyDescription = getHistoryXmlFile(timestampedDir);
 		final HistoryDescr myDescr = new HistoryDescr(user, userId, operation,

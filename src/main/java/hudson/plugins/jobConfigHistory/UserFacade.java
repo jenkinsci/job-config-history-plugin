@@ -13,8 +13,8 @@ public class UserFacade {
 
 	public UserFacade(User user) {
 		this(
-			user != null ? user.getId() : null,
-			user != null ? user.getFullName() : null);
+			(user != null) ? user.getId() : JobConfigHistoryConsts.UNKNOWN_USER_NAME,
+			(user != null) ? user.getFullName() : JobConfigHistoryConsts.UNKNOWN_USER_ID);
 	}
 
 	public UserFacade(String id, String fullName) {
