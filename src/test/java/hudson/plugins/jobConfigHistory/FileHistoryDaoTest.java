@@ -118,7 +118,7 @@ public class FileHistoryDaoTest {
 		sutWithoutUserAndDuplicateHistory = new FileHistoryDao(historyRoot,
 				jenkinsHome, null, 0, true);
 		sutWithUserAndNoDuplicateHistory = new FileHistoryDao(historyRoot,
-				jenkinsHome, mockedUser, 0, false);
+				jenkinsHome, new UserFacade(mockedUser), 0, false);
 		when(mockedUser.getFullName()).thenReturn(FULL_NAME);
 		when(mockedUser.getId()).thenReturn(USER_ID);
 	}

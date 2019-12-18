@@ -114,7 +114,7 @@ final public class PluginUtils {
 	 */
 	public static JobConfigHistoryStrategy getAnonymousHistoryDao(
 			final JobConfigHistory plugin) {
-		return getHistoryDao(plugin, null);
+		return getHistoryDao(plugin, (User) null);
 	}
 
 	/**
@@ -129,11 +129,17 @@ final public class PluginUtils {
 	 */
 	static JobConfigHistoryStrategy getSystemHistoryDao(
 			final JobConfigHistory plugin) {
-		return getHistoryDao(plugin, User.get(ACL.SYSTEM));
+		//avoid loading the SYSTEM user on startup, which causes some errors.
+		return getHistoryDao(plugin, new UserFacade(ACL.SYSTEM_USERNAME, ACL.SYSTEM_USERNAME));
 	}
 	
 	public static JobConfigHistoryStrategy getHistoryDao(
 			final JobConfigHistory plugin, final User user) {
+		return getHistoryDao(plugin, new UserFacade(user));
+	}
+
+	public static JobConfigHistoryStrategy getHistoryDao(
+		final JobConfigHistory plugin, final UserFacade userFacade) {
 		final String maxHistoryEntriesAsString = plugin.getMaxHistoryEntries();
 		int maxHistoryEntries = 0;
 		try {
@@ -143,8 +149,8 @@ final public class PluginUtils {
 		}
 		Jenkins jenkins = Jenkins.getInstance();
 		return new FileHistoryDao(plugin.getConfiguredHistoryRootDir(),
-				new File(jenkins.root.getPath()), user,
-				maxHistoryEntries, !plugin.getSkipDuplicateHistory());
+			new File(jenkins.root.getPath()), userFacade,
+			maxHistoryEntries, !plugin.getSkipDuplicateHistory());
 	}
 
 	public static boolean isUserExcluded(final JobConfigHistory plugin) {

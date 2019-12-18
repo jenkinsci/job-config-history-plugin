@@ -54,7 +54,6 @@ import java.util.logging.Logger;
 import hudson.model.AbstractItem;
 import hudson.model.Item;
 import hudson.model.Node;
-import hudson.model.User;
 import org.apache.commons.io.FileUtils;
 
 import hudson.Extension;
@@ -101,7 +100,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	/**
 	 * Currently logged in user.
 	 */
-	private final User currentUser;
+	private final UserFacade currentUser;
 
 	/**
 	 * Maximum numbers which should exist.
@@ -119,13 +118,13 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
 	/**
 	 * @param historyRootDir    where to store history
-	 * @param jenkinsHome       JENKKINS_HOME
+	 * @param jenkinsHome       JENKINS_HOME
 	 * @param currentUser       of operation
 	 * @param maxHistoryEntries max number of history entries
 	 * @param saveDuplicates    should we save duplicate entries?
 	 */
 	public FileHistoryDao(final File historyRootDir, final File jenkinsHome,
-						  final User currentUser, final int maxHistoryEntries,
+						  final UserFacade currentUser, final int maxHistoryEntries,
 						  final boolean saveDuplicates) {
 		this.historyRootDir = historyRootDir;
 		this.jenkinsHome = jenkinsHome;
