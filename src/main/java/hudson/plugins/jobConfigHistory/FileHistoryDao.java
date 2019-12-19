@@ -509,12 +509,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	}
 
 	@Override
-	public int getRevisionAmount(Node node) {
-		//TODO implement
-		throw new IllegalStateException("not yet implemented!");
-	}
-
-	@Override
 	public XmlFile getOldRevision(final AbstractItem item,
 								  final String identifier) {
 		final File configFile = item.getConfigFile().getFile();

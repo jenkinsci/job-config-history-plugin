@@ -79,8 +79,6 @@ public interface HistoryDao {
 
 	int getRevisionAmount(XmlFile xmlFile);
 
-	int getRevisionAmount(Node node);
-
 	/**
 	 * Returns one old configuration of item.
 	 *
