@@ -46,13 +46,18 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
+import hudson.model.FreeStyleProject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -378,6 +383,85 @@ public class FileHistoryDaoTest {
 		final XmlFile result = sutWithUserAndNoDuplicateHistory
 				.getOldRevision(mockedItem, identifier);
 		testGetOldRevision(result);
+	}
+
+	@Test
+	public void testGetRevisionAmount() throws IOException {
+		assertEquals(5, sutWithUserAndNoDuplicateHistory.getRevisionAmount(test1Config));
+
+		FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject();
+		assertEquals(2, getJenkinsRuleSut().getRevisionAmount(freeStyleProject.getConfigFile()));
+	}
+
+	@Test
+	public void testGetSystemRevisionAmount_Single() throws Exception {
+		assertEquals(5, sutWithUserAndNoDuplicateHistory.getSystemRevisionAmount("config"));
+//		System.out.println("sysconfigs: ");
+//		Arrays.asList(getJenkinsRuleSut().getSystemConfigs()).forEach(dir -> {
+//			System.out.println(dir + "###" + dir.listFiles().length);
+//
+//		});
+//		System.out.println("jenkinsloc...=" + getJenkinsRuleSut().getSystemHistory("jenkins.model.JenkinsLocationConfiguration").size());;
+		assertEquals(4, getJenkinsRuleSut().getSystemRevisionAmount("config"));
+		assertEquals(1, getJenkinsRuleSut().getSystemRevisionAmount("jenkins.telemetry.Correlator"));
+		assertEquals(2, getJenkinsRuleSut().getSystemRevisionAmount("hudson.model.UpdateCenter"));
+	}
+
+	@Test
+	public void testGetSystemRevisionAmount() {
+		assertEquals(5, sutWithUserAndNoDuplicateHistory.getSystemRevisionAmount());
+		assertEquals(9, getJenkinsRuleSut().getSystemRevisionAmount());
+	}
+
+	@Test
+	public void testGetJobRevisionAmount() throws IOException, InterruptedException {
+		assertEquals(6, sutWithUserAndNoDuplicateHistory.getJobRevisionAmount());
+
+
+		FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject();
+		assertEquals(2, getJenkinsRuleSut().getJobRevisionAmount());
+		jenkinsRule.createFreeStyleProject();
+		jenkinsRule.createFreeStyleProject();
+		assertEquals(6, getJenkinsRuleSut().getJobRevisionAmount());
+		freeStyleProject.renameTo("a9832jpokk");
+		assertEquals(7, getJenkinsRuleSut().getJobRevisionAmount());
+		freeStyleProject.delete();
+		//2 Jobs created (=2*2 revisions) + 1 deleted (=1 revision)
+		assertEquals(5, getJenkinsRuleSut().getJobRevisionAmount());
+	}
+
+	@Test
+	public void testGetJobRevisionAmount_Single() throws IOException, InterruptedException {
+		assertEquals(5, sutWithUserAndNoDuplicateHistory.getJobRevisionAmount(test1JobDirectory.getName()));
+
+		FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject();
+		assertEquals(2, getJenkinsRuleSut().getJobRevisionAmount(freeStyleProject.getFullName()));
+		freeStyleProject.renameTo("asdoknlwqkn");
+		assertEquals(3, getJenkinsRuleSut().getJobRevisionAmount(freeStyleProject.getFullName()));
+		freeStyleProject.delete();
+		assertEquals(0, getJenkinsRuleSut().getJobRevisionAmount(freeStyleProject.getFullName()));
+	}
+
+	@Test
+	public void testGetTotalRevisionAmount() throws IOException, InterruptedException {
+		assertEquals(11, sutWithUserAndNoDuplicateHistory.getTotalRevisionAmount());
+
+		assertEquals(9, getJenkinsRuleSut().getTotalRevisionAmount());
+		FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject();
+		assertEquals(11, getJenkinsRuleSut().getTotalRevisionAmount());
+		freeStyleProject.delete();
+		assertEquals(10, getJenkinsRuleSut().getTotalRevisionAmount());
+	}
+
+	@Test
+	public void testGetSystemConfigsMap() {
+		Iterator<String> it =
+			Arrays.asList(new String[] {"config", "hudson.model.UpdateCenter", "jenkins.model.JenkinsLocationConfiguration", "jenkins.telemetry.Correlator", "nodeMonitors"}).iterator();
+		getJenkinsRuleSut().getSystemConfigsMap().forEach((k, v) -> {
+			assertEquals(it.next(), k);
+			assertTrue(v instanceof LazyHistoryDescr);
+		});
+		getJenkinsRuleSut().getSystemConfigsMap().forEach((k,v) -> System.out.println(new Pair(k,v)));
 	}
 
 	/**
@@ -861,6 +945,10 @@ public class FileHistoryDaoTest {
 				"Should return config.xml file of revision 2014-01-20_10-12-34",
 				new File(revision3, "config.xml").getAbsolutePath(),
 				file3.getFile().getAbsolutePath());
+	}
+
+	private FileHistoryDao getJenkinsRuleSut() {
+		return (FileHistoryDao) PluginUtils.getHistoryDao();
 	}
 
 }
