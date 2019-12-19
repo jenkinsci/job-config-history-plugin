@@ -198,6 +198,7 @@ public class JobConfigHistoryProjectActionTest {
 		project.renameTo("pr0ject");
 		assertEquals(3, sut.getRevisionAmount());
 	}
+
 	@Test
 	public void testGetMaxPageNum() throws IOException, InterruptedException {
 
