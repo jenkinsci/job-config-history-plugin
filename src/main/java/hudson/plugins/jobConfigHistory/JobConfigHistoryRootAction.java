@@ -256,7 +256,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	/*
 	Maps "Timestamp#ProjectName" to <ProjectName, HistoryDescr>
 	 */
-	public SortedMap<String, Pair<String, HistoryDescr>> getSystemConfigsHistoryDescr() {
+	private SortedMap<String, Pair<String, HistoryDescr>> getSystemConfigsHistoryDescr() {
 		SortedMap configsMap = new TreeMap<String, Pair<String,HistoryDescr>>();
 		if (!hasConfigurePermission()) {
 			return Collections.emptySortedMap();
@@ -299,7 +299,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	 * @param type only all or deleted!
 	 * @return
 	 */
-	public SortedMap<String, Pair<String, HistoryDescr>> getJobConfigsHistoryDescr(String type) {
+	private SortedMap<String, Pair<String, HistoryDescr>> getJobConfigsHistoryDescr(String type) {
 
 		SortedMap configsMap = new TreeMap<String, Pair<String,HistoryDescr>>();
 		if (!hasConfigurePermission()) {
