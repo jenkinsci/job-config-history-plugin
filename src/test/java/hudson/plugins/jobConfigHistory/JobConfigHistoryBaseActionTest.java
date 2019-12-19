@@ -2,10 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -13,17 +10,25 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
 import org.kohsuke.stapler.StaplerRequest;
 
 import hudson.security.AccessControlled;
 import jenkins.model.Jenkins;
+import org.mockito.Mockito;
 
 /**
  *
  * @author Mirko Friedenhagen
  */
 public class JobConfigHistoryBaseActionTest {
+
+	@Rule
+	public JenkinsRule jenkinsRule = new JenkinsRule();
 
 	private final Jenkins jenkinsMock = mock(Jenkins.class);
 	private final StaplerRequest staplerRequestMock = mock(
@@ -176,6 +181,45 @@ public class JobConfigHistoryBaseActionTest {
 		assertEquals("\n", result);
 	}
 
+	@Test
+	public void testGetMaxEntriesPerPage() {
+		JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
+		assertEquals(JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE, sut.getMaxEntriesPerPage());
+	}
+
+	@Test
+	public void testGetRelevantPageNums() {
+		//assuming JobConfigHistoryConsts.PAGING_EPSILON == 2
+		assertArrayEquals(
+			new Integer[] {0, 1, 2, -1, 50},
+			new JobConfigHistoryBaseActionImpl().getRelevantPageNums(0,50).toArray()
+		);
+		assertArrayEquals(
+			new Integer[] {0, -1, 24, 25, 26, 27, 28, -1, 50},
+			new JobConfigHistoryBaseActionImpl().getRelevantPageNums(26,50).toArray()
+		);
+		assertArrayEquals(
+			new Integer[] {0, -1, 48, 49, 50},
+			new JobConfigHistoryBaseActionImpl().getRelevantPageNums(50,50).toArray()
+		);
+		assertArrayEquals(
+			new Integer[] {0, -1, 46, 47, 48, 49, 50},
+			new JobConfigHistoryBaseActionImpl().getRelevantPageNums(48,50).toArray()
+		);
+		assertArrayEquals(
+			new Integer[] {0, -1, 44, 45, 46, 47, 48, -1, 50},
+			new JobConfigHistoryBaseActionImpl().getRelevantPageNums(46,50).toArray()
+		);
+		assertArrayEquals(
+			new Integer[] {0, -1, 2, 3, 4, 5, 6, -1, 50},
+			new JobConfigHistoryBaseActionImpl().getRelevantPageNums(4,50).toArray()
+		);
+		assertArrayEquals(
+			new Integer[] {0, 1, 2, 3, 4, -1, 50},
+			new JobConfigHistoryBaseActionImpl().getRelevantPageNums(2,50).toArray()
+		);
+	}
+
 	private String testGetDiffAsString(final String file1txt,
 			final String file2txt) throws IOException {
 		File file1 = new File(JobConfigHistoryBaseActionTest.class
@@ -195,7 +239,7 @@ public class JobConfigHistoryBaseActionTest {
 				JobConfigHistoryBaseAction {
 
 		public JobConfigHistoryBaseActionImpl() {
-			super(jenkinsMock);
+			super(jenkinsRule.getInstance());
 		}
 
 		public void checkConfigurePermission() {
