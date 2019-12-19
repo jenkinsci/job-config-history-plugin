@@ -196,7 +196,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return jenkins;
     }
 
-    /**
+	public abstract int getRevisionAmount();
+
+	/**
      * Returns the object for which we want to provide access control.
      *
      * @return the access controlled object.
@@ -462,6 +464,16 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             LOG.log(WARNING, "Configured MaxEntriesPerPage does not represent an integer: {0}. Falling back to default.", maxEntriesPerPage);
             return JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE;
         }
+    }
+
+    public int getMaxPageNum() {
+        String entriesPerPageStr = getCurrentRequest().getParameter("entriesPerPage");
+        if (entriesPerPageStr != null && entriesPerPageStr.equals("all")) return 0;
+        int entriesPerPage = (entriesPerPageStr != null && !entriesPerPageStr.equals("")) ? Integer.parseInt(entriesPerPageStr) : getMaxEntriesPerPage();
+        int revisionAmount = getRevisionAmount();
+
+        int div = revisionAmount / entriesPerPage;
+        return (revisionAmount % entriesPerPage) == 0 ? div-1 : div;
     }
 
     /**

@@ -260,6 +260,11 @@ public class JobConfigHistoryBaseActionTest {
 			return false;
 		}
 
+		@Override
+		public int getRevisionAmount() {
+			return -1;
+		}
+
 		public AccessControlled getAccessControlledObject() {
 			return null;
 		}

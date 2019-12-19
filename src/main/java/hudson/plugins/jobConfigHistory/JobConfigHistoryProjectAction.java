@@ -181,13 +181,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
 	public int getRevisionAmount() { return  getHistoryDao().getRevisionAmount(project.getConfigFile()); }
 
-	public int getMaxPageNum() {
-		String entriesPerPageStr = getCurrentRequest().getParameter("entriesPerPage");
-		if (entriesPerPageStr != null && entriesPerPageStr.equals("all")) return 0;
-		int entriesPerPage = (entriesPerPageStr != null && !entriesPerPageStr.equals("")) ? Integer.parseInt(entriesPerPageStr) : getMaxEntriesPerPage();
-		return getRevisionAmount()/ entriesPerPage;
-	}
-
 	public List<Integer> getRelevantPageNums(int currentPageNum) {
 		return getRelevantPageNums(currentPageNum, getMaxPageNum());
 	}

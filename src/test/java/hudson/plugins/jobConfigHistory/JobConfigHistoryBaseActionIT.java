@@ -113,6 +113,12 @@ public class JobConfigHistoryBaseActionIT
 				return getAccessControlledObject()
 						.hasPermission(Permission.CONFIGURE);
 			}
+
+			@Override
+			public int getRevisionAmount() {
+				return -1;
+			}
+
 			public String getIconFileName() {
 				return null;
 			}

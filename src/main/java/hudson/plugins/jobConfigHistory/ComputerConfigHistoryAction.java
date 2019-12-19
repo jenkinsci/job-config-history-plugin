@@ -125,6 +125,12 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	}
 
 	@Override
+	public int getRevisionAmount() {
+		LOG.log(Level.WARNING, "Paging is not implemented for agents, yet!");
+		return -1;
+	}
+
+	@Override
 	public final String getIconFileName() {
 		if (!hasConfigurePermission()) {
 			return null;

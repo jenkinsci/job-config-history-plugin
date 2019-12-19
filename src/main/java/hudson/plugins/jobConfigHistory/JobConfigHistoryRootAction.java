@@ -385,21 +385,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		return configs;
 	}
 
-//	private List<ConfigInfo> toConfigInfoList(List<HistoryDescr> historyDescrs, boolean isDeletedJob, String name, int from, int to) {
-//		ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-//		for (final HistoryDescr historyDescr : historyDescrs.subList(from, to)) {
-//			final String timestamp = historyDescr.getTimestamp();
-//			if (isDeletedJob) {
-//				configs.add(ConfigInfo.create(name, false,
-//					historyDescr, true));
-//			} else {
-//				configs.add(ConfigInfo.create(name, true,
-//					historyDescr, true));
-//			}
-//		}
-//		return configs;
-//	}
-
+	@Override
 	public int getRevisionAmount() {
 		//TODO put all these values in a Paging Wrapper class!
 		final String filter = getRequestParameter("filter");
@@ -428,13 +414,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		} else if (filter.equals("deleted")) {
 			return getOverviewHistoryDao().getDeletedJobRevisionAmount();
 		} else return -1;
-	}
-
-	public int getMaxPageNum() {
-		String entriesPerPageStr = getCurrentRequest().getParameter("entriesPerPage");
-		if (entriesPerPageStr != null && entriesPerPageStr.equals("all")) return 0;
-		int entriesPerPage = (entriesPerPageStr != null && !entriesPerPageStr.equals("")) ? Integer.parseInt(entriesPerPageStr) : getMaxEntriesPerPage();
-		return getRevisionAmount()/ entriesPerPage;
 	}
 
 	public List<Integer> getRelevantPageNums(int currentPageNum) {
