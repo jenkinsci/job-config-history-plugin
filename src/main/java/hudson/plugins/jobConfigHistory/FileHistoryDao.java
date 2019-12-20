@@ -100,7 +100,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	/**
 	 * Currently logged in user.
 	 */
-	private final UserFacade currentUser;
+	private final MimickedUser currentUser;
 
 	/**
 	 * Maximum numbers which should exist.
@@ -124,7 +124,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 * @param saveDuplicates    should we save duplicate entries?
 	 */
 	public FileHistoryDao(final File historyRootDir, final File jenkinsHome,
-						  final UserFacade currentUser, final int maxHistoryEntries,
+						  final MimickedUser currentUser, final int maxHistoryEntries,
 						  final boolean saveDuplicates) {
 		this.historyRootDir = historyRootDir;
 		this.jenkinsHome = jenkinsHome;

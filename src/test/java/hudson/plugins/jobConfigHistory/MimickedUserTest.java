@@ -9,7 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
-public class UserFacadeTest {
+public class MimickedUserTest {
 
 
     @Rule
@@ -17,10 +17,10 @@ public class UserFacadeTest {
 
     private User user;
 
-    private UserFacade sutUser;
-    private UserFacade sutNameId = createSut("SYSTEM", "SYSTEM");
-    private UserFacade sutUserNull = createSut(null);
-    private UserFacade sutNameIdNullNull = createSut(null,null);
+    private MimickedUser sutUser;
+    private MimickedUser sutNameId = createSut("SYSTEM", "SYSTEM");
+    private MimickedUser sutUserNull = createSut(null);
+    private MimickedUser sutNameIdNullNull = createSut(null,null);
 
     @Before
     public void setupUser() {
@@ -54,9 +54,9 @@ public class UserFacadeTest {
         assertEquals(null, sutUserNull.getUser(false));
     }
 
-    private UserFacade createSut(User user) { return new UserFacade(user); }
+    private MimickedUser createSut(User user) { return new MimickedUser(user); }
 
-    private UserFacade createSut(String id, String fullName) { return new UserFacade(id, fullName); }
+    private MimickedUser createSut(String id, String fullName) { return new MimickedUser(id, fullName); }
 
     private User getSystemUser() { return jenkinsRule.getInstance().getUser(ACL.SYSTEM_USERNAME); }
 

@@ -46,13 +46,11 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
-import java.util.List;
 import java.util.SortedMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
@@ -125,7 +123,7 @@ public class FileHistoryDaoTest {
 		when(mockedUser.getFullName()).thenReturn(FULL_NAME);
 		when(mockedUser.getId()).thenReturn(USER_ID);
 		sutWithUserAndNoDuplicateHistory = new FileHistoryDao(historyRoot,
-				jenkinsHome, new UserFacade(mockedUser), 0, false);
+				jenkinsHome, new MimickedUser(mockedUser), 0, false);
 	}
 
 	/**
