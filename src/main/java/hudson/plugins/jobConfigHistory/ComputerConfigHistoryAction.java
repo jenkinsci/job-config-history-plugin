@@ -126,7 +126,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 
 	@Override
 	public int getRevisionAmount() {
-		LOG.log(Level.WARNING, "Paging is not implemented for agents, yet!");
+		LOG.log(Level.INFO, "Paging is not implemented for agents, yet!");
 		return -1;
 	}
 
