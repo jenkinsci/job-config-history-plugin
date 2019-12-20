@@ -196,6 +196,10 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return jenkins;
     }
 
+    /**
+     *
+     * @return the amount of revisions existing for the given request (not page-dependant).
+     */
 	public abstract int getRevisionAmount();
 
 	/**
@@ -418,6 +422,26 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         ) + "\n";
     }
 
+    /**
+     *
+     * @param currentPageNum the current page number
+     * @return the same as {@link #getRelevantPageNums(int, int)}, using {@link #getMaxPageNum()} as second parameter.
+     */
+    public List<Integer> getRelevantPageNums(int currentPageNum) {
+        return getRelevantPageNums(currentPageNum, getMaxPageNum());
+    }
+
+    /**
+     *
+     * @param currentPageNum the current page number
+     * @param maxPageNum the highest page number
+     * @return a list representing all page navigation entries which are displayed. These include:
+     * <ul>
+     *     <li>0</li>
+     *     <li>maxPageNum</li>
+     *     <li>all integers in {k in [currentPageNum - PAGING_EPSILON, currentPageNum + PAGING_EPSILON] | k > 0 && k < maxPageNum}.</li>
+     * </ul>
+     */
     public List<Integer> getRelevantPageNums(int currentPageNum, int maxPageNum) {
         final int epsilon = JobConfigHistoryConsts.PAGING_EPSILON;
         final HashSet<Integer> pageNumsSet = new HashSet<>();
@@ -454,6 +478,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return pageNumsList;
     }
 
+    /**
+     * @return the configured maximum entries per page.
+     */
     public int getMaxEntriesPerPage() {
         final String maxEntriesPerPage = getPlugin().getMaxEntriesPerPage();
         try {
@@ -466,6 +493,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         }
     }
 
+    /**
+     * @return the maximum page number given this request's number of entries per page and the revision amount.
+     */
     public int getMaxPageNum() {
         String entriesPerPageStr = getCurrentRequest().getParameter("entriesPerPage");
         if (entriesPerPageStr != null && entriesPerPageStr.equals("all")) return 0;

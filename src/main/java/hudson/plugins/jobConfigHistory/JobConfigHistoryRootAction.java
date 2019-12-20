@@ -140,10 +140,23 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		return configs;
 	}
 
+	/**
+	 * Used to map a timestamp#name identifier to its related config type.
+	 */
 	private enum ConfigType {
 		SYSTEM, JOB, JOB_DELETED, JOB_UNKNOWN;
 	}
 
+	/**
+	 *
+	 * Calculates a list containing the .subList(from, to) of the newest-first list of job config revision entries.
+	 * Does not read the history.xmls unless it is inevitable.
+	 * Since filter=created requires to read the history.xml of each revision which makes paging pointless from a performance and usability perspective,
+	 * all configs are returned in that case.
+	 * @param from the first revision to display
+	 * @param to the first revision not to display anymore
+	 * @return a list equivalent to getJobConfigs().subList(from, to) (except for filter=created), but more efficiently calculated.
+	 */
 	public final List<ConfigInfo> getConfigs(int from, int to) throws IOException {
 
 		if (from > to) throw new IllegalArgumentException("start index is greater than end index: (" + from + ", " + to + ")");
@@ -187,7 +200,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 			historyDescrSortedMap.putAll(deletedJobsMap);
 			deletedJobsMap.keySet().forEach(timestampAndName -> timestampNameToConfigTypeMap.put(timestampAndName, ConfigType.JOB_DELETED));
 		} else {
-			//hand this over to getConfigs(). The case "created" or "changed" can't be handled since that would require opening the history.xml.
+			//hand this over to getConfigs(). The case "created" or "changed" can't be handled since that would require reading the history.xml.
 			return getConfigs();
 		}
 
@@ -356,6 +369,13 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		return configs;
 	}
 
+	/**
+	 *
+	 * @param name of the item
+	 * @param from the first revision to display
+	 * @param to the first revision not to display anymore
+	 * @return the same as {@link #getSingleConfigs(String)}, but cut for paging.
+	 */
 	public final List<ConfigInfo> getSingleConfigs(String name, int from, int to) {
 		if (from > to) throw new IllegalArgumentException("start index is greater than end index: (" + from + ", " + to + ")");
 		final int revisionAmount = getRevisionAmount();
@@ -387,7 +407,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
 	@Override
 	public int getRevisionAmount() {
-		//TODO put all these values in a Paging Wrapper class!
 		final String filter = getRequestParameter("filter");
 		final String historyRequestURI = "/jenkins/" + JobConfigHistoryConsts.URLNAME + "/history";
 		if (getCurrentRequest().getRequestURI().equals(historyRequestURI)) {
@@ -412,12 +431,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		} else if (filter.equals("all")) {
 			return getOverviewHistoryDao().getTotalRevisionAmount();
 		} else if (filter.equals("deleted")) {
-			return getOverviewHistoryDao().getDeletedJobRevisionAmount();
+			return getOverviewHistoryDao().getDeletedJobAmount();
 		} else return -1;
-	}
-
-	public List<Integer> getRelevantPageNums(int currentPageNum) {
-		return getRelevantPageNums(currentPageNum, getMaxPageNum());
 	}
 
 	/**

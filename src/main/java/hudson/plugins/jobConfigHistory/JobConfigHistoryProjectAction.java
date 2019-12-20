@@ -150,6 +150,14 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		return configs;
 	}
 
+	/**
+	 *
+	 * Calculates a list containing the .subList(from, to) of the newest-first list of job config revision entries.
+	 * Does not read the history.xmls unless it is inevitable.
+	 * @param from the first revision to display
+	 * @param to the first revision not to display anymore
+	 * @return a list equivalent to getJobConfigs().subList(from, to), but more efficiently calculated.
+	 */
 	public final List<ConfigInfo> getJobConfigs(int from, int to) {
 		if (from > to) throw new IllegalArgumentException("start index is greater than end index: (" + from + ", " + to + ")");
 		final int revisionAmount = getRevisionAmount();
@@ -179,11 +187,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		return toConfigInfoList(cuttedHistoryDescrs, 0, cuttedHistoryDescrs.size());
 	}
 
+	@Override
 	public int getRevisionAmount() { return  getHistoryDao().getRevisionAmount(project.getConfigFile()); }
-
-	public List<Integer> getRelevantPageNums(int currentPageNum) {
-		return getRelevantPageNums(currentPageNum, getMaxPageNum());
-	}
 
 	private List<ConfigInfo> toConfigInfoList(List<HistoryDescr> historyDescrs, int from, int to) {
 		ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();

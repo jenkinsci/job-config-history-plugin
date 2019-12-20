@@ -45,7 +45,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -488,11 +487,11 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
 	@Override
 	public int getJobRevisionAmount() {
-		return countSubDirs(getJobs()) + getDeletedJobRevisionAmount();
+		return countSubDirs(getJobs()) + getDeletedJobAmount();
 	}
 
 	@Override
-	public int getDeletedJobRevisionAmount() {
+	public int getDeletedJobAmount() {
 		return getDeletedJobs().length;	//not counting subdirs since only one entry is to be displayed
 	}
 
@@ -506,8 +505,10 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
 	private int countSubDirs(File[] files) {
 
-		Optional<Integer> numberOfSubDirs = (Arrays.asList(files)).stream().map(file -> file.listFiles(HistoryFileFilter.INSTANCE).length).reduce(Integer::sum);
-		return numberOfSubDirs.orElse(0);
+		return (Arrays.asList(files)).stream()
+			.map(file -> file.listFiles(HistoryFileFilter.INSTANCE).length)
+			.reduce(Integer::sum)
+			.orElse(0);
 	}
 
 	@Override
