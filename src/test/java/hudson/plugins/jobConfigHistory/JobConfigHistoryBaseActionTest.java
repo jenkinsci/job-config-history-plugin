@@ -132,7 +132,7 @@ public class JobConfigHistoryBaseActionTest {
 	@Test
 	public void testGetJenkins() {
 		JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
-		Jenkins expResult = jenkinsMock;
+		Jenkins expResult = jenkinsRule.getInstance();
 		Jenkins result = sut.getJenkins();
 		assertEquals(expResult, result);
 	}
