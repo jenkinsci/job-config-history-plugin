@@ -408,8 +408,8 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	@Override
 	public int getRevisionAmount() {
 		final String filter = getRequestParameter("filter");
-		final String historyRequestURI = "/jenkins/" + JobConfigHistoryConsts.URLNAME + "/history";
-		if (getCurrentRequest().getRequestURI().equals(historyRequestURI)) {
+		final String historyRequestURI = JobConfigHistoryConsts.URLNAME + "/history";
+		if (getCurrentRequest().getRequestURI().endsWith(historyRequestURI)) {
 			//history diff page handling
 			final String name = getRequestParameter("name");
 			if (name != null) {
