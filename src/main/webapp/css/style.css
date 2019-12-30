@@ -357,6 +357,42 @@ a.download-arrow:hover{
 
 /*
 #####################################################################
+###                           config                              ###
+#####################################################################
+*/
+/*
+One Sign approximation is x / (sqrt(x*x + epsilon^2)
+*/
+.commitMessageInner {
+    --number: 2059px;
+    --guess01: calc((var(--number) + ( var(--number) / var(--number))) / 2);
+    --guess02: calc((var(--guess01) + ( var(--number) / var(--guess01))) / 2);
+    --guess03: calc((var(--guess02) + ( var(--number) / var(--guess02))) / 2);
+    --guess04: calc((var(--guess03) + ( var(--number) / var(--guess03))) / 2);
+    --guess05: calc((var(--guess04) + ( var(--number) / var(--guess04))) / 2);
+    --guess06: calc((var(--guess05) + ( var(--number) / var(--guess05))) / 2);
+    --guess07: calc((var(--guess06) + ( var(--number) / var(--guess06))) / 2);
+    --guess08: calc((var(--guess07) + ( var(--number) / var(--guess07))) / 2);
+    --guess09: calc((var(--guess08) + ( var(--number) / var(--guess08))) / 2);
+    --guess10: calc((var(--guess09) + ( var(--number) / var(--guess09))) / 2);
+    --guess11: calc((var(--guess09) + ( var(--number) / var(--guess10))) / 2);
+    --guess12: calc((var(--guess09) + ( var(--number) / var(--guess11))) / 2);
+    --guess13: calc((var(--guess09) + ( var(--number) / var(--guess12))) / 2);
+    --sqrtVw:  calc((var(--guess09) + ( var(--number) / var(--guess13))) / 2);
+
+
+    position:sticky;
+    top:40px;
+    //height:calc(var(--sqrtVw) * 2);
+    //width:calc(var(--sqrtVw));
+    width:200px;
+    width:calc(50px / 50px);
+}
+
+
+
+/*
+#####################################################################
 ###                        other stuff                            ###
 #####################################################################
 */

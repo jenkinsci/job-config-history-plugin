@@ -1,0 +1,28 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<!--    <f:block >-->
+<!--        <h1 style="color:red;">Change Reason</h1>-->
+<!--        <div style="position:absolute;top:5px;right:-200px; z-index:4000; width:200px">-->
+<!--            <h2 style="color:red">Don't forget your commit message!</h2>-->
+<!--            <f:textarea field="localValues.changeReasonComment" value="${instance.getMaxDepth()}" />-->
+<!--        </div>-->
+<!--        <input type="button"/>-->
+<!--    </f:block>-->
+
+    <!--Wrapper for positioning outside the main panel.-->
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
+    <div style="position:absolute;top:5px;right:calc(-60px - 11vw); z-index:4002;  height:100%;">
+        <!--Wrapper for sticky (scroll-resistant) positioning.-->
+        <div class="commitMessageInner">
+            <h2 style="color:red">JobConfigHistory&#8482; commit message:</h2>
+            <f:textarea field="localValues.changeReasonComment" value="${instance.getMaxDepth()}" />
+        </div>
+    </div>
+    <!--todo: remove this test-->
+<!--    <div style="position:sticky; top:50px; right:-200px; z-index:4001; width:200px">-->
+<!--        <h2 style="color:red">################################### THIS IS RED ##########################################################</h2>-->
+<!--        <h2 style="color:red">Don't forget your commit message!</h2>-->
+<!--        <f:textarea field="localValues.changeReasonComment" value="${instance.getMaxDepth()}" />-->
+
+<!--    </div>-->
+</j:jelly>
