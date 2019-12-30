@@ -387,6 +387,32 @@ One Sign approximation is x / (sqrt(x*x + epsilon^2)
     //width:calc(var(--sqrtVw));
     width:200px;
     width:calc(50px / 50px);
+
+
+
+    background-color: #383838;
+    color:white;
+    text-align: center;
+
+    font-weight: bold;
+    font-size: 1.2em;
+
+    padding: 2px;
+
+    border:1px solid #383838;
+    border-bottom: 0px solid #ddd;
+
+    border-top-left-radius: 3px;
+    border-radius: 3px;
+}
+
+.commitMessageOuter {
+
+}
+
+.changeReasonCommentError {
+    color:red;
+    background-color:white;
 }
 
 

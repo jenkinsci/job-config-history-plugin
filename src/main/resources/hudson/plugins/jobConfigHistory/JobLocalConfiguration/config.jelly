@@ -11,13 +11,64 @@
 
     <!--Wrapper for positioning outside the main panel.-->
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
-    <div style="position:absolute;top:5px;right:calc(-60px - 11vw); z-index:4002;  height:100%;">
-        <!--Wrapper for sticky (scroll-resistant) positioning.-->
-        <div class="commitMessageInner">
-            <h2 style="color:red">JobConfigHistory&#8482; commit message:</h2>
-            <f:textarea field="localValues.changeReasonComment" value="${instance.getMaxDepth()}" />
+    <script type="text/javascript">
+        function showError() {
+            var elem = document.getElementById('changeReasonCommentError');
+            elem.style.visibility = 'visible';
+            elem.style.height = '100%';
+        }
+        function hideError() {
+            var elem = document.getElementById('changeReasonCommentError');
+            elem.style.visibility = 'hidden';
+            elem.style.height = '0px';
+        }
+
+        function toggleError() {
+        var elem = document.getElementById('changeReasonCommentError');
+            if (elem.style.visibility == 'hidden') {
+                elem.style.visibility = 'visible';
+                elem.style.height = '100%';
+            } else {
+                elem.style.visibility = 'hidden';
+                elem.style.height = '0px';
+            }
+        }
+
+        function checkCurrentChangeReasonComment() {
+            var comment = getCurrentChangeReasonComment();
+            if (comment == "" || comment == null) {
+                showError();
+            } else {
+                hideError();
+            }
+        }
+
+        function getCurrentChangeReasonComment() {
+            console.log(document.getElementsByName('_.changeReasonComment')[0].value);
+            return document.getElementsByName('_.changeReasonComment')[0].value;
+        }
+
+        setTimeout(function() {
+            setInterval(function(){checkCurrentChangeReasonComment();}, 500);
+        }, 5000);
+
+        //var intervalID = setInterval(function(){checkCurrentChangeReasonComment();}, 500);
+
+    </script>
+    <f:block>
+        <div class="commitMessageOuter" style="position:absolute;top:5px;right:calc(-60px - 11vw); z-index:4002; height:100%">
+            <!--Wrapper for sticky (scroll-resistant) positioning.-->
+            <div class="commitMessageInner">
+                <div style="padding:2px">
+                    JobConfigHistory <br/>change message:
+                </div>
+                <f:textarea field="changeReasonComment" value="" onfocusout="console.log('test')" />
+                <div id="changeReasonCommentError" style="visibility:hidden; height:0px;" class="changeReasonCommentError">
+                    Please comment your changes!
+                </div>
+            </div>
         </div>
-    </div>
+    </f:block>
     <!--todo: remove this test-->
 <!--    <div style="position:sticky; top:50px; right:-200px; z-index:4001; width:200px">-->
 <!--        <h2 style="color:red">################################### THIS IS RED ##########################################################</h2>-->
