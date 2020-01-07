@@ -57,6 +57,9 @@ public class HistoryDescr implements ParsedDate {
 	/** Old name of the job before renaming. */
 	private final String oldName;
 
+	/* The reason for this configuration change*/
+	private final String changeReasonComment;
+
 	/**
 	 * @param user
 	 *            display name of the user doing the operation
@@ -79,6 +82,32 @@ public class HistoryDescr implements ParsedDate {
 		this.timestamp = timestamp;
 		this.currentName = currentName;
 		this.oldName = oldName;
+		this.changeReasonComment = null;
+	}
+
+	/**
+	 * @param user
+	 *            display name of the user doing the operation
+	 * @param userId
+	 *            id of the user doing the operation
+	 * @param operation
+	 *            name of the operation
+	 * @param timestamp
+	 *            timestamp of the operation
+	 * @param currentName
+	 *            the current name after renaming
+	 * @param oldName
+	 *            the name before renaming
+	 */
+	public HistoryDescr(String user, String userId, String operation,
+						String timestamp, String currentName, String oldName, String changeReasonComment) {
+		this.user = user;
+		this.userId = userId;
+		this.operation = operation;
+		this.timestamp = timestamp;
+		this.currentName = currentName;
+		this.oldName = oldName;
+		this.changeReasonComment = changeReasonComment;
 	}
 
 	/**
@@ -154,6 +183,16 @@ public class HistoryDescr implements ParsedDate {
 			", timestamp='" + timestamp + '\'' +
 			", currentName='" + currentName + '\'' +
 			", oldName='" + oldName + '\'' +
+			", changeReasonComment='" + changeReasonComment + '\'' +
 			'}';
+	}
+
+
+	/**
+	 *
+	 * @return the comment on why the config has been changed. null, if not given.
+	 */
+	public String getChangeReasonComment() {
+		return changeReasonComment;
 	}
 }

@@ -96,6 +96,15 @@ public class LazyHistoryDescr extends HistoryDescr {
 		return loadAndGetHistory().getTimestamp();
 	}
 
+
+	/**
+	 * {@inheritDoc}.
+	 */
+	@Override
+	public String getChangeReasonComment() {
+		return loadAndGetHistory().getChangeReasonComment();
+	}
+
 	/**
 	 * Loads configurations on first access of any property.
 	 * 

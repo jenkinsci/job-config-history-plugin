@@ -339,6 +339,16 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 			.get(getTimestamp(timestamp)).getUserID();
 	}
 
+	public final String getChangeReasonComment(int timestamp) {
+		//TODO permissions?
+		return getHistoryDao().getRevisions(this.project.getConfigFile()).get(getTimestamp(timestamp)).getChangeReasonComment();
+	}
+
+	public final boolean hasChangeReasonComment(int timestamp) {
+		final String comment = getHistoryDao().getRevisions(this.project.getConfigFile()).get(getTimestamp(timestamp)).getChangeReasonComment();
+		return comment != null && !comment.isEmpty();
+	}
+
 	/**
 	 * Used in the Difference jelly only. Returns the operation made on one of
 	 * the two Files A and B. timestampNumber decides which file exactly.

@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.FileFilter;
 
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 
 import java.util.List;
@@ -45,6 +46,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -54,6 +56,8 @@ import java.util.logging.Logger;
 import hudson.model.AbstractItem;
 import hudson.model.Item;
 import hudson.model.Node;
+import hudson.model.User;
+import jenkins.util.xml.XMLUtils;
 import org.apache.commons.io.FileUtils;
 
 import hudson.Extension;
@@ -64,6 +68,20 @@ import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 /**
  * Defines some helper functions needed by {@link JobConfigHistoryJobListener}
@@ -161,7 +179,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 */
 	void createHistoryXmlFile(final Calendar timestamp,
 							  final File timestampedDir, final String operation,
-							  final String newName, String oldName) throws IOException {
+							  final String newName, String oldName, String changeReasonComment) throws IOException {
 		oldName = ((oldName == null) ? "" : oldName);
 
 		// Mimicking User.getUnknown() that can not be instantiated here as a lot of tests are run without Jenkins
@@ -169,11 +187,10 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		final String userId = currentUser != null ? currentUser.getId() : JobConfigHistoryConsts.UNKNOWN_USER_ID;
 
 		final XmlFile historyDescription = getHistoryXmlFile(timestampedDir);
-		final HistoryDescr myDescr = new HistoryDescr(user, userId, operation,
-			getIdFormatter().format(timestamp.getTime()),
-			(newName == null) ? "" : newName, (newName == null)
-			? ""
-			: ((newName.equals(oldName)) ? "" : oldName));
+		final HistoryDescr myDescr =
+			new HistoryDescr(user, userId, operation, getIdFormatter().format(timestamp.getTime()),
+				(newName == null) ? "" : newName, (newName == null) ? "" : ((newName.equals(oldName)) ? "" : oldName),
+				changeReasonComment);
 		historyDescription.write(myDescr);
 	}
 
@@ -307,12 +324,68 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	private void createNewHistoryEntryAndCopyConfig(final XmlFile configFile,
 													final String operation, final String newName,
 													final String oldName) {
+
+		//TODO extract the changeReasonComment from the config file (here in the code).
+		//TODO delete the changeresonComment from the configFile (here in the code).
+		Optional<String> changeReasonCommentOptional;
+		try {
+			changeReasonCommentOptional = removeChangeReasonComment(configFile);
+		} catch (IOException | SAXException | TransformerException | ParserConfigurationException e) {
+			LOG.log(WARNING, "Error occurred while trying to extract changeReasonComment from config file: {0}", e);
+			changeReasonCommentOptional = Optional.empty();
+		}
+
+
+
+		//TODO write changeReasonComment to historyXML (alter "createNewHistoryEntry" for that purpose).
 		final File timestampedDir = createNewHistoryEntry(configFile, operation,
-			newName, oldName);
+			newName, oldName, changeReasonCommentOptional.orElse(null));
 		try {
 			copyConfigFile(configFile.getFile(), timestampedDir);
 		} catch (IOException ex) {
 			throw new RuntimeException("Unable to copy " + configFile, ex);
+		}
+	}
+
+	private Optional<String> removeChangeReasonComment(final XmlFile configFile) throws IOException, SAXException, TransformerException, ParserConfigurationException {
+		Document configFiledocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile.getFile());;
+
+		System.out.println("####################################################TEST##################################");
+		System.out.println("  path:" + configFile.getFile());
+//		System.out.println("  content: " + FileUtils.readFileToString(configFile.getFile()));
+		System.out.println("  document: " + configFiledocument.getTextContent());
+		System.out.println("  properties: " + configFiledocument.getElementsByTagName("properties").getLength());
+		System.out.println("  JLC: " + configFiledocument.getElementsByTagName("hudson.plugins.jobConfigHistory.JobLocalConfiguration").getLength());
+		NodeList jobLocalConfigurationNodes = configFiledocument.getElementsByTagName("hudson.plugins.jobConfigHistory.JobLocalConfiguration");
+		if (jobLocalConfigurationNodes.getLength() > 1) {
+			LOG.log(FINEST, "tag \"hudson.plugins.jobConfigHistory.JobLocalConfiguration\" found twice in {0}, not saving the change reason comment.", configFile.getFile());
+			return Optional.empty();
+		} else if (jobLocalConfigurationNodes.getLength() == 1) {
+			org.w3c.dom.Node jobLocalConfiguration = jobLocalConfigurationNodes.item(0);
+			NodeList jlcChildren = jobLocalConfiguration.getChildNodes();
+			org.w3c.dom.Node changeReasonCommentNode = null;
+			for (int i = 0; i < jlcChildren.getLength(); ++i) {
+				org.w3c.dom.Node node = jlcChildren.item(i);
+				//TODO make a constant
+				if (node.getNodeName().equals("changeReasonComment")) {
+					changeReasonCommentNode = node;
+				}
+			}
+			if (changeReasonCommentNode != null ) {
+				String changeReasonComment = changeReasonCommentNode.getTextContent();
+				if (changeReasonComment != null && !changeReasonComment.isEmpty()) {
+					//delete jobLocalConfiguration node from document
+					jobLocalConfiguration.getParentNode().removeChild(jobLocalConfiguration);
+					//save xml
+					Transformer transformer = TransformerFactory.newInstance().newTransformer();
+					transformer.transform(new DOMSource(configFiledocument), new StreamResult(configFile.getFile()));
+
+					return Optional.of(changeReasonComment);
+				} else return Optional.empty();
+			} else return Optional.empty();
+		} else {
+			//no comment contained.
+			return Optional.empty();
 		}
 	}
 
@@ -328,7 +401,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	public void deleteItem(final Item item) {
 		final AbstractItem aItem = (AbstractItem) item;
 		createNewHistoryEntry(aItem.getConfigFile(),
-			Messages.ConfigHistoryListenerHelper_DELETED(), null, null);
+			Messages.ConfigHistoryListenerHelper_DELETED(), null, null, null);
 		final File configFile = aItem.getConfigFile().getFile();
 		final File currentHistoryDir = getHistoryDir(configFile);
 		final SimpleDateFormat buildDateFormat = new SimpleDateFormat(
@@ -640,39 +713,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		final File configFile = xmlFile.getFile();
 		final XmlFile oldRevision = getOldRevision(configFile, identifier);
 		return oldRevision.getFile() != null && oldRevision.getFile().exists();
-	}
-
-	/**
-	 * Creates a new history entry.
-	 *
-	 * @param xmlFile   to save.
-	 * @param operation description
-	 * @return timestampedDir
-	 */
-	File createNewHistoryEntry(final XmlFile xmlFile, final String operation,
-							   final String newName, final String oldName) {
-		try {
-			final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
-			final File timestampedDir = getRootDir(xmlFile, timestampHolder);
-			LOG.log(Level.FINE, "{0} on {1}",
-				new Object[] {this, timestampedDir});
-			createHistoryXmlFile(timestampHolder.get(), timestampedDir,
-				operation, newName, oldName);
-			assert timestampHolder.get() != null;
-			return timestampedDir;
-		} catch (IOException e) {
-			// If not able to create the history entry, log, but continue
-			// without it.
-			// A known issue is where Jenkins core fails to move the folders on
-			// rename,
-			// but continues as if it did.
-			// Reference https://issues.jenkins-ci.org/browse/JENKINS-8318
-			throw new RuntimeException(
-				"Unable to create history entry for configuration file "
-					+ "\"" + xmlFile.getFile().getAbsolutePath() + "\": "
-					+ e.getMessage(),
-				e);
-		}
 	}
 
 	/**
@@ -1064,7 +1104,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 													final String content, final String operation, final String newName,
 													final String oldName) {
 		final File timestampedDir = createNewHistoryEntry(node, operation,
-			newName, oldName);
+			newName, oldName, null);
 		final File nodeConfigHistoryFile = new File(timestampedDir,
 			"config.xml");
 		PrintStream stream = null;
@@ -1085,7 +1125,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	@Override
 	public void deleteNode(final Node node) {
 		createNewHistoryEntry(node,
-			Messages.ConfigHistoryListenerHelper_DELETED(), null, null);
+			Messages.ConfigHistoryListenerHelper_DELETED(), null, null, null);
 		// final File configFile = aItem.getConfigFile().getFile();
 		final File currentHistoryDir = getHistoryDirForNode(node);
 		final SimpleDateFormat buildDateFormat = new SimpleDateFormat(
@@ -1175,14 +1215,14 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	}
 
 	private File createNewHistoryEntry(final Node node, final String operation,
-									   final String newName, final String oldName) {
+									   final String newName, final String oldName, String changeReasonComment) {
 		try {
 			final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
 			final File timestampedDir = getRootDir(node, timestampHolder);
 			LOG.log(Level.FINE, "{0} on {1}",
 				new Object[] {this, timestampedDir});
 			createHistoryXmlFile(timestampHolder.get(), timestampedDir,
-				operation, newName, oldName);
+				operation, newName, oldName, changeReasonComment);
 			assert timestampHolder.get() != null;
 			return timestampedDir;
 		} catch (IOException e) {
@@ -1195,6 +1235,39 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			throw new RuntimeException(
 				"Unable to create history entry for configuration file of node "
 					+ "\"" + node.getDisplayName() + "\": "
+					+ e.getMessage(),
+				e);
+		}
+	}
+
+	 /* Creates a new history entry.
+	 *
+	 * @param xmlFile   to save.
+	 * @param operation description
+	 * @return timestampedDir
+	 */
+	private File createNewHistoryEntry(final XmlFile xmlFile, final String operation,
+							   final String newName, final String oldName, String changeReasonComment) {
+		//TODO remove code duplicate!
+		try {
+			final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
+			final File timestampedDir = getRootDir(xmlFile, timestampHolder);
+			LOG.log(Level.FINE, "{0} on {1}",
+				new Object[] {this, timestampedDir});
+			createHistoryXmlFile(timestampHolder.get(), timestampedDir,
+				operation, newName, oldName, changeReasonComment);
+			assert timestampHolder.get() != null;
+			return timestampedDir;
+		} catch (IOException e) {
+			// If not able to create the history entry, log, but continue
+			// without it.
+			// A known issue is where Jenkins core fails to move the folders on
+			// rename,
+			// but continues as if it did.
+			// Reference https://issues.jenkins-ci.org/browse/JENKINS-8318
+			throw new RuntimeException(
+				"Unable to create history entry for configuration file "
+					+ "\"" + xmlFile.getFile().getAbsolutePath() + "\": "
 					+ e.getMessage(),
 				e);
 		}
