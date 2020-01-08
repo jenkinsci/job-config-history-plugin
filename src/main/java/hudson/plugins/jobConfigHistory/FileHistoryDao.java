@@ -361,7 +361,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 				}
 			}
 			if (changeReasonCommentNode != null ) {
-				//tag is found. Might be empty ("").
+				//tag is found. Might contain no comment (getTextContent() returns "").
 				String changeReasonComment = changeReasonCommentNode.getTextContent();
 				if (changeReasonComment != null) {
 					//delete jobLocalConfiguration node from document
