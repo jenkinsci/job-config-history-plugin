@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Optional;
 import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.concurrent.Callable;
@@ -132,7 +133,7 @@ public class FileHistoryDaoTest {
 	@Test
 	public void testCreateNewHistoryEntry() throws IOException {
 		sutWithoutUserAndDuplicateHistory.createNewHistoryEntry(test1Config,
-				"foo", null, null);
+				"foo", null, null, null);
 		final int newLength = getHistoryLength();
 		assertEquals(6, newLength);
 	}
@@ -152,7 +153,7 @@ public class FileHistoryDaoTest {
 			}
 		};
 		try {
-			sut.createNewHistoryEntry(xmlFile, "foo", null, null);
+			sut.createNewHistoryEntry(xmlFile, "foo", null, null, null);
 			fail("Should throw RTE");
 		} catch (RuntimeException e) {
 			final int newLength = getHistoryLength();
@@ -217,7 +218,7 @@ public class FileHistoryDaoTest {
 			final String fullName) throws IOException {
 		Calendar timestamp = new GregorianCalendar();
 		File timestampedDir = new File(historyRoot, "timestampedDir");
-		sut.createHistoryXmlFile(timestamp, timestampedDir, "foo", null, null);
+		sut.createHistoryXmlFile(timestamp, timestampedDir, "foo", null, null, null);
 		final File historyFile = new File(timestampedDir,
 				JobConfigHistoryConsts.HISTORY_FILE);
 		assertTrue(historyFile.exists());

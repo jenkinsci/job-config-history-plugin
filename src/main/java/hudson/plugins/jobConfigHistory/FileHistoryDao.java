@@ -311,7 +311,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	public void createNewItem(final Item item) {
 		final AbstractItem aItem = (AbstractItem) item;
 		createNewHistoryEntryAndCopyConfig(aItem.getConfigFile(),
-			Messages.ConfigHistoryListenerHelper_CREATED(), null, null);
+			Messages.ConfigHistoryListenerHelper_CREATED(), null, null, Optional.empty());
 	}
 
 	/**
@@ -323,21 +323,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 */
 	private void createNewHistoryEntryAndCopyConfig(final XmlFile configFile,
 													final String operation, final String newName,
-													final String oldName) {
-
-		//TODO extract the changeReasonComment from the config file (here in the code).
-		//TODO delete the changeresonComment from the configFile (here in the code).
-		Optional<String> changeReasonCommentOptional;
-		try {
-			changeReasonCommentOptional = removeChangeReasonComment(configFile);
-		} catch (IOException | SAXException | TransformerException | ParserConfigurationException e) {
-			LOG.log(WARNING, "Error occurred while trying to extract changeReasonComment from config file: {0}", e);
-			changeReasonCommentOptional = Optional.empty();
-		}
-
-
-
-		//TODO write changeReasonComment to historyXML (alter "createNewHistoryEntry" for that purpose).
+													final String oldName, final Optional<String> changeReasonCommentOptional) {
 		final File timestampedDir = createNewHistoryEntry(configFile, operation,
 			newName, oldName, changeReasonCommentOptional.orElse(null));
 		try {
@@ -351,11 +337,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		Document configFiledocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile.getFile());;
 
 		System.out.println("####################################################TEST##################################");
-		System.out.println("  path:" + configFile.getFile());
-//		System.out.println("  content: " + FileUtils.readFileToString(configFile.getFile()));
-		System.out.println("  document: " + configFiledocument.getTextContent());
-		System.out.println("  properties: " + configFiledocument.getElementsByTagName("properties").getLength());
-		System.out.println("  JLC: " + configFiledocument.getElementsByTagName("hudson.plugins.jobConfigHistory.JobLocalConfiguration").getLength());
 		NodeList jobLocalConfigurationNodes = configFiledocument.getElementsByTagName("hudson.plugins.jobConfigHistory.JobLocalConfiguration");
 		if (jobLocalConfigurationNodes.getLength() > 1) {
 			LOG.log(FINEST, "tag \"hudson.plugins.jobConfigHistory.JobLocalConfiguration\" found twice in {0}, not saving the change reason comment.", configFile.getFile());
@@ -373,14 +354,15 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			}
 			if (changeReasonCommentNode != null ) {
 				String changeReasonComment = changeReasonCommentNode.getTextContent();
-				if (changeReasonComment != null && !changeReasonComment.isEmpty()) {
+				System.out.println("changeReasonComment=\"" + changeReasonComment + "\"");
+				if (changeReasonComment != null) {
 					//delete jobLocalConfiguration node from document
 					jobLocalConfiguration.getParentNode().removeChild(jobLocalConfiguration);
 					//save xml
 					Transformer transformer = TransformerFactory.newInstance().newTransformer();
 					transformer.transform(new DOMSource(configFiledocument), new StreamResult(configFile.getFile()));
 
-					return Optional.of(changeReasonComment);
+					return changeReasonComment.isEmpty() ? Optional.empty() : Optional.of(changeReasonComment);
 				} else return Optional.empty();
 			} else return Optional.empty();
 		} else {
@@ -391,9 +373,18 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
 	@Override
 	public void saveItem(final XmlFile file) {
+		//remove the changeReasonComment entry from the xml file. (before checking duplicates!)
+		Optional<String> changeReasonCommentOptional;
+		try {
+			changeReasonCommentOptional = removeChangeReasonComment(file);
+		} catch (IOException | SAXException | TransformerException | ParserConfigurationException e) {
+			LOG.log(WARNING, "Error occurred while trying to extract changeReasonComment from config file: {0}", e);
+			changeReasonCommentOptional = Optional.empty();
+		}
+
 		if (checkDuplicate(file)) {
 			createNewHistoryEntryAndCopyConfig(file,
-				Messages.ConfigHistoryListenerHelper_CHANGED(), null, null);
+				Messages.ConfigHistoryListenerHelper_CHANGED(), null, null, changeReasonCommentOptional);
 		}
 	}
 
@@ -500,7 +491,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		}
 		createNewHistoryEntryAndCopyConfig(aItem.getConfigFile(),
 			Messages.ConfigHistoryListenerHelper_RENAMED(), newName,
-			oldName);
+			oldName, Optional.empty());
 	}
 
 	@Override
@@ -1246,7 +1237,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 * @param operation description
 	 * @return timestampedDir
 	 */
-	private File createNewHistoryEntry(final XmlFile xmlFile, final String operation,
+	File createNewHistoryEntry(final XmlFile xmlFile, final String operation,
 							   final String newName, final String oldName, String changeReasonComment) {
 		//TODO remove code duplicate!
 		try {
