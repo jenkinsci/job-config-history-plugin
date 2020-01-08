@@ -183,7 +183,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		final XmlFile historyDescription = getHistoryXmlFile(timestampedDir);
 		final HistoryDescr myDescr =
 			new HistoryDescr(user, userId, operation, getIdFormatter().format(timestamp.getTime()),
-				(newName == null) ? "" : newName, (newName == null) ? "" : ((newName.equals(oldName)) ? "" : oldName),
+				(newName == null) ? "" : newName,
+				(newName == null) ? "" : ((newName.equals(oldName)) ? "" : oldName),
 				changeReasonComment);
 		historyDescription.write(myDescr);
 	}
