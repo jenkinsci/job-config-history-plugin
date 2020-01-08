@@ -53,6 +53,8 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
 			return FormValidation.ok();
 		}
 
+		public boolean getShowChangeReasonCommentWindow() {
+			return PluginUtils.getPlugin().getShowChangeReasonCommentWindow();
+		}
 	}
-
 }

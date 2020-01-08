@@ -44,6 +44,15 @@
       <f:entry title="${%Exclude users}" help="/plugin/jobConfigHistory/help/help-excludedUsers.html">
         <f:textbox name="excludedUsers" value="${it.excludedUsers}" />
       </f:entry>
+
+      <f:entry title="Show change message window" help="/plugin/jobConfigHistory/help/help-showChangeReasonCommentWindow.html">
+        <f:checkbox
+                title="${%Show the change message window in jobs' configure pages.}"
+                name="showChangeReasonCommentWindow"
+                checked="${it.showChangeReasonCommentWindow}"/>
+      </f:entry>
+
+
     </f:advanced>
   </f:section>
 </j:jelly>
