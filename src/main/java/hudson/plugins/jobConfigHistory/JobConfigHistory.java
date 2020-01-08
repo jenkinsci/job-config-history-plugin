@@ -411,8 +411,6 @@ public class JobConfigHistory extends Plugin {
 	 * @return true if the item configuration should be saved.
 	 */
 	public boolean isSaveable(Saveable item, XmlFile xmlFile) {
-		System.out.println("####################################################TEST##################################");
-		System.out.println(" item class: " + item.getClass());
 		boolean canSave = checkRegex(xmlFile);
 		if (!canSave) {
 			LOG.log(Level.FINE, "skipped recording change history for job {0}", xmlFile.getFile().getAbsolutePath());
