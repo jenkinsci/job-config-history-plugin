@@ -20,8 +20,6 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
 
 	@DataBoundConstructor
 	public JobLocalConfiguration(String  changeReasonComment) {
-		System.out.println("crc: " + changeReasonComment);
-
 		this.changeReasonComment = changeReasonComment;
 	}
 
@@ -29,7 +27,6 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
 		return changeReasonComment;
 	}
 
-	/** Constructor loads previously saved form data.  TODO maybe not do this.*/
 	@Extension
 	public static class DescriptorImpl extends JobPropertyDescriptor {
 
@@ -50,7 +47,6 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
 			System.out.println("CONFIGURE");
 			throw new FormException("form exception", "localValues.changeReasonComment");
 		}
-
 
 		public FormValidation doCheckChangeReasonComment(@QueryParameter String changeReasonComment, @AncestorInPath Item item) {
 			//TODO maybe use this instead of javascript. (need to figure out how to relocate the message...)
