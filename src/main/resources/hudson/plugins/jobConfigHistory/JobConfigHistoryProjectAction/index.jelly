@@ -90,6 +90,9 @@
                             <j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">
                               ${config.operation}
                             </j:if>
+                            <j:if test="${config.changeReasonComment != null and !config.changeReasonComment.equals(&quot;&quot;)}">
+                              <img style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.png" title="Change Message: &quot;${config.changeReasonComment}&quot;"/>
+                            </j:if>
                           </td>
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                             <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
