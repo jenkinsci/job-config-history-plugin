@@ -1249,7 +1249,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	 */
 	File createNewHistoryEntry(final XmlFile xmlFile, final String operation,
 							   final String newName, final String oldName, String changeReasonComment) {
-		//TODO remove code duplicate!
 		try {
 			final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
 			final File timestampedDir = getRootDir(xmlFile, timestampHolder);

@@ -7,26 +7,14 @@ import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import hudson.util.FormValidation;
-import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.DoNotUse;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.interceptor.RequirePOST;
-
-import java.text.Normalizer;
 
 public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
-//
-//	@Extension
-//	public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
 
-
-	//TODO maybe optionally mandatory (configurable globally!)
 	private String changeReasonComment;
 
 
@@ -40,13 +28,6 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
 	public String getChangeReasonComment() {
 		return changeReasonComment;
 	}
-//
-//	@Override
-//	public DescriptorImpl getDescriptor() {
-//		return DESCRIPTOR;
-//	}
-//
-
 
 	/** Constructor loads previously saved form data.  TODO maybe not do this.*/
 	@Extension
@@ -54,13 +35,11 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
 
 		public DescriptorImpl() {
 			super(JobLocalConfiguration.class);
-			System.out.println("DESCRIPTOR IMPLE");
-			load();
 		}
 
 		@Override
 		public String getDisplayName() {
-			return "aaaaaJOBCONFIGHISTORY!";
+			return "changeReasonComment_holder";
 		}
 
 		public boolean isApplicable(AbstractProject<?, ?> item) {
