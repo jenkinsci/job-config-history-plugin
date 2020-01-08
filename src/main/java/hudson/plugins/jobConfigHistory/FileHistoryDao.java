@@ -54,7 +54,6 @@ import java.util.logging.Logger;
 import hudson.model.AbstractItem;
 import hudson.model.Item;
 import hudson.model.Node;
-import hudson.model.User;
 import org.apache.commons.io.FileUtils;
 
 import hudson.Extension;
@@ -101,7 +100,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	/**
 	 * Currently logged in user.
 	 */
-	private final User currentUser;
+	private final MimickedUser currentUser;
 
 	/**
 	 * Maximum numbers which should exist.
@@ -119,13 +118,13 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
 	/**
 	 * @param historyRootDir    where to store history
-	 * @param jenkinsHome       JENKKINS_HOME
+	 * @param jenkinsHome       JENKINS_HOME
 	 * @param currentUser       of operation
 	 * @param maxHistoryEntries max number of history entries
 	 * @param saveDuplicates    should we save duplicate entries?
 	 */
 	public FileHistoryDao(final File historyRootDir, final File jenkinsHome,
-						  final User currentUser, final int maxHistoryEntries,
+						  final MimickedUser currentUser, final int maxHistoryEntries,
 						  final boolean saveDuplicates) {
 		this.historyRootDir = historyRootDir;
 		this.jenkinsHome = jenkinsHome;
@@ -166,8 +165,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 		oldName = ((oldName == null) ? "" : oldName);
 
 		// Mimicking User.getUnknown() that can not be instantiated here as a lot of tests are run without Jenkins
-		final String user = currentUser != null ? currentUser.getFullName() : "unknown";
-		final String userId = currentUser != null ? currentUser.getId() : "unknown";
+		final String user = currentUser != null ? currentUser.getFullName() : JobConfigHistoryConsts.UNKNOWN_USER_NAME;
+		final String userId = currentUser != null ? currentUser.getId() : JobConfigHistoryConsts.UNKNOWN_USER_ID;
 
 		final XmlFile historyDescription = getHistoryXmlFile(timestampedDir);
 		final HistoryDescr myDescr = new HistoryDescr(user, userId, operation,
@@ -465,6 +464,51 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 			}
 			return map;
 		}
+	}
+
+	@Override
+	public int getRevisionAmount(XmlFile xmlFile) {
+		final File configFile = xmlFile.getFile();
+		final File historiesDir = getHistoryDir(configFile);
+		final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
+		if (historyDirsOfItem == null) {
+			LOG.log(WARNING, "Error occurred while trying to calculate the current revision amount: {0}.listFiles(..) returned null.", historiesDir);
+		}
+		return historyDirsOfItem != null ? historyDirsOfItem.length : -1;
+	}
+
+	@Override
+	public int getSystemRevisionAmount(String sysConfigName) { return getSystemHistory(sysConfigName).size(); }
+
+	@Override
+	public int getSystemRevisionAmount() {
+		return countSubDirs(getSystemConfigs());
+	}
+
+	@Override
+	public int getJobRevisionAmount() {
+		return countSubDirs(getJobs()) + getDeletedJobAmount();
+	}
+
+	@Override
+	public int getDeletedJobAmount() {
+		return getDeletedJobs().length;	//not counting subdirs since only one entry is to be displayed
+	}
+
+	@Override
+	public int getJobRevisionAmount(String jobName) { return getJobHistory(jobName).size(); }
+
+	@Override
+	public int getTotalRevisionAmount() {
+		return getJobRevisionAmount() + getSystemRevisionAmount();
+	}
+
+	private int countSubDirs(File[] files) {
+
+		return (Arrays.asList(files)).stream()
+			.map(file -> file.listFiles(HistoryFileFilter.INSTANCE).length)
+			.reduce(Integer::sum)
+			.orElse(0);
 	}
 
 	@Override
@@ -943,6 +987,24 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 	public File[] getSystemConfigs() {
 		return returnEmptyFileArrayForNull(
 			historyRootDir.listFiles(NonJobsDirectoryFileFilter.INSTANCE));
+	}
+
+	@Override
+	public SortedMap<String, HistoryDescr> getSystemConfigsMap() {
+		File[] systemConfigsArr = getSystemConfigs();
+
+		if (systemConfigsArr.length == 0) {
+			return Collections.emptySortedMap();
+		} else {
+			final TreeMap<String, HistoryDescr> map = new TreeMap();
+			for (File historyDir : systemConfigsArr) {
+				final XmlFile historyXml = getHistoryXmlFile(historyDir);
+				final LazyHistoryDescr historyDescription = new LazyHistoryDescr(
+					historyXml);
+				map.put(historyDir.getName(), historyDescription);
+			}
+			return map;
+		}
 	}
 
 	/**

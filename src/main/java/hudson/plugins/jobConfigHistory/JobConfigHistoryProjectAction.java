@@ -30,11 +30,15 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.SortedMap;
+import java.util.logging.Logger;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -55,11 +59,17 @@ import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import jenkins.model.Jenkins;
 
+import static java.util.logging.Level.FINEST;
+
 /**
  * @author Stefan Brausch
  */
 @ExportedBean(defaultVisibility = -1)
 public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
+
+	/** Our logger. */
+	private static final Logger LOG = Logger
+		.getLogger(JobConfigHistoryProjectAction.class.getName());
 
 	/** The project. */
 	private final transient AbstractItem project;
@@ -120,9 +130,8 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	public final List<ConfigInfo> getJobConfigs() throws IOException {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
 			checkConfigurePermission();
-			return null;
+			return Collections.emptyList();
 		}
-		final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
 		final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(
 				getHistoryDao().getRevisions(project.getConfigFile()).values());
 		final String maxEntriesPerPageAsString = getPlugin()
@@ -135,20 +144,66 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 		} else {
 			maxEntriesPerPage = values.size();
 		}
-		for (final HistoryDescr historyDescr : values
-				.subList(values.size() - maxEntriesPerPage, values.size())) {
+
+		final List<ConfigInfo> configs = toConfigInfoList(values, values.size() - maxEntriesPerPage, values.size());
+		Collections.sort(configs, ParsedDateComparator.DESCENDING);
+		return configs;
+	}
+
+	/**
+	 *
+	 * Calculates a list containing the .subList(from, to) of the newest-first list of job config revision entries.
+	 * Does not read the history.xmls unless it is inevitable.
+	 * @param from the first revision to display
+	 * @param to the first revision not to display anymore
+	 * @return a list equivalent to getJobConfigs().subList(from, to), but more efficiently calculated.
+	 */
+	public final List<ConfigInfo> getJobConfigs(int from, int to) {
+		if (from > to) throw new IllegalArgumentException("start index is greater than end index: (" + from + ", " + to + ")");
+		final int revisionAmount = getRevisionAmount();
+		if (from > revisionAmount) {
+			LOG.log(FINEST,"Unexpected arguments while generating overview page: start index ({0}) is greater than total revision amount ({1})!",
+				new Object[]{from, revisionAmount});
+			return Collections.emptyList();
+		}
+
+		if (to > revisionAmount) {
+			to = revisionAmount;
+		}
+
+		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
+			checkConfigurePermission();
+			return Collections.emptyList();
+		}
+		//load historydescrs lazily
+		final SortedMap<String, HistoryDescr> historyDescrSortedMap = getHistoryDao().getRevisions(project.getConfigFile());
+
+		//get them values in DESCENDING order (newest revision first)
+		ArrayList<HistoryDescr> mapValues = new ArrayList<>(historyDescrSortedMap.values());
+		Collections.reverse(mapValues);
+
+		final List<HistoryDescr> cuttedHistoryDescrs = mapValues.subList(from, to);
+		//only after selecting the entries to be displayed, the files are read (if the HistoryDao uses LazyHistoryDescr, of course).
+		return toConfigInfoList(cuttedHistoryDescrs, 0, cuttedHistoryDescrs.size());
+	}
+
+	@Override
+	public int getRevisionAmount() { return  getHistoryDao().getRevisionAmount(project.getConfigFile()); }
+
+	private List<ConfigInfo> toConfigInfoList(List<HistoryDescr> historyDescrs, int from, int to) {
+		ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+		for (final HistoryDescr historyDescr : historyDescrs.subList(from, to)) {
 			final String timestamp = historyDescr.getTimestamp();
 			final XmlFile oldRevision = getHistoryDao().getOldRevision(project,
-					timestamp);
+				timestamp);
 			if (oldRevision.getFile() != null) {
 				configs.add(ConfigInfo.create(project.getFullName(), true,
-						historyDescr, true));
+					historyDescr, true));
 			} else if ("Deleted".equals(historyDescr.getOperation())) {
 				configs.add(ConfigInfo.create(project.getFullName(), false,
-						historyDescr, true));
+					historyDescr, true));
 			}
 		}
-		Collections.sort(configs, ParsedDateComparator.DESCENDING);
 		return configs;
 	}
 

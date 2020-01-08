@@ -48,6 +48,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import hudson.XmlFile;
 import hudson.model.FreeStyleProject;
 import hudson.model.JDK;
+import hudson.model.Project;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -103,6 +104,59 @@ public class JobConfigHistoryRootActionTest {
 	@Test
 	public void testGetIconFileNameWithJobPermission() {
 		assertNotNull(createSut().getIconFileName());
+	}
+
+	@Test
+	public void testGetConfigs_fromTo() throws IOException, InterruptedException {
+//		given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME + "/history"); todo test for that!
+		given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME);
+		Project project = jenkinsRule.createFreeStyleProject("Test1");
+		JobConfigHistoryRootAction sut = createStaplerMockedSut();
+
+		given(mockedStaplerRequest.getParameter("filter")).willReturn(null);
+		assertEquals(sut.getRevisionAmount(), sut.getConfigs(0,sut.getRevisionAmount()).size());
+		assertTrue(createStaplerMockedSut().getConfigs(0,10).size() >= 8); // either 8 or 9
+
+		given(mockedStaplerRequest.getParameter("filter")).willReturn("system");
+		assertEquals(sut.getRevisionAmount(), sut.getConfigs(0,sut.getRevisionAmount()).size());
+		assertTrue(createStaplerMockedSut().getConfigs(0,10).size() >= 8); // either 8 or 9
+
+		given(mockedStaplerRequest.getParameter("filter")).willReturn("all");
+		assertEquals(sut.getRevisionAmount(), sut.getConfigs(0,sut.getRevisionAmount()).size());
+		assertTrue(createStaplerMockedSut().getConfigs(0,10).size() >= 10);
+
+		given(mockedStaplerRequest.getParameter("filter")).willReturn("jobs");
+		assertEquals(sut.getRevisionAmount(), sut.getConfigs(0,sut.getRevisionAmount()).size());
+		assertEquals(2, createStaplerMockedSut().getConfigs(0,10).size());
+		project.renameTo("asd");
+		assertEquals(sut.getRevisionAmount(), sut.getConfigs(0,sut.getRevisionAmount()).size());
+		assertEquals(3, createStaplerMockedSut().getConfigs(0,10).size());
+
+		given(mockedStaplerRequest.getParameter("filter")).willReturn("deleted");
+		assertEquals(sut.getRevisionAmount(), sut.getConfigs(0,sut.getRevisionAmount()).size());
+		assertEquals(0, createStaplerMockedSut().getConfigs().size());
+		project.delete();
+		assertEquals(sut.getRevisionAmount(), sut.getConfigs(0,sut.getRevisionAmount()).size());
+		assertEquals(1, createStaplerMockedSut().getConfigs().size());
+
+	}
+
+	@Test
+	public void testGetSingleConfigs_fromTo() throws Exception {
+		given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME + "/history");
+		given(mockedStaplerRequest.getParameter("name")).willReturn("config");
+		JobConfigHistoryRootAction sut = createStaplerMockedSut();
+
+
+		assertEquals(4, sut.getSingleConfigs("config", 0, sut.getRevisionAmount()).size());
+		assertEquals(2, sut.getSingleConfigs("config", 0, 2).size());
+
+		//create a deleted project
+		FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
+		freeStyleProject.delete();
+		String deletedFolderName = PluginUtils.getHistoryDao().getDeletedJobs()[0].getName();
+		assertEquals(4, sut.getSingleConfigs(deletedFolderName, 0, sut.getRevisionAmount()).size());
+
 	}
 
 	/**

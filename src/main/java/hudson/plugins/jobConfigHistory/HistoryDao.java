@@ -78,6 +78,13 @@ public interface HistoryDao {
 	SortedMap<String, HistoryDescr> getRevisions(Node node);
 
 	/**
+	 *
+	 * @param xmlFile the config's history xml file
+	 * @return the amount of revision entries of a certain config.
+	 */
+	int getRevisionAmount(XmlFile xmlFile);
+
+	/**
 	 * Returns one old configuration of item.
 	 *
 	 * @param item

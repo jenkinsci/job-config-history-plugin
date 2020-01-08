@@ -144,4 +144,16 @@ public class HistoryDescr implements ParsedDate {
 	public String getOldName() {
 		return oldName;
 	}
+
+	@Override
+	public String toString() {
+		return "HistoryDescr{" +
+			"user='" + user + '\'' +
+			", userId='" + userId + '\'' +
+			", operation='" + operation + '\'' +
+			", timestamp='" + timestamp + '\'' +
+			", currentName='" + currentName + '\'' +
+			", oldName='" + oldName + '\'' +
+			'}';
+	}
 }

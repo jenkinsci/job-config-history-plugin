@@ -60,4 +60,16 @@ public final class JobConfigHistoryConsts {
 
 	/** Format for timestamped dirs. */
 	public static final String ID_FORMATTER = "yyyy-MM-dd_HH-mm-ss";
+
+	/** Maximum entries to be displayed in the history table pages.*/
+	public static final int DEFAULT_MAX_ENTRIES_PER_PAGE = 25;
+
+	/** Amount of neighbors displayed around the current page number in the page navigation bar. Example (epsilon=2, currentPage=6): [0 ... 4 5 <b>6</b> 7 8  ... 204] */
+	public static final int PAGING_EPSILON = 2;
+
+	/**Name displayed for null users.*/
+	public static final String UNKNOWN_USER_NAME = "unknown";
+
+	/**Id displayed for null users.*/
+	public static final String UNKNOWN_USER_ID = "unknown";
 }

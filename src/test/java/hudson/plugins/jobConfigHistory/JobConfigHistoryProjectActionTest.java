@@ -15,6 +15,8 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.util.List;
 
+import hudson.model.FreeStyleProject;
+import hudson.model.Project;
 import org.acegisecurity.AccessDeniedException;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
@@ -41,7 +43,7 @@ import jenkins.model.Jenkins;
 public class JobConfigHistoryProjectActionTest {
 
 	@Rule
-	public JenkinsRule j = new JenkinsRule();
+	public JenkinsRule jenkinsRule = new JenkinsRule();
 
 	@Rule
 	public UnpackResourceZip testConfigs = UnpackResourceZip.create();
@@ -97,7 +99,7 @@ public class JobConfigHistoryProjectActionTest {
 	 */
 	@Test
 	public void testGetIconFileNameSaveMavenModules() {
-		assertNotNull(j.jenkins.getPlugin("maven-plugin"));
+		assertNotNull(jenkinsRule.jenkins.getPlugin("maven-plugin"));
 		when(mockedMavenModule.hasPermission(AbstractProject.CONFIGURE))
 				.thenReturn(true);
 		when(mockedPlugin.getSaveModuleConfiguration()).thenReturn(true);
@@ -187,6 +189,70 @@ public class JobConfigHistoryProjectActionTest {
 		testJobXHasYHistoryEntries("jobs/Test1", 0);
 	}
 
+	@Test
+	public void testGetRevisionAmount() throws IOException {
+		FreeStyleProject project = jenkinsRule.createFreeStyleProject("project");
+		final JobConfigHistoryProjectAction sut = createJenkinsRuleAction(project);
+		assertEquals(2, sut.getRevisionAmount());
+
+		project.renameTo("pr0ject");
+		assertEquals(3, sut.getRevisionAmount());
+	}
+
+	@Test
+	public void testGetMaxPageNum() throws IOException, InterruptedException {
+
+		FreeStyleProject project = jenkinsRule.createFreeStyleProject("project");
+		final JobConfigHistoryProjectAction sut = createJenkinsRuleAction(project);
+		project.renameTo("asd");
+		project.renameTo("asdf");
+		project.renameTo("asd");
+		project.renameTo("asdf");
+		//revision amount == 6
+
+		when(mockedRequest.getParameter("entriesPerPage")).thenReturn(String.valueOf(10));
+		assertEquals(0, sut.getMaxPageNum());
+
+		when(mockedRequest.getParameter("entriesPerPage")).thenReturn(String.valueOf(6));
+		assertEquals(0, sut.getMaxPageNum());
+
+		when(mockedRequest.getParameter("entriesPerPage")).thenReturn(String.valueOf(5));
+		assertEquals(1, sut.getMaxPageNum());
+
+		project.renameTo("pr0ject");
+		for (int i = 0; i < 13; ++i) {
+			project.renameTo("p." + i);
+		}
+		//revision amount == 20
+
+		when(mockedRequest.getParameter("entriesPerPage")).thenReturn(String.valueOf(5));
+		assertEquals(3, sut.getMaxPageNum());
+
+		when(mockedRequest.getParameter("entriesPerPage")).thenReturn(String.valueOf(4));
+		assertEquals(4, sut.getMaxPageNum());
+
+		when(mockedRequest.getParameter("entriesPerPage")).thenReturn(String.valueOf(20));
+		assertEquals(0, sut.getMaxPageNum());
+
+		when(mockedRequest.getParameter("entriesPerPage")).thenReturn(String.valueOf(10));
+		assertEquals(1, sut.getMaxPageNum());
+	}
+
+	@Test
+	public void testGetJobConfigs_fromTo() throws IOException {
+		testJobXHasYHistoryEntries("jobs/Test1", 5, 0,200);
+		testJobXHasYHistoryEntries("jobs/Test1", 4, 1,200);
+		testJobXHasYHistoryEntries("jobs/Test1", 3, 2,200);
+		testJobXHasYHistoryEntries("jobs/Test1", 1, 4,200);
+		testJobXHasYHistoryEntries("jobs/Test1", 0, 5,200);
+
+		testJobXHasYHistoryEntries("jobs/Test1", 4, 0,4);
+		testJobXHasYHistoryEntries("jobs/Test1", 5, 0,5);
+		testJobXHasYHistoryEntries("jobs/Test1", 5, 0,6);
+
+		testJobXHasYHistoryEntries("jobs/Test1", 1, 2,3);
+	}
+
 	private List<ConfigInfo> testJobXHasYHistoryEntries(final String jobDir,
 			final int noOfHistoryEntries) throws IOException {
 		when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
@@ -195,6 +261,19 @@ public class JobConfigHistoryProjectActionTest {
 				.thenReturn(testConfigs.getResource(jobDir));
 		final JobConfigHistoryProjectAction sut = createAction();
 		final List<ConfigInfo> result = sut.getJobConfigs();
+		assertEquals(noOfHistoryEntries, result.size());
+		return result;
+	}
+
+	private List<ConfigInfo> testJobXHasYHistoryEntries(final String jobDir,
+														final int noOfHistoryEntries,
+														int from, int to) throws IOException {
+		when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
+			.thenReturn(true);
+		when(mockedProject.getRootDir())
+			.thenReturn(testConfigs.getResource(jobDir));
+		final JobConfigHistoryProjectAction sut = createAction();
+		final List<ConfigInfo> result = sut.getJobConfigs(from, to);
 		assertEquals(noOfHistoryEntries, result.size());
 		return result;
 	}
@@ -364,6 +443,10 @@ public class JobConfigHistoryProjectActionTest {
 				mockedProject);
 	}
 
+	private JobConfigHistoryProjectAction createJenkinsRuleAction(Project project) {
+		return new JobConfigHistoryProjectActionJrImpl(jenkinsRule.getInstance(), project);
+	}
+
 	private JobConfigHistoryProjectAction createActionForMavenModule() {
 		return new JobConfigHistoryProjectActionImpl(mockedJenkins,
 				mockedMavenModule);
@@ -391,6 +474,18 @@ public class JobConfigHistoryProjectActionTest {
 		@Override
 		protected HistoryDao getHistoryDao() {
 			return historyDao;
+		}
+	}
+
+	private class JobConfigHistoryProjectActionJrImpl extends JobConfigHistoryProjectAction {
+
+		public JobConfigHistoryProjectActionJrImpl(Jenkins jenkins, AbstractItem project) {
+			super(jenkins, project);
+		}
+
+		@Override
+		protected StaplerRequest getCurrentRequest() {
+			return mockedRequest;
 		}
 	}
 }

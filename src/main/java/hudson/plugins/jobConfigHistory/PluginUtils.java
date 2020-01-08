@@ -114,7 +114,7 @@ final public class PluginUtils {
 	 */
 	public static JobConfigHistoryStrategy getAnonymousHistoryDao(
 			final JobConfigHistory plugin) {
-		return getHistoryDao(plugin, null);
+		return getHistoryDao(plugin, (User) null);
 	}
 
 	/**
@@ -129,11 +129,29 @@ final public class PluginUtils {
 	 */
 	static JobConfigHistoryStrategy getSystemHistoryDao(
 			final JobConfigHistory plugin) {
-		return getHistoryDao(plugin, User.get(ACL.SYSTEM));
+		//avoid loading the SYSTEM user on startup, which causes some errors.
+		return getHistoryDao(plugin, new MimickedUser(ACL.SYSTEM_USERNAME, ACL.SYSTEM_USERNAME));
 	}
-	
+
+	/**
+	 * Like {@link #getHistoryDao(JobConfigHistory)}, but with a custom user
+	 * @param plugin the plugin
+	 * @param user the user to initialize the historyDao with.
+	 * @return historyDao
+	 */
 	public static JobConfigHistoryStrategy getHistoryDao(
 			final JobConfigHistory plugin, final User user) {
+		return getHistoryDao(plugin, new MimickedUser(user));
+	}
+
+	/**
+	 * Like {@link #getHistoryDao(JobConfigHistory)}, but with a custom user wrapped with {@link MimickedUser}.
+	 * @param plugin the plugin
+	 * @param mimickedUser the user to initialize the historyDao with.
+	 * @return historyDao
+	 */
+	public static JobConfigHistoryStrategy getHistoryDao(
+		final JobConfigHistory plugin, final MimickedUser mimickedUser) {
 		final String maxHistoryEntriesAsString = plugin.getMaxHistoryEntries();
 		int maxHistoryEntries = 0;
 		try {
@@ -143,10 +161,15 @@ final public class PluginUtils {
 		}
 		Jenkins jenkins = Jenkins.getInstance();
 		return new FileHistoryDao(plugin.getConfiguredHistoryRootDir(),
-				new File(jenkins.root.getPath()), user,
-				maxHistoryEntries, !plugin.getSkipDuplicateHistory());
+			new File(jenkins.root.getPath()), mimickedUser,
+			maxHistoryEntries, !plugin.getSkipDuplicateHistory());
 	}
 
+	/**
+	 *
+	 * @param plugin the plugin
+	 * @return whether the current user (determined by {@link Jenkins#getAuthentication()}) is excluded.
+	 */
 	public static boolean isUserExcluded(final JobConfigHistory plugin) {
 
 		String user = Jenkins.getAuthentication().getName();

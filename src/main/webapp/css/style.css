@@ -27,7 +27,7 @@
 #####################################################################
 ###                     general modification                      ###
 #####################################################################
-###   TODO: cleanse this document of this abomination!
+###
 */
 
 h1 {
@@ -89,6 +89,7 @@ table.jch body {
 table.jch {
     width:100%;
     height:100%;
+    border-collapse: separate;
 }
 
 
@@ -170,6 +171,56 @@ table.jch groupBody td:last-child {
     border-right:21px;
 }
 
+/*
+#####################################################################
+###                          navigation                           ###
+#####################################################################
+*/
+.navigation {
+    padding: 2px;
+    background-color: rgb(250,250,250);
+    border: 1px solid rgb(232, 232, 232);
+    border:0px;
+    border-radius:2px;
+}
+
+table.jch.navigation tr td {
+    border:none;
+    text-align:center;
+    font-size:14px;
+}
+
+table.jch.navigation tr td a {
+
+    text-decoration:none;
+    font-size:12px;
+}
+
+table.jch.navigation tr td .menu-url-button.current {
+   font-size:16px;
+}
+
+table.jch.navigation caption {
+    //background-color: rgb(90, 90, 90);
+    background-color: rgb(240,240,240);
+    //color:white;
+    color:#383838;
+    text-align: center;
+
+    font-weight: bold;
+    font-size: 20px;
+
+    padding: 4px;
+
+    //border: 1px solid rgb(90, 90, 90);
+    border: 1px solid rgb(232, 232, 232);
+    border-bottom: 0px solid #ddd;
+
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+
 
 /*
 #####################################################################
@@ -226,10 +277,34 @@ a.download-arrow:hover{
 #####################################################################
 */
 
+.jch-footer {
+    position: sticky;
+    //left:0;
+    bottom: 0px;
+    width:100%;
+}
+
+.footer-content-wrapper {
+    background-color:rgb(250, 250, 250);
+    width:100%;
+    padding:0px;
+    border: 1px solid rgb(232, 232, 232);
+    border: 1px solid rgb(190, 190, 190);
+}
+
+.header-content-wrapper {
+    padding: 2px;
+    background-color: rgb(250,250,250);
+    border: 1px solid rgb(190, 190, 190);
+    border-radius:2px;
+}
+
 .resizeWrapper {
     resize: vertical;
-    overflow: auto;
-    max-height:59vh;
+    overflow-y: auto;
+    max-height:65vh;
+    border-bottom:1px solid rgb(187, 187, 187);;
+    border-radius:2px;
 }
 
 .collapseButton {
@@ -316,6 +391,10 @@ table.sortable.jch a.sortheader {
     border: 1px solid #383838;
     border-radius: 2px;
     padding: 12px;
+    padding-top:7px;
+    padding-bottom:7px;
+    margin-top:3px;
+    margin-right:3px;
     font-size: 14px;
 }
 
@@ -433,16 +512,37 @@ a.url-button:hover{
     outline:none;
 }
 
+.menu-url-button.dead {
+    color:grey;
+}
+
+.menu-url-button.dead:hover {
+    cursor: default;
+    background-color: rgb(230,230,230);
+}
+
 .menu-url-button:hover {
 
     background-color: rgb(200,200,200);
     cursor: pointer;
 }
 
+.menu-url-button.current {
+    background-color: rgb(200,200,200);
+    font-weight:bold;
+}
+
+.menu-url-button.current:hover {
+    background-color: rgb(200,200,200);
+
+    cursor: default;
+}
+
 .menu-url-button a {
     width:100%;
     display:block;
     color: rgba(0, 0, 0, 0.7);
+    outline:none;
 }
 .menu-url-button a:link {
 }

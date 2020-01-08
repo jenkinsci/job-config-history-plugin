@@ -41,6 +41,8 @@ import hudson.model.Job;
 import hudson.model.Project;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.security.ACL;
+import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -115,6 +117,7 @@ public class JobConfigBadgeActionTest {
 		JobConfigBadgeAction customSut = createSut(revisions.lastKey(), revisions.firstKey());
 		customSut.onAttached(build);
 		assertEquals(true, customSut.oldConfigsExist());
+		System.out.println("ACL.SYSTEM-check in PluginUtils: " + Jenkins.get().getUser(ACL.SYSTEM_USERNAME));
 	}
 
 	@Test
@@ -174,6 +177,10 @@ public class JobConfigBadgeActionTest {
 	 */
 	@Test
 	public void testGetIconFileName() {
+		System.out.println("plugins");
+		jenkinsRule.jenkins.getPluginManager().getPlugins().forEach(
+			plugin -> System.out.println(plugin.getDisplayName())
+		);
 		String result = sut.getIconFileName();
 		assertNull(result);
 	}
