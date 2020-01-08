@@ -1,15 +1,5 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
          xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-<!--    <f:block >-->
-<!--        <h1 style="color:red;">Change Reason</h1>-->
-<!--        <div style="position:absolute;top:5px;right:-200px; z-index:4000; width:200px">-->
-<!--            <h2 style="color:red">Don't forget your commit message!</h2>-->
-<!--            <f:textarea field="localValues.changeReasonComment" value="${instance.getMaxDepth()}" />-->
-<!--        </div>-->
-<!--        <input type="button"/>-->
-<!--    </f:block>-->
-
-    <!--Wrapper for positioning outside the main panel.-->
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
 
     <f:block>
@@ -26,16 +16,8 @@
             </div>
         </div>
     </f:block>
-    <!--todo: remove this test-->
-<!--    <div style="position:sticky; top:50px; right:-200px; z-index:4001; width:200px">-->
-<!--        <h2 style="color:red">################################### THIS IS RED ##########################################################</h2>-->
-<!--        <h2 style="color:red">Don't forget your commit message!</h2>-->
-<!--        <f:textarea field="localValues.changeReasonComment" value="${instance.getMaxDepth()}" />-->
-
-<!--    </div>-->
     <script type="text/javascript">
         function setCommitMessageDimensions() {
-            console.log('TODO: implement setCommitMessageDimenstions');
             commitMessageInnerDiv = document.getElementById('commitMessageInnerID');
             commitMessageOuterDiv = document.getElementById('commitMessageOuterID');
             viewPortWidth = document.viewport.getWidth();
@@ -47,12 +29,10 @@
                 diff = viewPortWidth - 1784
                 newWidth = 125 + 0.5*diff;
             } else if (1600 > viewPortWidth  &amp;&amp; viewPortWidth >= 1184 ){
-                //1600 > viewPortWidth
                 diff = viewPortWidth - 1600
                 newWidth = 285 + 0.5*diff;
             } else {
                 newWidth = 155;
-                //newWidth = -245 +  0.34 * viewPortWidth
             }
             commitMessageInnerDiv.style.width = newWidth + 'px';
 
@@ -66,29 +46,12 @@
             var elem = document.getElementById('changeReasonCommentError');
             elem.style.visibility = 'visible';
             elem.style.height = '100%';
-
-            //TODO this might be used in the future.
-            //document.getElementById('yui-gen43-button').disabled=true;
-            //document.getElementById('yui-gen43-button').style.background='grey';
         }
+
         function hideError() {
             var elem = document.getElementById('changeReasonCommentError');
             elem.style.visibility = 'hidden';
             elem.style.height = '0px';
-
-            //TODO this might be used in the future.
-            //document.getElementById('yui-gen43-button').disabled=false;
-        }
-
-        function toggleError() {
-            var elem = document.getElementById('changeReasonCommentError');
-            if (elem.style.visibility == 'hidden') {
-                elem.style.visibility = 'visible';
-                elem.style.height = '100%';
-            } else {
-                elem.style.visibility = 'hidden';
-                elem.style.height = '0px';
-            }
         }
 
         function checkCurrentChangeReasonComment() {
@@ -101,9 +64,11 @@
         }
 
         function getCurrentChangeReasonComment() {
-            console.log(document.getElementsByName('_.changeReasonComment')[0].value);
             return document.getElementsByName('_.changeReasonComment')[0].value;
         }
+
+
+        //Executing on startup:
 
         //set the dimensions unsettable with css (no if then else possible.)
         setCommitMessageDimensions();
@@ -113,10 +78,8 @@
 
         // let the warning pop up after 5000 ms.
         setTimeout(function() {
+            //call the check function every 500 ms.
             setInterval(function(){checkCurrentChangeReasonComment();}, 500);
         }, 5000);
-
-        //var intervalID = setInterval(function(){checkCurrentChangeReasonComment();}, 500);
-
     </script>
 </j:jelly>

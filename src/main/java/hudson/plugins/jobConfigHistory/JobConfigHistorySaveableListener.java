@@ -60,10 +60,6 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
 		LOG.log(FINEST, "onChange for {0} done.", o);
 	}
 
-	private void createAPopup() {
-//		Jenkins.g
-	}
-
 	/**
 	 * For tests only.
 	 *
