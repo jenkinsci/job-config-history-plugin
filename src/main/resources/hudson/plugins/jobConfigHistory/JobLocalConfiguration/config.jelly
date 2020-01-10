@@ -18,10 +18,36 @@
             </div>
         </f:block>
         <script type="text/javascript">
+
+            function getDynamicViewportOffset() {
+                staticViewPortWidth = document.viewport.getWidth();
+                dynamicViewPortWidth = staticViewPortWidth;
+
+                //calculate overlap width.
+                flexibleTable = document.getElementsByClassName("config-table")[0];
+                tableWrapper = document.getElementsByClassName("jenkins-config")[0];
+                if (flexibleTable !== undefined &amp;&amp; tableWrapper !== undefined) {
+                    flexWidth = flexibleTable.getWidth();
+                    wrapperWidth = tableWrapper.getWidth();
+
+                    diffOffset = 22;
+                    cleanDiff = (flexWidth -wrapperWidth) + diffOffset;
+                    if (cleanDiff > 0) {
+                        dynamicViewPortWidth += cleanDiff;
+                    }
+                    console.log("dynWidth=" + dynamicViewPortWidth + ", statWidth=" + staticViewPortWidth);
+                    return cleanDiff;
+                }
+                return 0;
+            }
+
             function setCommitMessageDimensions() {
                 commitMessageInnerDiv = document.getElementById('commitMessageInnerID');
                 commitMessageOuterDiv = document.getElementById('commitMessageOuterID');
                 viewPortWidth = document.viewport.getWidth();
+
+                dynamicViewPortOffset = getDynamicViewportOffset();
+
 
                 //these cases are based on jenkins' configure page behavior. the magic numbers were found through testing.
                 if (viewPortWidth >= 1600 &amp;&amp;  1784 > viewPortWidth) {
@@ -39,7 +65,7 @@
 
                 //set position
                 offset = 5;
-                newRightPosition = -1 * newWidth - offset;
+                newRightPosition = -1 * newWidth - offset - dynamicViewPortOffset;
                 commitMessageOuterDiv.style.right = newRightPosition + 'px';
             }
 
@@ -76,6 +102,9 @@
             window.addEventListener('resize', function(event){
                 setCommitMessageDimensions();
             });
+
+            //listening on tables won't work, so this is a workaround for that.
+            setInterval(function(){setCommitMessageDimensions();}, 200);
 
             // let the warning pop up after 5000 ms.
             setTimeout(function() {
