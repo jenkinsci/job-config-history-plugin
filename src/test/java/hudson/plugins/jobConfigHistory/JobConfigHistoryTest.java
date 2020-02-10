@@ -451,6 +451,7 @@ public class JobConfigHistoryTest {
 		obj.put("showBuildBadges", "5");
 		obj.put("excludedUsers", "user1,user2");
 		obj.put("excludePattern", JobConfigHistoryConsts.DEFAULT_EXCLUDE);
+		obj.put("showChangeReasonCommentWindow", true);
 		return obj;
 	}
 }

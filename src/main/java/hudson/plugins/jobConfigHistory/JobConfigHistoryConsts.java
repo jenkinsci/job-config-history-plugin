@@ -72,4 +72,10 @@ public final class JobConfigHistoryConsts {
 
 	/**Id displayed for null users.*/
 	public static final String UNKNOWN_USER_ID = "unknown";
+
+	/**The xml tag in config.xml which stores the changeReasonComment tag (that is temporarily storing the change message)*/
+	public static final String JOB_LOCAL_CONFIGURATION_XML_TAG = "hudson.plugins.jobConfigHistory.JobLocalConfiguration";
+
+	/**The xml tag in config.xml which stores the change message (temporarily!)*/
+	public static final String CHANGE_REASON_COMMENT_XML_TAG = "changeReasonComment";
 }

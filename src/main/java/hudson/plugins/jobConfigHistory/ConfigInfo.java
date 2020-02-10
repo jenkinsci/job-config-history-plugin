@@ -72,6 +72,11 @@ public class ConfigInfo implements ParsedDate {
 	private final String oldName;
 
 	/**
+	 * The (manually provided) reason for the change.
+	 */
+	private final String changeReasonComment;
+
+	/**
 	 * Returns a new ConfigInfo object for a system configuration file.
 	 * 
 	 * @param name
@@ -90,7 +95,7 @@ public class ConfigInfo implements ParsedDate {
 		return new ConfigInfo(name, configExists, histDescr.getTimestamp(),
 				histDescr.getUser(), histDescr.getOperation(),
 				histDescr.getUserID(), isJob, histDescr.getCurrentName(),
-				histDescr.getOldName());
+				histDescr.getOldName(), histDescr.getChangeReasonComment());
 	}
 
 	/**
@@ -99,19 +104,20 @@ public class ConfigInfo implements ParsedDate {
 	 * @param configExists
 	 *            see {@link ConfigInfo#configExists}.
 	 * @param date
-	 *            see {@link ConfigInfo#date}
+ *            see {@link ConfigInfo#date}
 	 * @param user
-	 *            see {@link ConfigInfo#user}
+*            see {@link ConfigInfo#user}
 	 * @param operation
-	 *            see {@link ConfigInfo#operation}
+*            see {@link ConfigInfo#operation}
 	 * @param userID
-	 *            see {@link ConfigInfo#userID}
+*            see {@link ConfigInfo#userID}
 	 * @param isJob
-	 *            see {@link ConfigInfo#isJob}
+*            see {@link ConfigInfo#isJob}
+	 * @param changeReasonComment
 	 */
 	ConfigInfo(String job, boolean configExists, String date, String user,
-			String operation, String userID, boolean isJob, String currentName,
-			String oldName) {
+			   String operation, String userID, boolean isJob, String currentName,
+			   String oldName, String changeReasonComment) {
 		this.job = job;
 		this.configExists = configExists;
 		this.date = date;
@@ -121,6 +127,7 @@ public class ConfigInfo implements ParsedDate {
 		this.isJob = isJob;
 		this.currentName = currentName;
 		this.oldName = oldName;
+		this.changeReasonComment = changeReasonComment;
 	}
 
 	/**
@@ -192,6 +199,15 @@ public class ConfigInfo implements ParsedDate {
 	 */
 	public boolean getIsJob() {
 		return isJob;
+	}
+
+	/**
+	 *
+	 * @return why the config change was made.
+	 */
+	@Exported
+	public String getChangeReasonComment() {
+		return changeReasonComment;
 	}
 
 	@Override

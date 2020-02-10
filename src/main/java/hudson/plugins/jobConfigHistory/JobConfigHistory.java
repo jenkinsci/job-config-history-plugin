@@ -99,6 +99,8 @@ public class JobConfigHistory extends Plugin {
 	 */
 	private String showBuildBadges = "always";
 
+	private boolean showChangeReasonCommentWindow = true;
+
 	private static final PermissionGroup PERMISSION_GROUP = new PermissionGroup(JobConfigHistory.class, Messages._displayName());
 
 	protected static final Permission DELETEENTRY_PERMISSION =
@@ -131,6 +133,7 @@ public class JobConfigHistory extends Plugin {
 		saveModuleConfiguration = formData.getBoolean("saveModuleConfiguration");
 		showBuildBadges = formData.getString("showBuildBadges");
 		excludedUsers = formData.getString("excludedUsers");
+		showChangeReasonCommentWindow = formData.getBoolean("showChangeReasonCommentWindow");
 		save();
 		loadRegexpPatterns();
 	}
@@ -278,6 +281,12 @@ public class JobConfigHistory extends Plugin {
 	public String getShowBuildBadges() {
 		return showBuildBadges;
 	}
+
+	/**
+	 *
+	 * @return whether the changeReasonComment window should be shown in jobs' configure pages or not.
+	 */
+	public boolean getShowChangeReasonCommentWindow() { return showChangeReasonCommentWindow; }
 
 	/**
 	 * Used for testing only.

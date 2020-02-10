@@ -357,6 +357,44 @@ a.download-arrow:hover{
 
 /*
 #####################################################################
+###                           config                              ###
+#####################################################################
+*/
+
+.commitMessageInner {
+    position:sticky;
+    top:40px;
+    width:200px;
+
+    background-color: #383838;
+    background-color: rgb(238, 238, 238);
+    color:black;
+    text-align: center;
+
+    font-weight: bold;
+    font-size: 1.0em;
+
+    padding: 2px;
+
+    border:1px solid rgb(204, 204, 204);
+    border-bottom: 1px solid rgb(204, 204, 204);
+    border-top-left-radius: 3px;
+    border-radius: 3px;
+}
+
+.commitMessageOuter {
+/*nothing for now*/
+}
+
+.changeReasonCommentError {
+    color:#CC0000;
+    background-color:white;
+}
+
+
+
+/*
+#####################################################################
 ###                        other stuff                            ###
 #####################################################################
 */
