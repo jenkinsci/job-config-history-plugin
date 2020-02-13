@@ -58,7 +58,7 @@ public interface OverviewHistoryDao {
 	/** @return the number of configuration revision entries for a certain system config. */
 	int getJobRevisionAmount(String jobName);
 
-	/** @return the total number of configuration revision entries, excluding agent config entries <-- TODO future work. */
+	/** @return the total number of configuration revision entries, excluding agent config entries - TODO future work. */
 	int getTotalRevisionAmount();
 
 	/**
