@@ -541,8 +541,7 @@ public class JobConfigHistory extends Plugin {
 	 * @return JENKINS_HOME
 	 */
 	protected File getJenkinsHome() {
-		Jenkins jenkins = Jenkins.getInstance();
-		return jenkins.getRootDir();
+		return Jenkins.get().getRootDir();
 	}
 
 	/**
@@ -552,6 +551,6 @@ public class JobConfigHistory extends Plugin {
 	 */
 	@Deprecated
 	public Jenkins getJenkins() {
-		return Jenkins.getInstance();
+		return Jenkins.get();
 	}
 }

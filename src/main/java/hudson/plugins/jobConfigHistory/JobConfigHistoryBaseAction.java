@@ -107,7 +107,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
 	 * Set the {@link Jenkins} instance.
 	 */
 	public JobConfigHistoryBaseAction() {
-		jenkins = Jenkins.getInstance();
+		jenkins = Jenkins.get();
 	}
 
     /**

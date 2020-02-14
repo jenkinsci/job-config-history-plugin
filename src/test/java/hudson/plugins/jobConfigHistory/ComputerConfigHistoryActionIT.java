@@ -3,15 +3,20 @@ package hudson.plugins.jobConfigHistory;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import hudson.model.Slave;
+import org.jvnet.hudson.test.JenkinsRule;
 
 /**
  *
  * @author Greg Fogelberg
  */
-public class ComputerConfigHistoryActionTest {
+public class ComputerConfigHistoryActionIT {
+
+	@ClassRule
+	public static JenkinsRule rule = new JenkinsRule();
 
 	private final Slave agentMock = mock(Slave.class);
 

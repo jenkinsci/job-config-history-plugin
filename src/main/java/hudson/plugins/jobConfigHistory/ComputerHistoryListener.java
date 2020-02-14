@@ -48,8 +48,7 @@ public class ComputerHistoryListener extends ComputerListener {
 			.getLogger(ComputerHistoryListener.class.getName());
 	
 	public ComputerHistoryListener() {
-		Jenkins jenkins = Jenkins.getInstance();
-		nodes = jenkins.getNodes();
+		nodes = Jenkins.get().getNodes();
 	}
 
 	@Override
@@ -57,7 +56,7 @@ public class ComputerHistoryListener extends ComputerListener {
 		// Ensure nodes is configured as getNodes() may return null
 		// during class initialization. NodeList will surely be defined
 		// on the first run of this method.
-		Jenkins jenkins = Jenkins.getInstance();
+		Jenkins jenkins = Jenkins.get();
 		if (nodes == null) {
 			nodes = jenkins.getNodes();
 		}
@@ -83,7 +82,7 @@ public class ComputerHistoryListener extends ComputerListener {
 	 * If a new slave get added.
 	 */
 	private void onAdd() {
-		Jenkins jenkins = Jenkins.getInstance();
+		Jenkins jenkins = Jenkins.get();
 		for (Node node : jenkins.getNodes()) {
 			if (!nodes.contains(node) && isTracked(node)) {
 				switchHistoryDao(node).createNewNode(node);
@@ -106,7 +105,7 @@ public class ComputerHistoryListener extends ComputerListener {
 	 * If a slave get removed.
 	 */
 	private void onRemove() {
-		Jenkins jenkins = Jenkins.getInstance();
+		Jenkins jenkins = Jenkins.get();
 		for (Node node : nodes) {
 			if (!jenkins.getNodes().contains(node)
 					&& isTracked(node)) {
@@ -120,7 +119,7 @@ public class ComputerHistoryListener extends ComputerListener {
 	 * If a slave configuration get changed.
 	 */
 	private void onChange() {
-		Jenkins jenkins = Jenkins.getInstance();
+		Jenkins jenkins = Jenkins.get();
 		final JobConfigHistoryStrategy hdao = PluginUtils.getHistoryDao();
 		for (Node node : jenkins.getNodes()) {
 			if (!PluginUtils.isUserExcluded(PluginUtils.getPlugin())
@@ -136,7 +135,7 @@ public class ComputerHistoryListener extends ComputerListener {
 	 */
 	private void onRename() {
 		Node originalNode = null;
-		Jenkins jenkins = Jenkins.getInstance();
+		Jenkins jenkins = Jenkins.get();
 		for (Node node : nodes) {
 			if (!jenkins.getNodes().contains(node)
 					&& isTracked(node)) {
