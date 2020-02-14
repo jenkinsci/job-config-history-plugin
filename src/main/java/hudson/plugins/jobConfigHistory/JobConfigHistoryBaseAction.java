@@ -439,7 +439,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * <ul>
      *     <li>0</li>
      *     <li>maxPageNum</li>
-     *     <li>all integers in {k in [currentPageNum - PAGING_EPSILON, currentPageNum + PAGING_EPSILON] | k > 0 && k < maxPageNum}.</li>
+     *     <li>all integers in {k in [currentPageNum - PAGING_EPSILON, currentPageNum + PAGING_EPSILON] | k &gt; 0 &amp;&amp; k &lt; maxPageNum}.</li>
      * </ul>
      */
     public List<Integer> getRelevantPageNums(int currentPageNum, int maxPageNum) {

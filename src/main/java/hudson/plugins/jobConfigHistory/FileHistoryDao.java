@@ -330,10 +330,10 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
 
 	/**
-	 * Find this in the configFile:<br/>
-	 * 		&emsp; &lt;hudson.plugins.jobConfigHistory.JobLocalConfiguration plugin="jobConfigHistory@2.25-SNAPSHOT"&gt;<br/>
-	 * 		&emsp; &emsp; &lt;changeReasonComment&gt;MY_CHANGE_REASON_COMMENT&lt;/changeReasonComment&gt;<br/>
-	 * 		&emsp; &lt;/hudson.plugins.jobConfigHistory.JobLocalConfiguration&gt;<br/>
+	 * Find this in the configFile:<br>
+	 * 		&emsp; &lt;hudson.plugins.jobConfigHistory.JobLocalConfiguration plugin="jobConfigHistory@2.25-SNAPSHOT"&gt;<br>
+	 * 		&emsp; &emsp; &lt;changeReasonComment&gt;MY_CHANGE_REASON_COMMENT&lt;/changeReasonComment&gt;<br>
+	 * 		&emsp; &lt;/hudson.plugins.jobConfigHistory.JobLocalConfiguration&gt;<br>
 	 * and delete it, receiving the changeReasonComment, if present.
 	 *
 	 * @param configFile the config file
