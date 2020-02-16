@@ -47,8 +47,7 @@ public abstract class JobConfigHistoryStrategy
 	@Override
 	@SuppressWarnings("unchecked")
 	public final Descriptor<JobConfigHistoryStrategy> getDescriptor() {
-		Jenkins jenkins = Jenkins.getInstance();
-		return jenkins.getDescriptorOrDie(getClass());
+		return Jenkins.get().getDescriptorOrDie(getClass());
 	}
 
 	/**
@@ -57,7 +56,6 @@ public abstract class JobConfigHistoryStrategy
 	 * @return the extension point list.
 	 */
 	public static DescriptorExtensionList<JobConfigHistoryStrategy, JobConfigHistoryDescriptor<JobConfigHistoryStrategy>> all() {
-		Jenkins jenkins = Jenkins.getInstance();
-		return jenkins.getDescriptorList(JobConfigHistoryStrategy.class);
+		return Jenkins.get().getDescriptorList(JobConfigHistoryStrategy.class);
 	}
 }

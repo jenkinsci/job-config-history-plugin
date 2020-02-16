@@ -54,8 +54,7 @@ final public class PluginUtils {
 	 * @return plugin
 	 */
 	public static JobConfigHistory getPlugin() {
-		Jenkins jenkins = Jenkins.getInstance();
-		return jenkins.getPlugin(JobConfigHistory.class);
+		return Jenkins.get().getPlugin(JobConfigHistory.class);
 	}
 
 	/**
@@ -159,9 +158,8 @@ final public class PluginUtils {
 		} catch (NumberFormatException e) {
 			maxHistoryEntries = 0;
 		}
-		Jenkins jenkins = Jenkins.getInstance();
 		return new FileHistoryDao(plugin.getConfiguredHistoryRootDir(),
-			new File(jenkins.root.getPath()), mimickedUser,
+			new File(Jenkins.get().root.getPath()), mimickedUser,
 			maxHistoryEntries, !plugin.getSkipDuplicateHistory());
 	}
 
@@ -207,9 +205,8 @@ final public class PluginUtils {
 	 * @return true, if Maven integration plugin is available and active.
 	 */
 	public static boolean isMavenPluginAvailable() {
-		Jenkins jenkins = Jenkins.getInstance();
 		try {
-			Plugin plugin = jenkins.getPlugin("maven-plugin");
+			Plugin plugin = Jenkins.get().getPlugin("maven-plugin");
 			return plugin != null && plugin.getWrapper().isActive();
 		} catch (Exception e) {
 			return false;

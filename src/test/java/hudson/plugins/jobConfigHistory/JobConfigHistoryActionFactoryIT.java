@@ -9,16 +9,21 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import hudson.model.AbstractProject;
 import hudson.model.Action;
+import org.jvnet.hudson.test.JenkinsRule;
 
 /**
  *
  * @author Mirko Friedenhagen
  */
-public class JobConfigHistoryActionFactoryTest {
+public class JobConfigHistoryActionFactoryIT {
+
+	@ClassRule
+	public static JenkinsRule rule = new JenkinsRule();
 
 	private final AbstractProject<?, ?> mockedTarget = mock(
 			AbstractProject.class);

@@ -77,7 +77,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	 */
 	public ComputerConfigHistoryAction(Slave slave) {
 		this.slave = slave;
-		jenkins = Jenkins.getInstance();
+		jenkins = Jenkins.get();
 	}
 
 	@Override
@@ -413,7 +413,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 
 	public boolean revisionEqualsCurrent(String timestamp) {
 		//going over Jenkins.get().getNode(..) is necessary because this.getSlave returns an old version of the node.
-		return PluginUtils.getHistoryDao().revisionEqualsCurrent(Jenkins.getInstance().getNode(this.getSlave().getNodeName()), timestamp);
+		return PluginUtils.getHistoryDao().revisionEqualsCurrent(Jenkins.get().getNode(this.getSlave().getNodeName()), timestamp);
 	}
 
 	/**
