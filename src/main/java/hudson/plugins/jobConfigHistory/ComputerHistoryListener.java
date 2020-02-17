@@ -47,15 +47,8 @@ public class ComputerHistoryListener extends ComputerListener {
 	private static final Logger LOG = Logger
 			.getLogger(ComputerHistoryListener.class.getName());
 	
-	public ComputerHistoryListener() {
-		nodes = Jenkins.get().getNodes();
-	}
-
 	@Override
 	public void onConfigurationChange() {
-		// Ensure nodes is configured as getNodes() may return null
-		// during class initialization. NodeList will surely be defined
-		// on the first run of this method.
 		Jenkins jenkins = Jenkins.get();
 		if (nodes == null) {
 			nodes = jenkins.getNodes();
