@@ -66,18 +66,12 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	private Slave slave;
 
 	/**
-	 * The jenkins instance.
-	 */
-	private final Jenkins jenkins;
-
-	/**
 	 * Standard constructor using instance.
 	 * 
 	 * @param slave Slave.
 	 */
 	public ComputerConfigHistoryAction(Slave slave) {
 		this.slave = slave;
-		jenkins = Jenkins.get();
 	}
 
 	@Override
@@ -374,14 +368,14 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		final Slave newSlave = (Slave) Jenkins.XSTREAM2
 				.fromXML(xmlFile.getFile());
 		final List<Node> nodes = new ArrayList<Node>();
-		nodes.addAll(jenkins.getNodes());
+		nodes.addAll(getJenkins().getNodes());
 		nodes.remove(slave);
 		nodes.add(newSlave);
 		slave = newSlave;
-		jenkins.setNodes(nodes);
+		getJenkins().setNodes(nodes);
 		try {
 			rsp.sendRedirect(
-					jenkins.getRootUrl() + slave.toComputer().getUrl());
+					getJenkins().getRootUrl() + slave.toComputer().getUrl());
 		} catch (NullPointerException e) {
 			LOG.log(Level.WARNING, "Failed to redirect to agent url. ", e);
 		}
