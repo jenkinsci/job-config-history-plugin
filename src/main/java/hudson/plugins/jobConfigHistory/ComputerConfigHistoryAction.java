@@ -368,14 +368,13 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 		final Slave newSlave = (Slave) Jenkins.XSTREAM2
 				.fromXML(xmlFile.getFile());
 		final List<Node> nodes = new ArrayList<Node>();
-		nodes.addAll(getJenkins().getNodes());
+		nodes.addAll(Jenkins.get().getNodes());
 		nodes.remove(slave);
 		nodes.add(newSlave);
 		slave = newSlave;
-		getJenkins().setNodes(nodes);
+		Jenkins.get().setNodes(nodes);
 		try {
-			rsp.sendRedirect(
-					getJenkins().getRootUrl() + slave.toComputer().getUrl());
+			rsp.sendRedirect(Jenkins.get().getRootUrl() + slave.toComputer().getUrl());
 		} catch (NullPointerException e) {
 			LOG.log(Level.WARNING, "Failed to redirect to agent url. ", e);
 		}

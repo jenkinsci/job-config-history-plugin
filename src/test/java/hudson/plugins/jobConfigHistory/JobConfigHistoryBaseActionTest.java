@@ -127,17 +127,6 @@ public class JobConfigHistoryBaseActionTest {
 	}
 
 	/**
-	 * Test of getJenkins method, of class JobConfigHistoryBaseAction.
-	 */
-	@Test
-	public void testGetJenkins() {
-		JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
-		Jenkins expResult = jenkinsRule.getInstance();
-		Jenkins result = sut.getJenkins();
-		assertEquals(expResult, result);
-	}
-
-	/**
 	 * Test of getAccessControlledObject method, of class
 	 * JobConfigHistoryBaseAction.
 	 */
@@ -237,10 +226,6 @@ public class JobConfigHistoryBaseActionTest {
 	public class JobConfigHistoryBaseActionImpl
 			extends
 				JobConfigHistoryBaseAction {
-
-		public JobConfigHistoryBaseActionImpl() {
-			super(jenkinsRule.getInstance());
-		}
 
 		public void checkConfigurePermission() {
 		}

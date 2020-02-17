@@ -49,6 +49,7 @@ import hudson.XmlFile;
 import hudson.model.FreeStyleProject;
 import hudson.model.JDK;
 import hudson.model.Project;
+import hudson.security.AccessControlled;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -66,10 +67,7 @@ public class JobConfigHistoryRootActionTest {
 	@Rule
 	public JenkinsRule jenkinsRule = new JenkinsRule();
 
-	//this is used for testing un-authorized access to various methods.
-	private final Jenkins mockedJenkins = mock(Jenkins.class);
-	private final StaplerRequest mockedStaplerRequest = mock(
-			StaplerRequest.class);
+	private final StaplerRequest mockedStaplerRequest = mock(StaplerRequest.class);
 
 	/**
 	 * Test of getUrlName method, of class JobConfigHistoryRootAction.
@@ -646,13 +644,13 @@ public class JobConfigHistoryRootActionTest {
 	JobConfigHistoryRootAction createUnauthorizedStaplerMockedSut() {
 		return new JobConfigHistoryRootAction() {
 			@Override
-			protected Jenkins getJenkins() {
-				return mockedJenkins;
+			protected StaplerRequest getCurrentRequest() {
+				return mockedStaplerRequest;
 			}
 
 			@Override
-			protected StaplerRequest getCurrentRequest() {
-				return mockedStaplerRequest;
+			public AccessControlled getAccessControlledObject() {
+			    return mock(Jenkins.class);
 			}
 		};
 	}
