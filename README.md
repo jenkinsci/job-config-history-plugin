@@ -17,3 +17,11 @@ Notes
 * This plugin uses highlight.js for syntax highlighting (code and diffs). See
     + [github](https://github.com/highlightjs/highlight.js/)
     + [homepage](https://highlightjs.org/)
+    
+-----------------------------------------
+
+# Changelog
+
+See
+[Changelog](https://github.com/jenkinsci/jobConfigHistory-plugin/blob/master/CHANGELOG.md)
+on Github.
