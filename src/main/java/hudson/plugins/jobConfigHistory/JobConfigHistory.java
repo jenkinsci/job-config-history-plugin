@@ -61,44 +61,37 @@ public class JobConfigHistory extends Plugin {
 	/** Root directory for storing histories. */
 	private String historyRootDir;
 
-	/** Maximum number of configuration history entries to keep. */
+	/** Maximum number of history entries to keep. */
 	private String maxHistoryEntries;
 
-	/** Maximum number of history entries per site to show. */
+	/** Maximum number of history entries to show per page. */
 	private String maxEntriesPerPage;
 
-	/** Maximum number of days to keep entries. */
+	/** Maximum number of days to keep history entries. */
 	private String maxDaysToKeepEntries;
 
+	/** Comma separated list of usernames whose changes should not get detected. */
 	private String excludedUsers;
 
-	/**
-	 * Flag to indicate if we should save history when it is a duplication of
-	 * the previous saved configuration.
-	 */
+	/** Whether to skip saving history when it is a duplication of the previous saved configuration. */
 	private boolean skipDuplicateHistory = true;
 
-	/**
-	 * Regular expression pattern for 'system' configuration files to exclude
-	 * from saving.
-	 */
+	/** Regular expression pattern for 'system' configuration files to exclude from saving. */
 	private String excludePattern;
 
 	/** Compiled regular expression pattern. */
 	private transient Pattern excludeRegexpPattern;
 
-	/**
-	 * Flag to indicate if we should save the config history of Maven modules.
-	 */
+	/** Whether to save the config history of Maven modules. */
 	private boolean saveModuleConfiguration = false;
 
 	/**
-	 * Whether build badges should appear when the config of a job has changed
-	 * since the last build. Three possible settings: Never, always, only for
-	 * users with config permission.
+	 * Whether build badges should appear when the config of a job has changed since the last build.
+	 * Possible values: "never", "always", "userWithConfigPermission", "adminUser"
 	 */
 	private String showBuildBadges = "always";
 
+	/** Whether a change reason comment window should be shown on a jobs' configure page. */
 	private boolean showChangeReasonCommentWindow = true;
 
 	private static final PermissionGroup PERMISSION_GROUP = new PermissionGroup(JobConfigHistory.class, Messages._displayName());
@@ -139,20 +132,26 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * @return The default history root directory.
+	 * Gets the default root directory for storing histories.
+	 *
+	 * @return The default root directory.
 	 */
 	public String getDefaultRootDir() {
 		return JobConfigHistoryConsts.DEFAULT_HISTORY_DIR;
 	}
 
 	/**
-	 * @return The configured history root directory.
+	 * Gets the root directory for storing histories.
+	 *
+	 * @return The root directory.
 	 */
 	public String getHistoryRootDir() {
 		return historyRootDir;
 	}
 
 	/**
+	 * Gets the maximum number of history entries to keep.
+	 *
 	 * @return The maximum number of history entries to keep.
 	 */
 	public String getMaxHistoryEntries() {
@@ -160,10 +159,10 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * Set the maximum number of history entries per item.
+	 * Sets the maximum number of history entries to keep.
 	 *
 	 * @param maxEntryInput
-	 *            The maximum number of history entries to keep
+	 *            The maximum number of history entries to keep.
 	 */
 	public void setMaxHistoryEntries(String maxEntryInput) {
 		String trimmedValue = StringUtils.trimToNull(maxEntryInput);
@@ -173,17 +172,19 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * @return The maximum number of history entries to show per site.
+	 * Gets the maximum number of history entries to show per page.
+	 *
+	 * @return The maximum number of history entries to show per page.
 	 */
 	public String getMaxEntriesPerPage() {
 		return maxEntriesPerPage;
 	}
 
 	/**
-	 * Set the maximum number of history entries to show per site.
+	 * Sets the maximum number of history entries to show per page.
 	 *
 	 * @param maxEntryInput
-	 *            The maximum number of history entries to show per site
+	 *            The maximum number of history entries to show per page.
 	 */
 	public void setMaxEntriesPerPage(String maxEntryInput) {
 		String trimmedValue = StringUtils.trimToNull(maxEntryInput);
@@ -193,6 +194,8 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
+	 * Gets the maximum number of days to keep history entries.
+	 *
 	 * @return The maximum number of days to keep history entries.
 	 */
 	public String getMaxDaysToKeepEntries() {
@@ -200,10 +203,10 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * Set allowed age of history entries.
+	 * Sets the maximum number of days to keep history entries.
 	 *
 	 * @param maxDaysInput
-	 *            For how long history entries should be kept (in days)
+	 *            The maximum number of days to keep history entries.
 	 */
 	public void setMaxDaysToKeepEntries(String maxDaysInput) {
 		String trimmedValue = StringUtils.trimToNull(maxDaysInput);
@@ -242,8 +245,9 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * @return true if we should skip saving history that duplicates the prior
-	 *         saved configuration.
+	 * Gets whether to skip saving history when it is a duplication of the previous saved configuration.
+	 *
+	 * @return Whether to skip saving history when it is a duplication of the previous saved configuration.
 	 */
 	public boolean getSkipDuplicateHistory() {
 		return skipDuplicateHistory;
@@ -260,47 +264,51 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * @return The regular expression for 'system' file names to exclude from
-	 *         saving.
+	 * Gets the regular expression pattern for 'system' configuration files to exclude from saving.
+	 *
+	 * @return The regular expression pattern.
 	 */
 	public String getExcludePattern() {
 		return excludePattern;
 	}
 
 	/**
-	 * @return true if we should save 'system' configurations.
+	 * Gets whether to save the config history of Maven modules.
+	 *
+	 * @return Whether to save the config history of Maven modules.
 	 */
 	public boolean getSaveModuleConfiguration() {
 		return saveModuleConfiguration;
 	}
 
 	/**
-	 * @return Whether build badges should appear always, never or only for
-	 *         users with config rights.
+	 * Gets whether build badges should appear when the config of a job has changed since the last build.
+	 *
+	 * @return Possible value: "never", "always", "userWithConfigPermission", "adminUser"
 	 */
 	public String getShowBuildBadges() {
 		return showBuildBadges;
 	}
 
 	/**
+	 * Gets whether a change reason comment window should be shown on a jobs' configure page.
 	 *
-	 * @return whether the changeReasonComment window should be shown in jobs' configure pages or not.
+	 * @return Whether a comment window should be shown.
 	 */
 	public boolean getShowChangeReasonCommentWindow() { return showChangeReasonCommentWindow; }
 
 	/**
-	 * Used for testing only.
+	 * Sets whether build badges should appear when the config of a job has changed since the last build.
 	 *
 	 * @param showBuildBadges
-	 *            possible values: "never", "always", "userWithConfigPermission" or "adminUser".
+	 *            Possible values: "never", "always", "userWithConfigPermission", "adminUser"
 	 */
 	public void setShowBuildBadges(String showBuildBadges) {
 		this.showBuildBadges = showBuildBadges;
 	}
 
 	/**
-	 * Whether build badges should appear for the builds of this project for
-	 * this user.
+	 * Whether build badges should appear for the builds of this project.
 	 *
 	 * @param project
 	 *            The project to which the build history belongs.
@@ -321,7 +329,7 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * Used for testing to verify invalid pattern not loaded.
+	 * Gets the regular expression pattern used by this class.
 	 *
 	 * @return The loaded regexp pattern, or null if pattern was invalid.
 	 */
@@ -330,7 +338,7 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * Loads regular expression patterns used by this class.
+	 * Loads the regular expression pattern used by this class.
 	 */
 	private void loadRegexpPatterns() {
 		excludeRegexpPattern = loadRegex(excludePattern);
@@ -393,9 +401,9 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
+	 * Gets usernames whose changes should not get detected.
 	 *
-	 * @return comma separated list of usernames, whose changes should not get
-	 *         detected.
+	 * @return Comma separated list of usernames.
 	 */
 	public String getExcludedUsers() {
 		return excludedUsers;
@@ -442,11 +450,11 @@ public class JobConfigHistory extends Plugin {
 	}
 
 	/**
-	 * Check whether config file should not be saved because of regex pattern.
+	 * Checks whether the config file should not be saved because of regex pattern.
 	 *
 	 * @param xmlFile
-	 *            The config file
-	 * @return True if it should be saved
+	 *            The config file.
+	 * @return True if it should be saved.
 	 */
 	private boolean checkRegex(XmlFile xmlFile) {
 		if (excludeRegexpPattern != null) {
@@ -477,7 +485,7 @@ public class JobConfigHistory extends Plugin {
 
 	/**
 	 * Validates the user entry for the maximum number of history items to show
-	 * per site. Must be blank or a non-negative integer.
+	 * per page. Must be blank or a non-negative integer.
 	 *
 	 * @param value
 	 *            The form input entered by the user.
@@ -529,7 +537,7 @@ public class JobConfigHistory extends Plugin {
 	/**
 	 * For tests.
 	 *
-	 * @return the historyDao
+	 * @return The history DAO.
 	 */
 	protected HistoryDao getHistoryDao() {
 		return PluginUtils.getHistoryDao(this);
@@ -547,7 +555,7 @@ public class JobConfigHistory extends Plugin {
 	/**
 	 * For tests.
 	 *
-	 * @return Jenkins instance.
+	 * @return The Jenkins instance.
 	 */
 	@Deprecated
 	public Jenkins getJenkins() {
