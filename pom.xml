@@ -309,9 +309,9 @@
                     <quiet>true</quiet>
                     <aggregate>false</aggregate>
                     <links>
-                        <link>http://docs.oracle.com/javase/8/docs/api/</link>
-                        <link>http://javadoc.jenkins-ci.org/</link>
-                        <link>http://stapler.kohsuke.org/apidocs/</link>
+                        <link>https://docs.oracle.com/javase/8/docs/api/</link>
+                        <link>https://javadoc.jenkins.io/</link>
+                        <link>https://stapler.kohsuke.org/apidocs/</link>
                     </links>
                 </configuration>
             </plugin>
