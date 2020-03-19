@@ -114,7 +114,7 @@
 
     <properties>
         <jenkins.version>2.164</jenkins.version>
-        <maven-surefire-report-plugin.version>2.22.2</maven-surefire-report-plugin.version>
+        <maven-surefire-report-plugin.version>3.0.0-M4</maven-surefire-report-plugin.version>
         <maven-hpi-plugin.injectedTestName>InjectedIT</maven-hpi-plugin.injectedTestName>
         <maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
         <jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
