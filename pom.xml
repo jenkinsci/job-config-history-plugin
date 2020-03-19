@@ -2,7 +2,7 @@
 <!--
  ~ The MIT License
  ~
- ~ Copyright (c) 2010-2018, Stefan Brausch, Mirko Friedenhagen, Jochen A. Fuerbacher,
+ ~ Copyright (c) 2010-2020, Stefan Brausch, Mirko Friedenhagen, Jochen A. Fuerbacher,
  ~ Kathi Stutz, Yordan Boev
  ~
  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>3.56</version>
+        <version>3.57</version>
     </parent>
 
     <artifactId>jobConfigHistory</artifactId>
@@ -114,7 +114,8 @@
 
     <properties>
         <jenkins.version>2.164</jenkins.version>
-        <maven-surefire-report-plugin.version>2.22.2</maven-surefire-report-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
+        <maven-surefire-report-plugin.version>${maven-surefire-plugin.version}</maven-surefire-report-plugin.version>
         <maven-hpi-plugin.injectedTestName>InjectedIT</maven-hpi-plugin.injectedTestName>
         <maven-checkstyle-plugin.version>3.1.0</maven-checkstyle-plugin.version>
         <jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
@@ -135,7 +136,7 @@
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
-            <version>2.6.3</version>
+            <version>2.6.4</version>
         </dependency>
         <dependency>
             <groupId>io.github.java-diff-utils</groupId>
@@ -151,6 +152,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>4.13</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -230,6 +232,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <testFailureIgnore>false</testFailureIgnore>
@@ -292,11 +295,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <!-- Avoid hanging site generation waiting for 'http://snapshots.maven.codehaus.org/maven2' see http://jira.codehaus.org/browse/MPIR-137 -->
-                <configuration>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -306,9 +304,9 @@
                     <quiet>true</quiet>
                     <aggregate>false</aggregate>
                     <links>
-                        <link>http://docs.oracle.com/javase/8/docs/api/</link>
-                        <link>http://javadoc.jenkins-ci.org/</link>
-                        <link>http://stapler.kohsuke.org/apidocs/</link>
+                        <link>https://docs.oracle.com/javase/8/docs/api/</link>
+                        <link>https://javadoc.jenkins.io/</link>
+                        <link>https://stapler.kohsuke.org/apidocs/</link>
                     </links>
                 </configuration>
             </plugin>
