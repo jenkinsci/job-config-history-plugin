@@ -1,5 +1,8 @@
 # Changelog
 
+## tbd
+* (JENKINS-61049)[https://issues.jenkins-ci.org/browse/JENKINS-61049] Move documentation from jenkins wiki to github
+
 ## 2.25 (March 13 2020)
 * Remove unused HTML help files (PR #117) Thanks, darxriggs 
 * Reduce deprecated API usage (PR #116) Thanks, darxriggs 
