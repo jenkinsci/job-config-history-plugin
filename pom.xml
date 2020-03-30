@@ -39,7 +39,7 @@
 
     <name>Jenkins Job Configuration History Plugin</name>
     <description>Saves copies of job, node and system configurations.</description>
-    <url>https://wiki.jenkins.io/display/JENKINS/JobConfigHistory+Plugin</url>
+    <url>https://github.com/jenkinsci/jobConfigHistory-plugin/</url>
 
     <issueManagement>
         <system>JIRA</system>
