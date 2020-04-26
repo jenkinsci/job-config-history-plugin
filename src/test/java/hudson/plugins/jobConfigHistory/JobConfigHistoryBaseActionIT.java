@@ -12,8 +12,14 @@ import java.util.List;
 
 import jenkins.model.Jenkins;
 import org.hamcrest.CoreMatchers;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
@@ -32,9 +38,10 @@ import hudson.tasks.LogRotator;
  * @author mfriedenhagen
  *
  */
-public class JobConfigHistoryBaseActionIT
-		extends
-			AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigHistoryBaseActionIT {
+
+	@Rule
+	public JenkinsRule j = new JenkinsRuleWithDeletingInstanceDir();
 
 	private WebClient webClient;
 	// we need to sleep between saves so we don't overwrite the history
@@ -46,17 +53,15 @@ public class JobConfigHistoryBaseActionIT
 	private final File file2 = new File("new/config.xml");
 	private String oldLineSeparator;
 
-	@Override
-	public void before() throws Throwable {
-		super.before();
-		webClient = createWebClient();
+	@Before
+	public void before() {
+		webClient = j.createWebClient();
 		oldLineSeparator = System.getProperty("line.separator");
 		System.setProperty("line.separator", "\n");
 	}
 
-	@Override
-	public void after() throws Exception {
-		super.after();
+	@After
+	public void after() {
 		System.setProperty("line.separator", oldLineSeparator);
 	}
 
@@ -64,6 +69,7 @@ public class JobConfigHistoryBaseActionIT
 	 * Test method for
 	 * {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffAsString(File, File, String[], String[])}.
 	 */
+	@Test
 	public void testGetDiffFileStringStringSameLineLength() {
 		final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
 		final String s1 = "123\n346";
@@ -78,6 +84,7 @@ public class JobConfigHistoryBaseActionIT
 	 * Test method for
 	 * {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffAsString(File, File, String[], String[])}.
 	 */
+	@Test
 	public void testGetDiffFileStringStringEmpty() {
 		final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
 		Assert.assertEquals("\n", makeResultPlatformIndependent(action
@@ -130,6 +137,7 @@ public class JobConfigHistoryBaseActionIT
 	 * Test method for
 	 * {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffAsString(File, File, String[], String[])}.
 	 */
+	@Test
 	public void testGetDiffFileStringStringDifferentLineLength() {
 		final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
 		Assert.assertEquals("\n",
@@ -147,6 +155,7 @@ public class JobConfigHistoryBaseActionIT
 		return result.replace("\\", "/");
 	}
 
+	@Test
 	public void testGetConfigXmlIllegalArgumentExceptionNonExistingJobName()
 			throws IOException, SAXException {
 		TextPage page = (TextPage) webClient.goTo(
@@ -157,6 +166,7 @@ public class JobConfigHistoryBaseActionIT
 				page.getContent().trim().isEmpty());
 	}
 
+	@Test
 	public void testGetConfigXmlIllegalArgumentExceptionInvalidTimestamp()
 			throws IOException, SAXException {
 		final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
@@ -170,36 +180,36 @@ public class JobConfigHistoryBaseActionIT
 	}
 
 	@Issue("JENKINS-5534")
-	public void testSecuredAccessToJobConfigHistoryPage()
-			throws IOException, SAXException {
-		// without security the jobConfigHistory-badge should show.
-		final HtmlPage withoutSecurity = webClient.goTo("/");
-		assertThat(withoutSecurity.asXml(), CoreMatchers
-				.containsString(JobConfigHistoryConsts.ICONFILENAME));
-		withoutSecurity.getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
+	@Test
+	public void testSecuredAccessToJobConfigHistoryPage() throws Exception {
+		String iconUrl = JobConfigHistoryConsts.ICONFILENAME;
+		String pageUrl = j.contextPath + "/" + JobConfigHistoryConsts.URLNAME;
+
+		// without security the jobConfigHistory-badge should show
+		final HtmlPage withoutSecurity = webClient.goTo("");
+		assertThat(withoutSecurity.asXml(), CoreMatchers.containsString(iconUrl));
+		withoutSecurity.getAnchorByHref(pageUrl);
+
 		// with security enabled the jobConfigHistory-badge should not show
-		// anymore.
-		jenkins.setSecurityRealm(
-				new HudsonPrivateSecurityRealm(false, false, null));
-		jenkins.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
-		final HtmlPage withSecurityEnabled = webClient.goTo("/");
-		assertThat(withSecurityEnabled.asXml(), not(CoreMatchers
-				.containsString(JobConfigHistoryConsts.ICONFILENAME)));
+		j.jenkins.setSecurityRealm(new HudsonPrivateSecurityRealm(false, false, null));
+		j.jenkins.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
+
+		final HtmlPage withSecurityEnabled = webClient.goTo("");
+		assertThat(withSecurityEnabled.asXml(), not(CoreMatchers.containsString(iconUrl)));
 		try {
-			withSecurityEnabled
-					.getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
-			Assert.fail("Expected a " + ElementNotFoundException.class
-					+ " to be thrown");
+			withSecurityEnabled.getAnchorByHref(pageUrl);
+			Assert.fail("Expected a " + ElementNotFoundException.class + " to be thrown");
 		} catch (ElementNotFoundException e) {
 			System.err.println(e);
 		}
 	}
 
 	@Issue("JENKINS-17124")
+	@Test
 	public void testClearDuplicateLines() throws Exception {
 		final String jobName = "Test";
 
-		final FreeStyleProject project = createFreeStyleProject(jobName);
+		final FreeStyleProject project = j.createFreeStyleProject(jobName);
 		project.setBuildDiscarder(new LogRotator(42, 42, -1, -1));
 		project.save();
 		Thread.sleep(SLEEP_TIME);
@@ -215,10 +225,10 @@ public class JobConfigHistoryBaseActionIT
 		final HtmlPage historyPage = webClient
 				.goTo("job/" + jobName + "/" + JobConfigHistoryConsts.URLNAME);
 		final HtmlForm diffFilesForm = historyPage.getFormByName("diffFiles");
-		final HtmlPage diffPage = last(diffFilesForm.getElementsByTagName("button")).click();
-		assertStringContains(diffPage.asText(), "<daysToKeep>42</daysToKeep>");
-		assertStringContains(diffPage.asText(), "<numToKeep>42</numToKeep>");
-		assertStringContains(diffPage.asText(), "<daysToKeep>47</daysToKeep>");
-		assertStringContains(diffPage.asText(), "<numToKeep>47</numToKeep>");
+		final HtmlPage diffPage = j.submit(diffFilesForm);
+		j.assertStringContains(diffPage.asText(), "<daysToKeep>42</daysToKeep>");
+		j.assertStringContains(diffPage.asText(), "<numToKeep>42</numToKeep>");
+		j.assertStringContains(diffPage.asText(), "<daysToKeep>47</daysToKeep>");
+		j.assertStringContains(diffPage.asText(), "<numToKeep>47</numToKeep>");
 	}
 }

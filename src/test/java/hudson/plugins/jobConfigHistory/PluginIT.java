@@ -10,6 +10,11 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.jvnet.hudson.test.recipes.LocalData;
 import org.xml.sax.SAXException;
 
@@ -24,7 +29,13 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
 /**
  * @author mfriedenhagen
  */
-public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
+public class PluginIT {
+
+	@Rule
+	public JenkinsRule j = new JenkinsRuleWithDeletingInstanceDir();
+
+	private WebClient webClient;
+	private static final String JOB_NAME = "bar";
 
 	private class JobPage {
 
@@ -37,12 +48,11 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 		}
 
 		public final String getJobConfigHistoryLink() {
-			return "job/" + JOB_NAME + "/jobConfigHistory";
+			return j.contextPath + "/job/" + JOB_NAME + "/jobConfigHistory";
 		}
 
 		public void checkHistoryLink() {
-			assertXPath(jobPage,
-					"//a[@href=\"/" + jobConfigHistoryLink + "\"]");
+			j.assertXPath(jobPage, "//a[@href=\"" + jobConfigHistoryLink + "\"]");
 		}
 	}
 
@@ -63,7 +73,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 			final HtmlTextArea descriptionTextArea = configForm
 					.getTextAreaByName("description");
 			descriptionTextArea.setText(text);
-			submit(configForm);
+			j.submit(configForm);
 		}
 	}
 
@@ -81,7 +91,6 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 		public List<HtmlAnchor> getConfigOutputLinks(final String type) {
 			return historyPage.getByXPath("//a[contains(@href, \"configOutput?type=" + type + "\")]");
 		}
-
 	}
 
 	private class AllJobConfigHistoryPage extends BasicHistoryPage {
@@ -92,7 +101,6 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 			Assert.assertEquals("All Configuration History [Jenkins]",
 					historyPage.getTitleText());
 		}
-
 	}
 
 	private class HistoryPage extends BasicHistoryPage {
@@ -103,10 +111,10 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 					historyPage.getTitleText());
 		}
 
-		public HtmlPage getDiffPage() throws IOException {
+		public HtmlPage getDiffPage() throws Exception {
 			final HtmlForm diffFilesForm = historyPage
 					.getFormByName("diffFiles");
-			return last(diffFilesForm.getElementsByTagName("button")).click();
+			return j.submit(diffFilesForm);
 		}
 
 		public void setCheckedTimestamp1RadioButton(int index,
@@ -134,33 +142,32 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 
 	}
 
-	private WebClient webClient;
-
-	private static final String JOB_NAME = "bar";
-
-	@Override
-	public void before() throws Throwable {
-		super.before();
-		webClient = createWebClient();
+	@Before
+	public void before() {
+		webClient = j.createWebClient();
 	}
 
+	@Test
 	public void testAllProjectsConfigurationHistoryPage()
 			throws IOException, SAXException {
 		new AllJobConfigHistoryPage(webClient.goTo("jobConfigHistory/"));
 	}
 
 	@LocalData
+	@Test
 	public void testJobPage() throws IOException, SAXException {
 		new JobPage().checkHistoryLink();
 	}
 
 	@LocalData
+	@Test
 	public void testHistoryPageWithOutEntries()
 			throws IOException, SAXException {
 		new HistoryPage().assertNoHistoryEntriesAvailable();
 	}
 
 	@LocalData
+	@Test
 	public void testSaveConfiguration() throws Exception {
 		final String firstDescription = "just a test";
 		final String secondDescription = "just a second test";
@@ -213,15 +220,16 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 	 * Checks whether history of a single system configuration is displayed
 	 * correctly and contains correct link targets.
 	 */
+	@Test
 	public void testHistoryPageOfSingleSystemConfig() {
 		final String firstDescription = "just a test";
 		final String secondDescription = "just a second test";
 		final int sleepTime = 1100;
 
 		try {
-			jenkins.setSystemMessage(firstDescription);
+			j.jenkins.setSystemMessage(firstDescription);
 			Thread.sleep(sleepTime);
-			jenkins.setSystemMessage(secondDescription);
+			j.jenkins.setSystemMessage(secondDescription);
 			Thread.sleep(sleepTime);
 		} catch (Exception ex) {
 			Assert.fail("Unable to prepare Jenkins instance: " + ex);

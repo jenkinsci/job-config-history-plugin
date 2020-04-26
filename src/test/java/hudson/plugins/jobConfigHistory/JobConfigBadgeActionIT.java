@@ -2,6 +2,11 @@ package hudson.plugins.jobConfigHistory;
 
 import org.acegisecurity.context.SecurityContextHolder;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.jvnet.hudson.test.recipes.LocalData;
 import org.jvnet.hudson.test.recipes.PresetData;
 import org.jvnet.hudson.test.recipes.PresetData.DataSet;
@@ -13,49 +18,51 @@ import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import jenkins.model.Jenkins;
 
-public class JobConfigBadgeActionIT
-		extends
-			AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigBadgeActionIT {
+
+	@Rule
+	public JenkinsRule j = new JenkinsRuleWithDeletingInstanceDir();
 
 	private WebClient webClient;
 	private static final int SLEEP_TIME = 1100;
 
-	@Override
-	public void before() throws Throwable {
-		super.before();
-		webClient = new WebClient();
+	@Before
+	public void before() {
+		webClient = j.createWebClient();
 	}
 
+	@Test
 	public void testBadgeAction() throws Exception {
 		final String jobName = "newjob";
 		final String description = "a description";
-		final FreeStyleProject project = createFreeStyleProject(jobName);
+		final FreeStyleProject project = j.createFreeStyleProject(jobName);
 
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 		HtmlPage htmlPage = webClient.goTo("job/" + jobName);
 		Assert.assertFalse("Page should not contain build badge",
 				htmlPage.asXml().contains("buildbadge.png"));
 
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 		htmlPage = (HtmlPage) htmlPage.refresh();
 		Assert.assertFalse("Page should still not contain build badge",
 				htmlPage.asXml().contains("buildbadge.png"));
 
 		project.setDescription(description);
 		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
 		htmlPage = (HtmlPage) htmlPage.refresh();
 		Assert.assertTrue("Page should contain build badge",
 				htmlPage.asXml().contains("buildbadge.png"));
 	}
 
+	@Test
 	public void testBadgeAfterRename() throws Exception {
 		final String oldName = "firstjobname";
 		final String newName = "secondjobname";
 
-		final FreeStyleProject project = createFreeStyleProject(oldName);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		final FreeStyleProject project = j.createFreeStyleProject(oldName);
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 		Thread.sleep(SLEEP_TIME);
 
 		project.renameTo(newName);
@@ -73,15 +80,16 @@ public class JobConfigBadgeActionIT
 				showDiffPage.asText().contains("No lines changed"));
 	}
 
+	@Test
 	public void testCorrectLinkTargetsAfterRename() throws Exception {
 		final String oldName = "jobname1";
 		final String newName = "jobname2";
 		final String oldDescription = "first description";
 		final String newDescription = "second description";
 
-		final FreeStyleProject project = createFreeStyleProject(oldName);
+		final FreeStyleProject project = j.createFreeStyleProject(oldName);
 		project.setDescription(oldDescription);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 		Thread.sleep(SLEEP_TIME);
 
 		project.setDescription(newDescription);
@@ -109,59 +117,62 @@ public class JobConfigBadgeActionIT
 				showDiffPage2.asText().contains("Older"));
 	}
 
+	@Test
 	public void testProjectWithConfigsButMissingBuilds() throws Exception {
-		final FreeStyleProject project = createFreeStyleProject();
+		final FreeStyleProject project = j.createFreeStyleProject();
 		Thread.sleep(SLEEP_TIME);
 		project.setDescription("bla");
 		Thread.sleep(SLEEP_TIME);
 		project.updateNextBuildNumber(5);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 	}
 
 	@LocalData
+	@Test
 	public void testBuildWithoutHistoryDir() throws Exception {
-		final FreeStyleProject project = (FreeStyleProject) jenkins
-				.getItem("Test1");
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		final FreeStyleProject project = (FreeStyleProject) j.jenkins.getItem("Test1");
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 	}
 
 	@LocalData
+	@Test
 	public void testBuildWithoutHistoryEntries() throws Exception {
-		final FreeStyleProject project = (FreeStyleProject) jenkins
-				.getItem("Test2");
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		final FreeStyleProject project = (FreeStyleProject) j.jenkins.getItem("Test2");
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 	}
 
 	@PresetData(DataSet.ANONYMOUS_READONLY)
+	@Test
 	public void testBadgeConfigurationAnonymous() throws Exception {
 		final String jobName = "newjob";
 		final String description = "a description";
-		final FreeStyleProject project = createFreeStyleProject(jobName);
+		final FreeStyleProject project = j.createFreeStyleProject(jobName);
 
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 		Thread.sleep(SLEEP_TIME);
 		project.setDescription(description);
 		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
-		jenkins.setSecurityRealm(createDummySecurityRealm());
+		j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
 		SecurityContextHolder.getContext().setAuthentication(Jenkins.ANONYMOUS);
 		shouldPageContainBadge("anonymous");
 	}
 
 	@LocalData
+	@Test
 	public void testBadgeConfigurationWithPermissions() throws Exception {
 		final String jobName = "newjob";
 		final String description = "a description";
-		final FreeStyleProject project = createFreeStyleProject(jobName);
+		final FreeStyleProject project = j.createFreeStyleProject(jobName);
 
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 		Thread.sleep(SLEEP_TIME);
 		project.setDescription(description);
 		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
-		jenkins.setSecurityRealm(createDummySecurityRealm());
+		j.jenkins.setSecurityRealm(j.createDummySecurityRealm());
 		webClient.login("configUser");
 		shouldPageContainBadge("configUser");
 
@@ -170,7 +181,7 @@ public class JobConfigBadgeActionIT
 	}
 
 	private void shouldPageContainBadge(String user) throws Exception {
-		final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+		final JobConfigHistory jch = j.jenkins.getPlugin(JobConfigHistory.class);
 		HtmlPage htmlPage = webClient.goTo("job/newjob");
 
 		// default = always
@@ -205,29 +216,29 @@ public class JobConfigBadgeActionIT
 		}
 	}
 
+	@Test
 	public void testCorrectShowDiffLinkWithSingleChange() throws Exception {
 		final String jobName = "testjob";
-		final FreeStyleProject project = createFreeStyleProject(jobName);
+		final FreeStyleProject project = j.createFreeStyleProject(jobName);
 		project.setDescription("first description");
 		Thread.sleep(SLEEP_TIME);
 
 		final String secondDescription = "second description";
 		project.setDescription(secondDescription);
 		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 		Thread.sleep(SLEEP_TIME);
 
 		final String lastDescription = "last description";
 		project.setDescription(lastDescription);
 		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
 		HtmlPage htmlPage = webClient.goTo("job/" + jobName);
 		Assert.assertTrue("Page should contain build badge",
 				htmlPage.asXml().contains("buildbadge.png"));
 
-		final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
-				.getElementById("showDiff");
+		final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage.getElementById("showDiff");
 		final HtmlPage showDiffPage = showDiffLink.click();
 		final String page = showDiffPage.asText();
 		Assert.assertTrue("ShowDiffFiles page should be reached now",
@@ -238,16 +249,17 @@ public class JobConfigBadgeActionIT
 				page.contains(lastDescription));
 	}
 
+	@Test
 	public void testCorrectShowDiffLinkWithMultipleChanges() throws Exception {
 		final String jobName = "testjob";
 
-		final FreeStyleProject project = createFreeStyleProject(jobName);
+		final FreeStyleProject project = j.createFreeStyleProject(jobName);
 		project.setDescription("first description");
 		Thread.sleep(SLEEP_TIME);
 		final String secondDescription = "second description";
 		project.setDescription(secondDescription);
 		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 		Thread.sleep(SLEEP_TIME);
 
 		for (int i = 3; i < 6; i++) {
@@ -257,7 +269,7 @@ public class JobConfigBadgeActionIT
 		final String lastDescription = "last description";
 		project.setDescription(lastDescription);
 		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+		j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
 		HtmlPage htmlPage = webClient.goTo("job/" + jobName);
 		final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage

@@ -7,9 +7,15 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
 
 import hudson.XmlFile;
 import hudson.maven.MavenModuleSet;
@@ -22,9 +28,10 @@ import jenkins.model.Jenkins;
  * @author jborghi@cisco.com
  *
  */
-public class JobConfigHistoryIT
-		extends
-			AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigHistoryIT {
+
+	@Rule
+	public JenkinsRule j = new JenkinsRuleWithDeletingInstanceDir();
 
 	private WebClient webClient;
 	// we need to sleep between saves so we don't overwrite the history
@@ -42,16 +49,15 @@ public class JobConfigHistoryIT
 		}
 	};
 
-	@Override
-	public void before() throws Throwable {
-		super.before();
-		jenkins.setSecurityRealm(
-				new HudsonPrivateSecurityRealm(true, false, null));
-		webClient = new WebClient();
+	@Before
+	public void before() {
+		j.jenkins.setSecurityRealm(new HudsonPrivateSecurityRealm(true, false, null));
+		webClient = j.createWebClient();
 	}
 
+	@Test
 	public void testJobConfigHistoryPreConfigured() {
-		final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+		final JobConfigHistory jch = j.jenkins.getPlugin(JobConfigHistory.class);
 		try {
 			final HtmlForm form = webClient.goTo("configure")
 					.getFormByName("config");
@@ -63,7 +69,7 @@ public class JobConfigHistoryIT
 			form.getInputByName("historyRootDir")
 					.setValueAttribute("jobConfigHistory");
 			form.getInputByValue("never").setChecked(true);
-			submit(form);
+			j.submit(form);
 		} catch (Exception e) {
 			Assert.fail("unable to configure Jenkins instance " + e);
 		}
@@ -74,7 +80,7 @@ public class JobConfigHistoryIT
 		Assert.assertFalse("Verify skip duplicate history setting.",
 				jch.getSkipDuplicateHistory());
 		Assert.assertEquals("Verify configured history root directory.",
-				new File(jenkins.root + "/jobConfigHistory/"
+				new File(j.jenkins.root + "/jobConfigHistory/"
 						+ JobConfigHistoryConsts.DEFAULT_HISTORY_DIR),
 				jch.getConfiguredHistoryRootDir());
 		Assert.assertEquals("Verify exclude pattern setting.",
@@ -84,9 +90,9 @@ public class JobConfigHistoryIT
 				jch.getShowBuildBadges());
 
 		final XmlFile jenkinsConfig = new XmlFile(
-				new File(jenkins.getRootDir(), "config.xml"));
+				new File(j.jenkins.getRootDir(), "config.xml"));
 		Assert.assertTrue("Verify a system level configuration is saveable.",
-				jch.isSaveable(jenkins, jenkinsConfig));
+				jch.isSaveable(j.jenkins, jenkinsConfig));
 
 		Assert.assertEquals("Verify system configuration history location",
 				getHistoryDir(jenkinsConfig).getParentFile(), jch.getConfiguredHistoryRootDir());
@@ -103,8 +109,9 @@ public class JobConfigHistoryIT
 				jch.isSaveable(null, new XmlFile(new File("/tmp/config.xml"))));
 	}
 
-	public void testJobConfigHistoryDefaults() throws IOException {
-		final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+	@Test
+	public void testJobConfigHistoryDefaults() {
+		final JobConfigHistory jch = j.jenkins.getPlugin(JobConfigHistory.class);
 
 		Assert.assertNull(
 				"Verify number of history entries to keep default setting.",
@@ -119,9 +126,9 @@ public class JobConfigHistoryIT
 				jch.getShowBuildBadges());
 
 		final XmlFile jenkinsConfig = new XmlFile(
-				new File(jenkins.getRootDir(), "config.xml"));
+				new File(j.jenkins.getRootDir(), "config.xml"));
 		Assert.assertTrue("Verify a system level configuration is saveable.",
-				jch.isSaveable(jenkins, jenkinsConfig));
+				jch.isSaveable(j.jenkins, jenkinsConfig));
 		// This would more naturally belong in
 		// JobConfigHistoryTest.testIsSaveable but Mockito chokes on
 		// MavenModuleSet.<clinit>:
@@ -134,13 +141,13 @@ public class JobConfigHistoryIT
 		testCreateRenameDeleteProject(jch);
 	}
 
-	public void testSkipDuplicateHistory()
-			throws IOException, SAXException, Exception {
-		final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+	@Test
+	public void testSkipDuplicateHistory() throws Exception {
+		final JobConfigHistory jch = j.jenkins.getPlugin(JobConfigHistory.class);
 		HtmlForm form = webClient.goTo("configure").getFormByName("config");
-		submit(form);
+		j.submit(form);
 
-		final FreeStyleProject project = createFreeStyleProject("testproject");
+		final FreeStyleProject project = j.createFreeStyleProject("testproject");
 		final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(
 				project);
 
@@ -166,13 +173,12 @@ public class JobConfigHistoryIT
 
 		// system history test - skip duplicate history -hardcode path to Jenkins
 		// config
-		final File jenkinsConfigDir = new File(jenkins.root,
-				JobConfigHistoryConsts.DEFAULT_HISTORY_DIR + "/config");
+		final File jenkinsConfigDir = new File(j.jenkins.root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR + "/config");
 		final int configLengthBeforeSave = jenkinsConfigDir
 				.listFiles(HistoryFileFilter.INSTANCE).length;
 		for (int i = 0; i < 5; i++) {
 			Thread.sleep(SLEEP_TIME);
-			jenkins.save();
+			j.jenkins.save();
 		}
 		Assert.assertEquals(
 				"Verify system history has still only previous entries after 5 duplicate saves.",
@@ -198,12 +204,12 @@ public class JobConfigHistoryIT
 		// reconfigure to allow saving duplicate history
 		form = webClient.goTo("configure").getFormByName("config");
 		form.getInputByName("skipDuplicateHistory").setChecked(false);
-		submit(form);
+		j.submit(form);
 
 		// perform additional save and verify more than one history entries
 		// exist
 		Thread.sleep(SLEEP_TIME);
-		jenkins.save();
+		j.jenkins.save();
 		project.save();
 		Assert.assertTrue("Verify duplicate project history entries.",
 				projectAction.getJobConfigs().size() >= 2);
@@ -212,8 +218,9 @@ public class JobConfigHistoryIT
 						.listFiles(HistoryFileFilter.INSTANCE).length > 1);
 	}
 
+	@Test
 	public void testFormValidation() {
-		final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+		final JobConfigHistory jch = j.jenkins.getPlugin(JobConfigHistory.class);
 		try {
 			final HtmlForm form = webClient.goTo("configure")
 					.getFormByName("config");
@@ -221,38 +228,46 @@ public class JobConfigHistoryIT
 					"Check no error message present for history entry.",
 					form.getTextContent()
 							.contains("Enter a valid positive integer"));
-			form.getInputByName("maxHistoryEntries").setValueAttribute("-2");
+			HtmlInput maxHistoryEntriesInput = form.getInputByName("maxHistoryEntries");
+			maxHistoryEntriesInput.focus();
+			maxHistoryEntriesInput.setValueAttribute("-2");
+			maxHistoryEntriesInput.removeFocus();
+			webClient.waitForBackgroundJavaScript(10000);
 			Assert.assertTrue("Check error message on invalid history entry.",
 					form.getTextContent()
 							.contains("Enter a valid positive integer"));
 			Assert.assertFalse(
 					"Check no error message present for regexp excludePattern.",
-					form.getTextContent().contains("Invalid regexp"));
-			form.getInputByName("excludePattern").setValueAttribute("**");
+					form.getTextContent().contains("Enter a valid regular expression"));
+			HtmlInput excludePatternInput = form.getInputByName("excludePattern");
+			excludePatternInput.focus();
+			excludePatternInput.setValueAttribute("**");
+			excludePatternInput.removeFocus();
+			webClient.waitForBackgroundJavaScript(10000);
 			Assert.assertTrue(
 					"Check error message on invalid regexp excludePattern.",
-					form.getTextContent().contains("Invalid regexp"));
-			submit(form);
+					form.getTextContent().contains("Enter a valid regular expression"));
+
+			j.submit(form);
 			Assert.assertEquals("Verify invalid regexp string is saved.", "**",
 					jch.getExcludePattern());
 			Assert.assertNull("Verify invalid regexp has not been loaded.",
 					jch.getExcludeRegexpPattern());
-
 		} catch (Exception e) {
 			Assert.fail("Unable to complete form validation: " + e);
 		}
 	}
 
+	@Test
 	public void testMaxHistoryEntries() {
 		try {
 			final HtmlForm form = webClient.goTo("configure")
 					.getFormByName("config");
 			form.getInputByName("maxHistoryEntries").setValueAttribute("5");
 			form.getInputByName("skipDuplicateHistory").setChecked(false);
-			submit(form);
+			j.submit(form);
 
-			final FreeStyleProject project = createFreeStyleProject(
-					"testproject");
+			final FreeStyleProject project = j.createFreeStyleProject("testproject");
 			final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(
 					project);
 
@@ -277,8 +292,9 @@ public class JobConfigHistoryIT
 		}
 	}
 
+	@Test
 	public void testAbsPathHistoryRootDir() throws Exception {
-		final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+		final JobConfigHistory jch = j.jenkins.getPlugin(JobConfigHistory.class);
 		// create a unique name, then delete the empty file - will be recreated
 		// later
 		final File root = File
@@ -290,13 +306,13 @@ public class JobConfigHistoryIT
 		final HtmlForm form = webClient.goTo("configure")
 				.getFormByName("config");
 		form.getInputByName("historyRootDir").setValueAttribute(absolutePath);
-		submit(form);
+		j.submit(form);
 		Assert.assertEquals("Verify history root configured at absolute path.",
 				new File(root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR),
 				jch.getConfiguredHistoryRootDir());
 
 		// save something
-		createFreeStyleProject();
+		j.createFreeStyleProject();
 		Assert.assertTrue("Verify history root exists.", root.exists());
 
 		// cleanup - Jenkins doesn't know about these files we created
@@ -310,10 +326,8 @@ public class JobConfigHistoryIT
 
 	private void testCreateRenameDeleteProject(final JobConfigHistory jch) {
 		try {
-			final FreeStyleProject project = createFreeStyleProject(
-					"testproject");
-			final File jobHistoryRootFile = new File(
-					jch.getConfiguredHistoryRootDir(), "jobs");
+			final FreeStyleProject project = j.createFreeStyleProject("testproject");
+			final File jobHistoryRootFile = new File(jch.getConfiguredHistoryRootDir(), "jobs");
 
 			final File expectedConfigDir = new File(jobHistoryRootFile,
 					"testproject");
@@ -403,35 +417,36 @@ public class JobConfigHistoryIT
 	 * Tests if project can still be built after the config history root dir has
 	 * been changed. (I.e. the project exists but has no configs.)
 	 */
+	@Test
 	public void testChangedRootDir() {
 		try {
-			final FreeStyleProject project = createFreeStyleProject("bla");
-			final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(
-					project);
+			final FreeStyleProject project = j.createFreeStyleProject("bla");
+			final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(project);
 			Assert.assertTrue("Verify project history entry is not empty.",
 					projectAction.getJobConfigs().size() > 0);
 
 			final HtmlForm form = webClient.goTo("configure")
 					.getFormByName("config");
 			form.getInputByName("historyRootDir").setValueAttribute("newDir");
-			submit(form);
+			j.submit(form);
 
 			Assert.assertEquals("Verify project history entry is empty.", 0,
 					projectAction.getJobConfigs().size());
-			assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+			j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
 			project.save();
 			Thread.sleep(SLEEP_TIME);
 			Assert.assertTrue("Verify project history entry is not empty.",
 					projectAction.getJobConfigs().size() > 0);
-			assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+			j.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 		} catch (Exception e) {
 			Assert.fail("Unable to complete changed root dir test: " + e);
 		}
 	}
 
+	@Test
 	public void testInputOfMaxHistoryEntries() {
-		final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+		final JobConfigHistory jch = j.jenkins.getPlugin(JobConfigHistory.class);
 
 		// check good value
 		jch.setMaxHistoryEntries("5");
@@ -454,8 +469,9 @@ public class JobConfigHistoryIT
 				jch.getMaxHistoryEntries());
 	}
 
+	@Test
 	public void testInputOfMaxDaysToKeepEntries() {
-		final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+		final JobConfigHistory jch = j.jenkins.getPlugin(JobConfigHistory.class);
 
 		// check good value
 		jch.setMaxDaysToKeepEntries("5");
@@ -479,7 +495,7 @@ public class JobConfigHistoryIT
 	}
 
 	private File getHistoryDir(XmlFile xmlFile) {
-		final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+		final JobConfigHistory jch = j.jenkins.getPlugin(JobConfigHistory.class);
 		final File configFile = xmlFile.getFile();
 		return ((FileHistoryDao) PluginUtils.getHistoryDao(jch))
 				.getHistoryDir(configFile);
