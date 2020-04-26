@@ -421,7 +421,6 @@ public class JobConfigHistoryTest {
 		return new JobConfigHistory() {
 			@Override
 			public Jenkins getJenkins() {
-				Jenkins ret = mock(Jenkins.class);
 				return mock(Jenkins.class);
 			}
 		};

@@ -89,7 +89,7 @@ public class JobConfigHistoryBaseActionIT
 
 			@Override
 			protected AccessControlled getAccessControlledObject() {
-				return getJenkins();
+				return Jenkins.get();
 			}
 			@Override
 			protected void checkConfigurePermission() {

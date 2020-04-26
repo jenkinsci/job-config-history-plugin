@@ -79,23 +79,9 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 *            for which configurations should be returned.
 	 */
 	public JobConfigHistoryProjectAction(AbstractItem project) {
-		super();
 		this.project = project;
 	}
 
-	/**
-	 * For testing only.
-	 *
-	 * @param jenkins
-	 *            instance
-	 * @param project
-	 *            for which configurations should be returned.
-	 */
-	public JobConfigHistoryProjectAction(Jenkins jenkins,
-			AbstractItem project) {
-		super(jenkins);
-		this.project = project;
-	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -504,7 +490,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 
 		project.updateByXml((Source) new StreamSource(is));
 		project.save();
-		rsp.sendRedirect(getJenkins().getRootUrl() + project.getUrl());
+		rsp.sendRedirect(Jenkins.get().getRootUrl() + project.getUrl());
 	}
 
 	/**

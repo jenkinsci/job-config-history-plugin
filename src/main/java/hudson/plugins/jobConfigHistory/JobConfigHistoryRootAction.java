@@ -484,7 +484,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 				LOG.log(FINEST, "Unable to get config for {0}", name);
 			}
 		} else if (config.getIsJob()) {
-			link = getJenkins().getRootUrl() + "job/" + name + getUrlName()
+			link = Jenkins.get().getRootUrl() + "job/" + name + getUrlName()
 					+ "/configOutput?type=" + type + "&timestamp=" + timestamp;
 		} else {
 			link = "configOutput?type=" + type + "&name=" + name + "&timestamp="
@@ -496,7 +496,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
 	@Override
 	public AccessControlled getAccessControlledObject() {
-		return getJenkins();
+		return Jenkins.get();
 	}
 
 	@Override
@@ -703,13 +703,12 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 		final String calculatedNewName = findNewName(newName);
 
 		//TODO problem: this only creates Items with Jenkins.get() as parent ItemGroup, which breaks the restoration of folders.
-		final TopLevelItem project = getJenkins()
-				.createProjectFromXML(calculatedNewName, is);
+		final TopLevelItem project = Jenkins.get().createProjectFromXML(calculatedNewName, is);
 		// TODO: Casting here should be removed.
 		((FileHistoryDao) getHistoryDao()).copyHistoryAndDelete(deletedName,
 				calculatedNewName);
 
-		rsp.sendRedirect(getJenkins().getRootUrl() + project.getUrl());
+		rsp.sendRedirect(Jenkins.get().getRootUrl() + project.getUrl());
 	}
 
 	/**
@@ -752,7 +751,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 	public String findNewName(String name) {
 		String newName = name;
 		int i = 1;
-		while (getJenkins().getItem(newName) != null) {
+		while (Jenkins.get().getItem(newName) != null) {
 			newName = name + "_" + String.valueOf(i);
 			i++;
 		}

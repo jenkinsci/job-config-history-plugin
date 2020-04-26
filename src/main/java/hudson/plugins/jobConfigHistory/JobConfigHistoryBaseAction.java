@@ -72,7 +72,6 @@ import hudson.model.Action;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
-import jenkins.model.Jenkins;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import org.xmlunit.diff.Comparison;
@@ -94,30 +93,9 @@ import static java.util.logging.Level.WARNING;
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
 
-    /**
-     * The jenkins instance.
-     */
-    private final Jenkins jenkins;
-
 	private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
 	private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
-
-	/**
-	 * Set the {@link Jenkins} instance.
-	 */
-	public JobConfigHistoryBaseAction() {
-		jenkins = Jenkins.get();
-	}
-
-    /**
-     * For tests only.
-     *
-     * @param jenkins injected jenkins
-     */
-    JobConfigHistoryBaseAction(Jenkins jenkins) {
-        this.jenkins = jenkins;
-    }
 
     @Override
     public String getDisplayName() {
@@ -186,15 +164,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * @return true if the current user may read configurations.
      */
     protected abstract boolean hasConfigurePermission();
-
-    /**
-     * Returns the jenkins instance.
-     *
-     * @return the jenkins
-     */
-    protected Jenkins getJenkins() {
-        return jenkins;
-    }
 
     /**
      *

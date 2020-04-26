@@ -51,9 +51,7 @@ public class JobConfigHistoryProjectActionTest {
 	private final ItemGroup<?> mockedItemGroup = mock(ItemGroup.class);
 	private final MavenModule mockedMavenModule = mock(MavenModule.class);
 	private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
-	private final Jenkins mockedJenkins = mock(Jenkins.class);
-	private final AbstractTopLevelItem mockedProject = mock(
-			AbstractTopLevelItem.class);
+	private final AbstractTopLevelItem mockedProject = mock(AbstractTopLevelItem.class);
 	private final StaplerRequest mockedRequest = mock(StaplerRequest.class);
 	private final StaplerResponse mockedResponse = mock(StaplerResponse.class);
 	private HistoryDao historyDao;
@@ -125,8 +123,7 @@ public class JobConfigHistoryProjectActionTest {
 		MatrixProject project = mock(MatrixProject.class);
 		when(project.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
 
-		JobConfigHistoryProjectActionImpl action = new JobConfigHistoryProjectActionImpl(
-				mockedJenkins, project);
+		JobConfigHistoryProjectActionImpl action = new JobConfigHistoryProjectActionImpl(project);
 		assertEquals(JobConfigHistoryConsts.ICONFILENAME,
 				action.getIconFileName());
 	}
@@ -137,8 +134,7 @@ public class JobConfigHistoryProjectActionTest {
 		when(configuration.hasPermission(AbstractProject.CONFIGURE))
 				.thenReturn(true);
 
-		JobConfigHistoryProjectActionImpl action = new JobConfigHistoryProjectActionImpl(
-				mockedJenkins, configuration);
+		JobConfigHistoryProjectActionImpl action = new JobConfigHistoryProjectActionImpl(configuration);
 		assertNull(action.getIconFileName());
 	}
 
@@ -439,26 +435,21 @@ public class JobConfigHistoryProjectActionTest {
 	}
 
 	private JobConfigHistoryProjectAction createAction() {
-		return new JobConfigHistoryProjectActionImpl(mockedJenkins,
-				mockedProject);
+		return new JobConfigHistoryProjectActionImpl(mockedProject);
 	}
 
 	private JobConfigHistoryProjectAction createJenkinsRuleAction(Project project) {
-		return new JobConfigHistoryProjectActionJrImpl(jenkinsRule.getInstance(), project);
+		return new JobConfigHistoryProjectActionJrImpl(project);
 	}
 
 	private JobConfigHistoryProjectAction createActionForMavenModule() {
-		return new JobConfigHistoryProjectActionImpl(mockedJenkins,
-				mockedMavenModule);
+		return new JobConfigHistoryProjectActionImpl(mockedMavenModule);
 	}
 
-	private class JobConfigHistoryProjectActionImpl
-			extends
-				JobConfigHistoryProjectAction {
+	private class JobConfigHistoryProjectActionImpl extends JobConfigHistoryProjectAction {
 
-		public JobConfigHistoryProjectActionImpl(Jenkins jenkins,
-				AbstractItem project) {
-			super(jenkins, project);
+		public JobConfigHistoryProjectActionImpl(AbstractItem project) {
+			super(project);
 		}
 
 		@Override
@@ -479,8 +470,8 @@ public class JobConfigHistoryProjectActionTest {
 
 	private class JobConfigHistoryProjectActionJrImpl extends JobConfigHistoryProjectAction {
 
-		public JobConfigHistoryProjectActionJrImpl(Jenkins jenkins, AbstractItem project) {
-			super(jenkins, project);
+		public JobConfigHistoryProjectActionJrImpl(AbstractItem project) {
+			super(project);
 		}
 
 		@Override
