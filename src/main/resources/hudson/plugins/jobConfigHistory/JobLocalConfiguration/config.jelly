@@ -11,7 +11,7 @@
                     <div style="padding:2px">
                         JobConfigHistory <br/>change message:
                     </div>
-                    <f:textarea field="changeReasonComment" value="" onfocusout="console.log('test')" />
+                    <f:textarea field="changeReasonComment" value=""/>
                     <div id="changeReasonCommentError" style="visibility:hidden; height:0px;" class="changeReasonCommentError">
                         Please comment your changes!
                     </div>
@@ -36,7 +36,6 @@
                     if (cleanDiff > 0) {
                         dynamicViewPortWidth += cleanDiff;
                     }
-                    console.log("dynWidth=" + dynamicViewPortWidth + ", statWidth=" + staticViewPortWidth);
                     return cleanDiff;
                 }
                 return 0;
