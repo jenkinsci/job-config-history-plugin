@@ -1,9 +1,9 @@
 # Changelog
 
 ## 2.26 (April 30 2020)
-* (JENKINS-61049)[https://issues.jenkins-ci.org/browse/JENKINS-61049] Move documentation from jenkins wiki to github
-* (PR #118)[https://github.com/jenkinsci/jobConfigHistory-plugin/pull/118] Simplify code
-* (PR #123)[https://github.com/jenkinsci/jobConfigHistory-plugin/pull/123] Remove debug lines
+* [JENKINS-61049](https://issues.jenkins-ci.org/browse/JENKINS-61049) Move documentation from jenkins wiki to github
+* [PR #118](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/118) Simplify code
+* [PR #123](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/123) Remove debug lines
 
 ## 2.25 (March 13 2020)
 * Remove unused HTML help files (PR #117) Thanks, darxriggs 
