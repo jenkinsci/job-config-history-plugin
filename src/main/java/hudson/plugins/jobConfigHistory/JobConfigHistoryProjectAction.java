@@ -115,7 +115,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 */
 	public final List<ConfigInfo> getJobConfigs() throws IOException {
 		if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
-			checkConfigurePermission();
 			return Collections.emptyList();
 		}
 		final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(
@@ -205,13 +204,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
 	 */
 	@Exported(name = "jobConfigHistory", visibility = 1)
 	public final List<ConfigInfo> getJobConfigsREST() throws IOException {
-		List<ConfigInfo> configs = null;
-		try {
-			configs = getJobConfigs();
-		} catch (org.acegisecurity.AccessDeniedException e) {
-			configs = new ArrayList<ConfigInfo>();
-		}
-		return configs;
+		return getJobConfigs();
 	}
 
 	/**

@@ -7,8 +7,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -17,7 +17,6 @@ import java.util.List;
 
 import hudson.model.FreeStyleProject;
 import hudson.model.Project;
-import org.acegisecurity.AccessDeniedException;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
@@ -314,12 +313,12 @@ public class JobConfigHistoryProjectActionTest {
 	 * Test of checkConfigurePermission method, of class
 	 * JobConfigHistoryProjectAction.
 	 */
-	@Test(expected = AccessDeniedException.class)
+	@Test
 	public void testCheckConfigurePermission() {
-		doThrow(new AccessDeniedException("Oops")).when(mockedProject)
-				.checkPermission(AbstractItem.CONFIGURE);
 		JobConfigHistoryProjectAction sut = createAction();
+		verify(mockedProject, times(0)).checkPermission(AbstractItem.CONFIGURE);
 		sut.checkConfigurePermission();
+		verify(mockedProject, times(1)).checkPermission(AbstractItem.CONFIGURE);
 	}
 
 	/**
