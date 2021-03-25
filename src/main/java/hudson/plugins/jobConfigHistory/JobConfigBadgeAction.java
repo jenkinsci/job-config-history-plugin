@@ -190,18 +190,9 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 	 * @return Link target as String.
 	 */
 	public String createLink() {
-		return getRootUrl() + build.getParent().getUrl()
+		return "/" + build.getParent().getUrl()
 				+ JobConfigHistoryConsts.URLNAME + "/showDiffFiles?timestamp1="
 				+ configDates[1] + "&timestamp2=" + configDates[0];
-	}
-
-	/**
-	 * Returns the root URL.
-	 * 
-	 * @return root-URL of Jenkins.
-	 */
-	String getRootUrl() {
-		return Jenkins.get().getRootUrl();
 	}
 
 	/**

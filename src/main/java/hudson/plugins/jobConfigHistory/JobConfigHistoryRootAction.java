@@ -484,7 +484,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 				LOG.log(FINEST, "Unable to get config for {0}", name);
 			}
 		} else if (config.getIsJob()) {
-			link = Jenkins.get().getRootUrl() + "job/" + name + getUrlName()
+			link = "/job/" + name + getUrlName()
 					+ "/configOutput?type=" + type + "&timestamp=" + timestamp;
 		} else {
 			link = "configOutput?type=" + type + "&name=" + name + "&timestamp="
