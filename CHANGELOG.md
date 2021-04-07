@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.27 (April 7 2021)
+* [PR #127](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/127) [JEP-227] Prepare plugin for Acegi update
+
 ## 2.26 (April 30 2020)
 * [JENKINS-61049](https://issues.jenkins-ci.org/browse/JENKINS-61049) Move documentation from jenkins wiki to github
 * [PR #118](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/118) Simplify code
