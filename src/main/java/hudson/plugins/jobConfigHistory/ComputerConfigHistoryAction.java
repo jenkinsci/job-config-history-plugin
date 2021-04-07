@@ -141,7 +141,9 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	 *             read or the path might not be urlencoded.
 	 */
 	public final List<ConfigInfo> getSlaveConfigs() throws IOException {
-		checkConfigurePermission();
+		if (!hasConfigurePermission()) {
+			return Collections.emptyList();
+		}
 		final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
 		final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(
 				getHistoryDao().getRevisions(slave).values());
@@ -173,13 +175,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 	 */
 	@Exported(name = "jobConfigHistory", visibility = 1)
 	public final List<ConfigInfo> getSlaveConfigsREST() throws IOException {
-		List<ConfigInfo> configs = null;
-		try {
-			configs = getSlaveConfigs();
-		} catch (org.acegisecurity.AccessDeniedException e) {
-			configs = new ArrayList<ConfigInfo>();
-		}
-		return configs;
+		return getSlaveConfigs();
 	}
 
 	/**
