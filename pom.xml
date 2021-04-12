@@ -70,12 +70,18 @@
             <name>Stefan Brausch</name>
             <email>stefanbrausch@protonmail.ch</email>
             <timezone>+1</timezone>
+            <roles>
+                <role>inactive</role>
+            </roles>
         </developer>
         <developer>
             <id>jochenafuerbacher</id>
             <name>Jochen A. Fuerbacher</name>
             <email>jochen.fuerbacher@1und1.de</email>
             <timezone>+1</timezone>
+            <roles>
+                <role>inactive</role>
+            </roles>
         </developer>
         <developer>
             <id>mfriedenhagen</id>
@@ -109,6 +115,9 @@
             <name>Robin Schulz</name>
             <email>robin.schulz@1und1.de</email>
             <timezone>+1</timezone>
+            <roles>
+                <role>inactive</role>
+            </roles>
         </developer>
     </developers>
 
