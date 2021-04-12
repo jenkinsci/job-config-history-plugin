@@ -113,7 +113,7 @@ table.jch .caption {
 
 table.jch .subcaption {
 
-	background-color: rgba(56, 56, 56, 0.05);
+	background-color: #f5f5f5;
     color:black;
     text-align: left;
 
@@ -132,6 +132,8 @@ table.jch  td {
     border-right: 1px solid #ddd;
     border-top: 1px solid #ddd;
     padding: 2px;
+
+    background-color: #ffffff
 }
 
 
@@ -149,6 +151,10 @@ table.jch  th {
 
 table.jch tr.alternate:nth-child(even) {
     background-color: #fbfbfb;
+}
+/*TODO TEST*/
+table.jch tr.alternate:nth-child(odd) {
+    background-color: #ffffff;
 }
 
 table.jch th:first-child {
