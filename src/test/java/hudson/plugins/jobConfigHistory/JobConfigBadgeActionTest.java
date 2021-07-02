@@ -142,7 +142,7 @@ public class JobConfigBadgeActionTest {
 		String timestampRegex = "[0-9\\-_]+";
 
 		String expectedRegex =
-			"http://localhost:[0-9]{1,5}?/jenkins/job/Test1/jobConfigHistory/showDiffFiles\\?timestamp1=" + timestampRegex
+			"/job/Test1/jobConfigHistory/showDiffFiles\\?timestamp1=" + timestampRegex
 			+ "&timestamp2=" + timestampRegex;
 		FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
 		jenkinsRule.buildAndAssertSuccess(project);
