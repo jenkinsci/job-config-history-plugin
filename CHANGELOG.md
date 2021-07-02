@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.28 (July 2 2021)
+* [PR #126](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/126) fix biggest style errors
+* [PR #129](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/129) remove Jenkins.get().getRootUrl() to generate relative url
+
 ## 2.27 (April 7 2021)
 * [PR #127](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/127) [JEP-227] Prepare plugin for Acegi update
 
