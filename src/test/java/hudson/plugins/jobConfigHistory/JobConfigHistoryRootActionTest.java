@@ -350,7 +350,7 @@ public class JobConfigHistoryRootActionTest {
 		given(config.getJob()).willReturn("Test1");
 		given(config.getDate()).willReturn("2012-11-21_11-42-05");
 		given(config.getIsJob()).willReturn(true);
-		String expectedRegex = "/job/Test1/jobConfigHistory/configOutput\\?type=xml&timestamp=[0-9\\-_]+";
+		String expectedRegex = "http://localhost:[0-9]{1,5}?/jenkins/job/Test1/jobConfigHistory/configOutput\\?type=xml&timestamp=[0-9\\-_]+";
 		assertTrue(createSut().createLinkToFiles(config, "xml").matches(expectedRegex));
 	}
 
