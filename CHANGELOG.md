@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.28.1 (July 16 2021)
+* revert [PR #129](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/129)
+
 ## 2.28 (July 2 2021)
 * [PR #126](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/126) fix biggest style errors
 * [PR #129](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/129) remove Jenkins.get().getRootUrl() to generate relative url
