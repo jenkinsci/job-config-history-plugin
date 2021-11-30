@@ -7,12 +7,12 @@
 
     <l:side-panel>
       <l:tasks>
-        <l:task icon="images/24x24/up.gif" href="${rootURL}/" title="${%Back to Dashboard}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=system" title="${%Show system configs only}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=jobs" title="${%Show job configs only}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=created" title="${%Show created jobs only}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.png" href="?filter=deleted" title="${%Show deleted jobs only}" />
-        <l:task icon="plugin/jobConfigHistory/img/all.png" href="?filter=all" title="${%Show all configs}" />
+        <l:task icon="icon-up icon-md" href="${rootURL}/" title="${%Back to Dashboard}" />
+        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=system" title="${%Show system configs only}" />
+        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=jobs" title="${%Show job configs only}" />
+        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=created" title="${%Show created jobs only}" />
+        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=deleted" title="${%Show deleted jobs only}" />
+        <l:task icon="icon-document icon-md" href="?filter=all" title="${%Show all configs}" />
       </l:tasks>
     </l:side-panel>
     <l:main-panel>
@@ -174,9 +174,7 @@
                     </j:if>
                     <td>
                       <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
-                      <a href="${it.createLinkToFiles(config,'xml')}">
-                        <img src="${imagesURL}/24x24/document.png"/>${%View as XML}
-                      </a>
+                      <a href="${it.createLinkToFiles(config,'xml')}"> ${%View as XML} </a>
                       <st:nbsp />
                       <a href="${it.createLinkToFiles(config,'raw')}">
                         (${%RAW})
@@ -190,7 +188,7 @@
                              TODO Fix that. (see code)-->
                             <j:if test="${config.job.replace('/jobs', '/job').equals(config.job)}">
                               <a id="restore" href="restoreQuestion?name=${config.getJob()}">
-                                <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
+                                <img src="$/plugin/jobConfigHistory/img/restore.svg" height="16" width="16" alt="${%Restore}" />
                               </a>
                             </j:if>
                           </j:if>
