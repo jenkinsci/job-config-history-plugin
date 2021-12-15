@@ -10,7 +10,6 @@
     <!--syntax highlighting-->
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/highlight.js/styles/purebasic.css"/>
     <script src="${rootURL}/plugin/jobConfigHistory/highlight.js/highlight.pack.js"></script>
-    <script src="${rootURL}/plugin/jobConfigHistory/indentation.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
 
     <st:include it="${it.project}" page="sidepanel.jelly" />
