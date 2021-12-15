@@ -84,14 +84,14 @@
                           <td>
                             <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
                               <span>${config.operation}</span>
-                              <img onmouseOver="showTooltip(${configNr})" onmouseLeave="hideTooltip(${configNr})" style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.png" alt="${%Info}" />
+                              <img onmouseOver="showTooltip(${configNr})" onmouseLeave="hideTooltip(${configNr})" style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.svg" alt="${%Info}" />
                               <div style="margin-top: 15px;visibility: hidden; position: absolute; background-color: beige; padding: 3px; border: 1px solid black;" id="tooltip${configNr}">${%Old name}: ${config.oldName}<br />${%New name}: ${config.currentName}</div>
                             </j:if>
                             <j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">
                               ${config.operation}
                             </j:if>
                             <j:if test="${config.changeReasonComment != null and !config.changeReasonComment.equals(&quot;&quot;)}">
-                              <img style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.png" title="Change Message: &quot;${config.changeReasonComment}&quot;"/>
+                              <img style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.svg" title="Change Message: &quot;${config.changeReasonComment}&quot;"/>
                             </j:if>
                           </td>
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
@@ -100,9 +100,7 @@
                           <td>
                             <j:set var="fileMissing" value="${!config.hasConfig()}"/>
                             <j:if test="${!fileMissing}">
-                              <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}">
-                                <img src="${imagesURL}/24x24/document.png"/>${%View as XML}
-                              </a>
+                              <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}"> ${%View as XML} </a>
                               <st:nbsp />
                               <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}">
                                 (${%RAW})
@@ -114,13 +112,13 @@
                               <j:set var="revisionEqualsCurrent" value="${it.revisionEqualsCurrent(config.getDate())}"/>
                               <j:if test="${!revisionEqualsCurrent and !fileMissing}">
                                 <a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
-                                  <img src="${resURL}/plugin/jobConfigHistory/img/restore.png" alt="${%Restore}" />
+                                  <img src="/plugin/jobConfigHistory/img/restore.svg" height="16" width="16" alt="${%Restore}" />
                                 </a>
                                 <j:if test="${configNr == 1 and pageNum == 0}">
                                   <!--The current version is not present in history!-->
                                   <br/>
                                   <span style="color: rgb(196, 109, 0); font-weight:bold;">
-                                    ${%Warning: this is the latest revision in history, but not the current config. Save config to create a current entry.}
+                                    ${%Warning: This is the latest revision in history, but not the current config. Save config to create a current entry.}
                                   </span>
                                 </j:if>
                               </j:if>
@@ -143,7 +141,7 @@
                             <td style="text-align:center">
                                 <j:set var="message" value="${%Do you really want to delete the history entry }"/>
                                 <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
-                                  <img src="${resURL}/images/16x16/stop.png" alt="Delete Revision"/>
+                                  <l:icon class="icon-stop icon-sm" alt="Delete Revision"/>
                                 </button>
                             </td>
                           </j:if>
