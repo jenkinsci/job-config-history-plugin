@@ -4,13 +4,19 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+      day: monday
     open-pull-requests-limit: 10
     target-branch: master
     reviewers:
       - NotMyFault
     labels:
       - dependencies
+    commit-message:
+      prefix: "build: "
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: daily
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "build: "

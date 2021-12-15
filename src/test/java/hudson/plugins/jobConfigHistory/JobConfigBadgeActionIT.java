@@ -34,12 +34,12 @@ public class JobConfigBadgeActionIT
 		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 		HtmlPage htmlPage = webClient.goTo("job/" + jobName);
 		Assert.assertFalse("Page should not contain build badge",
-				htmlPage.asXml().contains("buildbadge.png"));
+				htmlPage.asXml().contains("buildbadge.svg"));
 
 		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 		htmlPage = (HtmlPage) htmlPage.refresh();
 		Assert.assertFalse("Page should still not contain build badge",
-				htmlPage.asXml().contains("buildbadge.png"));
+				htmlPage.asXml().contains("buildbadge.svg"));
 
 		project.setDescription(description);
 		Thread.sleep(SLEEP_TIME);
@@ -47,7 +47,7 @@ public class JobConfigBadgeActionIT
 
 		htmlPage = (HtmlPage) htmlPage.refresh();
 		Assert.assertTrue("Page should contain build badge",
-				htmlPage.asXml().contains("buildbadge.png"));
+				htmlPage.asXml().contains("buildbadge.svg"));
 	}
 
 	public void testBadgeAfterRename() throws Exception {
@@ -64,7 +64,7 @@ public class JobConfigBadgeActionIT
 
 		final HtmlPage htmlPage = webClient.goTo("job/" + newName);
 		Assert.assertTrue("Page should contain build badge",
-				htmlPage.asXml().contains("buildbadge.png"));
+				htmlPage.asXml().contains("buildbadge.svg"));
 
 		final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
 				.getElementById("showDiff");
@@ -175,22 +175,22 @@ public class JobConfigBadgeActionIT
 
 		// default = always
 		Assert.assertTrue("Page should contain build badge",
-				htmlPage.asXml().contains("buildbadge.png"));
+				htmlPage.asXml().contains("buildbadge.svg"));
 
 		jch.setShowBuildBadges("never");
 		htmlPage = (HtmlPage) htmlPage.refresh();
 		Assert.assertFalse("Page should not contain build badge",
-				htmlPage.asXml().contains("buildbadge.png"));
+				htmlPage.asXml().contains("buildbadge.svg"));
 
 		jch.setShowBuildBadges("userWithConfigPermission");
 		htmlPage = (HtmlPage) htmlPage.refresh();
 
 		if (("configUser").equals(user) || ("admin").equals(user)) {
 			Assert.assertTrue("Page should contain build badge",
-					htmlPage.asXml().contains("buildbadge.png"));
+					htmlPage.asXml().contains("buildbadge.svg"));
 		} else {
 			Assert.assertFalse("Page should not contain build badge",
-					htmlPage.asXml().contains("buildbadge.png"));
+					htmlPage.asXml().contains("buildbadge.svg"));
 		}
 
 		jch.setShowBuildBadges("adminUser");
@@ -198,10 +198,10 @@ public class JobConfigBadgeActionIT
 
 		if (("admin").equals(user)) {
 			Assert.assertTrue("Page should contain build badge",
-					htmlPage.asXml().contains("buildbadge.png"));
+					htmlPage.asXml().contains("buildbadge.svg"));
 		} else {
 			Assert.assertFalse("Page should not contain build badge",
-					htmlPage.asXml().contains("buildbadge.png"));
+					htmlPage.asXml().contains("buildbadge.svg"));
 		}
 	}
 
@@ -224,7 +224,7 @@ public class JobConfigBadgeActionIT
 
 		HtmlPage htmlPage = webClient.goTo("job/" + jobName);
 		Assert.assertTrue("Page should contain build badge",
-				htmlPage.asXml().contains("buildbadge.png"));
+				htmlPage.asXml().contains("buildbadge.svg"));
 
 		final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
 				.getElementById("showDiff");

@@ -167,7 +167,7 @@ public class JobConfigBadgeActionTest {
 	 */
 	@Test
 	public void testGetIcon() {
-		String expResult = "/plugin/jobConfigHistory/img/buildbadge.png";
+		String expResult = "/plugin/jobConfigHistory/img/buildbadge.svg";
 		String result = sut.getIcon();
 		assertEquals(expResult, result);
 	}

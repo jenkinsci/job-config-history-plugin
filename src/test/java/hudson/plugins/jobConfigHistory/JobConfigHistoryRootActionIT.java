@@ -342,7 +342,7 @@ public class JobConfigHistoryRootActionIT
 		final HtmlPage htmlPage = webClient
 				.goTo(JobConfigHistoryConsts.URLNAME + "/?filter=deleted");
 		WebAssert.assertElementNotPresentByXPath(htmlPage,
-				("//img[contains(@src, \"restore.png\")]"));
+				("//img[contains(@src, \"restore.svg\")]"));
 	}
 
 	private HtmlPage restoreProject() throws Exception {
