@@ -60,64 +60,17 @@
 
     <licenses>
         <license>
-            <name>MIT License</name>
+            <name>The MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
 
     <developers>
         <developer>
-            <id>stefanbrausch</id>
-            <name>Stefan Brausch</name>
-            <email>stefanbrausch@protonmail.ch</email>
-            <timezone>+1</timezone>
-            <roles>
-                <role>inactive</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>jochenafuerbacher</id>
-            <name>Jochen A. Fuerbacher</name>
-            <email>jochen.fuerbacher@1und1.de</email>
-            <timezone>+1</timezone>
-            <roles>
-                <role>inactive</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>mfriedenhagen</id>
-            <name>Mirko Friedenhagen</name>
-            <email>mfriedenhagen@gmail.com</email>
-            <timezone>+1</timezone>
-            <roles>
-                <role>inactive</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>kstutz</id>
-            <name>Kathi Stutz</name>
-            <email>kathi.stutz@1und1.de</email>
-            <timezone>+1</timezone>
-            <roles>
-                <role>inactive</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>boev</id>
-            <name>Yordan Boev</name>
-            <email>iordan.boev@gmail.com</email>
-            <timezone>+1</timezone>
-            <roles>
-                <role>inactive</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>robischulz</id>
-            <name>Robin Schulz</name>
-            <email>robin.schulz@1und1.de</email>
-            <timezone>+1</timezone>
-            <roles>
-                <role>inactive</role>
-            </roles>
+            <id>NotMyFault</id>
+            <name>Alexander</name>
+            <email>contact@notmyfault.dev</email>
         </developer>
     </developers>
 

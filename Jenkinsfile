@@ -1,2 +1,7 @@
-// Build on ci.jenkins.io; see https://github.com/jenkins-infra/pipeline-library
-buildPlugin()
+#!/usr/bin/env groovy
+
+buildPlugin(failFast: false,
+            configurations: [
+                [platform: 'linux', jdk: '11'],
+                [platform: 'windows', jdk: '8'],
+            ])

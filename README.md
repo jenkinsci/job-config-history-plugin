@@ -58,14 +58,14 @@ If you use this plugin together with the [Cluster Statistics Plugin](https://plu
 
 # Open Issues
 
-* See [open issues](https://issues.jenkins-ci.org/secure/IssueNavigator.jspa?mode=hide&reset=true&jqlQuery=project+%3D+JENKINS+AND+status+in+%28Open%2C+%22In+Progress%22%2C+Reopened%29+AND+component+%3D+%27jobconfighistory-plugin%27) on issues.jenkins-ci.org.
+* See [open issues](https://issues.jenkins.io/browse/JENKINS-66956?jql=component%20%3D%20jobconfighistory-plugin) on issues.jenkins-ci.org.
 
 ------------------------------------------------------------------------
 
 # Changelog
 
 See
-[Changelog](https://github.com/jenkinsci/jobConfigHistory-plugin/blob/master/CHANGELOG.md)
+[Changelog](https://github.com/jenkinsci/jobConfigHistory-plugin/releases/tag/jobConfigHistory-2.27)
 on Github.
 
 ------------------------------------------------------------------------

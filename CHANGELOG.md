@@ -1,4 +1,4 @@
-# Changelog
+# Changelog moved to [GitHub Releases](https://github.com/jenkinsci/jobConfigHistory-plugin/releases)
 
 ## 2.28.1 (July 16 2021)
 * revert [PR #129](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/129)
