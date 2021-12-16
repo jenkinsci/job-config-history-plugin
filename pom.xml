@@ -55,7 +55,7 @@
 
     <ciManagement>
         <system>Jenkins</system>
-        <url>https://ci.jenkins.io/job/plugins/job/jobConfigHistory-plugin/</url>
+        <url>https://ci.jenkins.io/job/Plugins/job/job-config-history-plugin/job/master/</url>
     </ciManagement>
 
     <licenses>
