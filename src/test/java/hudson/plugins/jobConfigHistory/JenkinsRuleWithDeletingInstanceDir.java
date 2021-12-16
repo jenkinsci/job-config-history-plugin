@@ -16,24 +16,20 @@ import org.jvnet.hudson.test.JenkinsRule;
  *
  * @author mfriedenhagen
  */
-public abstract class AbstractHudsonTestCaseDeletingInstanceDir
-		extends
-			JenkinsRule {
+class JenkinsRuleWithDeletingInstanceDir extends JenkinsRule {
 
-	/** Our logger. */
-	private static final Logger LOG = Logger.getLogger(
-			AbstractHudsonTestCaseDeletingInstanceDir.class.getName());
+	private static final Logger LOG = Logger.getLogger(JenkinsRuleWithDeletingInstanceDir.class.getName());
 
 	static {
-		new File("target/tmp").mkdir();
-		System.setProperty("java.io.tmpdir", "target/tmp");
+		File tmpDir = new File("target/tmp");
+		tmpDir.mkdir();
+		System.setProperty("java.io.tmpdir", tmpDir.getAbsolutePath());
 		// Possible workaround for
 		// https://issues.jenkins-ci.org/browse/JENKINS-19244
 		// jenkins random hang during startup - Solaris and Linux
 		System.setProperty("hudson.model.Hudson.parallelLoad", "false");
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public void after() throws Exception {
 		super.after();

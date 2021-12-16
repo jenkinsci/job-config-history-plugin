@@ -10,7 +10,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
@@ -25,42 +30,39 @@ import hudson.security.HudsonPrivateSecurityRealm;
  * @author mirko
  *
  */
-public class JobConfigHistoryJobListenerIT
-		extends
-			AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigHistoryJobListenerIT {
+
+	@Rule
+	public JenkinsRule j = new JenkinsRuleWithDeletingInstanceDir();
 
 	private File jobHistoryDir;
 	private WebClient webClient;
 	private File rootDir;
 
-	@Override
-	public void before() throws Throwable {
-		super.before();
-		rootDir = jenkins.getPlugin(JobConfigHistory.class)
-				.getConfiguredHistoryRootDir();
-		jobHistoryDir = new File(rootDir,
-				JobConfigHistoryConsts.JOBS_HISTORY_DIR);
-		jenkins.setSecurityRealm(
-				new HudsonPrivateSecurityRealm(true, false, null));
-		webClient = new WebClient();
+	@Before
+	public void before() {
+		rootDir = j.jenkins.getPlugin(JobConfigHistory.class).getConfiguredHistoryRootDir();
+		jobHistoryDir = new File(rootDir, JobConfigHistoryConsts.JOBS_HISTORY_DIR);
+		j.jenkins.setSecurityRealm(new HudsonPrivateSecurityRealm(true, false, null));
+		webClient = j.createWebClient();
 	}
 
-	public void testCreation() throws IOException, SAXException {
+	@Test
+	public void testCreation() throws Exception {
 		final String jobName = "newjob";
-		createFreeStyleProject(jobName);
-		final List<File> historyFiles = Arrays
-				.asList(new File(jobHistoryDir, jobName).listFiles());
+		j.createFreeStyleProject(jobName);
+		final List<File> historyFiles = Arrays.asList(new File(jobHistoryDir, jobName).listFiles());
 		Assert.assertTrue(
 				"Expected " + historyFiles.toString()
 						+ " to have at least one entry",
 				historyFiles.size() >= 1);
 	}
 
-	public void testRename()
-			throws IOException, SAXException, InterruptedException {
+	@Test
+	public void testRename() throws Exception {
 		final String jobName1 = "newjob";
 		final String jobName2 = "renamedjob";
-		final FreeStyleProject project = createFreeStyleProject(jobName1);
+		final FreeStyleProject project = j.createFreeStyleProject(jobName1);
 		// Sleep two seconds to make sure we have at least two history entries.
 		Thread.sleep(TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
 		project.renameTo(jobName2);
@@ -76,6 +78,7 @@ public class JobConfigHistoryJobListenerIT
 	}
 
 	// TODO: ???
+	@Test
 	public void testNonAbstractProjects() {
 		final JobConfigHistoryJobListener listener = new JobConfigHistoryJobListener();
 		listener.onCreated(null);
@@ -83,13 +86,14 @@ public class JobConfigHistoryJobListenerIT
 		listener.onDeleted(null);
 	}
 
+	@Test
 	public void testRenameErrors() throws Exception {
 		final HtmlForm form = webClient.goTo("configure")
 				.getFormByName("config");
 		form.getInputByName("historyRootDir")
 				.setValueAttribute("jobConfigHistory");
-		submit(form);
-		FreeStyleProject project = createFreeStyleProject("newproject");
+		j.submit(form);
+		FreeStyleProject project = j.createFreeStyleProject("newproject");
 		File historyDir = getHistoryDir(project.getConfigFile());
 		// force deletion of existing directory
 		(new FilePath(historyDir)).deleteRecursive();
@@ -116,7 +120,7 @@ public class JobConfigHistoryJobListenerIT
 				historyDir.getParentFile().setWritable(true);
 
 				// test delete rename failure
-				project = createFreeStyleProject("newproject_deleteme");
+				project = j.createFreeStyleProject("newproject_deleteme");
 				historyDir = getHistoryDir(project.getConfigFile());
 				historyDir.getParentFile().setWritable(false);
 
@@ -130,11 +134,12 @@ public class JobConfigHistoryJobListenerIT
 	}
 
 	@Issue("JENKINS-16499")
+	@Test
 	public void testCopyJob() throws Exception {
 		final String text = "This is a description.";
-		final FreeStyleProject project1 = createFreeStyleProject();
+		final FreeStyleProject project1 = j.createFreeStyleProject();
 		project1.setDescription(text);
-		final AbstractProject<?, ?> project2 = jenkins
+		final AbstractProject<?, ?> project2 = j.jenkins
 				.copy((AbstractProject<?, ?>) project1, "project2");
 		Assert.assertEquals(
 				"Copied project should have same description as original.",
@@ -142,9 +147,8 @@ public class JobConfigHistoryJobListenerIT
 	}
 
 	private File getHistoryDir(XmlFile xmlFile) {
-		final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+		final JobConfigHistory jch = j.jenkins.getPlugin(JobConfigHistory.class);
 		final File configFile = xmlFile.getFile();
 		return ((FileHistoryDao) jch.getHistoryDao()).getHistoryDir(configFile);
 	}
-
 }

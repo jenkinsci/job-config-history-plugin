@@ -7,6 +7,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.JenkinsRule.WebClient;
 import org.jvnet.hudson.test.recipes.LocalData;
 
 import com.gargoylesoftware.htmlunit.TextPage;
@@ -19,9 +24,10 @@ import hudson.model.FreeStyleProject;
 import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.security.LegacyAuthorizationStrategy;
 
-public class JobConfigHistoryRootActionIT
-		extends
-			AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigHistoryRootActionIT {
+
+	@Rule
+	public JenkinsRule j = new JenkinsRuleWithDeletingInstanceDir();
 
 	private WebClient webClient;
 	// we need to sleep between saves so we don't overwrite the history
@@ -29,10 +35,9 @@ public class JobConfigHistoryRootActionIT
 	// (which are saved with a granularity of one second)
 	private static final int SLEEP_TIME = 1100;
 
-	@Override
-	public void before() throws Throwable {
-		super.before();
-		webClient = createWebClient();
+	@Before
+	public void before() {
+		webClient = j.createWebClient();
 		Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
 		Logger.getLogger("").setLevel(Level.WARNING);
 		Logger.getLogger(this.getClass().getPackage().getName())
@@ -44,17 +49,18 @@ public class JobConfigHistoryRootActionIT
 	 * Tests whether info gets displayed correctly for filter parameter
 	 * none/system/jobs/deleted/created.
 	 */
+	@Test
 	public void testFilterWithData() throws Exception {
 		// create some config history data
-		final FreeStyleProject project = createFreeStyleProject("Test1");
+		final FreeStyleProject project = j.createFreeStyleProject("Test1");
 		Thread.sleep(SLEEP_TIME);
 		project.disable();
 		Thread.sleep(SLEEP_TIME);
 
-		jenkins.setSystemMessage("Testmessage");
+		j.jenkins.setSystemMessage("Testmessage");
 		Thread.sleep(SLEEP_TIME);
 
-		final FreeStyleProject secondProject = createFreeStyleProject("Test2");
+		final FreeStyleProject secondProject = j.createFreeStyleProject("Test2");
 		Thread.sleep(SLEEP_TIME);
 		secondProject.delete();
 
@@ -135,10 +141,10 @@ public class JobConfigHistoryRootActionIT
 	/**
 	 * System config history should only be visible with the right permissions.
 	 */
+	@Test
 	public void testFilterWithoutPermissions() {
-		jenkins.setSecurityRealm(
-				new HudsonPrivateSecurityRealm(false, false, null));
-		jenkins.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
+		j.jenkins.setSecurityRealm(new HudsonPrivateSecurityRealm(false, false, null));
+		j.jenkins.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
 		try {
 			final HtmlPage htmlPage = webClient
 					.goTo(JobConfigHistoryConsts.URLNAME);
@@ -154,15 +160,16 @@ public class JobConfigHistoryRootActionIT
 	 * Tests whether the config history of a single system feature is displayed
 	 * correctly and showDiffs works.
 	 */
+	@Test
 	public void testSingleSystemHistoryPage() {
 		final String firstMessage = "First Testmessage";
 		final String secondMessage = "Second Testmessage";
 
 		// create some config history data
 		try {
-			jenkins.setSystemMessage(firstMessage);
+			j.jenkins.setSystemMessage(firstMessage);
 			Thread.sleep(SLEEP_TIME);
-			jenkins.setSystemMessage(secondMessage);
+			j.jenkins.setSystemMessage(secondMessage);
 			Thread.sleep(SLEEP_TIME);
 		} catch (Exception ex) {
 			Assert.fail("Unable to prepare Jenkins instance: " + ex);
@@ -180,9 +187,9 @@ public class JobConfigHistoryRootActionIT
 					page.split("Changed").length > 2);
 
 			final HtmlForm diffFilesForm = htmlPage.getFormByName("diffFiles");
-			final HtmlPage diffPage = last(diffFilesForm.getElementsByTagName("button")).click();
-			assertStringContains(diffPage.asText(), firstMessage);
-			assertStringContains(diffPage.asText(), secondMessage);
+			final HtmlPage diffPage = j.submit(diffFilesForm);
+			j.assertStringContains(diffPage.asText(), firstMessage);
+			j.assertStringContains(diffPage.asText(), secondMessage);
 		} catch (Exception ex) {
 			Assert.fail("Unable to complete testHistoryPage: " + ex);
 		}
@@ -192,10 +199,11 @@ public class JobConfigHistoryRootActionIT
 	 * Tests whether config history of single deleted job is displayed
 	 * correctly.
 	 */
+	@Test
 	public void testSingleDeletedJobHistoryPage() {
 		// create some config history data
 		try {
-			final FreeStyleProject project = createFreeStyleProject("Test");
+			final FreeStyleProject project = j.createFreeStyleProject("Test");
 			Thread.sleep(SLEEP_TIME);
 			project.delete();
 		} catch (Exception ex) {
@@ -218,6 +226,7 @@ public class JobConfigHistoryRootActionIT
 		}
 	}
 
+	@Test
 	public void testGetOldConfigXmlWithWrongParameters() {
 		final JobConfigHistoryRootAction rootAction = new JobConfigHistoryRootAction();
 		try {
@@ -240,9 +249,10 @@ public class JobConfigHistoryRootActionIT
 		}
 	}
 
+	@Test
 	public void testDeletedAfterDisabled() throws Exception {
 		final String description = "All your base";
-		final FreeStyleProject project = createFreeStyleProject("Test");
+		final FreeStyleProject project = j.createFreeStyleProject("Test");
 		project.setDescription(description);
 		Thread.sleep(SLEEP_TIME);
 		project.delete();
@@ -260,10 +270,11 @@ public class JobConfigHistoryRootActionIT
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRestoreAfterDisabled() throws Exception {
 		final String description = "bla";
 		final String name = "TestProject";
-		final FreeStyleProject project = createFreeStyleProject(name);
+		final FreeStyleProject project = j.createFreeStyleProject(name);
 		project.setDescription(description);
 		project.disable();
 		Thread.sleep(SLEEP_TIME);
@@ -290,15 +301,16 @@ public class JobConfigHistoryRootActionIT
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRestoreWithSameName() throws Exception {
 		final String description = "blubb";
 		final String name = "TestProject";
-		final FreeStyleProject project = createFreeStyleProject(name);
+		final FreeStyleProject project = j.createFreeStyleProject(name);
 		project.setDescription(description);
 		Thread.sleep(SLEEP_TIME);
 		project.delete();
 
-		createFreeStyleProject(name);
+		j.createFreeStyleProject(name);
 
 		final HtmlPage jobPage = restoreProject();
 		WebAssert.assertTextPresent(jobPage, description);
@@ -312,10 +324,10 @@ public class JobConfigHistoryRootActionIT
 	 * @throws Exception
 	 */
 	@LocalData
+	@Test
 	public void testRestoreWithoutConfigs() throws Exception {
 		final String name = "JobWithNoConfigHistory";
-		final FreeStyleProject project = (FreeStyleProject) jenkins
-				.getItem(name);
+		final FreeStyleProject project = (FreeStyleProject) j.jenkins.getItem(name);
 		final String description = project.getDescription();
 		Thread.sleep(SLEEP_TIME);
 		project.delete();
@@ -332,10 +344,10 @@ public class JobConfigHistoryRootActionIT
 	 * @throws Exception
 	 */
 	@LocalData
+	@Test
 	public void testNoRestoreLinkWhenNoConfigs() throws Exception {
 		final String name = "DisabledJobWithNoConfigHistory";
-		final FreeStyleProject project = (FreeStyleProject) jenkins
-				.getItem(name);
+		final FreeStyleProject project = (FreeStyleProject) j.jenkins.getItem(name);
 		Thread.sleep(SLEEP_TIME);
 		project.delete();
 
@@ -352,7 +364,7 @@ public class JobConfigHistoryRootActionIT
 				.getElementById("restore");
 		final HtmlPage reallyRestorePage = restoreLink.click();
 		final HtmlForm restoreForm = reallyRestorePage.getFormByName("restore");
-		return submit(restoreForm, "Submit");
+		return j.submit(restoreForm);
 	}
 
 	/**
@@ -361,10 +373,11 @@ public class JobConfigHistoryRootActionIT
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testRestoreFromHistoryPage() throws Exception {
 		final String description = "All your base";
 		final String name = "TestProject";
-		final FreeStyleProject project = createFreeStyleProject(name);
+		final FreeStyleProject project = j.createFreeStyleProject(name);
 		project.setDescription(description);
 		Thread.sleep(SLEEP_TIME);
 		project.delete();
@@ -374,10 +387,8 @@ public class JobConfigHistoryRootActionIT
 		final List<HtmlAnchor> hrefs = htmlPage
 				.getByXPath("//a[contains(@href, \"TestProject_deleted_\")]");
 		final HtmlPage historyPage = hrefs.get(0).click();
-		final HtmlPage reallyRestorePage = submit(
-				historyPage.getFormByName("forward"), "Submit");
-		final HtmlPage jobPage = submit(
-				reallyRestorePage.getFormByName("restore"), "Submit");
+		final HtmlPage reallyRestorePage = j.submit(historyPage.getFormByName("forward"));
+		final HtmlPage jobPage = j.submit(reallyRestorePage.getFormByName("restore"));
 
 		WebAssert.assertTextPresent(jobPage, name);
 		WebAssert.assertTextPresent(jobPage, description);

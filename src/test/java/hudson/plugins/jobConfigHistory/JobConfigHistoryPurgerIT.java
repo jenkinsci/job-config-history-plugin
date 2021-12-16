@@ -8,21 +8,26 @@ import java.util.GregorianCalendar;
 import java.util.SortedMap;
 
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.recipes.LocalData;
 
 import hudson.XmlFile;
 
-public class JobConfigHistoryPurgerIT
-		extends
-			AbstractHudsonTestCaseDeletingInstanceDir {
+public class JobConfigHistoryPurgerIT {
+
+	@Rule
+	public JenkinsRule j = new JenkinsRuleWithDeletingInstanceDir();
+
 	private static final int SLEEP_TIME = 1100;
 	private JobConfigHistory jch;
 	private JobConfigHistoryPurger purger;
 
-	@Override
-	public void before() throws Throwable {
-		super.before();
-		jch = jenkins.getPlugin(JobConfigHistory.class);
+	@Before
+	public void before() {
+		jch = j.jenkins.getPlugin(JobConfigHistory.class);
 		purger = new JobConfigHistoryPurger();
 	}
 
@@ -33,18 +38,18 @@ public class JobConfigHistoryPurgerIT
 	 * @throws Exception
 	 */
 	@LocalData
+	@Test
 	public void testSystemHistoryPurger() throws Exception {
 		final String message = "Some nice message";
 		final HistoryDao historyDao = purger.getHistoryDao();
-		final XmlFile configXml = new XmlFile(
-				new File(jenkins.root, "config.xml"));
+		final XmlFile configXml = new XmlFile(new File(j.jenkins.root, "config.xml"));
 		final int historyEntries = historyDao.getRevisions(configXml).size();
 		Assert.assertTrue(
 				"Verify at least 5 original system config history entries, got "
 						+ historyEntries,
 				historyEntries > 4);
 
-		jenkins.setSystemMessage(message);
+		j.jenkins.setSystemMessage(message);
 		Thread.sleep(SLEEP_TIME);
 		Assert.assertEquals("Verify one additional system history entry.",
 				historyEntries + 1, historyDao.getRevisions(configXml).size());
@@ -75,10 +80,11 @@ public class JobConfigHistoryPurgerIT
 	 * @throws Exception
 	 */
 	@LocalData
+	@Test
 	public void testHistoryPurgerWhenMaxDaysSetToZero() throws Exception {
 		final HistoryDao historyDao = purger.getHistoryDao();
 		final XmlFile configXml = new XmlFile(
-				new File(jenkins.root, "config.xml"));
+				new File(j.jenkins.root, "config.xml"));
 		final int historyEntries = historyDao.getRevisions(configXml).size();
 		Assert.assertTrue(
 				"Verify at least 5 original system config history entries.",
@@ -97,6 +103,7 @@ public class JobConfigHistoryPurgerIT
 	 * @throws Exception
 	 */
 	@LocalData
+	@Test
 	public void testWithNegativeMaxAge() throws Exception {
 		testWithWrongMaxAge("-1");
 	}
@@ -107,14 +114,14 @@ public class JobConfigHistoryPurgerIT
 	 * @throws Exception
 	 */
 	@LocalData
+	@Test
 	public void testWithEmptyMaxAge() throws Exception {
 		testWithWrongMaxAge("");
 	}
 
 	private void testWithWrongMaxAge(String maxAge) throws Exception {
 		final HistoryDao historyDao = purger.getHistoryDao();
-		final XmlFile configXml = new XmlFile(
-				new File(jenkins.root, "config.xml"));
+		final XmlFile configXml = new XmlFile(new File(j.jenkins.root, "config.xml"));
 		final int historyEntries = historyDao.getRevisions(configXml).size();
 		Assert.assertTrue(
 				"Verify at least 5 original system config history entries.",
@@ -131,6 +138,7 @@ public class JobConfigHistoryPurgerIT
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testJobHistoryPurger() throws Exception {
 		final String name = "TestJob";
 		final File historyDir = new File(
@@ -178,10 +186,11 @@ public class JobConfigHistoryPurgerIT
 	 * @throws Exception
 	 */
 	@LocalData
+	@Test
 	public void testJobHistoryPurgerWithCreatedEntries() throws Exception {
 		final HistoryDao historyDao = purger.getHistoryDao();
 		final XmlFile configXml = new XmlFile(
-				new File(jenkins.root, "jobs/Test1/config.xml"));
+				new File(j.jenkins.root, "jobs/Test1/config.xml"));
 		Assert.assertEquals("Verify 5 original project history entries.", 5,
 				historyDao.getRevisions(configXml).size());
 
