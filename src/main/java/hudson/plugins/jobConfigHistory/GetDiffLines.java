@@ -30,9 +30,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.github.difflib.UnifiedDiffUtils;
-import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Chunk;
+import com.github.difflib.patch.DiffException;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
