@@ -29,7 +29,7 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.util.List;
 
-import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.patch.DiffException;
 import org.junit.Test;
 
 /**

@@ -54,8 +54,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
-import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.DiffException;
 import com.github.difflib.patch.Patch;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.Stapler;
@@ -188,7 +188,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     public final List<Line> getDiffLines(List<String> diffLines) {
         try {
             return new GetDiffLines(diffLines).get();
-        } catch (DiffException e) {
+        } catch (Exception e) {
             LOG.log(Level.SEVERE, "DiffException occurred while trying to get diffs: {0}", e.getMessage());
             return Collections.emptyList();
         }
@@ -327,7 +327,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         final Patch<String> patch;
         try {
             patch = DiffUtils.diff(Arrays.asList(file1Lines), Arrays.asList(file2Lines));
-        } catch (DiffException e) {
+        } catch (Exception e) {
             LOG.log(Level.SEVERE, "DiffException occurred while trying to calculate diffs: {0}", e.getMessage());
             return "";
         }
