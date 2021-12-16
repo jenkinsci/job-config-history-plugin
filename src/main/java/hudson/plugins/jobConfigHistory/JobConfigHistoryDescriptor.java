@@ -26,11 +26,10 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.Descriptor;
 
 /**
+ * @param <T> the class that this descriptor describes.
  * @author Brandon Koepke
- * @param <T>
- *            the class that this descriptor describes.
  */
 public abstract class JobConfigHistoryDescriptor<T extends JobConfigHistoryStrategy>
-		extends
-			Descriptor<JobConfigHistoryStrategy> {
+        extends
+        Descriptor<JobConfigHistoryStrategy> {
 }

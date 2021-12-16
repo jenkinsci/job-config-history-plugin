@@ -33,89 +33,96 @@ import java.util.SortedMap;
  */
 public interface OverviewHistoryDao {
 
-	/**
-	 * Returns a list of deleted jobs with a history.
-	 *
-	 * @param folderName
-	 *            name of folder.
-	 * @return list of deleted jobs with a history, emtpy when no history
-	 *         exists.
-	 */
-	File[] getDeletedJobs(String folderName);
+    /**
+     * Returns a list of deleted jobs with a history.
+     *
+     * @param folderName name of folder.
+     * @return list of deleted jobs with a history, empty when no history
+     * exists.
+     */
+    File[] getDeletedJobs(String folderName);
 
-	/** @return the total number of system configuration revision entries. */
-	int getSystemRevisionAmount();
+    /**
+     * @return the total number of system configuration revision entries.
+     */
+    int getSystemRevisionAmount();
 
-	/** @return the total number of job configuration revision entries. */
-	int getJobRevisionAmount();
+    /**
+     * @return the total number of job configuration revision entries.
+     */
+    int getJobRevisionAmount();
 
-	/** @return the number of configuration revision entries for a certain system config. */
-	int getSystemRevisionAmount(String jobName);
+    /**
+     * @return the number of configuration revision entries for a certain system config.
+     */
+    int getSystemRevisionAmount(String jobName);
 
-	/** @return the total number of deleted Jobs. */
-	int getDeletedJobAmount();
+    /**
+     * @return the total number of deleted Jobs.
+     */
+    int getDeletedJobAmount();
 
-	/** @return the number of configuration revision entries for a certain system config. */
-	int getJobRevisionAmount(String jobName);
+    /**
+     * @return the number of configuration revision entries for a certain system config.
+     */
+    int getJobRevisionAmount(String jobName);
 
-	/** @return the total number of configuration revision entries, excluding agent config entries - TODO future work. */
-	int getTotalRevisionAmount();
+    /**
+     * @return the total number of configuration revision entries, excluding agent config entries - TODO future work.
+     */
+    int getTotalRevisionAmount();
 
-	/**
-	 * Returns a list of deleted jobs with a history, including all those
-	 * contained in folders.
-	 *
-	 * @return list of deleted jobs with a history, emtpy when no history
-	 *         exists.
-	 */
-	File[] getDeletedJobs();
+    /**
+     * Returns a list of deleted jobs with a history, including all those
+     * contained in folders.
+     *
+     * @return list of deleted jobs with a history, empty when no history
+     * exists.
+     */
+    File[] getDeletedJobs();
 
-	/**
-	 * Returns a list of jobs with a history.
-	 *
-	 * @param folderName
-	 *            name of folder
-	 * @return list of jobs with a history, empty when no history exists.
-	 */
-	File[] getJobs(String folderName);
+    /**
+     * Returns a list of jobs with a history.
+     *
+     * @param folderName name of folder
+     * @return list of jobs with a history, empty when no history exists.
+     */
+    File[] getJobs(String folderName);
 
-	/**
-	 * Returns a list of jobs with a history, including all those contained in folders.
-	 *
-	 * @return list of all jobs with a history, empty when no history exists.
-	 */
-	File[] getJobs();
+    /**
+     * Returns a list of jobs with a history, including all those contained in folders.
+     *
+     * @return list of all jobs with a history, empty when no history exists.
+     */
+    File[] getJobs();
 
-	/**
-	 * Returns a list of all system configuration files with a history.
-	 *
-	 * @return list of all system configuration files with a history, empty when
-	 *         no history exists.
-	 */
-	File[] getSystemConfigs();
+    /**
+     * Returns a list of all system configuration files with a history.
+     *
+     * @return list of all system configuration files with a history, empty when
+     * no history exists.
+     */
+    File[] getSystemConfigs();
 
-	/**
-	 *
-	 * @return a map mapping timestamps to historydescrs. Contains all system config revision entries.
-	 */
-	SortedMap<String, HistoryDescr> getSystemConfigsMap();
+    /**
+     * @return a map mapping timestamps to historydescrs. Contains all system config revision entries.
+     */
+    SortedMap<String, HistoryDescr> getSystemConfigsMap();
 
-	/**
-	 * Returns a sorted map of all HistoryDescr for a given job.
-	 * 
-	 * @param jobName
-	 *            of the job
-	 * @return sorted map.
-	 */
-	SortedMap<String, HistoryDescr> getJobHistory(final String jobName);
+    /**
+     * Returns a sorted map of all HistoryDescr for a given job.
+     *
+     * @param jobName of the job
+     * @return sorted map.
+     */
+    SortedMap<String, HistoryDescr> getJobHistory(final String jobName);
 
-	/**
-	 * Returns a sorted map of all HistoryDescr for a given system
-	 * configuration.
-	 * 
-	 * @param name
-	 *            of the configuration
-	 * @return sorted map.
-	 */
-	SortedMap<String, HistoryDescr> getSystemHistory(final String name);
+    /**
+     * Returns a sorted map of all HistoryDescr for a given system
+     * configuration.
+     *
+     * @param name of the configuration
+     * @return sorted map.
+     */
+    SortedMap<String, HistoryDescr> getSystemHistory(final String name);
 }

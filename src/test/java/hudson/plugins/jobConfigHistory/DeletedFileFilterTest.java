@@ -24,43 +24,42 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 import java.io.File;
 
-import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
- *
  * @author Mirko Friedenhagen
  */
 public class DeletedFileFilterTest {
 
-	/**
-	 * Test of accept method, of class DeletedFileFilter.
-	 */
-	@Test
-	public void testAcceptNoDeletedFile() {
-		File file = new File("123");
-		assertFalse(DeletedFileFilter.accepts(file));
-	}
+    /**
+     * Test of accept method, of class DeletedFileFilter.
+     */
+    @Test
+    public void testAcceptNoDeletedFile() {
+        File file = new File("123");
+        assertFalse(DeletedFileFilter.accepts(file));
+    }
 
-	/**
-	 * Test of accept method, of class DeletedFileFilter.
-	 */
-	@Test
-	public void testAcceptDeletedFile() {
-		File file = new File("_deleted_");
-		assertTrue(DeletedFileFilter.accepts(file));
-	}
+    /**
+     * Test of accept method, of class DeletedFileFilter.
+     */
+    @Test
+    public void testAcceptDeletedFile() {
+        File file = new File("_deleted_");
+        assertTrue(DeletedFileFilter.accepts(file));
+    }
 
-	/**
-	 * Test of accept method, of class DeletedFileFilter.
-	 */
-	@Test
-	public void testAcceptDeletedFileName() {
-		assertTrue(DeletedFileFilter.accepts("_deleted_"));
-	}
+    /**
+     * Test of accept method, of class DeletedFileFilter.
+     */
+    @Test
+    public void testAcceptDeletedFileName() {
+        assertTrue(DeletedFileFilter.accepts("_deleted_"));
+    }
 
 }

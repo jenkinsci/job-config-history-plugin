@@ -24,32 +24,32 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
+import java.io.IOException;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
- *
  * @author mirko
  */
 public class NonJobsDirectoryFileFilterTest {
 
-	@Rule
-	public TemporaryFolder folder = new TemporaryFolder(new File("target"));
-	/**
-	 * Test of accepts method, of class NonJobsDirectoryFileFilter.
-	 */
-	@Test
-	public void testAccepts() throws IOException {
-		assertTrue(
-				NonJobsDirectoryFileFilter.accepts(folder.newFolder("config")));
-		assertFalse(
-				NonJobsDirectoryFileFilter.accepts(folder.newFolder("jobs")));
-	}
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder(new File("target"));
+
+    /**
+     * Test of accepts method, of class NonJobsDirectoryFileFilter.
+     */
+    @Test
+    public void testAccepts() throws IOException {
+        assertTrue(
+                NonJobsDirectoryFileFilter.accepts(folder.newFolder("config")));
+        assertFalse(
+                NonJobsDirectoryFileFilter.accepts(folder.newFolder("jobs")));
+    }
 }

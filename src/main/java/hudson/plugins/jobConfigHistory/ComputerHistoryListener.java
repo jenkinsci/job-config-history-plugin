@@ -23,10 +23,6 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import hudson.Extension;
 import hudson.model.Node;
 import hudson.model.Slave;
@@ -35,169 +31,171 @@ import hudson.slaves.ComputerListener;
 import hudson.slaves.EphemeralNode;
 import jenkins.model.Jenkins;
 
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
- *
  * @author Lucie Votypkova
  */
 @Extension
 public class ComputerHistoryListener extends ComputerListener {
 
-	List<Node> nodes;
+    private static final Logger LOG = Logger
+            .getLogger(ComputerHistoryListener.class.getName());
+    List<Node> nodes;
 
-	private static final Logger LOG = Logger
-			.getLogger(ComputerHistoryListener.class.getName());
-	
-	@Override
-	public void onConfigurationChange() {
-		Jenkins jenkins = Jenkins.get();
-		if (nodes == null) {
-			nodes = jenkins.getNodes();
-		}
-		if (nodes.size() < jenkins.getNodes().size()) {
-			onAdd();
-			nodes = jenkins.getNodes();
-			return;
-		}
-		if (nodes.size() > jenkins.getNodes().size()) {
-			onRemove();
-			nodes = jenkins.getNodes();
-			return;
-		}
-		if (!nodes.equals(jenkins.getNodes())) {
-			onRename();
-			nodes = jenkins.getNodes();
-		}
-		if (nodes.size() == jenkins.getNodes().size()) {
-			onChange();
-		}
-	}
-	/**
-	 * If a new slave get added.
-	 */
-	private void onAdd() {
-		Jenkins jenkins = Jenkins.get();
-		for (Node node : jenkins.getNodes()) {
-			if (!nodes.contains(node) && isTracked(node)) {
-				switchHistoryDao(node).createNewNode(node);
-				return;
-			}
-		}
-	}
+    @Override
+    public void onConfigurationChange() {
+        Jenkins jenkins = Jenkins.get();
+        if (nodes == null) {
+            nodes = jenkins.getNodes();
+        }
+        if (nodes.size() < jenkins.getNodes().size()) {
+            onAdd();
+            nodes = jenkins.getNodes();
+            return;
+        }
+        if (nodes.size() > jenkins.getNodes().size()) {
+            onRemove();
+            nodes = jenkins.getNodes();
+            return;
+        }
+        if (!nodes.equals(jenkins.getNodes())) {
+            onRename();
+            nodes = jenkins.getNodes();
+        }
+        if (nodes.size() == jenkins.getNodes().size()) {
+            onChange();
+        }
+    }
 
-	/**
-	 * Is this node likely to be important to the user?
-	 * 
-	 * @param node
-	 */
-	private boolean isTracked(Node node) {
-		return node != null && !(node instanceof AbstractCloudSlave
-				|| node instanceof EphemeralNode);
-	}
+    /**
+     * If a new slave get added.
+     */
+    private void onAdd() {
+        Jenkins jenkins = Jenkins.get();
+        for (Node node : jenkins.getNodes()) {
+            if (!nodes.contains(node) && isTracked(node)) {
+                switchHistoryDao(node).createNewNode(node);
+                return;
+            }
+        }
+    }
 
-	/**
-	 * If a slave get removed.
-	 */
-	private void onRemove() {
-		Jenkins jenkins = Jenkins.get();
-		for (Node node : nodes) {
-			if (!jenkins.getNodes().contains(node)
-					&& isTracked(node)) {
-				switchHistoryDao(node).deleteNode(node);
-				return;
-			}
-		}
-	}
+    /**
+     * Is this node likely to be important to the user?
+     *
+     * @param node
+     */
+    private boolean isTracked(Node node) {
+        return node != null && !(node instanceof AbstractCloudSlave
+                || node instanceof EphemeralNode);
+    }
 
-	/**
-	 * If a slave configuration get changed.
-	 */
-	private void onChange() {
-		Jenkins jenkins = Jenkins.get();
-		final JobConfigHistoryStrategy hdao = PluginUtils.getHistoryDao();
-		for (Node node : jenkins.getNodes()) {
-			if (!PluginUtils.isUserExcluded(PluginUtils.getPlugin())
-					&& isTracked(node) && !hdao.hasDuplicateHistory(node)) {
-				PluginUtils.getHistoryDao().saveNode(node);
-				return;
-			}
-		}
-	}
+    /**
+     * If a slave get removed.
+     */
+    private void onRemove() {
+        Jenkins jenkins = Jenkins.get();
+        for (Node node : nodes) {
+            if (!jenkins.getNodes().contains(node)
+                    && isTracked(node)) {
+                switchHistoryDao(node).deleteNode(node);
+                return;
+            }
+        }
+    }
 
-	/**
-	 * If a slave get renamed.
-	 */
-	private void onRename() {
-		Node originalNode = null;
-		Jenkins jenkins = Jenkins.get();
-		for (Node node : nodes) {
-			if (!jenkins.getNodes().contains(node)
-					&& isTracked(node)) {
-				originalNode = node;
-			}
-		}
-		if (originalNode == null) {
-			LOG.log(Level.WARNING, "Can not find changed node.");
-			return;
-		}
-		Node newNode = null;
-		for (Node node : jenkins.getNodes()) {
-			if (!nodes.contains(node) && isTracked(node)) {
-				newNode = node;
-			}
-		}
-		if (!originalNode.getNodeName().equals(newNode.getNodeName())) {
-			switchHistoryDao(originalNode).renameNode(newNode,
-					originalNode.getNodeName(), newNode.getNodeName());
-		}
-	}
+    /**
+     * If a slave configuration get changed.
+     */
+    private void onChange() {
+        Jenkins jenkins = Jenkins.get();
+        final JobConfigHistoryStrategy hdao = PluginUtils.getHistoryDao();
+        for (Node node : jenkins.getNodes()) {
+            if (!PluginUtils.isUserExcluded(PluginUtils.getPlugin())
+                    && isTracked(node) && !hdao.hasDuplicateHistory(node)) {
+                PluginUtils.getHistoryDao().saveNode(node);
+                return;
+            }
+        }
+    }
 
-	/**
-	 * Returns NodeListenerHistoryDao depending on the item type.
-	 *
-	 * @param node
-	 *            the node to switch on.
-	 * @return dao
-	 */
-	private NodeListenerHistoryDao switchHistoryDao(Node node) {
-		return node instanceof Slave
-				? getHistoryDao()
-				: NoOpNodeListenerHistoryDao.INSTANCE;
-	}
+    /**
+     * If a slave get renamed.
+     */
+    private void onRename() {
+        Node originalNode = null;
+        Jenkins jenkins = Jenkins.get();
+        for (Node node : nodes) {
+            if (!jenkins.getNodes().contains(node)
+                    && isTracked(node)) {
+                originalNode = node;
+            }
+        }
+        if (originalNode == null) {
+            LOG.log(Level.WARNING, "Can not find changed node.");
+            return;
+        }
+        Node newNode = null;
+        for (Node node : jenkins.getNodes()) {
+            if (!nodes.contains(node) && isTracked(node)) {
+                newNode = node;
+            }
+        }
+        if (!originalNode.getNodeName().equals(newNode.getNodeName())) {
+            switchHistoryDao(originalNode).renameNode(newNode,
+                    originalNode.getNodeName(), newNode.getNodeName());
+        }
+    }
 
-	NodeListenerHistoryDao getHistoryDao() {
-		return PluginUtils.getHistoryDao();
-	}
+    /**
+     * Returns NodeListenerHistoryDao depending on the item type.
+     *
+     * @param node the node to switch on.
+     * @return dao
+     */
+    private NodeListenerHistoryDao switchHistoryDao(Node node) {
+        return node instanceof Slave
+                ? getHistoryDao()
+                : NoOpNodeListenerHistoryDao.INSTANCE;
+    }
 
-	/**
-	 * No operation NodeListenerHistoryDao.
-	 */
-	private static class NoOpNodeListenerHistoryDao
-			implements
-				NodeListenerHistoryDao {
+    NodeListenerHistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
+    }
 
-		/**
-		 * The instance.
-		 */
-		static final NoOpNodeListenerHistoryDao INSTANCE = new NoOpNodeListenerHistoryDao();
+    /**
+     * No operation NodeListenerHistoryDao.
+     */
+    private static class NoOpNodeListenerHistoryDao
+            implements
+            NodeListenerHistoryDao {
 
-		@Override
-		public void createNewNode(Node node) {
-			LOG.log(Level.FINEST, "onCreated: not an Slave {0}, skipping.",
-					node);
-		}
+        /**
+         * The instance.
+         */
+        static final NoOpNodeListenerHistoryDao INSTANCE = new NoOpNodeListenerHistoryDao();
 
-		@Override
-		public void renameNode(Node node, String oldName, String newName) {
-			LOG.log(Level.FINEST, "onRenamed: not an Slave {0}, skipping.",
-					node);
-		}
+        @Override
+        public void createNewNode(Node node) {
+            LOG.log(Level.FINEST, "onCreated: not an Slave {0}, skipping.",
+                    node);
+        }
 
-		@Override
-		public void deleteNode(Node node) {
-			LOG.log(Level.FINEST, "onDeleted: not an Slave {0}, skipping.",
-					node);
-		}
+        @Override
+        public void renameNode(Node node, String oldName, String newName) {
+            LOG.log(Level.FINEST, "onRenamed: not an Slave {0}, skipping.",
+                    node);
+        }
 
-	}
+        @Override
+        public void deleteNode(Node node) {
+            LOG.log(Level.FINEST, "onDeleted: not an Slave {0}, skipping.",
+                    node);
+        }
+
+    }
 
 }

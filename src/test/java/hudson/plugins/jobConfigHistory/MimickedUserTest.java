@@ -1,7 +1,5 @@
 package hudson.plugins.jobConfigHistory;
 
-import static org.junit.Assert.assertEquals;
-
 import hudson.model.User;
 import hudson.security.ACL;
 import org.junit.Before;
@@ -9,18 +7,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 public class MimickedUserTest {
 
 
+    private final MimickedUser sutNameId = createSut("SYSTEM", "SYSTEM");
+    private final MimickedUser sutUserNull = createSut(null);
+    private final MimickedUser sutNameIdNullNull = createSut(null, null);
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
-
     private User user;
-
     private MimickedUser sutUser;
-    private MimickedUser sutNameId = createSut("SYSTEM", "SYSTEM");
-    private MimickedUser sutUserNull = createSut(null);
-    private MimickedUser sutNameIdNullNull = createSut(null,null);
 
     @Before
     public void setupUser() {
@@ -34,7 +33,7 @@ public class MimickedUserTest {
         assertEquals(user.getId(), sutNameId.getId());
 
         assertEquals(JobConfigHistoryConsts.UNKNOWN_USER_ID, sutUserNull.getId());
-        assertEquals(null, sutNameIdNullNull.getId());
+        assertNull(sutNameIdNullNull.getId());
     }
 
     @Test
@@ -43,7 +42,7 @@ public class MimickedUserTest {
         assertEquals(user.getFullName(), sutNameId.getFullName());
 
         assertEquals(JobConfigHistoryConsts.UNKNOWN_USER_NAME, sutUserNull.getFullName());
-        assertEquals(null, sutNameIdNullNull.getFullName());
+        assertNull(sutNameIdNullNull.getFullName());
     }
 
     @Test
@@ -51,13 +50,19 @@ public class MimickedUserTest {
         assertEquals(user, sutUser.getUser(false));
         assertEquals(user, sutNameId.getUser(false));
 
-        assertEquals(null, sutUserNull.getUser(false));
+        assertNull(sutUserNull.getUser(false));
     }
 
-    private MimickedUser createSut(User user) { return new MimickedUser(user); }
+    private MimickedUser createSut(User user) {
+        return new MimickedUser(user);
+    }
 
-    private MimickedUser createSut(String id, String fullName) { return new MimickedUser(id, fullName); }
+    private MimickedUser createSut(String id, String fullName) {
+        return new MimickedUser(id, fullName);
+    }
 
-    private User getSystemUser() { return jenkinsRule.getInstance().getUser(ACL.SYSTEM_USERNAME); }
+    private User getSystemUser() {
+        return jenkinsRule.getInstance().getUser(ACL.SYSTEM_USERNAME);
+    }
 
 }

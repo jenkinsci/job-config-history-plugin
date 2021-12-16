@@ -34,74 +34,66 @@ import java.util.List;
  */
 class HistoryDescrToConfigInfo {
 
-	/**
-	 * Name of ConfigInfo.
-	 */
-	private final String name;
-	/**
-	 * Does the configuration file exist?
-	 */
-	private final boolean configExists;
-	/**
-	 * List of history descriptions.
-	 */
-	private final Collection<HistoryDescr> historyDescrs;
-	/**
-	 * Is this a job?
-	 */
-	private final boolean isJob;
+    /**
+     * Name of ConfigInfo.
+     */
+    private final String name;
+    /**
+     * Does the configuration file exist?
+     */
+    private final boolean configExists;
+    /**
+     * List of history descriptions.
+     */
+    private final Collection<HistoryDescr> historyDescrs;
+    /**
+     * Is this a job?
+     */
+    private final boolean isJob;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param name
-	 *            of the job or configuration.
-	 * @param configExists
-	 *            Does the configuration file exist?
-	 * @param historyDescrs
-	 *            history descriptions.
-	 * @param isJob
-	 *            is this a job?
-	 */
-	HistoryDescrToConfigInfo(String name, boolean configExists,
-			Collection<HistoryDescr> historyDescrs, boolean isJob) {
-		this.name = name;
-		this.configExists = configExists;
-		this.historyDescrs = historyDescrs;
-		this.isJob = isJob;
-	}
+    /**
+     * Constructor.
+     *
+     * @param name          of the job or configuration.
+     * @param configExists  Does the configuration file exist?
+     * @param historyDescrs history descriptions.
+     * @param isJob         is this a job?
+     */
+    HistoryDescrToConfigInfo(String name, boolean configExists,
+                             Collection<HistoryDescr> historyDescrs, boolean isJob) {
+        this.name = name;
+        this.configExists = configExists;
+        this.historyDescrs = historyDescrs;
+        this.isJob = isJob;
+    }
 
-	/**
-	 * Converts to a list of {@link ConfigInfo}.
-	 *
-	 * @return list of {@link ConfigInfo}s.
-	 */
-	List<ConfigInfo> convert() {
-		final ArrayList<ConfigInfo> configInfos = new ArrayList<ConfigInfo>();
-		for (HistoryDescr historyDescr : historyDescrs) {
-			configInfos.add(
-					ConfigInfo.create(name, configExists, historyDescr, isJob));
-		}
-		return configInfos;
-	}
+    /**
+     * Converts to a list of {@link ConfigInfo}.
+     *
+     * @param name          of the job or configuration.
+     * @param configExists  Does the configuration file exist?
+     * @param historyDescrs history descriptions.
+     * @param isJob         is this a job?
+     * @return list of {@link ConfigInfo}s.
+     */
+    static List<ConfigInfo> convert(String name, boolean configExists,
+                                    Collection<HistoryDescr> historyDescrs, boolean isJob) {
+        return new HistoryDescrToConfigInfo(name, configExists, historyDescrs,
+                isJob).convert();
+    }
 
-	/**
-	 * Converts to a list of {@link ConfigInfo}.
-	 *
-	 * @param name
-	 *            of the job or configuration.
-	 * @param configExists
-	 *            Does the configuration file exist?
-	 * @param historyDescrs
-	 *            history descriptions.
-	 * @param isJob
-	 *            is this a job?
-	 * @return list of {@link ConfigInfo}s.
-	 */
-	static List<ConfigInfo> convert(String name, boolean configExists,
-			Collection<HistoryDescr> historyDescrs, boolean isJob) {
-		return new HistoryDescrToConfigInfo(name, configExists, historyDescrs,
-				isJob).convert();
-	}
+    /**
+     * Converts to a list of {@link ConfigInfo}.
+     *
+     * @return list of {@link ConfigInfo}s.
+     */
+    List<ConfigInfo> convert() {
+        final ArrayList<ConfigInfo> configInfos = new ArrayList<>();
+        for (HistoryDescr historyDescr : historyDescrs) {
+            configInfos.add(
+                    ConfigInfo.create(name, configExists, historyDescr, isJob));
+        }
+        return configInfos;
+    }
 
 }

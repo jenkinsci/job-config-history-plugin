@@ -32,15 +32,16 @@ import java.util.Comparator;
  *
  * @author Mirko Friedenhagen
  */
-@SuppressWarnings("serial")
 final class FileNameComparator implements Comparator<File>, Serializable {
 
-	/** The one and only instance. */
-	public static final FileNameComparator INSTANCE = new FileNameComparator();
+    /**
+     * The one and only instance.
+     */
+    public static final FileNameComparator INSTANCE = new FileNameComparator();
 
-	@Override
-	public int compare(File f1, File f2) {
-		return f1.getName().compareTo(f2.getName());
-	}
+    @Override
+    public int compare(File f1, File f2) {
+        return f1.getName().compareTo(f2.getName());
+    }
 
 }

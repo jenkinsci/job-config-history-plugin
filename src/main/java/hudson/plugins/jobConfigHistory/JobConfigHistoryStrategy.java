@@ -35,27 +35,29 @@ import jenkins.model.Jenkins;
  * @author Brandon Koepke
  */
 public abstract class JobConfigHistoryStrategy
-		implements
-			ExtensionPoint,
-			Describable<JobConfigHistoryStrategy>,
-			HistoryDao,
-			ItemListenerHistoryDao,
-			OverviewHistoryDao,
-			NodeListenerHistoryDao {
+        implements
+        ExtensionPoint,
+        Describable<JobConfigHistoryStrategy>,
+        HistoryDao,
+        ItemListenerHistoryDao,
+        OverviewHistoryDao,
+        NodeListenerHistoryDao {
 
-	/** {@inheritDoc} */
-	@Override
-	@SuppressWarnings("unchecked")
-	public final Descriptor<JobConfigHistoryStrategy> getDescriptor() {
-		return Jenkins.get().getDescriptorOrDie(getClass());
-	}
+    /**
+     * Gets the extension point list for the JobConfigHistoryStrategy.
+     *
+     * @return the extension point list.
+     */
+    public static DescriptorExtensionList<JobConfigHistoryStrategy, JobConfigHistoryDescriptor<JobConfigHistoryStrategy>> all() {
+        return Jenkins.get().getDescriptorList(JobConfigHistoryStrategy.class);
+    }
 
-	/**
-	 * Gets the extension point list for the JobConfigHistoryStrategy.
-	 *
-	 * @return the extension point list.
-	 */
-	public static DescriptorExtensionList<JobConfigHistoryStrategy, JobConfigHistoryDescriptor<JobConfigHistoryStrategy>> all() {
-		return Jenkins.get().getDescriptorList(JobConfigHistoryStrategy.class);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public final Descriptor<JobConfigHistoryStrategy> getDescriptor() {
+        return Jenkins.get().getDescriptorOrDie(getClass());
+    }
 }

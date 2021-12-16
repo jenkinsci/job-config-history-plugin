@@ -24,35 +24,35 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Date;
-
 import org.junit.Test;
 
+import java.util.Calendar;
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+
 /**
- *
  * @author mirko
  */
 public class PluginUtilsTest {
 
-	/**
-	 * Test of parsedDate method, of class PluginUtils.
-	 */
-	@Test
-	public void testParsedDate() {
-		String timeStamp = "2012-11-21_11-29-12";
-		Date expResult = new Date(112, 10, 21, 11, 29, 12);
-		Date result = PluginUtils.parsedDate(timeStamp);
-		assertEquals(expResult, result);
-	}
+    /**
+     * Test of parsedDate method, of class PluginUtils.
+     */
+    @Test
+    public void testParsedDate() {
+        String timeStamp = "2012-11-21_11-29-12";
+        Date expResult = new Date(112, Calendar.NOVEMBER, 21, 11, 29, 12);
+        Date result = PluginUtils.parsedDate(timeStamp);
+        assertEquals(expResult, result);
+    }
 
-	/**
-	 * Test of parsedDate method, of class PluginUtils.
-	 */
-	@Test(expected = IllegalArgumentException.class)
-	public void testParsedDateError() {
-		String timeStamp = "abc";
-		PluginUtils.parsedDate(timeStamp);
-	}
+    /**
+     * Test of parsedDate method, of class PluginUtils.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testParsedDateError() {
+        String timeStamp = "abc";
+        PluginUtils.parsedDate(timeStamp);
+    }
 }

@@ -24,50 +24,47 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import static org.junit.Assert.assertEquals;
+import hudson.XmlFile;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
-import hudson.XmlFile;
+import static org.junit.Assert.assertEquals;
 
 /**
- *
  * @author Mirko Friedenhagen
  */
 public class HistoryDescrToConfigInfoTest {
-	private FileHistoryDao historyDao;
-	private File historyRoot;
-	private File jenkinsHome;
-	@Rule
-	public final UnpackResourceZip unpackResourceZip = UnpackResourceZip
-			.create();
+    @Rule
+    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip
+            .create();
+    private FileHistoryDao historyDao;
+    private File jenkinsHome;
 
-	@Before
-	public void setUp() {
-		jenkinsHome = unpackResourceZip.getRoot();
-		historyRoot = unpackResourceZip.getResource("config-history");
-		historyDao = new FileHistoryDao(historyRoot, jenkinsHome, null, 0,
-				true);
-	}
+    @Before
+    public void setUp() {
+        jenkinsHome = unpackResourceZip.getRoot();
+        File historyRoot = unpackResourceZip.getResource("config-history");
+        historyDao = new FileHistoryDao(historyRoot, jenkinsHome, null, 0,
+                true);
+    }
 
-	/**
-	 * Test of convert method, of class HistoryDescrToConfigInfo.
-	 */
-	@Test
-	public void testConvert() {
-		List<ConfigInfo> result = HistoryDescrToConfigInfo.convert("Test1",
-				true,
-				new ArrayList<HistoryDescr>(historyDao
-						.getRevisions(new XmlFile(
-								new File(jenkinsHome, "jobs/Test1/config.xml")))
-						.values()),
-				true);
-		assertEquals(5, result.size());
-	}
+    /**
+     * Test of convert method, of class HistoryDescrToConfigInfo.
+     */
+    @Test
+    public void testConvert() {
+        List<ConfigInfo> result = HistoryDescrToConfigInfo.convert("Test1",
+                true,
+                new ArrayList<>(historyDao
+                        .getRevisions(new XmlFile(
+                                new File(jenkinsHome, "jobs/Test1/config.xml")))
+                        .values()),
+                true);
+        assertEquals(5, result.size());
+    }
 }
