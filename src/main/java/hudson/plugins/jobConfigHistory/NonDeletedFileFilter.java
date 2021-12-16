@@ -35,23 +35,24 @@ import java.io.FileFilter;
  */
 class NonDeletedFileFilter implements FileFilter {
 
-	/** Only one instance needed. */
-	static final NonDeletedFileFilter INSTANCE = new NonDeletedFileFilter();
+    /**
+     * Only one instance needed.
+     */
+    static final NonDeletedFileFilter INSTANCE = new NonDeletedFileFilter();
 
-	@Override
-	public boolean accept(File pathname) {
-		return !DeletedFileFilter.accepts(pathname);
-	}
+    /**
+     * Is this item not deleted?
+     *
+     * @param file to inspect
+     * @return true when file does not have the special deleted mark.
+     */
+    public static boolean accepts(File file) {
+        return INSTANCE.accept(file);
+    }
 
-	/**
-	 * Is this item not deleted?
-	 *
-	 * @param file
-	 *            to inspect
-	 * @return true when file does not have the special deleted mark.
-	 */
-	public static boolean accepts(File file) {
-		return INSTANCE.accept(file);
-	}
+    @Override
+    public boolean accept(File pathname) {
+        return !DeletedFileFilter.accepts(pathname);
+    }
 
 }

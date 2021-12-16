@@ -35,48 +35,49 @@ import java.io.FileFilter;
  */
 public class DeletedFileFilter implements FileFilter {
 
-	/** name of history xml file. */
-	public static final String DELETED_MARKER = "_deleted_";
+    /**
+     * name of history xml file.
+     */
+    public static final String DELETED_MARKER = "_deleted_";
 
-	/** Only one instance needed. */
-	public static final DeletedFileFilter INSTANCE = new DeletedFileFilter();
+    /**
+     * Only one instance needed.
+     */
+    public static final DeletedFileFilter INSTANCE = new DeletedFileFilter();
 
-	@Override
-	public boolean accept(File file) {
-		return accept(file.getName());
-	}
+    /**
+     * Is this item deleted?
+     *
+     * @param file to inspect
+     * @return true when file has the special deleted mark.
+     */
+    public static boolean accepts(File file) {
+        return INSTANCE.accept(file);
+    }
 
-	/**
-	 * Deleted?
-	 *
-	 * @param fileName
-	 *            to inspect
-	 * @return true when fileName has the special deleted mark.
-	 */
-	private boolean accept(final String fileName) {
-		return fileName.contains(DELETED_MARKER);
-	}
+    /**
+     * Is this item deleted?
+     *
+     * @param fileName to inspect
+     * @return true when fileName has the special deleted mark.
+     */
+    public static boolean accepts(String fileName) {
+        return INSTANCE.accept(fileName);
+    }
 
-	/**
-	 * Is this item deleted?
-	 *
-	 * @param file
-	 *            to inspect
-	 * @return true when file has the special deleted mark.
-	 */
-	public static boolean accepts(File file) {
-		return INSTANCE.accept(file);
-	}
+    @Override
+    public boolean accept(File file) {
+        return accept(file.getName());
+    }
 
-	/**
-	 * Is this item deleted?
-	 *
-	 * @param fileName
-	 *            to inspect
-	 * @return true when fileName has the special deleted mark.
-	 */
-	public static boolean accepts(String fileName) {
-		return INSTANCE.accept(fileName);
-	}
+    /**
+     * Deleted?
+     *
+     * @param fileName to inspect
+     * @return true when fileName has the special deleted mark.
+     */
+    private boolean accept(final String fileName) {
+        return fileName.contains(DELETED_MARKER);
+    }
 
 }

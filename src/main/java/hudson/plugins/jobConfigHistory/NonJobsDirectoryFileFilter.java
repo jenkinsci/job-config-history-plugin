@@ -33,22 +33,23 @@ import java.io.FileFilter;
  */
 class NonJobsDirectoryFileFilter implements FileFilter {
 
-	/** Only one instance needed. */
-	static final NonJobsDirectoryFileFilter INSTANCE = new NonJobsDirectoryFileFilter();
+    /**
+     * Only one instance needed.
+     */
+    static final NonJobsDirectoryFileFilter INSTANCE = new NonJobsDirectoryFileFilter();
 
-	@Override
-	public boolean accept(File pathname) {
-		return pathname.isDirectory() && !pathname.getName().endsWith("jobs");
-	}
+    /**
+     * Is this file not a job history directory?
+     *
+     * @param file to inspect
+     * @return true when directory is not a jobs history directory.
+     */
+    public static boolean accepts(File file) {
+        return INSTANCE.accept(file);
+    }
 
-	/**
-	 * Is this file not a job history directory?
-	 *
-	 * @param file
-	 *            to inspect
-	 * @return true when directory is not a jobs history directory.
-	 */
-	public static boolean accepts(File file) {
-		return INSTANCE.accept(file);
-	}
+    @Override
+    public boolean accept(File pathname) {
+        return pathname.isDirectory() && !pathname.getName().endsWith("jobs");
+    }
 }

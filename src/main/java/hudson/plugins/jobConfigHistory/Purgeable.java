@@ -31,27 +31,24 @@ import java.io.File;
  * @author Brandon Koepke
  */
 public interface Purgeable {
-	/**
-	 * Purges entries when there are more entries than specified by max entries.
-	 *
-	 * The purge will drop old entries according to:
-	 *
-	 * sort(entries, e.timestamp()); for (int i = maxEntries; i &lt;
-	 * entries.length(); i++) drop(entries[i]);
-	 *
-	 * @param itemHistoryRoot
-	 *            the history root to drop entries from.
-	 * @param maxEntries
-	 *            the maximum number of entries to retain.
-	 */
-	void purgeOldEntries(final File itemHistoryRoot, final int maxEntries);
+    /**
+     * Purges entries when there are more entries than specified by max entries.
+     * <p>
+     * The purge will drop old entries according to:
+     * <p>
+     * sort(entries, e.timestamp()); for (int i = maxEntries; i &lt;
+     * entries.length(); i++) drop(entries[i]);
+     *
+     * @param itemHistoryRoot the history root to drop entries from.
+     * @param maxEntries      the maximum number of entries to retain.
+     */
+    void purgeOldEntries(final File itemHistoryRoot, final int maxEntries);
 
-	/**
-	 * Determines whether the specified directory should be dropped or not.
-	 *
-	 * @param historyDir
-	 *            the directory to check against.
-	 * @return true if it can be deleted, false otherwise.
-	 */
-	boolean isCreatedEntry(final File historyDir);
+    /**
+     * Determines whether the specified directory should be dropped or not.
+     *
+     * @param historyDir the directory to check against.
+     * @return true if it can be deleted, false otherwise.
+     */
+    boolean isCreatedEntry(final File historyDir);
 }

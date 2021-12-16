@@ -23,6 +23,41 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.UnifiedDiffUtils;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.Patch;
+import com.google.common.collect.Lists;
+import hudson.XmlFile;
+import hudson.model.Action;
+import hudson.plugins.jobConfigHistory.SideBySideView.Line;
+import hudson.security.AccessControlled;
+import hudson.util.MultipartFormDataParser;
+import org.apache.commons.lang.StringUtils;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.builder.Input;
+import org.xmlunit.diff.Comparison;
+import org.xmlunit.diff.ComparisonResult;
+import org.xmlunit.diff.ComparisonType;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.Difference;
+import org.xmlunit.diff.DifferenceEvaluator;
+import org.xmlunit.diff.ElementSelectors;
+
+import javax.servlet.ServletException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,46 +78,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import com.github.difflib.DiffUtils;
-import com.github.difflib.UnifiedDiffUtils;
-import com.github.difflib.patch.AbstractDelta;
-import com.github.difflib.patch.DiffException;
-import com.github.difflib.patch.Patch;
-import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
-import org.xml.sax.InputSource;
-
-import com.google.common.collect.Lists;
-
-import org.w3c.dom.Node;
-
-import hudson.XmlFile;
-import hudson.model.Action;
-import hudson.plugins.jobConfigHistory.SideBySideView.Line;
-import hudson.security.AccessControlled;
-import hudson.util.MultipartFormDataParser;
-import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.builder.Input;
-import org.xmlunit.diff.Comparison;
-import org.xmlunit.diff.ComparisonResult;
-import org.xmlunit.diff.ComparisonType;
-import org.xmlunit.diff.Diff;
-import org.xmlunit.diff.Difference;
-import org.xmlunit.diff.DifferenceEvaluator;
-import org.xmlunit.diff.DefaultNodeMatcher;
-import org.xmlunit.diff.ElementSelectors;
-
 import static java.util.logging.Level.WARNING;
 
 /**
@@ -93,9 +88,8 @@ import static java.util.logging.Level.WARNING;
  */
 public abstract class JobConfigHistoryBaseAction implements Action {
 
-	private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-
-	private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
+    private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
+    private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
     @Override
     public String getDisplayName() {
@@ -151,9 +145,9 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected abstract void checkConfigurePermission();
 
-	public abstract boolean hasAdminPermission();
+    public abstract boolean hasAdminPermission();
 
-	public abstract boolean hasDeleteEntryPermission();
+    public abstract boolean hasDeleteEntryPermission();
 
     protected abstract void checkDeleteEntryPermission();
 
@@ -166,12 +160,11 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     protected abstract boolean hasConfigurePermission();
 
     /**
-     *
      * @return the amount of revisions existing for the given request (not page-dependant).
      */
-	public abstract int getRevisionAmount();
+    public abstract int getRevisionAmount();
 
-	/**
+    /**
      * Returns the object for which we want to provide access control.
      *
      * @return the access controlled object.
@@ -255,14 +248,13 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     /**
      * Get the current request's 'showVersionDiffs'-parameter. If there is none, "True" is returned.
      *
-     * @return
-     * 		<b>true</b> if the current request has set this parameter to true or not at all.
-     *		<br>
-     * 		<b>false</b> else
+     * @return <b>true</b> if the current request has set this parameter to true or not at all.
+     * <br>
+     * <b>false</b> else
      */
     public String getShowVersionDiffs() {
         String showVersionDiffs = this.getRequestParameter("showVersionDiffs");
-        return (showVersionDiffs  == null) ? "True" : showVersionDiffs;
+        return (showVersionDiffs == null) ? "True" : showVersionDiffs;
     }
 
     /**
@@ -271,8 +263,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * deleted job from the url parameters.
      *
      * @return Differences between two config versions as list of lines.
-     * @throws IOException
-     *             If diff doesn't work or xml files can't be read.
+     * @throws IOException If diff doesn't work or xml files can't be read.
      */
     public final List<Line> getLines() throws IOException {
         final boolean hideVersionDiffs = !Boolean.parseBoolean(getShowVersionDiffs());
@@ -296,12 +287,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             //extract anything that doesnt match.
             String tagThatBelongsInTheNextLine = firstLine.replaceFirst(firstLineRegex, "");
 
-            ret += firstLine.substring(0, firstLine.length()-tagThatBelongsInTheNextLine.length()) + "\n"
-                + tagThatBelongsInTheNextLine + "\n";
+            ret += firstLine.substring(0, firstLine.length() - tagThatBelongsInTheNextLine.length()) + "\n"
+                    + tagThatBelongsInTheNextLine + "\n";
         }
 
         for (int i = 1; i < arr.length; ++i) {
-            if (i < arr.length-1) {
+            if (i < arr.length - 1) {
                 ret = ret.concat(arr[i]).concat("\n");
             } else {
                 ret = ret.concat(arr[i]);
@@ -309,15 +300,16 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         }
         return ret;
     }
+
     /**
      * Returns a unified diff between two string arrays representing an xml file.
      * The order of elements in the xml file is NOT ignored.
      *
-     * @param file1               first config file.
-     * @param file2               second config file.
-     * @param file1Lines          the lines of the first file.
-     * @param file2Lines          the lines of the second file.
-     * @param hideVersionDiffs            determines whether version diffs shall be shown or not.
+     * @param file1            first config file.
+     * @param file2            second config file.
+     * @param file1Lines       the lines of the first file.
+     * @param file2Lines       the lines of the second file.
+     * @param hideVersionDiffs determines whether version diffs shall be shown or not.
      * @return unified diff
      */
     protected final String getDiffAsString(final File file1, final File file2, final String[] file1Lines,
@@ -340,12 +332,12 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             for (AbstractDelta<String> delta : patch.getDeltas()) {
                 // Modify both deltas and save the changes.
 
-                List<String> originalLines = Lists.newArrayList((List<String>) delta.getSource().getLines());
-                List<String> revisedLines = Lists.newArrayList((List<String>) delta.getTarget().getLines());
+                List<String> originalLines = Lists.newArrayList(delta.getSource().getLines());
+                List<String> revisedLines = Lists.newArrayList(delta.getTarget().getLines());
                 for (Difference versionDifference : versionDiffs.getDifferences()) {
                     //check for each calculated versionDifference where it occurred and delete it.
                     String controlValue = versionDifference.getComparison().getControlDetails().getValue().toString();
-                    String testValue     = versionDifference.getComparison().getTestDetails().getValue().toString();
+                    String testValue = versionDifference.getComparison().getTestDetails().getValue().toString();
 
                     //go through both line lists and find pairs.
                     for (int oriLineNumber = 0; oriLineNumber < originalLines.size(); oriLineNumber++) {
@@ -355,10 +347,10 @@ public abstract class JobConfigHistoryBaseAction implements Action {
                         if (currentOriLine.contains(controlValue)) {
                             otherValue = testValue;
 
-                        } else if  (currentOriLine.contains(testValue)) {
+                        } else if (currentOriLine.contains(testValue)) {
                             otherValue = controlValue;
                         } else continue;
-                            //search for test value in the other list
+                        //search for test value in the other list
                         for (int revLineNumber = 0; revLineNumber < revisedLines.size(); revLineNumber++) {
                             String currentRevLine = revisedLines.get(revLineNumber);
                             if (currentRevLine.contains(otherValue)) {
@@ -380,19 +372,18 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         }
 
         return StringUtils.join(
-            UnifiedDiffUtils.generateUnifiedDiff(
-                file1.getPath(),
-                file2.getPath(),
-                Arrays.asList(file1Lines),
-                patch,
-                3
-            ),
-            "\n"
+                UnifiedDiffUtils.generateUnifiedDiff(
+                        file1.getPath(),
+                        file2.getPath(),
+                        Arrays.asList(file1Lines),
+                        patch,
+                        3
+                ),
+                "\n"
         ) + "\n";
     }
 
     /**
-     *
      * @param currentPageNum the current page number
      * @return the same as {@link #getRelevantPageNums(int, int)}, using {@link #getMaxPageNum()} as second parameter.
      */
@@ -401,9 +392,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     /**
-     *
      * @param currentPageNum the current page number
-     * @param maxPageNum the highest page number
+     * @param maxPageNum     the highest page number
      * @return a list representing all page navigation entries which are displayed. These include:
      * <ul>
      *     <li>0</li>
@@ -420,10 +410,10 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         if (maxPageNum > 10) {
             pageNumsSet.add(currentPageNum);
             //add everything in epsilon around current pageNum
-            for (int i = currentPageNum; i <= Math.min(currentPageNum+epsilon, maxPageNum); i++) {
+            for (int i = currentPageNum; i <= Math.min(currentPageNum + epsilon, maxPageNum); i++) {
                 pageNumsSet.add(i);
             }
-            for (int i = currentPageNum; i >= Math.max(0, currentPageNum-epsilon); i--) {
+            for (int i = currentPageNum; i >= Math.max(0, currentPageNum - epsilon); i--) {
                 pageNumsSet.add(i);
             }
         } else {
@@ -437,7 +427,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         int lastNumber = pageNumsList.get(0);
         for (int i = 1; i < pageNumsList.size(); i++) {
             int thisNumber = pageNumsList.get(i);
-            if (lastNumber+1 != thisNumber) {
+            if (lastNumber + 1 != thisNumber) {
                 //add dots before thisNumber. -1 stands for dots (easier than defining a special class etc)
                 pageNumsList.add(i++, -1);
             }
@@ -454,8 +444,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         final String maxEntriesPerPage = getPlugin().getMaxEntriesPerPage();
         try {
             return (maxEntriesPerPage == null || maxEntriesPerPage.equals(""))
-                ? JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE
-                : Integer.parseInt(maxEntriesPerPage);
+                    ? JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE
+                    : Integer.parseInt(maxEntriesPerPage);
         } catch (NumberFormatException e) {
             LOG.log(WARNING, "Configured MaxEntriesPerPage does not represent an integer: {0}. Falling back to default.", maxEntriesPerPage);
             return JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE;
@@ -472,7 +462,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         int revisionAmount = getRevisionAmount();
 
         int div = revisionAmount / entriesPerPage;
-        return (revisionAmount % entriesPerPage) == 0 ? div-1 : div;
+        return (revisionAmount % entriesPerPage) == 0 ? div - 1 : div;
     }
 
     /**
@@ -537,49 +527,49 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return PluginUtils.getHistoryDao();
     }
 
-	private Writer sort(File file) throws IOException {
+    private Writer sort(File file) throws IOException {
         //this produces a sorted xml without indentation.
         try (Reader source = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
-			InputStream xslt = JobConfigHistoryBaseAction.class.getResourceAsStream("xslt/sort.xslt");
-			Objects.requireNonNull(xslt);
-			Transformer transformer = transformerFactory.newTransformer(new StreamSource(xslt));
-			Writer result = new StringWriter();
-			transformer.transform(new SAXSource(new InputSource(source)), new StreamResult(result));
-			transformer.reset();
+            InputStream xslt = JobConfigHistoryBaseAction.class.getResourceAsStream("xslt/sort.xslt");
+            Objects.requireNonNull(xslt);
+            Transformer transformer = transformerFactory.newTransformer(new StreamSource(xslt));
+            Writer result = new StringWriter();
+            transformer.transform(new SAXSource(new InputSource(source)), new StreamResult(result));
+            transformer.reset();
 
-			return result;
-		} catch (TransformerFactoryConfigurationError | TransformerException | NullPointerException e) {
-			LogRecord lr = new LogRecord(Level.WARNING, "Diff may have extra changes for XML config {0}");
-			lr.setParameters(new Object[] { file.toPath() });
-			lr.setThrown(e);
-			LOG.log(lr);
-		}
+            return result;
+        } catch (TransformerFactoryConfigurationError | TransformerException | NullPointerException e) {
+            LogRecord lr = new LogRecord(Level.WARNING, "Diff may have extra changes for XML config {0}");
+            lr.setParameters(new Object[]{file.toPath()});
+            lr.setThrown(e);
+            LOG.log(lr);
+        }
 
-		// fallback - return an original file as is
-		Writer fallback = new StringWriter();
-		new XmlFile(file).writeRawTo(fallback);
-		return fallback;
-	}
+        // fallback - return an original file as is
+        Writer fallback = new StringWriter();
+        new XmlFile(file).writeRawTo(fallback);
+        return fallback;
+    }
 
-	/**
-	 * Takes the two config files and returns the diff between them as a list of
-	 * single lines.
-	 *
-	 * @param leftConfig  first config file
-	 * @param rightConfig second config file
-	 * @return Differences between two config versions as list of lines.
-	 * @throws IOException If diff doesn't work or xml files can't be read.
-	 */
-	protected final List<Line> getLines(XmlFile leftConfig, XmlFile rightConfig, boolean hideVersionDiffs) throws IOException {
+    /**
+     * Takes the two config files and returns the diff between them as a list of
+     * single lines.
+     *
+     * @param leftConfig  first config file
+     * @param rightConfig second config file
+     * @return Differences between two config versions as list of lines.
+     * @throws IOException If diff doesn't work or xml files can't be read.
+     */
+    protected final List<Line> getLines(XmlFile leftConfig, XmlFile rightConfig, boolean hideVersionDiffs) throws IOException {
 
-		final String[] leftLines = sort(leftConfig.getFile()).toString().split("\\n");
-		final String[] rightLines = sort(rightConfig.getFile()).toString().split("\\n");
+        final String[] leftLines = sort(leftConfig.getFile()).toString().split("\\n");
+        final String[] rightLines = sort(rightConfig.getFile()).toString().split("\\n");
 
-		final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines,
+        final String diffAsString = getDiffAsString(leftConfig.getFile(), rightConfig.getFile(), leftLines,
                 rightLines, hideVersionDiffs);
-		final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
+        final List<String> diffLines = Arrays.asList(diffAsString.split("\n"));
 
-		return getDiffLines(diffLines);
-	}
+        return getDiffLines(diffLines);
+    }
 
 }

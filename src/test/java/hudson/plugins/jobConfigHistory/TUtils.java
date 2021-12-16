@@ -24,122 +24,116 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
 /**
- *
  * @author Mirko Friedenhagen
  */
 public class TUtils {
 
-	public static ServletInputStream createServletInputStreamFromMultiPartFormData(
-			final String boundary) {
-		final String body = "--" + boundary + "\r\n"
-				+ "Content-Disposition: form-data; name=\"timestamp1\"\r\n\r\n"
-				+ "2014-02-05_10-42-37\r\n" + "--" + boundary + "\r\n"
-				+ "Content-Disposition: form-data; name=\"timestamp2\"\r\n\r\n"
-				+ "2014-03-12_11-02-12\r\n" + "--" + boundary + "\r\n"
-				+ "Content-Disposition: form-data; name=\"name\"\r\n\r\n"
-				+ "foo\r\n" + "--" + boundary + "--\r\n";
-		final ByteArrayInputStream bodyByteStream = new ByteArrayInputStream(
-				body.getBytes());
-		return new ServletInputStream() {
-			@Override
-			public int read() throws IOException {
-				return bodyByteStream.read();
-			}
+    public static ServletInputStream createServletInputStreamFromMultiPartFormData(
+            final String boundary) {
+        final String body = "--" + boundary + "\r\n"
+                + "Content-Disposition: form-data; name=\"timestamp1\"\r\n\r\n"
+                + "2014-02-05_10-42-37\r\n" + "--" + boundary + "\r\n"
+                + "Content-Disposition: form-data; name=\"timestamp2\"\r\n\r\n"
+                + "2014-03-12_11-02-12\r\n" + "--" + boundary + "\r\n"
+                + "Content-Disposition: form-data; name=\"name\"\r\n\r\n"
+                + "foo\r\n" + "--" + boundary + "--\r\n";
+        final ByteArrayInputStream bodyByteStream = new ByteArrayInputStream(
+                body.getBytes());
+        return new ServletInputStream() {
+            @Override
+            public int read() {
+                return bodyByteStream.read();
+            }
 
-			@Override
-			public boolean isFinished() {
-				// Not needed.
-				return false;
-			}
+            @Override
+            public boolean isFinished() {
+                // Not needed.
+                return false;
+            }
 
-			@Override
-			public boolean isReady() {
-				// Not needed.
-				return false;
-			}
+            @Override
+            public boolean isReady() {
+                // Not needed.
+                return false;
+            }
 
-			@Override
-			public void setReadListener(ReadListener readListener) {
-				// Not needed.
+            @Override
+            public void setReadListener(ReadListener readListener) {
+                // Not needed.
 
-			}
-		};
-	}
+            }
+        };
+    }
 
-	static List<String> readResourceLines(final String resourceName)
-			throws IOException {
-		final InputStream stream = TUtils.class
-				.getResourceAsStream(resourceName);
-		try {
-			return IOUtils.readLines(stream, "UTF-8");
-		} finally {
-			stream.close();
-		}
-	}
+    static List<String> readResourceLines(final String resourceName)
+            throws IOException {
+        try (InputStream stream = TUtils.class
+                .getResourceAsStream(resourceName)) {
+            return IOUtils.readLines(stream, "UTF-8");
+        }
+    }
 
-	/**
-	 * Checks if the path ends by the specified suffix. The method converts
-	 * actual values to system path using {@link FilePathSuffixMatcher}.
-	 * 
-	 * @param expectedSuffix
-	 *            The expected suffix
-	 * @return A matcher for further comparison.
-	 */
-	public static Matcher<String> pathEndsWith(String expectedSuffix) {
-		return new FilePathSuffixMatcher(expectedSuffix);
-	}
+    /**
+     * Checks if the path ends by the specified suffix. The method converts
+     * actual values to system path using {@link FilePathSuffixMatcher}.
+     *
+     * @param expectedSuffix The expected suffix
+     * @return A matcher for further comparison.
+     */
+    public static Matcher<String> pathEndsWith(String expectedSuffix) {
+        return new FilePathSuffixMatcher(expectedSuffix);
+    }
 
-	/**
-	 * A suffix {@link Matcher}, which automatically handles file separators.
-	 *
-	 * @since TODO: define a version
-	 */
-	public static class FilePathSuffixMatcher implements Matcher<String> {
+    /**
+     * A suffix {@link Matcher}, which automatically handles file separators.
+     *
+     * @since TODO: define a version
+     */
+    public static class FilePathSuffixMatcher implements Matcher<String> {
 
-		private final String expectedSuffix;
+        private final String expectedSuffix;
 
-		public FilePathSuffixMatcher(String expectedSuffix) {
-			this.expectedSuffix = FilenameUtils
-					.separatorsToSystem(expectedSuffix);
-		}
+        public FilePathSuffixMatcher(String expectedSuffix) {
+            this.expectedSuffix = FilenameUtils
+                    .separatorsToSystem(expectedSuffix);
+        }
 
-		@Override
-		public boolean matches(Object actual) {
-			if (actual instanceof String) {
-				String actualSystemPath = FilenameUtils
-						.separatorsToSystem((String) actual);
-				return actualSystemPath.endsWith(expectedSuffix);
-			}
-			return false;
-		}
+        @Override
+        public boolean matches(Object actual) {
+            if (actual instanceof String) {
+                String actualSystemPath = FilenameUtils
+                        .separatorsToSystem((String) actual);
+                return actualSystemPath.endsWith(expectedSuffix);
+            }
+            return false;
+        }
 
-		@Override
-		public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {
-			// nop
-		}
+        @Override
+        public void _dont_implement_Matcher___instead_extend_BaseMatcher_() {
+            // nop
+        }
 
-		@Override
-		public void describeTo(Description d) {
-			d.appendText("path with suffix " + expectedSuffix);
-		}
+        @Override
+        public void describeTo(Description d) {
+            d.appendText("path with suffix " + expectedSuffix);
+        }
 
-		@Override
-		public void describeMismatch(Object o, Description d) {
-			d.appendText("path " + o + " has no such suffix");
-		}
-	}
+        @Override
+        public void describeMismatch(Object o, Description d) {
+            d.appendText("path " + o + " has no such suffix");
+        }
+    }
 }

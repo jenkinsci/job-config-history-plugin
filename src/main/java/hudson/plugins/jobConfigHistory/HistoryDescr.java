@@ -33,166 +33,163 @@ import java.util.Date;
  */
 public class HistoryDescr implements ParsedDate {
 
-	public static final HistoryDescr EMPTY_HISTORY_DESCR = new HistoryDescr(
-			null, null, null, null, null, null);
+    public static final HistoryDescr EMPTY_HISTORY_DESCR = new HistoryDescr(
+            null, null, null, null, null, null);
 
-	/** Display name of the user doing the operation. */
-	private final String user;
+    /**
+     * Display name of the user doing the operation.
+     */
+    private final String user;
 
-	/** Id of the user doing the operation. */
-	private final String userId;
+    /**
+     * Id of the user doing the operation.
+     */
+    private final String userId;
 
-	/** Name of the operation. */
-	private final String operation;
+    /**
+     * Name of the operation.
+     */
+    private final String operation;
 
-	/**
-	 * Timestamp of the operation, see
-	 * {@link JobConfigHistoryConsts#ID_FORMATTER}.
-	 */
-	private final String timestamp;
+    /**
+     * Timestamp of the operation, see
+     * {@link JobConfigHistoryConsts#ID_FORMATTER}.
+     */
+    private final String timestamp;
 
-	/** Current name of the job after renaming. */
-	private final String currentName;
+    /**
+     * Current name of the job after renaming.
+     */
+    private final String currentName;
 
-	/** Old name of the job before renaming. */
-	private final String oldName;
+    /**
+     * Old name of the job before renaming.
+     */
+    private final String oldName;
 
-	/* The reason for this configuration change*/
-	private final String changeReasonComment;
+    /* The reason for this configuration change*/
+    private final String changeReasonComment;
 
-	/**
-	 * @param user
-	 *            display name of the user doing the operation
-	 * @param userId
-	 *            id of the user doing the operation
-	 * @param operation
-	 *            name of the operation
-	 * @param timestamp
-	 *            timestamp of the operation
-	 * @param currentName
-	 *            the current name after renaming
-	 * @param oldName
-	 *            the name before renaming
-	 */
-	public HistoryDescr(String user, String userId, String operation,
-			String timestamp, String currentName, String oldName) {
-		this.user = user;
-		this.userId = userId;
-		this.operation = operation;
-		this.timestamp = timestamp;
-		this.currentName = currentName;
-		this.oldName = oldName;
-		this.changeReasonComment = null;
-	}
+    /**
+     * @param user        display name of the user doing the operation
+     * @param userId      id of the user doing the operation
+     * @param operation   name of the operation
+     * @param timestamp   timestamp of the operation
+     * @param currentName the current name after renaming
+     * @param oldName     the name before renaming
+     */
+    public HistoryDescr(String user, String userId, String operation,
+                        String timestamp, String currentName, String oldName) {
+        this.user = user;
+        this.userId = userId;
+        this.operation = operation;
+        this.timestamp = timestamp;
+        this.currentName = currentName;
+        this.oldName = oldName;
+        this.changeReasonComment = null;
+    }
 
-	/**
-	 * @param user
-	 *            display name of the user doing the operation
-	 * @param userId
-	 *            id of the user doing the operation
-	 * @param operation
-	 *            name of the operation
-	 * @param timestamp
-	 *            timestamp of the operation
-	 * @param currentName
-	 *            the current name after renaming
-	 * @param oldName
-	 *            the name before renaming
-	 */
-	public HistoryDescr(String user, String userId, String operation,
-						String timestamp, String currentName, String oldName, String changeReasonComment) {
-		this.user = user;
-		this.userId = userId;
-		this.operation = operation;
-		this.timestamp = timestamp;
-		this.currentName = currentName;
-		this.oldName = oldName;
-		this.changeReasonComment = changeReasonComment;
-	}
+    /**
+     * @param user        display name of the user doing the operation
+     * @param userId      id of the user doing the operation
+     * @param operation   name of the operation
+     * @param timestamp   timestamp of the operation
+     * @param currentName the current name after renaming
+     * @param oldName     the name before renaming
+     */
+    public HistoryDescr(String user, String userId, String operation,
+                        String timestamp, String currentName, String oldName, String changeReasonComment) {
+        this.user = user;
+        this.userId = userId;
+        this.operation = operation;
+        this.timestamp = timestamp;
+        this.currentName = currentName;
+        this.oldName = oldName;
+        this.changeReasonComment = changeReasonComment;
+    }
 
-	/**
-	 * Returns display name of the user doing the operation.
-	 *
-	 * @return display name of the user
-	 */
-	public String getUser() {
-		return user;
-	}
+    /**
+     * Returns display name of the user doing the operation.
+     *
+     * @return display name of the user
+     */
+    public String getUser() {
+        return user;
+    }
 
-	/**
-	 * Returns id of the user doing the operation.
-	 *
-	 * @return id of the user
-	 */
-	public String getUserID() {
-		return userId;
-	}
+    /**
+     * Returns id of the user doing the operation.
+     *
+     * @return id of the user
+     */
+    public String getUserID() {
+        return userId;
+    }
 
-	/**
-	 * Returns name of the operation.
-	 *
-	 * @return name of the operation
-	 */
-	public String getOperation() {
-		return operation;
-	}
+    /**
+     * Returns name of the operation.
+     *
+     * @return name of the operation
+     */
+    public String getOperation() {
+        return operation;
+    }
 
-	/**
-	 * Returns timestamp of the operation.
-	 *
-	 * @return timestamp
-	 */
-	public String getTimestamp() {
-		return timestamp;
-	}
+    /**
+     * Returns timestamp of the operation.
+     *
+     * @return timestamp
+     */
+    public String getTimestamp() {
+        return timestamp;
+    }
 
-	/**
-	 * Returns a {@link Date}.
-	 *
-	 * @return The parsed date as a java.util.Date.
-	 */
-	@Override
-	public Date parsedDate() {
-		return PluginUtils.parsedDate(getTimestamp());
-	}
+    /**
+     * Returns a {@link Date}.
+     *
+     * @return The parsed date as a java.util.Date.
+     */
+    @Override
+    public Date parsedDate() {
+        return PluginUtils.parsedDate(getTimestamp());
+    }
 
-	/**
-	 * Returns the current job name after renaming.
-	 * 
-	 * @return the current job name
-	 */
-	public String getCurrentName() {
-		return currentName;
-	}
+    /**
+     * Returns the current job name after renaming.
+     *
+     * @return the current job name
+     */
+    public String getCurrentName() {
+        return currentName;
+    }
 
-	/**
-	 * Returns the old job name before renaming.
-	 * 
-	 * @return the old job name
-	 */
-	public String getOldName() {
-		return oldName;
-	}
+    /**
+     * Returns the old job name before renaming.
+     *
+     * @return the old job name
+     */
+    public String getOldName() {
+        return oldName;
+    }
 
-	@Override
-	public String toString() {
-		return "HistoryDescr{" +
-			"user='" + user + '\'' +
-			", userId='" + userId + '\'' +
-			", operation='" + operation + '\'' +
-			", timestamp='" + timestamp + '\'' +
-			", currentName='" + currentName + '\'' +
-			", oldName='" + oldName + '\'' +
-			", changeReasonComment='" + changeReasonComment + '\'' +
-			'}';
-	}
+    @Override
+    public String toString() {
+        return "HistoryDescr{" +
+                "user='" + user + '\'' +
+                ", userId='" + userId + '\'' +
+                ", operation='" + operation + '\'' +
+                ", timestamp='" + timestamp + '\'' +
+                ", currentName='" + currentName + '\'' +
+                ", oldName='" + oldName + '\'' +
+                ", changeReasonComment='" + changeReasonComment + '\'' +
+                '}';
+    }
 
 
-	/**
-	 *
-	 * @return the comment on why the config has been changed. null, if not given.
-	 */
-	public String getChangeReasonComment() {
-		return changeReasonComment;
-	}
+    /**
+     * @return the comment on why the config has been changed. null, if not given.
+     */
+    public String getChangeReasonComment() {
+        return changeReasonComment;
+    }
 }

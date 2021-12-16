@@ -23,11 +23,10 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import java.io.IOException;
-
 import com.thoughtworks.xstream.mapper.CannotResolveClassException;
-
 import hudson.XmlFile;
+
+import java.io.IOException;
 
 /**
  * Lazy loader for HistoryDescr as preparation for paging.
@@ -36,94 +35,93 @@ import hudson.XmlFile;
  */
 public class LazyHistoryDescr extends HistoryDescr {
 
-	HistoryDescr historyDescr = HistoryDescr.EMPTY_HISTORY_DESCR;
-	private final XmlFile historyDescriptionFile;
+    private final XmlFile historyDescriptionFile;
+    HistoryDescr historyDescr = HistoryDescr.EMPTY_HISTORY_DESCR;
 
-	/**
-	 *
-	 * @param historyDescriptionFile
-	 */
-	public LazyHistoryDescr(XmlFile historyDescriptionFile) {
-		super(null, null, null, null, null, null);
-		this.historyDescriptionFile = historyDescriptionFile;
-	}
+    /**
+     * @param historyDescriptionFile
+     */
+    public LazyHistoryDescr(XmlFile historyDescriptionFile) {
+        super(null, null, null, null, null, null);
+        this.historyDescriptionFile = historyDescriptionFile;
+    }
 
-	/**
-	 * {@inheritDoc}.
-	 */
-	@Override
-	public String getUser() {
-		return loadAndGetHistory().getUser();
-	}
+    /**
+     * {@inheritDoc}.
+     */
+    @Override
+    public String getUser() {
+        return loadAndGetHistory().getUser();
+    }
 
-	/**
-	 * {@inheritDoc}.
-	 */
-	@Override
-	public String getUserID() {
-		return loadAndGetHistory().getUserID();
-	}
+    /**
+     * {@inheritDoc}.
+     */
+    @Override
+    public String getUserID() {
+        return loadAndGetHistory().getUserID();
+    }
 
-	/**
-	 * {@inheritDoc}.
-	 */
-	@Override
-	public String getOperation() {
-		return loadAndGetHistory().getOperation();
-	}
+    /**
+     * {@inheritDoc}.
+     */
+    @Override
+    public String getOperation() {
+        return loadAndGetHistory().getOperation();
+    }
 
-	/**
-	 * {@inheritDoc}.
-	 */
-	@Override
-	public String getCurrentName() {
-		return loadAndGetHistory().getCurrentName();
-	}
+    /**
+     * {@inheritDoc}.
+     */
+    @Override
+    public String getCurrentName() {
+        return loadAndGetHistory().getCurrentName();
+    }
 
-	/**
-	 * {@inheritDoc}.
-	 */
-	@Override
-	public String getOldName() {
-		return loadAndGetHistory().getOldName();
-	}
+    /**
+     * {@inheritDoc}.
+     */
+    @Override
+    public String getOldName() {
+        return loadAndGetHistory().getOldName();
+    }
 
-	/**
-	 * {@inheritDoc}.
-	 */
-	@Override
-	public String getTimestamp() {
-		return loadAndGetHistory().getTimestamp();
-	}
+    /**
+     * {@inheritDoc}.
+     */
+    @Override
+    public String getTimestamp() {
+        return loadAndGetHistory().getTimestamp();
+    }
 
 
-	/**
-	 * {@inheritDoc}.
-	 */
-	@Override
-	public String getChangeReasonComment() {
-		return loadAndGetHistory().getChangeReasonComment();
-	}
+    /**
+     * {@inheritDoc}.
+     */
+    @Override
+    public String getChangeReasonComment() {
+        return loadAndGetHistory().getChangeReasonComment();
+    }
 
-	/**
-	 * Loads configurations on first access of any property.
-	 * 
-	 * @return historyDescr
-	 */
-	private HistoryDescr loadAndGetHistory() {
-		if (historyDescr == HistoryDescr.EMPTY_HISTORY_DESCR) {
-			try {
-				historyDescr = (HistoryDescr) historyDescriptionFile.read();
-			} catch (IOException ex) {
-				throw new RuntimeException(
-						"Unable to read " + historyDescriptionFile.getFile(),
-						ex);
-			} catch (CannotResolveClassException ex) {
-				throw new RuntimeException(historyDescriptionFile.getFile()
-						+ " is not a history description", ex);
-			}
-		}
-		return historyDescr;
-	}
+    /**
+     * Loads configurations on first access of any property.
+     *
+     * @return historyDescr
+     */
+    private HistoryDescr loadAndGetHistory() {
+        if (historyDescr == HistoryDescr.EMPTY_HISTORY_DESCR) {
+            try {
+                historyDescr = (HistoryDescr) historyDescriptionFile.read();
+            } catch (IOException ex) {
+                throw new RuntimeException(
+                        "Unable to read " + historyDescriptionFile.getFile(),
+                        ex);
+            } catch (CannotResolveClassException ex) {
+                throw new RuntimeException(historyDescriptionFile.getFile()
+                        + " is not a history description", ex);
+            }
+        }
+        return historyDescr;
+    }
 
 }

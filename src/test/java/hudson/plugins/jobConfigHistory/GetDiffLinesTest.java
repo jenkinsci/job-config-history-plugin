@@ -23,46 +23,45 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import com.github.difflib.patch.DiffException;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
 
-import com.github.difflib.patch.DiffException;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
- *
  * @author Mirko Friedenhagen
  */
 public class GetDiffLinesTest {
 
-	/**
-	 * Test of get method, of class GetDiffLines.
-	 */
-	@Test
-	public void testGet() throws IOException, DiffException {
-		GetDiffLines sut = createGetDiffLines();
-		List<SideBySideView.Line> result = sut.get();
-		assertEquals(24, result.size());
-		SideBySideView.Line firstLine = result.get(0);
-		assertEquals("import bmsi.util.Diff;", firstLine.getLeft().getText());
-		assertEquals("import bmsi.util.Diff;", firstLine.getRight().getText());
-		SideBySideView.Line fourthLine = result.get(3);
-		final SideBySideView.Line.Item left = fourthLine.getLeft();
-		final SideBySideView.Line.Item right = fourthLine.getRight();
-		assertEquals("3", right.getLineNumber());
-		assertNull(left.getText());
-		assertEquals("import org.kohsuke.stapler.StaplerRequest;",
-				right.getText());
-		assertEquals("diff_original", left.getCssClass());
-		assertEquals("diff_revised", right.getCssClass());
-	}
+    /**
+     * Test of get method, of class GetDiffLines.
+     */
+    @Test
+    public void testGet() throws IOException, DiffException {
+        GetDiffLines sut = createGetDiffLines();
+        List<SideBySideView.Line> result = sut.get();
+        assertEquals(24, result.size());
+        SideBySideView.Line firstLine = result.get(0);
+        assertEquals("import bmsi.util.Diff;", firstLine.getLeft().getText());
+        assertEquals("import bmsi.util.Diff;", firstLine.getRight().getText());
+        SideBySideView.Line fourthLine = result.get(3);
+        final SideBySideView.Line.Item left = fourthLine.getLeft();
+        final SideBySideView.Line.Item right = fourthLine.getRight();
+        assertEquals("3", right.getLineNumber());
+        assertNull(left.getText());
+        assertEquals("import org.kohsuke.stapler.StaplerRequest;",
+                right.getText());
+        assertEquals("diff_original", left.getCssClass());
+        assertEquals("diff_revised", right.getCssClass());
+    }
 
-	GetDiffLines createGetDiffLines() throws IOException {
-		final String resourceName = "diff.txt";
-		final List<String> lines = TUtils.readResourceLines(resourceName);
-		return new GetDiffLines(lines);
-	}
+    GetDiffLines createGetDiffLines() throws IOException {
+        final String resourceName = "diff.txt";
+        final List<String> lines = TUtils.readResourceLines(resourceName);
+        return new GetDiffLines(lines);
+    }
 }

@@ -26,37 +26,31 @@ package hudson.plugins.jobConfigHistory;
 import hudson.model.Node;
 
 /**
- *
  * @author Lucie Votypkova
  */
 public interface NodeListenerHistoryDao {
 
-	/**
-	 * Adds and saves the initial configuration of a node.
-	 *
-	 * @param node
-	 *            node
-	 */
-	void createNewNode(Node node);
+    /**
+     * Adds and saves the initial configuration of a node.
+     *
+     * @param node node
+     */
+    void createNewNode(Node node);
 
-	/**
-	 * Save and renames the node.
-	 *
-	 * @param node
-	 *            node
-	 * @param oldName
-	 *            old node name
-	 * @param newName
-	 *            new name
-	 */
-	void renameNode(Node node, String oldName, String newName);
+    /**
+     * Save and renames the node.
+     *
+     * @param node    node
+     * @param oldName old node name
+     * @param newName new name
+     */
+    void renameNode(Node node, String oldName, String newName);
 
-	/**
-	 * Deletes the history of an node.
-	 *
-	 * @param node
-	 *            node
-	 */
-	void deleteNode(Node node);
+    /**
+     * Deletes the history of a node.
+     *
+     * @param node node
+     */
+    void deleteNode(Node node);
 
 }

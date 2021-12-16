@@ -34,23 +34,24 @@ import java.io.FileFilter;
  */
 public class HistoryFileFilter implements FileFilter {
 
-	/** Singleton. */
-	public static final HistoryFileFilter INSTANCE = new HistoryFileFilter();
+    /**
+     * Singleton.
+     */
+    public static final HistoryFileFilter INSTANCE = new HistoryFileFilter();
 
-	@Override
-	public boolean accept(File file) {
-		return file.exists()
-				&& new File(file, JobConfigHistoryConsts.HISTORY_FILE).exists();
-	}
+    /**
+     * Is file a history directory?
+     *
+     * @param file to inspect
+     * @return true, when file denotes a history directory.
+     */
+    public static boolean accepts(File file) {
+        return INSTANCE.accept(file);
+    }
 
-	/**
-	 * Is file a history directory?
-	 *
-	 * @param file
-	 *            to inspect
-	 * @return true, when file denotes a history directory.
-	 */
-	public static boolean accepts(File file) {
-		return INSTANCE.accept(file);
-	}
+    @Override
+    public boolean accept(File file) {
+        return file.exists()
+                && new File(file, JobConfigHistoryConsts.HISTORY_FILE).exists();
+    }
 }

@@ -1,274 +1,272 @@
 package hudson.plugins.jobConfigHistory;
 
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import hudson.model.FreeStyleProject;
+import hudson.model.Result;
+import jenkins.model.Jenkins;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.junit.Assert;
 import org.jvnet.hudson.test.recipes.LocalData;
 import org.jvnet.hudson.test.recipes.PresetData;
 import org.jvnet.hudson.test.recipes.PresetData.DataSet;
 
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
-import hudson.model.FreeStyleProject;
-import hudson.model.Result;
-import jenkins.model.Jenkins;
-
 public class JobConfigBadgeActionIT
-		extends
-			AbstractHudsonTestCaseDeletingInstanceDir {
+        extends
+        AbstractHudsonTestCaseDeletingInstanceDir {
 
-	private WebClient webClient;
-	private static final int SLEEP_TIME = 1100;
+    private static final int SLEEP_TIME = 1100;
+    private WebClient webClient;
 
-	@Override
-	public void before() throws Throwable {
-		super.before();
-		webClient = new WebClient();
-	}
+    @Override
+    public void before() throws Throwable {
+        super.before();
+        webClient = new WebClient();
+    }
 
-	public void testBadgeAction() throws Exception {
-		final String jobName = "newjob";
-		final String description = "a description";
-		final FreeStyleProject project = createFreeStyleProject(jobName);
+    public void testBadgeAction() throws Exception {
+        final String jobName = "newjob";
+        final String description = "a description";
+        final FreeStyleProject project = createFreeStyleProject(jobName);
 
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-		HtmlPage htmlPage = webClient.goTo("job/" + jobName);
-		Assert.assertFalse("Page should not contain build badge",
-				htmlPage.asXml().contains("buildbadge.svg"));
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        HtmlPage htmlPage = webClient.goTo("job/" + jobName);
+        Assert.assertFalse("Page should not contain build badge",
+                htmlPage.asXml().contains("buildbadge.svg"));
 
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-		htmlPage = (HtmlPage) htmlPage.refresh();
-		Assert.assertFalse("Page should still not contain build badge",
-				htmlPage.asXml().contains("buildbadge.svg"));
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        htmlPage = (HtmlPage) htmlPage.refresh();
+        Assert.assertFalse("Page should still not contain build badge",
+                htmlPage.asXml().contains("buildbadge.svg"));
 
-		project.setDescription(description);
-		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        project.setDescription(description);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
-		htmlPage = (HtmlPage) htmlPage.refresh();
-		Assert.assertTrue("Page should contain build badge",
-				htmlPage.asXml().contains("buildbadge.svg"));
-	}
+        htmlPage = (HtmlPage) htmlPage.refresh();
+        Assert.assertTrue("Page should contain build badge",
+                htmlPage.asXml().contains("buildbadge.svg"));
+    }
 
-	public void testBadgeAfterRename() throws Exception {
-		final String oldName = "firstjobname";
-		final String newName = "secondjobname";
+    public void testBadgeAfterRename() throws Exception {
+        final String oldName = "firstjobname";
+        final String newName = "secondjobname";
 
-		final FreeStyleProject project = createFreeStyleProject(oldName);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-		Thread.sleep(SLEEP_TIME);
+        final FreeStyleProject project = createFreeStyleProject(oldName);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
 
-		project.renameTo(newName);
-		Thread.sleep(SLEEP_TIME);
-		project.scheduleBuild2(0).get();
+        project.renameTo(newName);
+        Thread.sleep(SLEEP_TIME);
+        project.scheduleBuild2(0).get();
 
-		final HtmlPage htmlPage = webClient.goTo("job/" + newName);
-		Assert.assertTrue("Page should contain build badge",
-				htmlPage.asXml().contains("buildbadge.svg"));
+        final HtmlPage htmlPage = webClient.goTo("job/" + newName);
+        Assert.assertTrue("Page should contain build badge",
+                htmlPage.asXml().contains("buildbadge.svg"));
 
-		final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
-				.getElementById("showDiff");
-		final HtmlPage showDiffPage = showDiffLink.click();
-		Assert.assertTrue("ShowDiffFiles page should be reached now",
-				showDiffPage.asText().contains("No lines changed"));
-	}
+        final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
+                .getElementById("showDiff");
+        final HtmlPage showDiffPage = showDiffLink.click();
+        Assert.assertTrue("ShowDiffFiles page should be reached now",
+                showDiffPage.asText().contains("No lines changed"));
+    }
 
-	public void testCorrectLinkTargetsAfterRename() throws Exception {
-		final String oldName = "jobname1";
-		final String newName = "jobname2";
-		final String oldDescription = "first description";
-		final String newDescription = "second description";
+    public void testCorrectLinkTargetsAfterRename() throws Exception {
+        final String oldName = "jobname1";
+        final String newName = "jobname2";
+        final String oldDescription = "first description";
+        final String newDescription = "second description";
 
-		final FreeStyleProject project = createFreeStyleProject(oldName);
-		project.setDescription(oldDescription);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-		Thread.sleep(SLEEP_TIME);
+        final FreeStyleProject project = createFreeStyleProject(oldName);
+        project.setDescription(oldDescription);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
 
-		project.setDescription(newDescription);
-		Thread.sleep(SLEEP_TIME);
-		project.scheduleBuild2(0).get();
+        project.setDescription(newDescription);
+        Thread.sleep(SLEEP_TIME);
+        project.scheduleBuild2(0).get();
 
-		final HtmlPage htmlPage = webClient.goTo("job/" + oldName);
-		final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
-				.getElementById("showDiff");
-		final HtmlPage showDiffPage = showDiffLink.click();
-		Assert.assertTrue("ShowDiffFiles page should be reached now",
-				showDiffPage.asText().contains("Older"));
+        final HtmlPage htmlPage = webClient.goTo("job/" + oldName);
+        final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
+                .getElementById("showDiff");
+        final HtmlPage showDiffPage = showDiffLink.click();
+        Assert.assertTrue("ShowDiffFiles page should be reached now",
+                showDiffPage.asText().contains("Older"));
 
-		project.renameTo(newName);
-		Thread.sleep(SLEEP_TIME);
-		project.scheduleBuild2(0).get();
+        project.renameTo(newName);
+        Thread.sleep(SLEEP_TIME);
+        project.scheduleBuild2(0).get();
 
-		// Test whether build badge link that was created before rename still
-		// leads to correct page
-		final HtmlPage htmlPage2 = webClient.goTo("job/" + newName);
-		final HtmlAnchor oldShowDiffLink = (HtmlAnchor) htmlPage2
-				.getByXPath("//a[@id='showDiff']").get(1);
-		final HtmlPage showDiffPage2 = oldShowDiffLink.click();
-		Assert.assertTrue("ShowDiffFiles page should be reached now",
-				showDiffPage2.asText().contains("Older"));
-	}
+        // Test whether build badge link that was created before rename still
+        // leads to correct page
+        final HtmlPage htmlPage2 = webClient.goTo("job/" + newName);
+        final HtmlAnchor oldShowDiffLink = (HtmlAnchor) htmlPage2
+                .getByXPath("//a[@id='showDiff']").get(1);
+        final HtmlPage showDiffPage2 = oldShowDiffLink.click();
+        Assert.assertTrue("ShowDiffFiles page should be reached now",
+                showDiffPage2.asText().contains("Older"));
+    }
 
-	public void testProjectWithConfigsButMissingBuilds() throws Exception {
-		final FreeStyleProject project = createFreeStyleProject();
-		Thread.sleep(SLEEP_TIME);
-		project.setDescription("bla");
-		Thread.sleep(SLEEP_TIME);
-		project.updateNextBuildNumber(5);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-	}
+    public void testProjectWithConfigsButMissingBuilds() throws Exception {
+        final FreeStyleProject project = createFreeStyleProject();
+        Thread.sleep(SLEEP_TIME);
+        project.setDescription("bla");
+        Thread.sleep(SLEEP_TIME);
+        project.updateNextBuildNumber(5);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+    }
 
-	@LocalData
-	public void testBuildWithoutHistoryDir() throws Exception {
-		final FreeStyleProject project = (FreeStyleProject) jenkins
-				.getItem("Test1");
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-	}
+    @LocalData
+    public void testBuildWithoutHistoryDir() throws Exception {
+        final FreeStyleProject project = (FreeStyleProject) jenkins
+                .getItem("Test1");
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+    }
 
-	@LocalData
-	public void testBuildWithoutHistoryEntries() throws Exception {
-		final FreeStyleProject project = (FreeStyleProject) jenkins
-				.getItem("Test2");
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-	}
+    @LocalData
+    public void testBuildWithoutHistoryEntries() throws Exception {
+        final FreeStyleProject project = (FreeStyleProject) jenkins
+                .getItem("Test2");
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+    }
 
-	@PresetData(DataSet.ANONYMOUS_READONLY)
-	public void testBadgeConfigurationAnonymous() throws Exception {
-		final String jobName = "newjob";
-		final String description = "a description";
-		final FreeStyleProject project = createFreeStyleProject(jobName);
+    @PresetData(DataSet.ANONYMOUS_READONLY)
+    public void testBadgeConfigurationAnonymous() throws Exception {
+        final String jobName = "newjob";
+        final String description = "a description";
+        final FreeStyleProject project = createFreeStyleProject(jobName);
 
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-		Thread.sleep(SLEEP_TIME);
-		project.setDescription(description);
-		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
+        project.setDescription(description);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
-		jenkins.setSecurityRealm(createDummySecurityRealm());
-		SecurityContextHolder.getContext().setAuthentication(Jenkins.ANONYMOUS);
-		shouldPageContainBadge("anonymous");
-	}
+        jenkins.setSecurityRealm(createDummySecurityRealm());
+        SecurityContextHolder.getContext().setAuthentication(Jenkins.ANONYMOUS);
+        shouldPageContainBadge("anonymous");
+    }
 
-	@LocalData
-	public void testBadgeConfigurationWithPermissions() throws Exception {
-		final String jobName = "newjob";
-		final String description = "a description";
-		final FreeStyleProject project = createFreeStyleProject(jobName);
+    @LocalData
+    public void testBadgeConfigurationWithPermissions() throws Exception {
+        final String jobName = "newjob";
+        final String description = "a description";
+        final FreeStyleProject project = createFreeStyleProject(jobName);
 
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-		Thread.sleep(SLEEP_TIME);
-		project.setDescription(description);
-		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
+        project.setDescription(description);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
-		jenkins.setSecurityRealm(createDummySecurityRealm());
-		webClient.login("configUser");
-		shouldPageContainBadge("configUser");
+        jenkins.setSecurityRealm(createDummySecurityRealm());
+        webClient.login("configUser");
+        shouldPageContainBadge("configUser");
 
-		webClient.login("administrator");
-		shouldPageContainBadge("admin");
-	}
+        webClient.login("administrator");
+        shouldPageContainBadge("admin");
+    }
 
-	private void shouldPageContainBadge(String user) throws Exception {
-		final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
-		HtmlPage htmlPage = webClient.goTo("job/newjob");
+    private void shouldPageContainBadge(String user) throws Exception {
+        final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+        HtmlPage htmlPage = webClient.goTo("job/newjob");
 
-		// default = always
-		Assert.assertTrue("Page should contain build badge",
-				htmlPage.asXml().contains("buildbadge.svg"));
+        // default = always
+        Assert.assertTrue("Page should contain build badge",
+                htmlPage.asXml().contains("buildbadge.svg"));
 
-		jch.setShowBuildBadges("never");
-		htmlPage = (HtmlPage) htmlPage.refresh();
-		Assert.assertFalse("Page should not contain build badge",
-				htmlPage.asXml().contains("buildbadge.svg"));
+        jch.setShowBuildBadges("never");
+        htmlPage = (HtmlPage) htmlPage.refresh();
+        Assert.assertFalse("Page should not contain build badge",
+                htmlPage.asXml().contains("buildbadge.svg"));
 
-		jch.setShowBuildBadges("userWithConfigPermission");
-		htmlPage = (HtmlPage) htmlPage.refresh();
+        jch.setShowBuildBadges("userWithConfigPermission");
+        htmlPage = (HtmlPage) htmlPage.refresh();
 
-		if (("configUser").equals(user) || ("admin").equals(user)) {
-			Assert.assertTrue("Page should contain build badge",
-					htmlPage.asXml().contains("buildbadge.svg"));
-		} else {
-			Assert.assertFalse("Page should not contain build badge",
-					htmlPage.asXml().contains("buildbadge.svg"));
-		}
+        if (("configUser").equals(user) || ("admin").equals(user)) {
+            Assert.assertTrue("Page should contain build badge",
+                    htmlPage.asXml().contains("buildbadge.svg"));
+        } else {
+            Assert.assertFalse("Page should not contain build badge",
+                    htmlPage.asXml().contains("buildbadge.svg"));
+        }
 
-		jch.setShowBuildBadges("adminUser");
-		htmlPage = (HtmlPage) htmlPage.refresh();
+        jch.setShowBuildBadges("adminUser");
+        htmlPage = (HtmlPage) htmlPage.refresh();
 
-		if (("admin").equals(user)) {
-			Assert.assertTrue("Page should contain build badge",
-					htmlPage.asXml().contains("buildbadge.svg"));
-		} else {
-			Assert.assertFalse("Page should not contain build badge",
-					htmlPage.asXml().contains("buildbadge.svg"));
-		}
-	}
+        if (("admin").equals(user)) {
+            Assert.assertTrue("Page should contain build badge",
+                    htmlPage.asXml().contains("buildbadge.svg"));
+        } else {
+            Assert.assertFalse("Page should not contain build badge",
+                    htmlPage.asXml().contains("buildbadge.svg"));
+        }
+    }
 
-	public void testCorrectShowDiffLinkWithSingleChange() throws Exception {
-		final String jobName = "testjob";
-		final FreeStyleProject project = createFreeStyleProject(jobName);
-		project.setDescription("first description");
-		Thread.sleep(SLEEP_TIME);
+    public void testCorrectShowDiffLinkWithSingleChange() throws Exception {
+        final String jobName = "testjob";
+        final FreeStyleProject project = createFreeStyleProject(jobName);
+        project.setDescription("first description");
+        Thread.sleep(SLEEP_TIME);
 
-		final String secondDescription = "second description";
-		project.setDescription(secondDescription);
-		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-		Thread.sleep(SLEEP_TIME);
+        final String secondDescription = "second description";
+        project.setDescription(secondDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
 
-		final String lastDescription = "last description";
-		project.setDescription(lastDescription);
-		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        final String lastDescription = "last description";
+        project.setDescription(lastDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
-		HtmlPage htmlPage = webClient.goTo("job/" + jobName);
-		Assert.assertTrue("Page should contain build badge",
-				htmlPage.asXml().contains("buildbadge.svg"));
+        HtmlPage htmlPage = webClient.goTo("job/" + jobName);
+        Assert.assertTrue("Page should contain build badge",
+                htmlPage.asXml().contains("buildbadge.svg"));
 
-		final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
-				.getElementById("showDiff");
-		final HtmlPage showDiffPage = showDiffLink.click();
-		final String page = showDiffPage.asText();
-		Assert.assertTrue("ShowDiffFiles page should be reached now",
-				page.contains("Older"));
-		Assert.assertTrue("ShowDiff page should contain second description",
-				page.contains(secondDescription));
-		Assert.assertTrue("ShowDiff page should contain last description",
-				page.contains(lastDescription));
-	}
+        final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
+                .getElementById("showDiff");
+        final HtmlPage showDiffPage = showDiffLink.click();
+        final String page = showDiffPage.asText();
+        Assert.assertTrue("ShowDiffFiles page should be reached now",
+                page.contains("Older"));
+        Assert.assertTrue("ShowDiff page should contain second description",
+                page.contains(secondDescription));
+        Assert.assertTrue("ShowDiff page should contain last description",
+                page.contains(lastDescription));
+    }
 
-	public void testCorrectShowDiffLinkWithMultipleChanges() throws Exception {
-		final String jobName = "testjob";
+    public void testCorrectShowDiffLinkWithMultipleChanges() throws Exception {
+        final String jobName = "testjob";
 
-		final FreeStyleProject project = createFreeStyleProject(jobName);
-		project.setDescription("first description");
-		Thread.sleep(SLEEP_TIME);
-		final String secondDescription = "second description";
-		project.setDescription(secondDescription);
-		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
-		Thread.sleep(SLEEP_TIME);
+        final FreeStyleProject project = createFreeStyleProject(jobName);
+        project.setDescription("first description");
+        Thread.sleep(SLEEP_TIME);
+        final String secondDescription = "second description";
+        project.setDescription(secondDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        Thread.sleep(SLEEP_TIME);
 
-		for (int i = 3; i < 6; i++) {
-			project.setDescription("description no. " + i);
-			Thread.sleep(SLEEP_TIME);
-		}
-		final String lastDescription = "last description";
-		project.setDescription(lastDescription);
-		Thread.sleep(SLEEP_TIME);
-		assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
+        for (int i = 3; i < 6; i++) {
+            project.setDescription("description no. " + i);
+            Thread.sleep(SLEEP_TIME);
+        }
+        final String lastDescription = "last description";
+        project.setDescription(lastDescription);
+        Thread.sleep(SLEEP_TIME);
+        assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
-		HtmlPage htmlPage = webClient.goTo("job/" + jobName);
-		final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
-				.getElementById("showDiff");
-		final HtmlPage showDiffPage = showDiffLink.click();
-		final String page = showDiffPage.asText();
-		Assert.assertTrue("ShowDiffFiles page should be reached now",
-				page.contains("Older"));
-		Assert.assertTrue("ShowDiff page should contain second description",
-				page.contains(secondDescription));
-		Assert.assertTrue("ShowDiff page should contain last description",
-				page.contains(lastDescription));
-	}
+        HtmlPage htmlPage = webClient.goTo("job/" + jobName);
+        final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
+                .getElementById("showDiff");
+        final HtmlPage showDiffPage = showDiffLink.click();
+        final String page = showDiffPage.asText();
+        Assert.assertTrue("ShowDiffFiles page should be reached now",
+                page.contains("Older"));
+        Assert.assertTrue("ShowDiff page should contain second description",
+                page.contains(secondDescription));
+        Assert.assertTrue("ShowDiff page should contain last description",
+                page.contains(lastDescription));
+    }
 }

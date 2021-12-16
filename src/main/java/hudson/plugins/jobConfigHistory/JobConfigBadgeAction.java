@@ -23,11 +23,6 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
 import hudson.Extension;
 import hudson.model.BuildBadgeAction;
 import hudson.model.Job;
@@ -37,6 +32,11 @@ import hudson.model.listeners.RunListener;
 import jenkins.model.Jenkins;
 import jenkins.model.RunAction2;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 /**
  * This class adds a badge to the build history marking builds that occurred
  * after the configuration was changed.
@@ -45,219 +45,215 @@ import jenkins.model.RunAction2;
  */
 public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
 
-	/**
-	 * The dates of the last two config changes as Strings.
-	 */
-	private String[] configDates;
+    /**
+     * The dates of the last two config changes as Strings.
+     */
+    private final String[] configDates;
 
-	/**
-	 * We need the build in order to get the project name.
-	 */
-	private transient Run<?, ?> build;
+    /**
+     * We need the build in order to get the project name.
+     */
+    private transient Run<?, ?> build;
 
-	/**
-	 * Creates a new JobConfigBadgeAction.
-	 *
-	 * @param configDates
-	 *            The dates of the last two config changes
-	 */
-	JobConfigBadgeAction(String[] configDates) {
-		this.configDates = configDates.clone();
-		this.build = null;
-	}
+    /**
+     * Creates a new JobConfigBadgeAction.
+     *
+     * @param configDates The dates of the last two config changes
+     */
+    JobConfigBadgeAction(String[] configDates) {
+        this.configDates = configDates.clone();
+        this.build = null;
+    }
 
-	@Override
-	public void onAttached(Run<?, ?> r) {
-		build = r;
+    @Override
+    public void onAttached(Run<?, ?> r) {
+        build = r;
 
-	}
+    }
 
-	@Override
-	public void onLoad(Run<?, ?> r) {
-		build = r;
-	}
+    @Override
+    public void onLoad(Run<?, ?> r) {
+        build = r;
+    }
 
-	/**
-	 * Listener.
-	 */
-	@Extension
-	public static class Listener extends RunListener<Run<?, ?>> {
+    /**
+     * Returns true if the config change build badges should appear (depending
+     * on plugin settings and user permissions). Called from badge.jelly.
+     *
+     * @return True if badges should appear.
+     */
+    public boolean showBadge() {
+        return getPlugin().showBuildBadges(build.getParent());
+    }
 
-		@Override
-		public void onStarted(Run<?, ?> build, TaskListener listener) {
-			final Job<?, ?> project = build.getParent();
-			if (project.getNextBuildNumber() <= 2) {
-				super.onStarted(build, listener);
-				return;
-			}
+    /**
+     * Check if the config history files that are attached to the build still
+     * exist.
+     *
+     * @return True if both files exist.
+     */
+    public boolean oldConfigsExist() {
+        final HistoryDao historyDao = getHistoryDao();
+        final Job<?, ?> project = build.getParent();
+        for (String timestamp : configDates) {
+            if (!historyDao.hasOldRevision(project.getConfigFile(),
+                    timestamp)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-			Date lastBuildDate = null;
-			final Run<?, ?> lastBuild = project.getLastBuild();
-			if (lastBuild != null) {
-				Run<?, ?> previousBuild = lastBuild.getPreviousBuild();
-				if(previousBuild != null)
-					lastBuildDate = previousBuild.getTime();
-			}
-			final List<HistoryDescr> historyDescriptions = getRevisions(
-					project);
-			if (historyDescriptions.size() > 1) {
-				Collections.sort(historyDescriptions,
-						ParsedDateComparator.DESCENDING);
-				final HistoryDescr lastChange = Collections.min(
-						historyDescriptions, ParsedDateComparator.DESCENDING);
-				final Date lastConfigChange = lastChange.parsedDate();
+    /**
+     * Creates the target for the link to the showDiffFiles page.
+     *
+     * @return Link target as String.
+     */
+    public String createLink() {
+        return getRootUrl() + build.getParent().getUrl()
+                + JobConfigHistoryConsts.URLNAME + "/showDiffFiles?timestamp1="
+                + configDates[1] + "&timestamp2=" + configDates[0];
+    }
 
-				if (lastBuildDate != null
-						&& lastConfigChange.after(lastBuildDate)) {
-					final String[] dates = {lastChange.getTimestamp(),
-							findLastRelevantConfigChangeDate(
-									historyDescriptions, lastBuildDate),};
-					build.addAction(new JobConfigBadgeAction(dates));
-				}
-			}
+    /**
+     * Returns the root URL.
+     *
+     * @return root-URL of Jenkins.
+     */
+    String getRootUrl() {
+        return Jenkins.get().getRootUrl();
+    }
 
-			super.onStarted(build, listener);
-		}
+    /**
+     * Returns tooltip so users know what our nice little icon stands for.
+     *
+     * @return Explanatory text as string
+     */
+    public String getTooltip() {
+        return Messages.JobConfigBadgeAction_ToolTip();
+    }
 
-		/**
-		 * For tests.
-		 * 
-		 * @param project
-		 *            to inspect.
-		 * @return list of revisions
-		 */
-		List<HistoryDescr> getRevisions(final Job<?, ?> project) {
-			final HistoryDao historyDao = PluginUtils.getHistoryDao();
-			return new ArrayList<>(historyDao.getRevisions(project.getConfigFile()).values());
-		}
+    /**
+     * Returns the path to our nice little icon.
+     *
+     * @return Icon path as string
+     */
+    public String getIcon() {
+        return "/plugin/jobConfigHistory/img/buildbadge.svg";
+    }
 
-		/**
-		 * Finds the date of the last config change that happened before the
-		 * last build. This is needed for the link in the build history that
-		 * shows the difference between the current configuration and the
-		 * version that was in place when the last build happened.
-		 *
-		 * @param historyDescriptions
-		 *            An ArrayList full of HistoryDescr.
-		 * @param lastBuildDate
-		 *            The date of the lastBuild (as Date).
-		 * @return The date of the last relevant config change (as String).
-		 */
-		private String findLastRelevantConfigChangeDate(
-				List<HistoryDescr> historyDescriptions, Date lastBuildDate) {
-			for (HistoryDescr oldConfigChange : historyDescriptions.subList(1,
-					historyDescriptions.size())) {
-				final Date changeDate = oldConfigChange.parsedDate();
-				if (changeDate != null && changeDate.before(lastBuildDate)) {
-					return oldConfigChange.getTimestamp();
-				}
-			}
-			return historyDescriptions.get(1).getTimestamp();
-		}
-	} // end Listener
+    /**
+     * Non-use interface method. {@inheritDoc}
+     */
+    public String getIconFileName() {
+        return null;
+    }
 
-	/**
-	 * Returns true if the config change build badges should appear (depending
-	 * on plugin settings and user permissions). Called from badge.jelly.
-	 *
-	 * @return True if badges should appear.
-	 */
-	public boolean showBadge() {
-		return getPlugin().showBuildBadges(build.getParent());
-	}
+    /**
+     * Non-use interface method. {@inheritDoc}
+     */
+    public String getDisplayName() {
+        return null;
+    }
 
-	/**
-	 * Check if the config history files that are attached to the build still
-	 * exist.
-	 *
-	 * @return True if both files exist.
-	 */
-	public boolean oldConfigsExist() {
-		final HistoryDao historyDao = getHistoryDao();
-		final Job<?, ?> project = build.getParent();
-		for (String timestamp : configDates) {
-			if (!historyDao.hasOldRevision(project.getConfigFile(),
-					timestamp)) {
-				return false;
-			}
-		}
-		return true;
-	}
+    /**
+     * Non-use interface method. {@inheritDoc}
+     */
+    public String getUrlName() {
+        return "";
+    }
 
-	/**
-	 * Creates the target for the link to the showDiffFiles page.
-	 *
-	 * @return Link target as String.
-	 */
-	public String createLink() {
-		return getRootUrl() + build.getParent().getUrl()
-				+ JobConfigHistoryConsts.URLNAME + "/showDiffFiles?timestamp1="
-				+ configDates[1] + "&timestamp2=" + configDates[0];
-	}
-	
-	/**
-	 * Returns the root URL.
-	 * 
-	 * @return root-URL of Jenkins.
-	 */
-	String getRootUrl() {
-		return Jenkins.get().getRootUrl();
-	}
+    /**
+     * Returns the plugin for tests.
+     *
+     * @return plugin
+     */
+    JobConfigHistory getPlugin() {
+        return PluginUtils.getPlugin();
+    }
 
-	/**
-	 * Returns tooltip so users know what our nice little icon stands for.
-	 *
-	 * @return Explanatory text as string
-	 */
-	public String getTooltip() {
-		return Messages.JobConfigBadgeAction_ToolTip();
-	}
+    /**
+     * For tests.
+     *
+     * @return listener
+     */
 
-	/**
-	 * Returns the path to our nice little icon.
-	 *
-	 * @return Icon path as string
-	 */
-	public String getIcon() {
-		return "/plugin/jobConfigHistory/img/buildbadge.svg";
-	}
+    HistoryDao getHistoryDao() {
+        return PluginUtils.getHistoryDao();
+    }
 
-	/**
-	 * Non-use interface method. {@inheritDoc}
-	 */
-	public String getIconFileName() {
-		return null;
-	}
+    /**
+     * Listener.
+     */
+    @Extension
+    public static class Listener extends RunListener<Run<?, ?>> {
 
-	/**
-	 * Non-use interface method. {@inheritDoc}
-	 */
-	public String getDisplayName() {
-		return null;
-	}
+        @Override
+        public void onStarted(Run<?, ?> build, TaskListener listener) {
+            final Job<?, ?> project = build.getParent();
+            if (project.getNextBuildNumber() <= 2) {
+                super.onStarted(build, listener);
+                return;
+            }
 
-	/**
-	 * Non-use interface method. {@inheritDoc}
-	 */
-	public String getUrlName() {
-		return "";
-	}
-	/**
-	 * Returns the plugin for tests.
-	 *
-	 * @return plugin
-	 */
-	JobConfigHistory getPlugin() {
-		return PluginUtils.getPlugin();
-	}
+            Date lastBuildDate = null;
+            final Run<?, ?> lastBuild = project.getLastBuild();
+            if (lastBuild != null) {
+                Run<?, ?> previousBuild = lastBuild.getPreviousBuild();
+                if (previousBuild != null)
+                    lastBuildDate = previousBuild.getTime();
+            }
+            final List<HistoryDescr> historyDescriptions = getRevisions(
+                    project);
+            if (historyDescriptions.size() > 1) {
+                historyDescriptions.sort(ParsedDateComparator.DESCENDING);
+                final HistoryDescr lastChange = Collections.min(
+                        historyDescriptions, ParsedDateComparator.DESCENDING);
+                final Date lastConfigChange = lastChange.parsedDate();
 
-	/**
-	 * For tests.
-	 *
-	 * @return listener
-	 */
+                if (lastBuildDate != null
+                        && lastConfigChange.after(lastBuildDate)) {
+                    final String[] dates = {lastChange.getTimestamp(),
+                            findLastRelevantConfigChangeDate(
+                                    historyDescriptions, lastBuildDate),};
+                    build.addAction(new JobConfigBadgeAction(dates));
+                }
+            }
 
-	HistoryDao getHistoryDao() {
-		return PluginUtils.getHistoryDao();
-	}
+            super.onStarted(build, listener);
+        }
+
+        /**
+         * For tests.
+         *
+         * @param project to inspect.
+         * @return list of revisions
+         */
+        List<HistoryDescr> getRevisions(final Job<?, ?> project) {
+            final HistoryDao historyDao = PluginUtils.getHistoryDao();
+            return new ArrayList<>(historyDao.getRevisions(project.getConfigFile()).values());
+        }
+
+        /**
+         * Finds the date of the last config change that happened before the
+         * last build. This is needed for the link in the build history that
+         * shows the difference between the current configuration and the
+         * version that was in place when the last build happened.
+         *
+         * @param historyDescriptions An ArrayList full of HistoryDescr.
+         * @param lastBuildDate       The date of the lastBuild (as Date).
+         * @return The date of the last relevant config change (as String).
+         */
+        private String findLastRelevantConfigChangeDate(
+                List<HistoryDescr> historyDescriptions, Date lastBuildDate) {
+            for (HistoryDescr oldConfigChange : historyDescriptions.subList(1,
+                    historyDescriptions.size())) {
+                final Date changeDate = oldConfigChange.parsedDate();
+                if (changeDate != null && changeDate.before(lastBuildDate)) {
+                    return oldConfigChange.getTimestamp();
+                }
+            }
+            return historyDescriptions.get(1).getTimestamp();
+        }
+    } // end Listener
 }

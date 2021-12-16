@@ -36,7 +36,7 @@ h1 {
 }
 
 table {
-    margin-top: 0px;
+    margin-top: 0;
     border-spacing: 0;
     border: 1px solid #ddd;
     border-bottom-left-radius: 3px;
@@ -65,7 +65,7 @@ table.center th {
 }
 
 table.center td {
-    padding:0px;
+    padding:0;
     width:100%
 }
 
@@ -105,7 +105,7 @@ table.jch .caption {
 	padding: 12px;
 
 	border:1px solid #383838;
-	border-bottom: 0px solid #ddd;
+	border-bottom: 0 solid #ddd;
 
 	border-top-left-radius: 3px;
 	border-top-right-radius: 3px;
@@ -158,19 +158,19 @@ table.jch tr.alternate:nth-child(odd) {
 }
 
 table.jch th:first-child {
-    border-left: 0px;
+    border-left: 0;
 }
 
 table.jch th:last-child {
-    border-right: 0px;
+    border-right: 0;
 }
 
 table.jch tr td:first-child {
-    border-left:0px;
+    border-left:0;
 }
 
 table.jch tr td:last-child {
-    border-right:0px;
+    border-right:0;
 }
 
 table.jch groupBody td:last-child {
@@ -186,7 +186,6 @@ table.jch groupBody td:last-child {
     padding: 2px;
     background-color: rgb(250,250,250);
     border: 1px solid rgb(232, 232, 232);
-    border:0px;
     border-radius:2px;
 }
 
@@ -286,14 +285,14 @@ a.download-arrow:hover{
 .jch-footer {
     position: sticky;
     //left:0;
-    bottom: 0px;
+    bottom: 0;
     width:100%;
 }
 
 .footer-content-wrapper {
     background-color:rgb(250, 250, 250);
     width:100%;
-    padding:0px;
+    padding:0;
     border: 1px solid rgb(232, 232, 232);
     border: 1px solid rgb(190, 190, 190);
 }
@@ -322,7 +321,7 @@ a.download-arrow:hover{
   border-radius: 3px;
   height:25px;
   width:25px;
-  padding:0px;
+  padding:0;
 
   display: table-cell;
   vertical-align: middle;
@@ -354,7 +353,7 @@ a.download-arrow:hover{
 }
 
 .collapseableContent {
-  padding: 0 0px;
+  padding: 0 0;
   background-color: white;
   max-height: 0;
   overflow: hidden;
@@ -382,9 +381,7 @@ a.download-arrow:hover{
 
     padding: 2px;
 
-    border:1px solid rgb(204, 204, 204);
-    border-bottom: 1px solid rgb(204, 204, 204);
-    border-top-left-radius: 3px;
+    border: 1px solid rgb(204, 204, 204);
     border-radius: 3px;
 }
 
@@ -434,9 +431,7 @@ table.sortable.jch a.sortheader {
     color: white;
     border: 1px solid #383838;
     border-radius: 2px;
-    padding: 12px;
-    padding-top:7px;
-    padding-bottom:7px;
+    padding: 7px 12px;
     margin-top:3px;
     margin-right:3px;
     font-size: 14px;
@@ -456,10 +451,8 @@ a.standard-button {
 
 .delete-button {
     background-color: rgba(0,0,0, 0.0);
-    border:0px;
-    padding: 2px;
-    padding-left: 35px;
-    padding-right:35px;
+    border:0;
+    padding: 2px 35px;
 }
 
 .delete-button:hover{
@@ -616,9 +609,7 @@ div.jch-warning span.describedElement {
     color:rgba(255,255,255,0.9);
     background-color:rgba(217, 143, 35,0.9);
     border-radius:3px;
-    padding:2px;
-    padding-top:0px;
-    padding-bottom:0px;
+    padding: 0 2px 0;
 }
 
 table.no-borders-warning {

@@ -24,27 +24,27 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import java.io.File;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Mirko Friedenhagen
  */
 public class FileNameComparatorTest {
 
-	/**
-	 * Test of compare method, of class FileNameComparator.
-	 */
-	@Test
-	public void testCompare() {
-		File f1 = new File("a");
-		File f2 = new File("a");
-		int expResult = 0;
-		int result = FileNameComparator.INSTANCE.compare(f1, f2);
-		assertEquals(expResult, result);
-	}
+    /**
+     * Test of compare method, of class FileNameComparator.
+     */
+    @Test
+    public void testCompare() {
+        File f1 = new File("a");
+        File f2 = new File("a");
+        int expResult = 0;
+        int result = FileNameComparator.INSTANCE.compare(f1, f2);
+        assertEquals(expResult, result);
+    }
 
 }
