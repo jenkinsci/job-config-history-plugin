@@ -3,7 +3,7 @@ Job Configuration History Plugin
 [![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins/jobConfigHistory-plugin/master)](https://ci.jenkins.io/job/plugins/job/jobConfigHistory-plugin/)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/jobConfigHistory.svg)](https://plugins.jenkins.io/jobConfigHistory)
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/jobConfigHistory.svg?color=blue)](https://plugins.jenkins.io/jobConfigHistory)
-[![Contributors](https://img.shields.io/github/contributors/jenkinsci/jobConfigHistory-plugin.svg)](https://github.com/jenkinsci/jobConfigHistory-plugin/graphs/contributors)
+[![Contributors](https://img.shields.io/github/contributors/jenkinsci/jobConfigHistory-plugin.svg)](https://github.com/jenkinsci/job-config-history-plugin/graphs/contributors)
 
 Saves copies of all job and system configurations.
 
@@ -65,7 +65,7 @@ If you use this plugin together with the [Cluster Statistics Plugin](https://plu
 # Changelog
 
 See
-[Changelog](https://github.com/jenkinsci/jobConfigHistory-plugin/releases/tag/jobConfigHistory-2.27)
+[Changelog](https://github.com/jenkinsci/job-config-history-plugin/releases)
 on Github.
 
 ------------------------------------------------------------------------

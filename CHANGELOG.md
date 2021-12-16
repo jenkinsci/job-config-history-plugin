@@ -1,19 +1,19 @@
-# Changelog moved to [GitHub Releases](https://github.com/jenkinsci/jobConfigHistory-plugin/releases)
+# Changelog moved to [GitHub Releases](https://github.com/jenkinsci/job-config-history-plugin/releases)
 
 ## 2.28.1 (July 16 2021)
-* revert [PR #129](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/129)
+* revert [PR #129](https://github.com/jenkinsci/job-config-history-plugin/pull/129)
 
 ## 2.28 (July 2 2021)
-* [PR #126](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/126) fix biggest style errors
-* [PR #129](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/129) remove Jenkins.get().getRootUrl() to generate relative url
+* [PR #126](https://github.com/jenkinsci/job-config-history-plugin/pull/126) fix biggest style errors
+* [PR #129](https://github.com/jenkinsci/job-config-history-plugin/pull/129) remove Jenkins.get().getRootUrl() to generate relative url
 
 ## 2.27 (April 7 2021)
-* [PR #127](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/127) [JEP-227] Prepare plugin for Acegi update
+* [PR #127](https://github.com/jenkinsci/job-config-history-plugin/pull/127) [JEP-227] Prepare plugin for Acegi update
 
 ## 2.26 (April 30 2020)
 * [JENKINS-61049](https://issues.jenkins-ci.org/browse/JENKINS-61049) Move documentation from jenkins wiki to github
-* [PR #118](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/118) Simplify code
-* [PR #123](https://github.com/jenkinsci/jobConfigHistory-plugin/pull/123) Remove debug lines
+* [PR #118](https://github.com/jenkinsci/job-config-history-plugin/pull/118) Simplify code
+* [PR #123](https://github.com/jenkinsci/job-config-history-plugin/pull/123) Remove debug lines
 
 ## 2.25 (March 13 2020)
 * Remove unused HTML help files (PR #117) Thanks, darxriggs 

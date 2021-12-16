@@ -39,17 +39,17 @@
 
     <name>Jenkins Job Configuration History Plugin</name>
     <description>Saves copies of job, node and system configurations.</description>
-    <url>https://github.com/jenkinsci/jobConfigHistory-plugin/</url>
+    <url>https://github.com/jenkinsci/job-config-history-plugin</url>
 
     <issueManagement>
         <system>JIRA</system>
-        <url>https://issues.jenkins-ci.org/issues/?jql=project %3D Jenkins AND status in (Open, "In Progress", Reopened) AND component %3D jobconfighistory-plugin</url>
+        <url>https://issues.jenkins.io/issues/?jql=project+%3D+JENKINS+AND+component+%3D+jobconfighistory-plugin</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git://github.com/jenkinsci/jobConfigHistory-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:jenkinsci/jobConfigHistory-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/jobConfigHistory-plugin</url>
+        <connection>scm:git:git://github.com/jenkinsci/job-config-history-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/job-config-history-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/job-config-history-plugin</url>
         <tag>${scmTag}</tag>
     </scm>
 
