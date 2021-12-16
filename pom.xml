@@ -35,7 +35,7 @@
 
     <artifactId>jobConfigHistory</artifactId>
     <packaging>hpi</packaging>
-    <version>2.29-SNAPSHOT</version>
+    <version>${revision}${changelist}</version>
 
     <name>Jenkins Job Configuration History Plugin</name>
     <description>Saves copies of job, node and system configurations.</description>
@@ -50,7 +50,7 @@
         <connection>scm:git:git://github.com/jenkinsci/jobConfigHistory-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/jobConfigHistory-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/jobConfigHistory-plugin</url>
-        <tag>HEAD</tag>
+        <tag>${scmTag}</tag>
     </scm>
 
     <ciManagement>
@@ -75,6 +75,8 @@
     </developers>
 
     <properties>
+        <revision>2.29</revision>
+        <changelist>-SNAPSHOT</changelist>
         <jenkins.version>2.164</jenkins.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-surefire-report-plugin.version>${maven-surefire-plugin.version}</maven-surefire-report-plugin.version>
