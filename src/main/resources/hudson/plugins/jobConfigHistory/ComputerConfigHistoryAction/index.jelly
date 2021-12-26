@@ -115,7 +115,7 @@
                         </td>
                         <j:if test="${it.hasDeleteEntryPermission()}">
                           <td style="text-align:center">
-                              <j:set var="message" value="${%Do you really want to delete the history entry }"/>
+                              <j:set var="message" value="${%Do you really want to delete the history entry} "/>
                               <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
                                 <l:icon class="icon-stop icon-sm" alt="${%Delete Revision}"/>
                               </button>

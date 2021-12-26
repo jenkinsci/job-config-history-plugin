@@ -85,7 +85,7 @@
                         <th style="text-align:center">${%File A}</th>
                         <th style="text-align:center">${%File B}</th>
                         <j:if test="${it.hasDeleteEntryPermission()}">
-                          <th style="text-align:center">Delete Entry</th>
+                          <th style="text-align:center">${%Delete Entry}</th>
                         </j:if>
                       </tr>
                     </thead>
@@ -122,7 +122,7 @@
                         <j:if test="${it.hasDeleteEntryPermission()}">
                           <j:if test="${!config.operation.toString().equals(&quot;Deleted&quot;)}">
                             <td style="text-align:center">
-                                  <j:set var="message" value="${%Do you really want to delete the history entry }"/>
+                                  <j:set var="message" value="${%Do you really want to delete the history entry} "/>
                                   <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', '${config.getJob()}', '${message}')" value="X">
                                     <l:icon class="icon-stop icon-sm" alt="${%Delete Revision}"/>
                                   </button>
