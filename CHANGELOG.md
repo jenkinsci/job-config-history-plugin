@@ -105,7 +105,7 @@
 
 ## Version 2.11 (April 17 2015)
 * Avoid calling User.current() during Jenkins initialization (Thanks to Thomas de Grenier de Latour)
-* Avoid tracking changes for cloud slave as well (Thanks to Ryan Campbel)
+* Avoid tracking changes for cloud agents as well (Thanks to Ryan Campbel)
 
 ## Version 2.10 (November 12 2014)
 * Fix proposal for NPE in ComputerHistoryListener.onConfigurationChange method (Thanks to William Bernardet)
@@ -129,7 +129,7 @@
 ## Version 2.6 (Apr 14 2014)
 * Diff view: easily review changes sequentially (Next/Previous links) (JENKINS-21411)
 * Show Config Versions in Diff View (JENKINS-21406)
-* Add config history for slaves too (Thanks to Lucie Votypkova)
+* Add config history for agents too (Thanks to Lucie Votypkova)
 * Folder integration (JENKINS-20990) (Thanks to Jesse Glick)
 
 ## Version 2.5 (Oct 31 2013)

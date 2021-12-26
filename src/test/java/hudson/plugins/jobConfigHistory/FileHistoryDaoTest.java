@@ -746,11 +746,11 @@ public class FileHistoryDaoTest {
 
     @Test
     public void testCreateNewNode() throws Exception {
-        when(mockedNode.getNodeName()).thenReturn("slave1");
+        when(mockedNode.getNodeName()).thenReturn("agentOne");
         sutWithUserAndNoDuplicateHistory.createNewNode(mockedNode);
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
-        File revisions = new File(file, "slave1");
-        assertEquals("Slave1 should have only one save history.", 1,
+        File revisions = new File(file, "agentOne");
+        assertEquals("agentOne should have only one save history.", 1,
                 revisions.list().length);
         File config = new File(revisions.listFiles()[0], "config.xml");
         assertTrue("File config.xml should be saved.", config.exists());
@@ -765,9 +765,9 @@ public class FileHistoryDaoTest {
      * {@link #testRenameNode()}.
      */
     private void printTestData(Callable<Void> func) throws Exception {
-        when(mockedNode.getNodeName()).thenReturn("slave1");
+        when(mockedNode.getNodeName()).thenReturn("agentOne");
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
-        File revisions = new File(file, "slave1");
+        File revisions = new File(file, "agentOne");
         File revision = new File(revisions, "2014-01-20_10-12-34");
         revision.mkdirs();
         File config = new File(revision, "config.xml");
@@ -808,7 +808,7 @@ public class FileHistoryDaoTest {
 
     @Test
     public void testGetRevisions() throws Exception {
-        when(mockedNode.getNodeName()).thenReturn("slave1");
+        when(mockedNode.getNodeName()).thenReturn("agentOne");
         createNodeRevisionManually("2014-01-18_10-12-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-18_10-12-34"));
         createNodeRevisionManually("2014-01-19_10-12-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-19_10-12-34"));
         createNodeRevisionManually("2014-01-20_10-12-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-20_10-12-34"));
@@ -828,7 +828,7 @@ public class FileHistoryDaoTest {
 
     private File createNodeRevisionManually(String timestamp, String configXmlContent, String historyXmlContent) throws IOException {
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
-        File revisions = new File(file, "slave1");
+        File revisions = new File(file, "agentOne");
         File revision = new File(revisions, timestamp);
         revision.mkdirs();
         FileUtils.writeStringToFile(
@@ -867,7 +867,7 @@ public class FileHistoryDaoTest {
     private File createNodeRevision(String timestamp, Node mockedNode)
             throws Exception {
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
-        File revisions = new File(file, "slave1");
+        File revisions = new File(file, "agentOne");
         File revision = new File(revisions, timestamp);
         revision.mkdirs();
         Jenkins.XSTREAM2.toXMLUTF8(mockedNode,
@@ -881,9 +881,9 @@ public class FileHistoryDaoTest {
 
     @Test
     public void testSaveNode() {
-        when(mockedNode.getNodeName()).thenReturn("slave1");
+        when(mockedNode.getNodeName()).thenReturn("agentOne");
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
-        File revisions = new File(file, "slave1");
+        File revisions = new File(file, "agentOne");
         sutWithUserAndNoDuplicateHistory.saveNode(mockedNode);
         assertEquals("New revision should be saved.", 1,
                 revisions.list().length);
@@ -891,7 +891,7 @@ public class FileHistoryDaoTest {
 
     @Test
     public void testGetOldRevision_Node() throws Exception {
-        when(mockedNode.getNodeName()).thenReturn("slave1");
+        when(mockedNode.getNodeName()).thenReturn("agentOne");
         when(mockedNode.getNumExecutors()).thenReturn(1);
         File revision1 = createNodeRevision("2014-01-18_10-12-34", mockedNode);
         when(mockedNode.getNumExecutors()).thenReturn(2);

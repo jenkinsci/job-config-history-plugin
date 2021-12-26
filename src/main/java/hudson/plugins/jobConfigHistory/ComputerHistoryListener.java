@@ -71,7 +71,7 @@ public class ComputerHistoryListener extends ComputerListener {
     }
 
     /**
-     * If a new slave get added.
+     * If a new agent gets added.
      */
     private void onAdd() {
         Jenkins jenkins = Jenkins.get();
@@ -93,7 +93,7 @@ public class ComputerHistoryListener extends ComputerListener {
     }
 
     /**
-     * If a slave get removed.
+     * If an agent gets removed.
      */
     private void onRemove() {
         Jenkins jenkins = Jenkins.get();
@@ -107,7 +107,7 @@ public class ComputerHistoryListener extends ComputerListener {
     }
 
     /**
-     * If a slave configuration get changed.
+     * If an agent configuration get changed.
      */
     private void onChange() {
         Jenkins jenkins = Jenkins.get();
@@ -122,7 +122,7 @@ public class ComputerHistoryListener extends ComputerListener {
     }
 
     /**
-     * If a slave get renamed.
+     * If an agent gets renamed.
      */
     private void onRename() {
         Node originalNode = null;
@@ -179,19 +179,19 @@ public class ComputerHistoryListener extends ComputerListener {
 
         @Override
         public void createNewNode(Node node) {
-            LOG.log(Level.FINEST, "onCreated: not an Slave {0}, skipping.",
+            LOG.log(Level.FINEST, "onCreated: not an agent {0}, skipping.",
                     node);
         }
 
         @Override
         public void renameNode(Node node, String oldName, String newName) {
-            LOG.log(Level.FINEST, "onRenamed: not an Slave {0}, skipping.",
+            LOG.log(Level.FINEST, "onRenamed: not an agent {0}, skipping.",
                     node);
         }
 
         @Override
         public void deleteNode(Node node) {
-            LOG.log(Level.FINEST, "onDeleted: not an Slave {0}, skipping.",
+            LOG.log(Level.FINEST, "onDeleted: not an agent {0}, skipping.",
                     node);
         }
 

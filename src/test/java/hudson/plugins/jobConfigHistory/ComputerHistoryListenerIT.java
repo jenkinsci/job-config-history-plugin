@@ -23,15 +23,15 @@ public class ComputerHistoryListenerIT {
 
     @Test
     public void testOnConfigurationChange_create() throws Exception {
-        Slave slave1 = rule.createOnlineSlave();
+        Slave agentOne = rule.createOnlineSlave();
         JobConfigHistoryStrategy dao = PluginUtils.getHistoryDao();
-        SortedMap<String, HistoryDescr> revisions = dao.getRevisions(slave1);
+        SortedMap<String, HistoryDescr> revisions = dao.getRevisions(agentOne);
         assertNotNull("Revisions should exists.", revisions);
         assertFalse("Revisions should not be empty.", revisions.isEmpty());
         assertEquals("Revisions should contains 1 revision.", 1,
                 revisions.size());
         String firstKey = revisions.firstKey();
-        HistoryDescr descr = dao.getRevisions(slave1).get(firstKey);
+        HistoryDescr descr = dao.getRevisions(agentOne).get(firstKey);
         assertEquals("Revisions should have status created.",
                 Messages.ConfigHistoryListenerHelper_CREATED(),
                 descr.getOperation());
@@ -39,84 +39,84 @@ public class ComputerHistoryListenerIT {
 
     @Test
     public void testOnConfigurationChange_rename() throws Exception {
-        Slave slave1 = rule.createOnlineSlave();
-        Slave slave2 = rule.createOnlineSlave();
-        Slave slave3 = rule.createOnlineSlave();
-        HtmlForm form = rule.createWebClient().getPage(slave2, "configure")
+        Slave agentOne = rule.createOnlineSlave();
+        Slave agentTwo = rule.createOnlineSlave();
+        Slave agentThree = rule.createOnlineSlave();
+        HtmlForm form = rule.createWebClient().getPage(agentTwo, "configure")
                 .getFormByName("config");
         HtmlInput element = form.getInputByName("_.name");
-        element.setValueAttribute("newSlaveName");
+        element.setValueAttribute("newAgentName");
         rule.submit(form);
-        slave2 = (Slave) rule.jenkins.getNode("newSlaveName");
+        agentTwo = (Slave) rule.jenkins.getNode("newAgentName");
         JobConfigHistoryStrategy dao = PluginUtils.getHistoryDao();
         assertEquals(
-                "Revisions of " + slave1.getNodeName()
+                "Revisions of " + agentOne.getNodeName()
                         + " should contains 1 revision.",
-                1, dao.getRevisions(slave1).size());
+                1, dao.getRevisions(agentOne).size());
         assertEquals(
-                "Revisions of " + slave2.getNodeName()
+                "Revisions of " + agentTwo.getNodeName()
                         + " should contains 2 revision.",
-                2, dao.getRevisions(slave2).size());
+                2, dao.getRevisions(agentTwo).size());
         assertEquals(
-                "Revisions of " + slave3.getNodeName()
+                "Revisions of " + agentThree.getNodeName()
                         + " should contains 1 revision.",
-                1, dao.getRevisions(slave3).size());
-        String key = dao.getRevisions(slave2).lastKey();
+                1, dao.getRevisions(agentThree).size());
+        String key = dao.getRevisions(agentTwo).lastKey();
         assertEquals(
-                "The last revision of slave " + slave2.getNodeName()
+                "The last revision of agent " + agentTwo.getNodeName()
                         + " should have state renamed.",
                 Messages.ConfigHistoryListenerHelper_RENAMED(),
-                dao.getRevisions(slave2).get(key).getOperation());
+                dao.getRevisions(agentTwo).get(key).getOperation());
     }
 
     @Test
     public void testOnConfigurationChange_delete() throws Exception {
-        Slave slave1 = rule.createOnlineSlave();
-        Slave slave2 = rule.createOnlineSlave();
-        Slave slave3 = rule.createOnlineSlave();
-        rule.jenkins.removeNode(slave2);
+        Slave agentOne = rule.createOnlineSlave();
+        Slave agentTwo = rule.createOnlineSlave();
+        Slave agentThree = rule.createOnlineSlave();
+        rule.jenkins.removeNode(agentTwo);
         JobConfigHistoryStrategy dao = PluginUtils.getHistoryDao();
         assertEquals(
-                "Revisions of " + slave1.getNodeName()
+                "Revisions of " + agentOne.getNodeName()
                         + " should contains 1 revision.",
-                1, dao.getRevisions(slave1).size());
-        assertEquals(slave2.getNodeName() + " should have any revision.", 0,
-                dao.getRevisions(slave2).size());
+                1, dao.getRevisions(agentOne).size());
+        assertEquals(agentTwo.getNodeName() + " should have any revision.", 0,
+                dao.getRevisions(agentTwo).size());
         assertEquals(
-                "Revisions of " + slave3.getNodeName()
+                "Revisions of " + agentThree.getNodeName()
                         + " should contains 1 revision.",
-                1, dao.getRevisions(slave3).size());
+                1, dao.getRevisions(agentThree).size());
     }
 
     @Test
     public void testOnConfigurationChange_change() throws Exception {
-        Slave slave1 = rule.createOnlineSlave();
-        Slave slave2 = rule.createOnlineSlave();
-        Slave slave3 = rule.createOnlineSlave();
-        HtmlForm form = rule.createWebClient().getPage(slave2, "configure")
+        Slave agentOne = rule.createOnlineSlave();
+        Slave agentTwo = rule.createOnlineSlave();
+        Slave agentThree = rule.createOnlineSlave();
+        HtmlForm form = rule.createWebClient().getPage(agentTwo, "configure")
                 .getFormByName("config");
         HtmlInput element = form.getInputByName("_.nodeDescription");
         element.setValueAttribute("Node description");
         rule.submit(form);
         JobConfigHistoryStrategy dao = PluginUtils.getHistoryDao();
         assertEquals(
-                "Revisions of " + slave1.getNodeName()
+                "Revisions of " + agentOne.getNodeName()
                         + " should contains 1 revision.",
-                1, dao.getRevisions(slave1).size());
+                1, dao.getRevisions(agentOne).size());
         assertEquals(
-                "Revisions of " + slave2.getNodeName()
+                "Revisions of " + agentTwo.getNodeName()
                         + " should contains 2 revision.",
-                2, dao.getRevisions(slave2).size());
+                2, dao.getRevisions(agentTwo).size());
         assertEquals(
-                "Revisions of " + slave3.getNodeName()
+                "Revisions of " + agentThree.getNodeName()
                         + " should contains 1 revision.",
-                1, dao.getRevisions(slave3).size());
-        String key = dao.getRevisions(slave2).lastKey();
+                1, dao.getRevisions(agentThree).size());
+        String key = dao.getRevisions(agentTwo).lastKey();
         assertEquals(
-                "The last revision of slave " + slave2.getNodeName()
+                "The last revision of agent " + agentTwo.getNodeName()
                         + " should have state changed.",
                 Messages.ConfigHistoryListenerHelper_CHANGED(),
-                dao.getRevisions(slave2).get(key).getOperation());
+                dao.getRevisions(agentTwo).get(key).getOperation());
     }
 
 }

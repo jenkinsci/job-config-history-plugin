@@ -50,7 +50,7 @@
           <j:when test="${!it.hasConfigurePermission()}">
             ${%No permission to view config history}
           </j:when>
-          <j:when test="${it.getSlaveConfigs().size() == 0}">
+          <j:when test="${it.getAgentConfigs().size() == 0}">
             ${%No agent configuration history available}
           </j:when>
           <j:otherwise>
@@ -91,7 +91,7 @@
               <table style="width:100%;" class="center jch">
                 <thead>
                   <caption class="caption" style="text-align:center">
-                    ${it.getSlave().getNodeName()}
+                    ${it.getAgent().getNodeName()}
                   </caption>
                   <tr>
                     <th colspan="2" class="subcaption">
@@ -113,7 +113,7 @@
                       <div style="float:bottom" class="singleLineView description">
                         <div>
                           <b>${%Date}:</b>
-                          <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/computer/${it.getSlave().getNodeName()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(1)}">
+                          <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/computer/${it.getAgent().getNodeName()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(1)}">
                             ${it.getTimestamp(1)}
                           </a>
                         </div>
@@ -143,7 +143,7 @@
                       <div style="float:bottom" class="singleLineView description">
                         <div>
                           <b>${%Date}:</b>
-                          <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/computer/${it.getSlave().getNodeName()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(2)}">
+                          <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/computer/${it.getAgent().getNodeName()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(2)}">
                             ${it.getTimestamp(2)}
                           </a>
                         </div>

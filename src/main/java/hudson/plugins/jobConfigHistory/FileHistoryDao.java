@@ -1134,7 +1134,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         final String onRenameDesc = " old name: " + oldName + ", new name: "
                 + newName;
         if (historyRootDir != null) {
-            // final File configFile = aItem.getConfigFile().getSlaveFile();
+            // final File configFile = aItem.getConfigFile().getAgentFile();
             final File currentHistoryDir = getHistoryDirForNode(node);
             final File historyParentDir = currentHistoryDir.getParentFile();
             final File oldHistoryDir = new File(historyParentDir, oldName);

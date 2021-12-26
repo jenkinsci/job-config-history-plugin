@@ -4,7 +4,7 @@
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
 
-    <st:include it="${it.slave.toComputer()}" page="sidepanel.jelly" />
+    <st:include it="${it.agent.toComputer()}" page="sidepanel.jelly" />
     <l:main-panel>
       <h1>${%Agent Configuration History}</h1>
       <div>
@@ -18,10 +18,10 @@
             document.getElementById('tooltip' + nr).style.visibility = 'hidden';
           }
         </script>
-        <j:set var="configs" value="${it.getSlaveConfigs()}" />
+        <j:set var="configs" value="${it.getAgentConfigs()}" />
         <j:choose>
           <j:when test="${configs.size() == 0}">
-            ${%No slave configuration history available}
+            ${%No agent configuration history available}
           </j:when>
           <j:otherwise>
             <br/>
@@ -39,7 +39,7 @@
                 <table class="jch" style="width:100%">
                   <thead>
                     <caption class="caption">
-                      ${it.getSlave().getNodeName()}
+                      ${it.getAgent().getNodeName()}
                     </caption>
                   </thead>
                 </table>
