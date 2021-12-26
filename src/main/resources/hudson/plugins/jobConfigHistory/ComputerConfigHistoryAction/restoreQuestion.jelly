@@ -12,7 +12,7 @@
       <div style="text-align:center">
         <div class="jch-warning">
           <div style="float:left; font-size:30px; font-weight:bold">
-            &#x26A0;
+            &#x2757;
           </div>
           <span style="font-size:20px;">${%Replace the current configuration with the version from}
             <span class="describedElement">${timestamp}</span>
@@ -20,7 +20,7 @@
           </span>
 
           <div style="float:right; font-size:30px; font-weight:bold">
-            &#x26A0;
+            &#x2757;
           </div>
           <div style="padding:10px;"/>
 
