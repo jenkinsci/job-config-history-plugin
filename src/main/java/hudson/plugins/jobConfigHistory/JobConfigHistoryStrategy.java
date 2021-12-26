@@ -30,7 +30,7 @@ import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
 
 /**
- * Master class for adding new backends to the history plugin.
+ * Controller class for adding new backends to the history plugin.
  *
  * @author Brandon Koepke
  */

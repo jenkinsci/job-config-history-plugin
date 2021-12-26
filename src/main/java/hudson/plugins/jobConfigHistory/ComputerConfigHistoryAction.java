@@ -57,21 +57,20 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     /**
      * The logger.
      */
-    private static final Logger LOG = Logger
-            .getLogger(ComputerConfigHistoryAction.class.getName());
+    private static final Logger LOG = Logger.getLogger(ComputerConfigHistoryAction.class.getName());
 
     /**
-     * The slave.
+     * The agent.
      */
-    private Slave slave;
+    private Slave agent;
 
     /**
      * Standard constructor using instance.
      *
-     * @param slave Slave.
+     * @param agent agent.
      */
-    public ComputerConfigHistoryAction(Slave slave) {
-        this.slave = slave;
+    public ComputerConfigHistoryAction(Slave agent) {
+        this.agent = agent;
     }
 
     @Override
@@ -85,18 +84,29 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     }
 
     /**
-     * Returns the slave.
+     * Returns the agent.
      *
-     * @return the slave.
+     * @return the agent.
+     * @deprecated Use {@link #getAgent()} instead. This method is subject to removal in future releases, to comply
+     * with Jenkins' terminology updates.
      */
-
+    @Deprecated
     public Slave getSlave() {
-        return slave;
+        return agent;
+    }
+
+    /**
+     * Returns the agent.
+     *
+     * @return the agent.
+     */
+    public Slave getAgent() {
+        return agent;
     }
 
     @Override
     protected AccessControlled getAccessControlledObject() {
-        return slave;
+        return agent;
     }
 
     @Override
@@ -126,7 +136,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 
     @Override
     public int getRevisionAmount() {
-        LOG.log(Level.INFO, "Paging is not implemented for agents, yet!");
+        LOG.log(Level.INFO, "Paging is not implemented for agents yet!");
         return -1;
     }
 
@@ -142,24 +152,47 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * Returns the configuration history entries for one {@link Slave}.
      *
      * @return history list for one {@link Slave}.
+     * @deprecated Use {@link #getAgentConfigs()} instead. This method is subject to removal in future releases,
+     * to comply with Jenkins' terminology updates.
      */
+    @Deprecated
     public final List<ConfigInfo> getSlaveConfigs() {
         if (!hasConfigurePermission()) {
             return Collections.emptyList();
         }
         final ArrayList<ConfigInfo> configs = new ArrayList<>();
-        final ArrayList<HistoryDescr> values = new ArrayList<>(
-                getHistoryDao().getRevisions(slave).values());
+        final ArrayList<HistoryDescr> values = new ArrayList<>(getHistoryDao().getRevisions(agent).values());
         for (final HistoryDescr historyDescr : values) {
             final String timestamp = historyDescr.getTimestamp();
-            final XmlFile oldRevision = getHistoryDao().getOldRevision(slave,
-                    timestamp);
+            final XmlFile oldRevision = getHistoryDao().getOldRevision(agent, timestamp);
             if (oldRevision.getFile() != null) {
-                configs.add(ConfigInfo.create(slave.getNodeName(), true,
-                        historyDescr, true));
+                configs.add(ConfigInfo.create(agent.getNodeName(), true, historyDescr, true));
             } else if ("Deleted".equals(historyDescr.getOperation())) {
-                configs.add(ConfigInfo.create(slave.getNodeName(), false,
-                        historyDescr, true));
+                configs.add(ConfigInfo.create(agent.getNodeName(), false, historyDescr, true));
+            }
+        }
+        configs.sort(ParsedDateComparator.DESCENDING);
+        return configs;
+    }
+
+    /**
+     * Returns the configuration history entries for one {@link Slave}.
+     *
+     * @return history list for one {@link Slave}.
+     */
+    public final List<ConfigInfo> getAgentConfigs() {
+        if (!hasConfigurePermission()) {
+            return Collections.emptyList();
+        }
+        final ArrayList<ConfigInfo> configs = new ArrayList<>();
+        final ArrayList<HistoryDescr> values = new ArrayList<>(getHistoryDao().getRevisions(agent).values());
+        for (final HistoryDescr historyDescr : values) {
+            final String timestamp = historyDescr.getTimestamp();
+            final XmlFile oldRevision = getHistoryDao().getOldRevision(agent, timestamp);
+            if (oldRevision.getFile() != null) {
+                configs.add(ConfigInfo.create(agent.getNodeName(), true, historyDescr, true));
+            } else if ("Deleted".equals(historyDescr.getOperation())) {
+                configs.add(ConfigInfo.create(agent.getNodeName(), false, historyDescr, true));
             }
         }
         configs.sort(ParsedDateComparator.DESCENDING);
@@ -174,10 +207,27 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * authorized.
      * @throws IOException if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be
      *                     read or the path might not be urlencoded.
+     * @deprecated Use {@link #getAgentConfigs()} instead. This method is subject to removal in future releases, to comply
+     * with Jenkins' terminology updates.
      */
+    @Deprecated
     @Exported(name = "jobConfigHistory", visibility = 1)
     public final List<ConfigInfo> getSlaveConfigsREST() throws IOException {
         return getSlaveConfigs();
+    }
+
+    /**
+     * Returns the configuration history entries for one {@link Slave} for the
+     * REST API.
+     *
+     * @return history list for one {@link Slave}, or an empty list if not
+     * authorized.
+     * @throws IOException if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be
+     *                     read or the path might not be urlencoded.
+     */
+    @Exported(name = "jobConfigHistory", visibility = 1)
+    public final List<ConfigInfo> getAgentConfigsREST() throws IOException {
+        return getAgentConfigs();
     }
 
     /**
@@ -190,10 +240,8 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      */
     public final String getTimestamp(int timestampNumber) {
         checkConfigurePermission();
-        String timeStamp = this
-                .getRequestParameter("timestamp" + timestampNumber);
-        SimpleDateFormat format = new java.text.SimpleDateFormat(
-                "yyyy-MM-dd_HH-mm-ss");
+        String timeStamp = this.getRequestParameter("timestamp" + timestampNumber);
+        SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 
         try {
             format.setLenient(false);
@@ -215,14 +263,12 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      */
     public final String getUser(int timestampNumber) {
         checkConfigurePermission();
-        return getHistoryDao().getRevisions(this.slave)
-                .get(getTimestamp(timestampNumber)).getUser();
+        return getHistoryDao().getRevisions(this.agent).get(getTimestamp(timestampNumber)).getUser();
     }
 
     public final String getUserID(int timestamp) {
         checkConfigurePermission();
-        return getHistoryDao().getRevisions(this.slave)
-                .get(getTimestamp(timestamp)).getUserID();
+        return getHistoryDao().getRevisions(this.agent).get(getTimestamp(timestamp)).getUserID();
     }
 
     /**
@@ -234,8 +280,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      */
     public final String getOperation(int timestampNumber) {
         checkConfigurePermission();
-        return getHistoryDao().getRevisions(this.slave)
-                .get(getTimestamp(timestampNumber)).getOperation();
+        return getHistoryDao().getRevisions(this.agent).get(getTimestamp(timestampNumber)).getOperation();
     }
 
     /**
@@ -248,15 +293,11 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      */
     public final String getNextTimestamp(int timestampNumber) {
         checkConfigurePermission();
-        final String timestamp = this
-                .getRequestParameter("timestamp" + timestampNumber);
-        final SortedMap<String, HistoryDescr> revisions = getHistoryDao()
-                .getRevisions(this.slave);
-        final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet()
-                .iterator();
+        final String timestamp = this.getRequestParameter("timestamp" + timestampNumber);
+        final SortedMap<String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.agent);
+        final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet().iterator();
         while (itr.hasNext()) {
-            if (itr.next().getValue().getTimestamp().equals(timestamp)
-                    && itr.hasNext()) {
+            if (itr.next().getValue().getTimestamp().equals(timestamp) && itr.hasNext()) {
                 return itr.next().getValue().getTimestamp();
             }
         }
@@ -274,12 +315,9 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      */
     public final String getPrevTimestamp(int timestampNumber) {
         checkConfigurePermission();
-        final String timestamp = this
-                .getRequestParameter("timestamp" + timestampNumber);
-        final SortedMap<String, HistoryDescr> revisions = getHistoryDao()
-                .getRevisions(this.slave);
-        final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet()
-                .iterator();
+        final String timestamp = this.getRequestParameter("timestamp" + timestampNumber);
+        final SortedMap<String, HistoryDescr> revisions = getHistoryDao().getRevisions(this.agent);
+        final Iterator<Entry<String, HistoryDescr>> itr = revisions.entrySet().iterator();
         String prevTimestamp = timestamp;
         while (itr.hasNext()) {
             final String checkTimestamp = itr.next().getValue().getTimestamp();
@@ -328,13 +366,11 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      */
     private XmlFile getOldConfigXml(String timestamp) {
         checkConfigurePermission();
-        final XmlFile oldRevision = getHistoryDao().getOldRevision(slave,
-                timestamp);
+        final XmlFile oldRevision = getHistoryDao().getOldRevision(agent, timestamp);
         if (oldRevision.getFile() != null) {
             return oldRevision;
         } else {
-            throw new IllegalArgumentException(
-                    "Non existent timestamp " + timestamp);
+            throw new IllegalArgumentException("Non existent timestamp " + timestamp);
         }
     }
 
@@ -346,22 +382,19 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * @param rsp Outgoing StaplerResponse
      * @throws IOException If something goes wrong
      */
-    public final void doRestore(StaplerRequest req, StaplerResponse rsp)
-            throws IOException {
+    public final void doRestore(StaplerRequest req, StaplerResponse rsp) throws IOException {
         checkConfigurePermission();
         final String timestamp = req.getParameter("timestamp");
 
-        final XmlFile xmlFile = getHistoryDao().getOldRevision(slave,
-                timestamp);
-        final Slave newSlave = (Slave) Jenkins.XSTREAM2
-                .fromXML(xmlFile.getFile());
+        final XmlFile xmlFile = getHistoryDao().getOldRevision(agent, timestamp);
+        final Slave newAgent = (Slave) Jenkins.XSTREAM2.fromXML(xmlFile.getFile());
         final List<Node> nodes = new ArrayList<>(Jenkins.get().getNodes());
-        nodes.remove(slave);
-        nodes.add(newSlave);
-        slave = newSlave;
+        nodes.remove(agent);
+        nodes.add(newAgent);
+        agent = newAgent;
         Jenkins.get().setNodes(nodes);
         try {
-            rsp.sendRedirect(Jenkins.get().getRootUrl() + slave.toComputer().getUrl());
+            rsp.sendRedirect(Jenkins.get().getRootUrl() + agent.toComputer().getUrl());
         } catch (NullPointerException e) {
             LOG.log(Level.WARNING, "Failed to redirect to agent url. ", e);
         }
@@ -375,8 +408,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * @param rsp Outgoing StaplerResponse
      * @throws IOException If XML file can't be read
      */
-    public final void doForwardToRestoreQuestion(StaplerRequest req,
-                                                 StaplerResponse rsp) throws IOException {
+    public final void doForwardToRestoreQuestion(StaplerRequest req, StaplerResponse rsp) throws IOException {
         final String timestamp = req.getParameter("timestamp");
         rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
     }
@@ -384,13 +416,13 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     public final void doDeleteRevision(StaplerRequest req) {
         checkDeleteEntryPermission();
         final String timestamp = req.getParameter("timestamp");
-        PluginUtils.getHistoryDao().deleteRevision(this.getSlave(), timestamp);
+        PluginUtils.getHistoryDao().deleteRevision(this.getAgent(), timestamp);
         //do nothing with the rsp
     }
 
     public boolean revisionEqualsCurrent(String timestamp) {
-        //going over Jenkins.get().getNode(..) is necessary because this.getSlave returns an old version of the node.
-        return PluginUtils.getHistoryDao().revisionEqualsCurrent(Jenkins.get().getNode(this.getSlave().getNodeName()), timestamp);
+        //going over Jenkins.get().getNode(..) is necessary because this.getAgent() returns an old version of the node.
+        return PluginUtils.getHistoryDao().revisionEqualsCurrent(Jenkins.get().getNode(this.getAgent().getNodeName()), timestamp);
     }
 
     /**
@@ -406,10 +438,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         final String timestamp1 = req.getParameter("timestamp1");
         final String timestamp2 = req.getParameter("timestamp2");
         final String showVersionDiffs = Boolean.toString(!Boolean.parseBoolean(req.getParameter("showVersionDiffs")));
-        rsp.sendRedirect("showDiffFiles?"
-                + "timestamp1=" + timestamp1
-                + "&timestamp2=" + timestamp2
-                + "&showVersionDiffs=" + showVersionDiffs);
+        rsp.sendRedirect("showDiffFiles?" + "timestamp1=" + timestamp1 + "&timestamp2=" + timestamp2 + "&showVersionDiffs=" + showVersionDiffs);
     }
 
     public Api getApi() {

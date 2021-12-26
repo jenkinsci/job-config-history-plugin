@@ -4,7 +4,7 @@
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
 
-    <st:include it="${it.slave.toComputer()}" page="sidepanel.jelly" />
+    <st:include it="${it.agent.toComputer()}" page="sidepanel.jelly" />
     <l:main-panel>
       <j:set var="timestamp" value="${request.getParameter('timestamp')}" />
 
