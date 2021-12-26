@@ -78,7 +78,7 @@ public class GetDiffLines {
 
         final Patch<String> diff = UnifiedDiffUtils.parseUnifiedDiff(diffLines);
         int previousLeftPos = 0;
-        for (final AbstractDelta delta : diff.getDeltas()) {
+        for (final AbstractDelta<String> delta : diff.getDeltas()) {
             previousLeftPos = deltaLoop(delta, previousLeftPos);
         }
         view.clearDuplicateLines();
@@ -112,7 +112,7 @@ public class GetDiffLines {
         /**
          * delta.
          */
-        private final AbstractDelta delta;
+        private final AbstractDelta<?> delta;
         /**
          * Current leftPos.
          */
@@ -128,7 +128,7 @@ public class GetDiffLines {
          * @param delta delta
          */
         public DeltaLoop(SideBySideView view, DiffRowGenerator dfg,
-                         AbstractDelta delta) {
+                         AbstractDelta<?> delta) {
             this.view = view;
             this.dfg = dfg;
             this.delta = delta;

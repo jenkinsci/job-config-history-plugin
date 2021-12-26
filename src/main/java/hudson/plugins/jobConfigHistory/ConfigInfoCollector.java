@@ -84,7 +84,7 @@ final class ConfigInfoCollector {
         final String itemName = folderName.isEmpty()
                 ? itemDir.getName()
                 : folderName + jobsString + itemDir.getName();
-        final List<HistoryDescr> historyEntries = new ArrayList<HistoryDescr>(
+        final List<HistoryDescr> historyEntries = new ArrayList<>(
                 overViewhistoryDao.getJobHistory(itemName).values());
         if (historyEntries.isEmpty()) {
             return;

@@ -137,7 +137,7 @@ public class JobConfigHistoryProjectActionTest {
      * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    public void testGetJobConfigs() throws Exception {
+    public void testGetJobConfigs() {
         when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("");
         testJobXHasYHistoryEntries("jobs/Test1", 5);
     }
@@ -146,7 +146,7 @@ public class JobConfigHistoryProjectActionTest {
      * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    public void testGetJobConfigsLimitedTo3() throws Exception {
+    public void testGetJobConfigsLimitedTo3() {
         when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("3");
         testJobXHasYHistoryEntries("jobs/Test1", 3);
     }
@@ -155,7 +155,7 @@ public class JobConfigHistoryProjectActionTest {
      * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    public void testGetJobConfigsLimitedTo1000() throws Exception {
+    public void testGetJobConfigsLimitedTo1000() {
         when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("1000");
         testJobXHasYHistoryEntries("jobs/Test1", 5);
     }
@@ -164,7 +164,7 @@ public class JobConfigHistoryProjectActionTest {
      * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
      */
     @Test
-    public void testGetJobConfigsDeleted() throws Exception {
+    public void testGetJobConfigsDeleted() {
         final List<ConfigInfo> historyEntries = testJobXHasYHistoryEntries(
                 "jobs/Foo_deleted_20130830_223932_071", 3);
         assertEquals("Deleted", historyEntries.get(0).getOperation());
@@ -230,7 +230,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetJobConfigs_fromTo() throws IOException {
+    public void testGetJobConfigs_fromTo() {
         testJobXHasYHistoryEntries("jobs/Test1", 5, 0, 200);
         testJobXHasYHistoryEntries("jobs/Test1", 4, 1, 200);
         testJobXHasYHistoryEntries("jobs/Test1", 3, 2, 200);

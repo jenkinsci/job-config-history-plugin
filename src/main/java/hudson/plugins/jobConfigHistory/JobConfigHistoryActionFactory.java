@@ -28,6 +28,7 @@ import hudson.model.AbstractItem;
 import hudson.model.Action;
 import jenkins.model.TransientActionFactory;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -58,7 +59,7 @@ public class JobConfigHistoryActionFactory
      * {@inheritDoc}
      */
     @Override
-    public Collection<? extends Action> createFor(AbstractItem target) {
+    public Collection<? extends Action> createFor(@Nonnull AbstractItem target) {
         final JobConfigHistoryProjectAction newAction = new JobConfigHistoryProjectAction(
                 target);
         LOG.log(Level.FINE, "{0} adds {1} for {2}",

@@ -38,9 +38,6 @@ public class LazyHistoryDescr extends HistoryDescr {
     private final XmlFile historyDescriptionFile;
     HistoryDescr historyDescr = HistoryDescr.EMPTY_HISTORY_DESCR;
 
-    /**
-     * @param historyDescriptionFile
-     */
     public LazyHistoryDescr(XmlFile historyDescriptionFile) {
         super(null, null, null, null, null, null);
         this.historyDescriptionFile = historyDescriptionFile;

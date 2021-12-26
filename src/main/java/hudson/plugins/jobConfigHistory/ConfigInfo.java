@@ -95,7 +95,6 @@ public class ConfigInfo implements ParsedDate {
      * @param operation           see {@link ConfigInfo#operation}
      * @param userID              see {@link ConfigInfo#userID}
      * @param isJob               see {@link ConfigInfo#isJob}
-     * @param changeReasonComment
      */
     ConfigInfo(String job, boolean configExists, String date, String user,
                String operation, String userID, boolean isJob, String currentName,

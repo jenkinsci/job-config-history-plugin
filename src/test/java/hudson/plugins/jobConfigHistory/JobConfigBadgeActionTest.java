@@ -55,9 +55,6 @@ import static org.mockito.Mockito.when;
  */
 public class JobConfigBadgeActionTest {
 
-    private static final String ROOT_URL = "http://example.org/jenkins";
-    private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
-    private final HistoryDao mockedHistoryDao = mock(HistoryDao.class);
     private final Build mockedBuild = mock(Build.class);
     private final Project mockedProject = mock(Project.class);
     private final String[] configDates = {"2013_01_01", "2013_01_02"};

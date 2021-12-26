@@ -45,7 +45,7 @@ public interface HistoryDao {
     void saveNode(Node node);
 
     /**
-     * Saves a copy of an xml file.
+     * Saves a copy of a xml file.
      *
      * @param file xmlFile
      */

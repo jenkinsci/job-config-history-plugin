@@ -110,7 +110,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     @Override
     protected void doRun() {
         final String maxAgeString = plugin.getMaxDaysToKeepEntries();
-        int maxAge = 0;
+        int maxAge;
         if (StringUtils.isNotEmpty(maxAgeString)) {
             try {
                 maxAge = Integer.parseInt(maxAgeString);

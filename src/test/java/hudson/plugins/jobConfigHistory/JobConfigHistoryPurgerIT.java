@@ -28,8 +28,6 @@ public class JobConfigHistoryPurgerIT
     /**
      * Tests if the system config entries provided by the test data are deleted
      * correctly except for the newest one.
-     *
-     * @throws Exception
      */
     @LocalData
     public void testSystemHistoryPurger() throws Exception {
@@ -90,8 +88,6 @@ public class JobConfigHistoryPurgerIT
 
     /**
      * Checks that nothing gets deleted when a negative max age is entered.
-     *
-     * @throws Exception
      */
     @LocalData
     public void testWithNegativeMaxAge() throws Exception {
@@ -100,8 +96,6 @@ public class JobConfigHistoryPurgerIT
 
     /**
      * Checks that nothings gets deleted when max age is empty.
-     *
-     * @throws Exception
      */
     @LocalData
     public void testWithEmptyMaxAge() throws Exception {

@@ -25,7 +25,6 @@ public class XmlSyntaxChecker {
 
 
                 private final String ERROR_STR = Messages.XmlSyntaxChecker_error();
-                private final String WARNING_STR = Messages.XmlSyntaxChecker_warning();
                 private final String FATAL_ERROR_STR = Messages.XmlSyntaxChecker_fatalError();
 
                 private String getMessage(String prefix, Exception exception) {
