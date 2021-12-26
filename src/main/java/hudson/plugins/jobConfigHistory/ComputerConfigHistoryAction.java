@@ -142,15 +142,13 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * Returns the configuration history entries for one {@link Slave}.
      *
      * @return history list for one {@link Slave}.
-     * @throws IOException if {@link JobConfigHistoryConsts#HISTORY_FILE} might not be
-     *                     read or the path might not be urlencoded.
      */
-    public final List<ConfigInfo> getSlaveConfigs() throws IOException {
+    public final List<ConfigInfo> getSlaveConfigs() {
         if (!hasConfigurePermission()) {
             return Collections.emptyList();
         }
-        final ArrayList<ConfigInfo> configs = new ArrayList<ConfigInfo>();
-        final ArrayList<HistoryDescr> values = new ArrayList<HistoryDescr>(
+        final ArrayList<ConfigInfo> configs = new ArrayList<>();
+        final ArrayList<HistoryDescr> values = new ArrayList<>(
                 getHistoryDao().getRevisions(slave).values());
         for (final HistoryDescr historyDescr : values) {
             final String timestamp = historyDescr.getTimestamp();
@@ -383,7 +381,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
     }
 
-    public final void doDeleteRevision(StaplerRequest req, StaplerResponse rsp) {
+    public final void doDeleteRevision(StaplerRequest req) {
         checkDeleteEntryPermission();
         final String timestamp = req.getParameter("timestamp");
         PluginUtils.getHistoryDao().deleteRevision(this.getSlave(), timestamp);

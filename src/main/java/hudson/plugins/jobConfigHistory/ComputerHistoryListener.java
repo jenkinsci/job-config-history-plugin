@@ -86,7 +86,6 @@ public class ComputerHistoryListener extends ComputerListener {
     /**
      * Is this node likely to be important to the user?
      *
-     * @param node
      */
     private boolean isTracked(Node node) {
         return node != null && !(node instanceof AbstractCloudSlave

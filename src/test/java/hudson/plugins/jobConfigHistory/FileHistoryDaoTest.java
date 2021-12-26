@@ -114,7 +114,7 @@ public class FileHistoryDaoTest {
      * Test of createNewHistoryEntry method, of class FileHistoryDao.
      */
     @Test
-    public void testCreateNewHistoryEntry() throws IOException {
+    public void testCreateNewHistoryEntry() {
         sutWithoutUserAndDuplicateHistory.createNewHistoryEntry(test1Config,
                 "foo", null, null, null);
         final int newLength = getHistoryLength();

@@ -28,6 +28,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import hudson.XmlFile;
+import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.JDK;
 import hudson.model.Project;
@@ -105,7 +106,7 @@ public class JobConfigHistoryRootActionTest {
     public void testGetConfigs_fromTo() throws IOException, InterruptedException {
 //		given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME + "/history"); todo test for that!
         given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME);
-        Project project = jenkinsRule.createFreeStyleProject("Test1");
+        Project<FreeStyleProject, FreeStyleBuild> project = jenkinsRule.createFreeStyleProject("Test1");
         JobConfigHistoryRootAction sut = createStaplerMockedSut();
 
         given(mockedStaplerRequest.getParameter("filter")).willReturn(null);

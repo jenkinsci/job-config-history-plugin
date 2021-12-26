@@ -869,7 +869,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      */
     boolean hasDuplicateHistory(final XmlFile xmlFile) {
         boolean isDuplicated = false;
-        final ArrayList<String> timeStamps = new ArrayList<String>(
+        final ArrayList<String> timeStamps = new ArrayList<>(
                 getRevisions(xmlFile).keySet());
         if (!timeStamps.isEmpty()) {
             timeStamps.sort(Collections.reverseOrder());
@@ -992,7 +992,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     private List<File> getJobFilesIncludingThoseInFolders(File fromFile) {
-        List<File> folderNames = new LinkedList<File>();
+        List<File> folderNames = new LinkedList<>();
 
         File[] currentChildren = fromFile.listFiles();
         if (currentChildren == null) {
@@ -1235,7 +1235,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     File createNewHistoryEntry(final XmlFile xmlFile, final String operation,
                                final String newName, final String oldName, String changeReasonComment) {
         try {
-            final AtomicReference<Calendar> timestampHolder = new AtomicReference<Calendar>();
+            final AtomicReference<Calendar> timestampHolder = new AtomicReference<>();
             final File timestampedDir = getRootDir(xmlFile, timestampHolder);
             LOG.log(Level.FINE, "{0} on {1}",
                     new Object[]{this, timestampedDir});

@@ -13,7 +13,12 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.util.logging.Logger;
+
 public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
+
+    private static final Logger LOG = Logger
+            .getLogger(JobLocalConfiguration.class.getName());
 
     private final String changeReasonComment;
 
@@ -44,7 +49,7 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
         }
 
         public boolean configure(StaplerRequest request, JSONObject jsonObject) throws FormException {
-            System.out.println("CONFIGURE");
+            LOG.info("CONFIGURE");
             throw new FormException("form exception", "localValues.changeReasonComment");
         }
 

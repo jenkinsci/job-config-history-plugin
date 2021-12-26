@@ -298,11 +298,10 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
 
     /**
      * @param type only all or deleted!
-     * @return
      */
     private SortedMap<String, Pair<String, HistoryDescr>> getJobConfigsHistoryDescr(String type) {
 
-        SortedMap configsMap = new TreeMap<String, Pair<String, HistoryDescr>>();
+        SortedMap<String, Pair<String, HistoryDescr>> configsMap = new TreeMap<>();
         if (!hasConfigurePermission()) {
             return Collections.emptySortedMap();
         }
