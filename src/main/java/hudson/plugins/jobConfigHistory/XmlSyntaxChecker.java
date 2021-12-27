@@ -52,13 +52,13 @@ public class XmlSyntaxChecker {
                 builder.parse(xmlFile);
             } catch (SAXException | IOException exception) {
 
-                message[0] = exception.getClass().getSimpleName() + Messages.XmlSyntaxChecker_occuredWhile() + exception.getMessage();
+                message[0] = exception.getClass().getSimpleName() + Messages.XmlSyntaxChecker_occurredWhile() + ": " + exception.getMessage();
                 wellFormatted[0] = false;
             }
 
         } catch (ParserConfigurationException exception) {
 
-            message[0] = "ParserConfigurationException" + Messages.XmlSyntaxChecker_occuredWhile() + exception.getMessage();
+            message[0] = "ParserConfigurationException" + Messages.XmlSyntaxChecker_occurredWhile() + ": " + exception.getMessage();
             wellFormatted[0] = false;
         }
         return new Answer(message[0], wellFormatted[0]);
