@@ -33,8 +33,8 @@ import java.util.List;
 
 /**
  * Collects all configs of a special type. For Jobs these follow the pattern:
- * <tt>config-history/jobs/FOLDERNAME/JOBNAME/TIMESTAMP</tt>, where
- * <tt>FOLDERNAME</tt> may be empty.
+ * <code>config-history/jobs/FOLDERNAME/JOBNAME/TIMESTAMP</code>, where
+ * <code>FOLDERNAME</code> may be empty.
  * <p>
  * Extracted from {@link JobConfigHistoryRootAction} for easier testability.
  *
@@ -45,7 +45,7 @@ final class ConfigInfoCollector {
     /**
      * outparameter.
      */
-    private final List<ConfigInfo> configs = new ArrayList<ConfigInfo>();
+    private final List<ConfigInfo> configs = new ArrayList<>();
 
     /**
      * Type to collect.
@@ -77,9 +77,8 @@ final class ConfigInfoCollector {
      * @param itemDir    The job directory as File
      * @param folderName Something Jesse Glick came up with but never documented,
      *                   probably the folderName.
-     * @throws IOException If one of the entries cannot be read.
      */
-    void getConfigsForType(File itemDir, String folderName) throws IOException {
+    void getConfigsForType(File itemDir, String folderName) {
         final String jobsString = "/jobs/";
         final String itemName = folderName.isEmpty()
                 ? itemDir.getName()
