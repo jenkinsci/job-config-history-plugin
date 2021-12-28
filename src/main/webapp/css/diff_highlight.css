@@ -34,13 +34,13 @@ td.skipping {
 }
 
 td.diff_original {
-	/*background-color: #FF8C8C;*/
-	background-color: rgb(251, 233, 235);
+    /*background-color: #FF8C8C;*/
+    background-color: rgb(251, 233, 235);
 }
 
 td.diff_revised {
-	/*background-color: #CCCCFF;*/
-	background-color: rgb(236, 253, 240);
+    /*background-color: #CCCCFF;*/
+    background-color: rgb(236, 253, 240);
 }
 
 td.singleLineView.skipping {
@@ -49,11 +49,11 @@ td.singleLineView.skipping {
 
 
 td.singleLineView.diff_original {
-	background-color: rgb(251, 233, 235);
+    background-color: rgb(251, 233, 235);
 }
 
 td.singleLineView.diff_revised {
-	background-color: rgb(236, 253, 240);
+    background-color: rgb(236, 253, 240);
 }
 
 
@@ -167,12 +167,12 @@ div.singleLineView.description {
 */
 
 pre {
-	margin: 0;
-	white-space: pre-wrap;
+    margin: 0;
+    white-space: pre-wrap;
 }
 
 code.hljs {
-	background-color: inherit;
+    background-color: inherit;
     padding:0;
 }
 

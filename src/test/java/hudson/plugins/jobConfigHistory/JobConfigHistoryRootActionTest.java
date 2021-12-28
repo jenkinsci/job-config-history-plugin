@@ -104,7 +104,7 @@ public class JobConfigHistoryRootActionTest {
 
     @Test
     public void testGetConfigs_fromTo() throws IOException, InterruptedException {
-//		given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME + "/history"); todo test for that!
+//        given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME + "/history"); todo test for that!
         given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME);
         Project<FreeStyleProject, FreeStyleBuild> project = jenkinsRule.createFreeStyleProject("Test1");
         JobConfigHistoryRootAction sut = createStaplerMockedSut();
@@ -461,7 +461,7 @@ public class JobConfigHistoryRootActionTest {
         testLines(0, freeStyleProject, 0, 0, false);
         testLines(0, freeStyleProject, 0, 1, false);
         testLines(7, freeStyleProject, 1, 2, false);
-//		testLines(6, freeStyleProject, 2, 3, false);
+//        testLines(6, freeStyleProject, 2, 3, false);
     }
 
     private void testLines(long expected, FreeStyleProject freeStyleProject, int i, int j, boolean hideVersionDiffs) throws IOException {

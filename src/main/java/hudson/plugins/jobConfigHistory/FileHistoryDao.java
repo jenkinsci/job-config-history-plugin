@@ -370,7 +370,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     private Optional<String> removeChangeReasonComment(final XmlFile configFile) throws IOException, SAXException, TransformerException, ParserConfigurationException {
         Document configFiledocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile.getFile());
 
-		NodeList jobLocalConfigurationNodes = configFiledocument.getElementsByTagName(JobConfigHistoryConsts.JOB_LOCAL_CONFIGURATION_XML_TAG);
+        NodeList jobLocalConfigurationNodes = configFiledocument.getElementsByTagName(JobConfigHistoryConsts.JOB_LOCAL_CONFIGURATION_XML_TAG);
         if (jobLocalConfigurationNodes.getLength() > 1) {
             LOG.log(FINEST, "tag \"{0}\" found twice in {1}, not saving the change reason comment.",
                     new Object[]{JobConfigHistoryConsts.JOB_LOCAL_CONFIGURATION_XML_TAG, configFile.getFile()});
