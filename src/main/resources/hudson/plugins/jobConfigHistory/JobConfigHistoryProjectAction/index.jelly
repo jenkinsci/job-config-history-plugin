@@ -1,15 +1,15 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-  <l:layout title="Job Configuration History">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+  <l:layout title="${%Job Configuration History}">
 
-    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
 
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
       <h1>${%Job Configuration History}</h1>
       <div>
 
-        <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"></script>
+        <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"/>
         <script type="text/javascript">
           function showTooltip(nr) {
             document.getElementById('tooltip' + nr).style.visibility = 'visible';
@@ -71,7 +71,7 @@
                         <th style="text-align:center">${%File A}</th>
                         <th style="text-align:center">${%File B}</th>
                         <j:if test="${it.hasDeleteEntryPermission()}">
-                          <th style="text-align:center">Delete Entry</th>
+                          <th style="text-align:center">${%Delete Entry}</th>
                         </j:if>
                       </tr>
                     </thead>
@@ -91,7 +91,7 @@
                               ${config.operation}
                             </j:if>
                             <j:if test="${config.changeReasonComment != null and !config.changeReasonComment.equals(&quot;&quot;)}">
-                              <img style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.svg" title="Change Message: &quot;${config.changeReasonComment}&quot;"/>
+                              <img style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.svg" title="${%Change Message}: &quot;${config.changeReasonComment}&quot;"/>
                             </j:if>
                           </td>
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
@@ -118,7 +118,7 @@
                                   <!--The current version is not present in history!-->
                                   <br/>
                                   <span style="color: rgb(196, 109, 0); font-weight:bold;">
-                                    ${%Warning: This is the latest revision in history, but not the current config. Save config to create a current entry.}
+                                    ${%Warning}: ${%This is the latest revision in history, but not the current config. Save config to create a current entry.}
                                   </span>
                                 </j:if>
                               </j:if>
@@ -139,9 +139,9 @@
                           </td>
                           <j:if test="${it.hasDeleteEntryPermission()}">
                             <td style="text-align:center">
-                                <j:set var="message" value="${%Do you really want to delete the history entry }"/>
+                                <j:set var="message" value="${%Do you really want to delete the history entry} "/>
                                 <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
-                                  <l:icon class="icon-stop icon-sm" alt="Delete Revision"/>
+                                  <l:icon class="icon-stop icon-sm" alt="${%Delete Revision}"/>
                                 </button>
                             </td>
                           </j:if>
@@ -159,7 +159,7 @@
                       <div style="float:left; width:34%">
                         <table class="jch navigation">
                           <tr>
-                            <td style="width:150px; font-weight:bold;">Entries per page:</td>
+                            <td style="width:150px; font-weight:bold;">${%Entries per page}:</td>
                             <!--                          <td><div class="menu-url-button current">${entriesPerPage}</div></td>-->
                             <td><div class="${(entriesPerPage.equals(&quot;10&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
                               <a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${10}">10</a>
@@ -174,7 +174,7 @@
                               <a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${250}">250</a>
                             </div></td>
                             <td><div class="${(entriesPerPage.equals(&quot;all&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="${request.getRequestURL().toString()}?entriesPerPage=${&quot;all&quot;}">all</a>
+                              <a href="${request.getRequestURL().toString()}?entriesPerPage=${&quot;all&quot;}">${%all}</a>
                             </div></td>
                           </tr>
                         </table>

@@ -1,7 +1,6 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
 
     <j:if test="${descriptor.getShowChangeReasonCommentWindow()}">
         <f:block>
@@ -9,11 +8,11 @@
                 <!--Wrapper for sticky (scroll-resistant) positioning.-->
                 <div class="commitMessageInner" id="commitMessageInnerID">
                     <div style="padding:2px">
-                        JobConfigHistory <br/>change message:
+                        ${%JobConfigHistory} <br/>${%change message}:
                     </div>
                     <f:textarea field="changeReasonComment" value=""/>
                     <div id="changeReasonCommentError" style="visibility:hidden; height:0px;" class="changeReasonCommentError">
-                        Please comment your changes!
+                        ${%This field cannot be empty, please enter a valid notice}!
                     </div>
                 </div>
             </div>

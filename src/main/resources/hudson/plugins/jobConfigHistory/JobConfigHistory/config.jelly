@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
   <f:section title="${%Job Config History}">
     <f:entry title="${%Use different history directory than default}:" help="/plugin/jobConfigHistory/help/help-historyRootDir.html">
       <f:textbox value="${it.historyRootDir}" name="historyRootDir"/>
@@ -44,7 +44,7 @@
       <f:entry title="${%Exclude users}" help="/plugin/jobConfigHistory/help/help-excludedUsers.html">
         <f:textbox name="excludedUsers" value="${it.excludedUsers}" />
       </f:entry>
-      <f:entry title="Show change message window" help="/plugin/jobConfigHistory/help/help-showChangeReasonCommentWindow.html">
+      <f:entry title="${%Show change message window}" help="/plugin/jobConfigHistory/help/help-showChangeReasonCommentWindow.html">
         <f:checkbox
                 title="${%Show the change message window in jobs' configure pages.}"
                 name="showChangeReasonCommentWindow"

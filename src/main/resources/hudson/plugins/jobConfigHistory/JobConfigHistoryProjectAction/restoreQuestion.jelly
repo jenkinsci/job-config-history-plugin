@@ -1,8 +1,8 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
-  <l:layout title="Job Configuration History">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+  <l:layout title="${%Job Configuration History}">
 
-    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"></link>
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
 
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
@@ -11,7 +11,7 @@
       <div style="text-align:center">
         <div class="jch-warning">
           <div style="float:left; font-size:30px; font-weight:bold">
-            &#x26A0;
+            &#x2757;
           </div>
           <span style="font-size:20px;">${%Replace the current configuration with the version from}
             <span class="describedElement">${timestamp}</span>
@@ -19,7 +19,7 @@
           </span>
 
           <div style="float:right; font-size:30px; font-weight:bold">
-            &#x26A0;
+            &#x2757;
           </div>
           <div style="padding:10px;"/>
 
