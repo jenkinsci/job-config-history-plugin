@@ -189,7 +189,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
             historyDate.setTime(parsedDate);
             final Calendar oldestAllowedDate = new GregorianCalendar();
             oldestAllowedDate.add(Calendar.DAY_OF_YEAR, -getMaxAge());
-			return historyDate.before(oldestAllowedDate);
+            return historyDate.before(oldestAllowedDate);
         }
         return false;
     }

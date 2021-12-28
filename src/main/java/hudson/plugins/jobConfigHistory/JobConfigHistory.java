@@ -328,8 +328,8 @@ public class JobConfigHistory extends Plugin {
         if ("userWithConfigPermission".equals(showBuildBadges) && project.hasPermission(Item.CONFIGURE)) {
             return true;
         }
-		return "adminUser".equals(showBuildBadges) && getJenkins().hasPermission(Jenkins.ADMINISTER);
-	}
+        return "adminUser".equals(showBuildBadges) && getJenkins().hasPermission(Jenkins.ADMINISTER);
+    }
 
     /**
      * Gets the regular expression pattern used by this class.
@@ -439,9 +439,9 @@ public class JobConfigHistory extends Plugin {
             // system configs
             return canSave;
         }
-		return PluginUtils.isMavenPluginAvailable() && item instanceof MavenModule
-				&& saveModuleConfiguration;
-	}
+        return PluginUtils.isMavenPluginAvailable() && item instanceof MavenModule
+                && saveModuleConfiguration;
+    }
 
     /**
      * Checks whether the config file should not be saved because of regex pattern.

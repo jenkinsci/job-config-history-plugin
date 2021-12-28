@@ -378,12 +378,11 @@ public class FileHistoryDaoTest {
     @Test
     public void testGetSystemRevisionAmount_Single() {
         assertEquals(5, sutWithUserAndNoDuplicateHistory.getSystemRevisionAmount("config"));
-//		System.out.println("sysconfigs: ");
-//		Arrays.asList(getJenkinsRuleSut().getSystemConfigs()).forEach(dir -> {
-//			System.out.println(dir + "###" + dir.listFiles().length);
-//
-//		});
-//		System.out.println("jenkinsloc...=" + getJenkinsRuleSut().getSystemHistory("jenkins.model.JenkinsLocationConfiguration").size());;
+//        System.out.println("sysconfigs: ");
+//        Arrays.asList(getJenkinsRuleSut().getSystemConfigs()).forEach(dir -> {
+//            System.out.println(dir + "###" + dir.listFiles().length);
+//        });
+//        System.out.println("jenkinsloc...=" + getJenkinsRuleSut().getSystemHistory("jenkins.model.JenkinsLocationConfiguration").size());;
         assertEquals(4, getJenkinsRuleSut().getSystemRevisionAmount("config"));
         assertEquals(1, getJenkinsRuleSut().getSystemRevisionAmount("jenkins.telemetry.Correlator"));
         assertEquals(2, getJenkinsRuleSut().getSystemRevisionAmount("hudson.model.UpdateCenter"));
