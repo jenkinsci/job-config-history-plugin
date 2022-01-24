@@ -19,7 +19,7 @@ jobs:
           output_result: true
 
       - name: Release Drafter
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@v5.17.6
         if: steps.verify-ci-status.outputs.result == 'success'
         with:
           name: next
@@ -45,7 +45,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up JDK 8
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v2.5.0
         with:
           distribution: 'adopt'
           java-version: 8
