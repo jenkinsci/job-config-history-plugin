@@ -1,115 +1,11 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
 
     <j:if test="${descriptor.getShowChangeReasonCommentWindow()}">
         <f:block>
-            <div class="commitMessageOuter" style="position:absolute;top:1px;right:calc(-60px - 11vw); z-index:4002; height:100%" id="commitMessageOuterID">
-                <!--Wrapper for sticky (scroll-resistant) positioning.-->
-                <div class="commitMessageInner" id="commitMessageInnerID">
-                    <div style="padding:2px">
-                        ${%JobConfigHistory} <br/>${%change message}:
-                    </div>
-                    <f:textarea field="changeReasonComment" value=""/>
-                    <div id="changeReasonCommentError" style="visibility:hidden; height:0px;" class="changeReasonCommentError">
-                        ${%This field cannot be empty, please enter a valid notice}!
-                    </div>
-                </div>
-            </div>
+            <f:entry title="${%Job config history change message}" field="changeReasonComment">
+                <f:textbox/>
+            </f:entry>
         </f:block>
-        <script type="text/javascript">
-
-            function getDynamicViewportOffset() {
-                staticViewPortWidth = document.viewport.getWidth();
-                dynamicViewPortWidth = staticViewPortWidth;
-
-                //calculate overlap width.
-                flexibleTable = document.getElementsByClassName("config-table")[0];
-                tableWrapper = document.getElementsByClassName("jenkins-config")[0];
-                if (flexibleTable !== undefined &amp;&amp; tableWrapper !== undefined) {
-                    flexWidth = flexibleTable.getWidth();
-                    wrapperWidth = tableWrapper.getWidth();
-
-                    diffOffset = 22;
-                    cleanDiff = (flexWidth -wrapperWidth) + diffOffset;
-                    if (cleanDiff > 0) {
-                        dynamicViewPortWidth += cleanDiff;
-                    }
-                    return cleanDiff;
-                }
-                return 0;
-            }
-
-            function setCommitMessageDimensions() {
-                commitMessageInnerDiv = document.getElementById('commitMessageInnerID');
-                commitMessageOuterDiv = document.getElementById('commitMessageOuterID');
-                viewPortWidth = document.viewport.getWidth();
-
-                dynamicViewPortOffset = getDynamicViewportOffset();
-
-
-                //these cases are based on jenkins' configure page behavior. the magic numbers were found through testing.
-                if (viewPortWidth >= 1600 &amp;&amp;  1784 > viewPortWidth) {
-                    newWidth = -245 +  0.34 * viewPortWidth
-                } else if (viewPortWidth >= 1784) {
-                    diff = viewPortWidth - 1784
-                    newWidth = 125 + 0.5*diff;
-                } else if (1600 > viewPortWidth  &amp;&amp; viewPortWidth >= 1184 ){
-                    diff = viewPortWidth - 1600
-                    newWidth = 285 + 0.5*diff;
-                } else {
-                    newWidth = 155;
-                }
-                commitMessageInnerDiv.style.width = newWidth + 'px';
-
-                //set position
-                offset = 5;
-                newRightPosition = -1 * newWidth - offset - dynamicViewPortOffset;
-                commitMessageOuterDiv.style.right = newRightPosition + 'px';
-            }
-
-            function showError() {
-                var elem = document.getElementById('changeReasonCommentError');
-                elem.style.visibility = 'visible';
-                elem.style.height = '100%';
-            }
-
-            function hideError() {
-                var elem = document.getElementById('changeReasonCommentError');
-                elem.style.visibility = 'hidden';
-                elem.style.height = '0px';
-            }
-
-            function checkCurrentChangeReasonComment() {
-                var comment = getCurrentChangeReasonComment();
-                if (comment == "" || comment == null) {
-                    showError();
-                } else {
-                    hideError();
-                }
-            }
-
-            function getCurrentChangeReasonComment() {
-                return document.getElementsByName('_.changeReasonComment')[0].value;
-            }
-
-
-            //Executing on startup:
-
-            //set the dimensions unsettable with css (no if then else possible.)
-            setCommitMessageDimensions();
-            window.addEventListener('resize', function(event){
-                setCommitMessageDimensions();
-            });
-
-            //listening on tables won't work, so this is a workaround for that.
-            setInterval(function(){setCommitMessageDimensions();}, 200);
-
-            // let the warning pop up after 5000 ms.
-            setTimeout(function() {
-                //call the check function every 500 ms.
-                setInterval(function(){checkCurrentChangeReasonComment();}, 500);
-            }, 5000);
-        </script>
     </j:if>
 </j:jelly>
