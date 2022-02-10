@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>3.57</version>
+        <version>4.33</version>
     </parent>
 
     <artifactId>jobConfigHistory</artifactId>
@@ -52,7 +52,7 @@
     <properties>
         <revision>2.31</revision>
         <changelist>-SNAPSHOT</changelist>
-        <jenkins.version>2.164</jenkins.version>
+        <jenkins.version>2.319.3</jenkins.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-surefire-report-plugin.version>${maven-surefire-plugin.version}</maven-surefire-report-plugin.version>
         <maven-hpi-plugin.injectedTestName>InjectedIT</maven-hpi-plugin.injectedTestName>
@@ -67,6 +67,13 @@
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>3.8.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jenkins.tools.bom</groupId>
+                <artifactId>bom-2.319.x</artifactId>
+                <version>1148.v7261f385f859</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -85,8 +92,14 @@
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
-            <version>3.0</version>
+            <version>3.16</version>
             <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jenkins-ci</groupId>
+                    <artifactId>symbol-annotation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -103,7 +116,6 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>matrix-project</artifactId>
-            <version>1.0</version>
             <scope>test</scope>
             <optional>true</optional>
         </dependency>

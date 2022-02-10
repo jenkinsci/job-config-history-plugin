@@ -82,11 +82,11 @@ public class JobConfigHistoryRootActionIT
                 htmlPageCreated.getAnchorByText("Test1"));
         Assert.assertFalse(
                 "Verify history entry for deleted job is not listed.",
-                htmlPageCreated.asText()
+                htmlPageCreated.asNormalizedText()
                         .contains(DeletedFileFilter.DELETED_MARKER));
         Assert.assertFalse(
                 "Verify that no history entry for system change is listed.",
-                htmlPageCreated.asText().contains("config (system)"));
+                htmlPageCreated.asNormalizedText().contains("config (system)"));
         Assert.assertTrue("Check link to job page exists.", htmlPageJobs.asXml()
                 .contains("job/Test1/" + JobConfigHistoryConsts.URLNAME));
         Assert.assertFalse("Verify that only 'Created' entries are listed.",
@@ -141,7 +141,7 @@ public class JobConfigHistoryRootActionIT
             final HtmlPage htmlPage = webClient
                     .goTo(JobConfigHistoryConsts.URLNAME);
             Assert.assertTrue("Verify nothing is shown without permission",
-                    htmlPage.asText().contains("No permission to view"));
+                    htmlPage.asNormalizedText().contains("No permission to view"));
         } catch (Exception ex) {
             Assert.fail(
                     "Unable to complete testFilterWithoutPermissions: " + ex);
@@ -179,8 +179,8 @@ public class JobConfigHistoryRootActionIT
 
             final HtmlForm diffFilesForm = htmlPage.getFormByName("diffFiles");
             final HtmlPage diffPage = last(diffFilesForm.getElementsByTagName("button")).click();
-            assertStringContains(diffPage.asText(), firstMessage);
-            assertStringContains(diffPage.asText(), secondMessage);
+            assertStringContains(diffPage.asNormalizedText(), firstMessage);
+            assertStringContains(diffPage.asNormalizedText(), secondMessage);
         } catch (Exception ex) {
             Assert.fail("Unable to complete testHistoryPage: " + ex);
         }

@@ -220,9 +220,9 @@ public class JobConfigHistoryBaseActionIT
                 .goTo("job/" + jobName + "/" + JobConfigHistoryConsts.URLNAME);
         final HtmlForm diffFilesForm = historyPage.getFormByName("diffFiles");
         final HtmlPage diffPage = last(diffFilesForm.getElementsByTagName("button")).click();
-        assertStringContains(diffPage.asText(), "<daysToKeep>42</daysToKeep>");
-        assertStringContains(diffPage.asText(), "<numToKeep>42</numToKeep>");
-        assertStringContains(diffPage.asText(), "<daysToKeep>47</daysToKeep>");
-        assertStringContains(diffPage.asText(), "<numToKeep>47</numToKeep>");
+        assertStringContains(diffPage.asNormalizedText(), "<daysToKeep>42</daysToKeep>");
+        assertStringContains(diffPage.asNormalizedText(), "<numToKeep>42</numToKeep>");
+        assertStringContains(diffPage.asNormalizedText(), "<daysToKeep>47</daysToKeep>");
+        assertStringContains(diffPage.asNormalizedText(), "<numToKeep>47</numToKeep>");
     }
 }

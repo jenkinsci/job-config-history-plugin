@@ -52,7 +52,7 @@ public class JobConfigHistoryProjectActionIT
 
             Assert.assertTrue(
                     "Verify return to job page and changed description.",
-                    jobPage.asText().contains(firstDescription));
+                    jobPage.asNormalizedText().contains(firstDescription));
             Assert.assertEquals("Verify changed description.",
                     project.getDescription(), firstDescription);
 
@@ -91,7 +91,7 @@ public class JobConfigHistoryProjectActionIT
 
             Assert.assertTrue(
                     "Verify return to job page and changed description.",
-                    jobPage.asText().contains(firstDescription));
+                    jobPage.asNormalizedText().contains(firstDescription));
             Assert.assertEquals("Verify changed description.",
                     project.getDescription(), firstDescription);
         } catch (Exception ex) {
