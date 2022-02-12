@@ -68,7 +68,7 @@ public class JobConfigBadgeActionIT
                 .getElementById("showDiff");
         final HtmlPage showDiffPage = showDiffLink.click();
         Assert.assertTrue("ShowDiffFiles page should be reached now",
-                showDiffPage.asText().contains("No lines changed"));
+                showDiffPage.asNormalizedText().contains("No lines changed"));
     }
 
     public void testCorrectLinkTargetsAfterRename() throws Exception {
@@ -91,7 +91,7 @@ public class JobConfigBadgeActionIT
                 .getElementById("showDiff");
         final HtmlPage showDiffPage = showDiffLink.click();
         Assert.assertTrue("ShowDiffFiles page should be reached now",
-                showDiffPage.asText().contains("Older"));
+                showDiffPage.asNormalizedText().contains("Older"));
 
         project.renameTo(newName);
         Thread.sleep(SLEEP_TIME);
@@ -104,7 +104,7 @@ public class JobConfigBadgeActionIT
                 .getByXPath("//a[@id='showDiff']").get(1);
         final HtmlPage showDiffPage2 = oldShowDiffLink.click();
         Assert.assertTrue("ShowDiffFiles page should be reached now",
-                showDiffPage2.asText().contains("Older"));
+                showDiffPage2.asNormalizedText().contains("Older"));
     }
 
     public void testProjectWithConfigsButMissingBuilds() throws Exception {
@@ -227,7 +227,7 @@ public class JobConfigBadgeActionIT
         final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
                 .getElementById("showDiff");
         final HtmlPage showDiffPage = showDiffLink.click();
-        final String page = showDiffPage.asText();
+        final String page = showDiffPage.asNormalizedText();
         Assert.assertTrue("ShowDiffFiles page should be reached now",
                 page.contains("Older"));
         Assert.assertTrue("ShowDiff page should contain second description",
@@ -261,7 +261,7 @@ public class JobConfigBadgeActionIT
         final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
                 .getElementById("showDiff");
         final HtmlPage showDiffPage = showDiffLink.click();
-        final String page = showDiffPage.asText();
+        final String page = showDiffPage.asNormalizedText();
         Assert.assertTrue("ShowDiffFiles page should be reached now",
                 page.contains("Older"));
         Assert.assertTrue("ShowDiff page should contain second description",
