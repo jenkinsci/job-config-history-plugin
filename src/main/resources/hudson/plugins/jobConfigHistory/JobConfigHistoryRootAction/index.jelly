@@ -188,7 +188,7 @@
                              TODO Fix that. (see code)-->
                             <j:if test="${config.job.replace('/jobs', '/job').equals(config.job)}">
                               <a id="restore" href="restoreQuestion?name=${config.getJob()}">
-                                <img src="$/plugin/jobConfigHistory/img/restore.svg" height="16" width="16" alt="${%Restore}" />
+                                <img src="/plugin/jobConfigHistory/img/restore.svg" height="16" width="16" alt="${%Restore}" />
                               </a>
                             </j:if>
                           </j:if>
