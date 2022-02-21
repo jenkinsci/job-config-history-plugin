@@ -7,8 +7,6 @@ updates:
       day: monday
     open-pull-requests-limit: 10
     target-branch: master
-    reviewers:
-      - NotMyFault
     labels:
       - dependencies
     commit-message:
