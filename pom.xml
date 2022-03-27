@@ -22,7 +22,7 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:git:git://github.com/jenkinsci/job-config-history-plugin.git</connection>
+        <connection>scm:git:https://github.com/jenkinsci/job-config-history-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/job-config-history-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/job-config-history-plugin</url>
         <tag>${scmTag}</tag>
