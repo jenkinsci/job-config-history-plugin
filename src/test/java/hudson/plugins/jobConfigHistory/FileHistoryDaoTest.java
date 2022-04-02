@@ -29,6 +29,7 @@ import hudson.XmlFile;
 import hudson.model.AbstractItem;
 import hudson.model.FreeStyleProject;
 import hudson.model.Node;
+import hudson.model.Slave;
 import hudson.model.User;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
@@ -80,7 +81,6 @@ public class FileHistoryDaoTest {
             .create();
     private final User mockedUser = mock(User.class);
     private final AbstractItem mockedItem = mock(AbstractItem.class);
-    private final Node mockedNode = mock(Node.class);
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
     private File jenkinsHome;
@@ -749,11 +749,11 @@ public class FileHistoryDaoTest {
 
     @Test
     public void testCreateNewNode() throws Exception {
-        when(mockedNode.getNodeName()).thenReturn("agentOne");
-        sutWithUserAndNoDuplicateHistory.createNewNode(mockedNode);
+        Node agent = jenkinsRule.createOnlineSlave();
+        sutWithUserAndNoDuplicateHistory.createNewNode(agent);
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
-        File revisions = new File(file, "agentOne");
-        assertEquals("agentOne should have only one save history.", 1,
+        File revisions = new File(file, agent.getNodeName());
+        assertEquals("agent should have only one save history.", 1,
                 revisions.list().length);
         File config = new File(revisions.listFiles()[0], "config.xml");
         assertTrue("File config.xml should be saved.", config.exists());
@@ -767,10 +767,9 @@ public class FileHistoryDaoTest {
      * shared logic from {@link #testDeleteNode()} and
      * {@link #testRenameNode()}.
      */
-    private void printTestData(Callable<Void> func) throws Exception {
-        when(mockedNode.getNodeName()).thenReturn("agentOne");
+    private void printTestData(Node agent, Callable<Void> func) throws Exception {
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
-        File revisions = new File(file, "agentOne");
+        File revisions = new File(file, agent.getNodeName());
         File revision = new File(revisions, "2014-01-20_10-12-34");
         revision.mkdirs();
         File config = new File(revision, "config.xml");
@@ -779,7 +778,7 @@ public class FileHistoryDaoTest {
         HistoryDescr descr = new HistoryDescr("User", "user", "created",
                 "2014-01-20_10-12-34", null, null);
         try (OutputStream configsFile = new PrintStream(config); OutputStream historyFile = new FileOutputStream(history)) {
-            Jenkins.XSTREAM2.toXMLUTF8(mockedNode, configsFile);
+            Jenkins.XSTREAM2.toXMLUTF8(agent, configsFile);
             Jenkins.XSTREAM2.toXMLUTF8(descr, historyFile);
         }
 
@@ -793,32 +792,34 @@ public class FileHistoryDaoTest {
 
     @Test
     public void testDeleteNode() throws Exception {
-        printTestData(() -> {
-            sutWithUserAndNoDuplicateHistory.deleteNode(mockedNode);
+        Node agent = jenkinsRule.createOnlineSlave();
+        printTestData(agent, () -> {
+            sutWithUserAndNoDuplicateHistory.deleteNode(agent);
             return null;
         });
     }
 
     @Test
     public void testRenameNode() throws Exception {
-        printTestData(() -> {
-            sutWithUserAndNoDuplicateHistory.renameNode(mockedNode,
-                    mockedNode.getNodeName(),
-                    mockedNode.getNodeName() + "_renamed");
+        Node agent = jenkinsRule.createOnlineSlave();
+        printTestData(agent, () -> {
+            sutWithUserAndNoDuplicateHistory.renameNode(agent,
+                    agent.getNodeName(),
+                    agent.getNodeName() + "_renamed");
             return null;
         });
     }
 
     @Test
     public void testGetRevisions() throws Exception {
-        when(mockedNode.getNodeName()).thenReturn("agentOne");
-        createNodeRevisionManually("2014-01-18_10-12-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-18_10-12-34"));
-        createNodeRevisionManually("2014-01-19_10-12-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-19_10-12-34"));
-        createNodeRevisionManually("2014-01-20_10-12-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-20_10-12-34"));
-        createNodeRevisionManually("2014-01-20_10-21-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-20_10-21-34"));
+        Node agent = jenkinsRule.createOnlineSlave();
+        createNodeRevisionManually("2014-01-18_10-12-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-18_10-12-34"), agent);
+        createNodeRevisionManually("2014-01-19_10-12-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-19_10-12-34"), agent);
+        createNodeRevisionManually("2014-01-20_10-12-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-20_10-12-34"), agent);
+        createNodeRevisionManually("2014-01-20_10-21-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-20_10-21-34"), agent);
 
         SortedMap<String, HistoryDescr> revisions = sutWithUserAndNoDuplicateHistory
-                .getRevisions(mockedNode);
+                .getRevisions(agent);
         assertNotNull("Revision 2014-01-18_10-12-34 should be returned.",
                 revisions.get("2014-01-18_10-12-34"));
         assertNotNull("Revision 2014-01-19_10-12-34 should be returned.",
@@ -829,9 +830,9 @@ public class FileHistoryDaoTest {
                 revisions.get("2014-01-20_10-21-34"));
     }
 
-    private File createNodeRevisionManually(String timestamp, String configXmlContent, String historyXmlContent) throws IOException {
+    private File createNodeRevisionManually(String timestamp, String configXmlContent, String historyXmlContent, Node agent) throws IOException {
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
-        File revisions = new File(file, "agentOne");
+        File revisions = new File(file, agent.getNodeName());
         File revision = new File(revisions, timestamp);
         revision.mkdirs();
         FileUtils.writeStringToFile(
@@ -867,13 +868,13 @@ public class FileHistoryDaoTest {
                         "</hudson.plugins.jobConfigHistory.HistoryDescr>";
     }
 
-    private File createNodeRevision(String timestamp, Node mockedNode)
+    private File createNodeRevision(String timestamp, Node agent)
             throws Exception {
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
-        File revisions = new File(file, "agentOne");
+        File revisions = new File(file, agent.getNodeName());
         File revision = new File(revisions, timestamp);
         revision.mkdirs();
-        Jenkins.XSTREAM2.toXMLUTF8(mockedNode,
+        Jenkins.XSTREAM2.toXMLUTF8(agent,
                 new PrintStream(new File(revision, "config.xml")));
         HistoryDescr descr = new HistoryDescr("User", "user", "created",
                 timestamp, null, null);
@@ -883,30 +884,30 @@ public class FileHistoryDaoTest {
     }
 
     @Test
-    public void testSaveNode() {
-        when(mockedNode.getNodeName()).thenReturn("agentOne");
+    public void testSaveNode() throws Exception {
+        Node agent = jenkinsRule.createOnlineSlave();
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
-        File revisions = new File(file, "agentOne");
-        sutWithUserAndNoDuplicateHistory.saveNode(mockedNode);
+        File revisions = new File(file, agent.getNodeName());
+        sutWithUserAndNoDuplicateHistory.saveNode(agent);
         assertEquals("New revision should be saved.", 1,
                 revisions.list().length);
     }
 
     @Test
     public void testGetOldRevision_Node() throws Exception {
-        when(mockedNode.getNodeName()).thenReturn("agentOne");
-        when(mockedNode.getNumExecutors()).thenReturn(1);
-        File revision1 = createNodeRevision("2014-01-18_10-12-34", mockedNode);
-        when(mockedNode.getNumExecutors()).thenReturn(2);
-        File revision2 = createNodeRevision("2014-01-19_10-12-34", mockedNode);
-        when(mockedNode.getNumExecutors()).thenReturn(3);
-        File revision3 = createNodeRevision("2014-01-20_10-12-34", mockedNode);
+        Slave agent = jenkinsRule.createOnlineSlave();
+        agent.setNumExecutors(1);
+        File revision1 = createNodeRevision("2014-01-18_10-12-34", agent);
+        agent.setNumExecutors(2);
+        File revision2 = createNodeRevision("2014-01-19_10-12-34", agent);
+        agent.setNumExecutors(3);
+        File revision3 = createNodeRevision("2014-01-20_10-12-34", agent);
         XmlFile file1 = sutWithUserAndNoDuplicateHistory
-                .getOldRevision(mockedNode, "2014-01-18_10-12-34");
+                .getOldRevision(agent, "2014-01-18_10-12-34");
         XmlFile file2 = sutWithUserAndNoDuplicateHistory
-                .getOldRevision(mockedNode, "2014-01-19_10-12-34");
+                .getOldRevision(agent, "2014-01-19_10-12-34");
         XmlFile file3 = sutWithUserAndNoDuplicateHistory
-                .getOldRevision(mockedNode, "2014-01-20_10-12-34");
+                .getOldRevision(agent, "2014-01-20_10-12-34");
         assertEquals(
                 "Should return config.xml file of revision 2014-01-18_10-12-34",
                 new File(revision1, "config.xml").getAbsolutePath(),
