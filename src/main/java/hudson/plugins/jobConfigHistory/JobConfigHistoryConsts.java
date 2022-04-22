@@ -57,7 +57,7 @@ public final class JobConfigHistoryConsts {
     /**
      * Default regexp pattern of configuration files not to save.
      */
-    public static final String DEFAULT_EXCLUDE = "queue\\.xml|nodeMonitors\\.xml|UpdateCenter\\.xml|global-build-stats|LockableResourcesManager\\.xml|MilestoneStep\\.xml";
+    public static final String DEFAULT_EXCLUDE = "queue\\.xml|nodeMonitors\\.xml|UpdateCenter\\.xml|global-build-stats|LockableResourcesManager\\.xml|MilestoneStep\\.xml|cloudbees-disk-usage-simple\\.xml";
     /**
      * Format for timestamped dirs.
      */
