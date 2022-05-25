@@ -1,6 +1,8 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" >
   <j:if test="${it.showBadge() and it.oldConfigsExist()}">
-    <l:icon id="showDiff" src="${it.getIcon()}" href="${it.createLink()}" title="${it.getTooltip()}" alt="x" />
+    <span class="icon-sm" >
+      <l:icon id="showDiff" src="${it.getIcon()}" href="${it.createLink()}" title="${it.getTooltip()}" alt="x" />
+    </span>
   </j:if>
 </j:jelly>
