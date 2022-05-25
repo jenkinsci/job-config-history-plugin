@@ -37,7 +37,7 @@ public final class JobConfigHistoryConsts {
     /**
      * Path to the icon.
      */
-    public static final String ICONFILENAME = "/plugin/jobConfigHistory/img/confighistory.svg";
+    public static final String ICONFILENAME = "/plugin/jobConfigHistory/images/sources/confighistory.svg";
     /**
      * Default root directory for storing history.
      */
