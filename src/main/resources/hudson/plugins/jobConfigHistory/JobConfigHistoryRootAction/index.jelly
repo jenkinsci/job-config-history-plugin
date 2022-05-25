@@ -8,10 +8,10 @@
     <l:side-panel>
       <l:tasks>
         <l:task icon="icon-up icon-md" href="${rootURL}/" title="${%Back to Dashboard}" />
-        <l:task icon="filter plugin-jobConfigHistory" href="?filter=system" title="${%Show system configs only}" />
-        <l:task icon="filter plugin-jobConfigHistory" href="?filter=jobs" title="${%Show job configs only}" />
-        <l:task icon="filter plugin-jobConfigHistory" href="?filter=created" title="${%Show created jobs only}" />
-        <l:task icon="filter plugin-jobConfigHistory" href="?filter=deleted" title="${%Show deleted jobs only}" />
+        <l:task icon="symbol-filter plugin-jobConfigHistory" href="?filter=system" title="${%Show system configs only}" />
+        <l:task icon="symbol-filter plugin-jobConfigHistory" href="?filter=jobs" title="${%Show job configs only}" />
+        <l:task icon="symbol-filter plugin-jobConfigHistory" href="?filter=created" title="${%Show created jobs only}" />
+        <l:task icon="symbol-filter plugin-jobConfigHistory" href="?filter=deleted" title="${%Show deleted jobs only}" />
         <l:task icon="icon-document icon-md" href="?filter=all" title="${%Show all configs}" />
       </l:tasks>
     </l:side-panel>
@@ -188,7 +188,7 @@
                              TODO Fix that. (see code)-->
                             <j:if test="${config.job.replace('/jobs', '/job').equals(config.job)}">
                               <span class="icon-md">
-                                <l:icon id="restore" src="restore plugin-jobConfigHistory"  href="restoreQuestion?name=${config.getJob()}" title="${%Restore}" />
+                                <l:icon id="restore" src="symbol-restore plugin-jobConfigHistory"  href="restoreQuestion?name=${config.getJob()}" title="${%Restore}" />
                               </span>
                             </j:if>
                           </j:if>
