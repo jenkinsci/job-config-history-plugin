@@ -67,7 +67,7 @@
                         <td>
                         <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
                           <span>${config.operation}</span>
-                          <img onmouseOver="showTooltip(${configNr})" onmouseLeave="hideTooltip(${configNr})" style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.svg" alt="${%Info}" />
+                          <l:icon src="info plugin-jobConfigHistory" onmouseOver="showTooltip(${configNr})" onmouseLeave="hideTooltip(${configNr})"  alt="${%Info}" />
                           <div style="margin-top: 15px;visibility: hidden; position: absolute; background-color: beige; padding: 3px; border: 1px solid black;" id="tooltip${configNr}">${%Old name}: ${config.oldName}<br />${%New name}: ${config.currentName}</div>
                         </j:if>
                         <j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">
