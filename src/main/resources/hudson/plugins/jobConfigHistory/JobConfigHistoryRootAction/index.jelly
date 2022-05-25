@@ -8,10 +8,10 @@
     <l:side-panel>
       <l:tasks>
         <l:task icon="icon-up icon-md" href="${rootURL}/" title="${%Back to Dashboard}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=system" title="${%Show system configs only}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=jobs" title="${%Show job configs only}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=created" title="${%Show created jobs only}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=deleted" title="${%Show deleted jobs only}" />
+        <l:task icon="filter plugin-jobConfigHistory" href="?filter=system" title="${%Show system configs only}" />
+        <l:task icon="filter plugin-jobConfigHistory" href="?filter=jobs" title="${%Show job configs only}" />
+        <l:task icon="filter plugin-jobConfigHistory" href="?filter=created" title="${%Show created jobs only}" />
+        <l:task icon="filter plugin-jobConfigHistory" href="?filter=deleted" title="${%Show deleted jobs only}" />
         <l:task icon="icon-document icon-md" href="?filter=all" title="${%Show all configs}" />
       </l:tasks>
     </l:side-panel>
