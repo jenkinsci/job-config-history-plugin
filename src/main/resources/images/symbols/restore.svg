@@ -1,56 +1,15 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   class="ionicon"
-   viewBox="0 0 512 512"
-   version="1.1"
-   id="svg767"
-   sodipodi:docname="chevron-down.svg"
-   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <defs
-     id="defs771" />
-  <sodipodi:namedview
-     id="namedview769"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     showgrid="false"
-     inkscape:zoom="2.0058594"
-     inkscape:cx="143.57936"
-     inkscape:cy="256"
-     inkscape:window-width="2560"
-     inkscape:window-height="1351"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg767" />
-  <title
-     id="title763">Chevron Down</title>
-  <g
-     id="g806"
-     transform="translate(-70.000007)">
-    <path
-       fill="none"
-       stroke="currentColor"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       stroke-width="48"
-       d="m 328.00001,112 -144,144 144,144"
-       id="path765" />
-    <path
-       fill="none"
-       stroke="currentColor"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       stroke-width="48"
-       d="m 467.99901,112 -144,144 144,144"
-       id="path765-5" />
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg class="ionicon" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <title>Chevron Down</title>
+ <g transform="translate(-70)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="48">
+  <path d="m328 112-144 144 144 144"/>
+  <path d="m468 112-144 144 144 144"/>
+ </g>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:title>Chevron Down</dc:title>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
 </svg>
