@@ -68,7 +68,9 @@
                         <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
                           <span>${config.operation}</span>
                           <span class="icon-sd">
-                            <l:icon src="symbol-info plugin-jobConfigHistory" onmouseOver="showTooltip(${configNr})" onmouseLeave="hideTooltip(${configNr})"  alt="${%Info}" />
+                            <!-- Create proxy object which is able to reach public name space -->
+                            <st:bind var="bindItem" value="${it}"/>
+                            <l:icon src="symbol-info plugin-jobConfigHistory" onmouseOver="bindItem.showTooltip(${configNr})" onmouseLeave="bindItem.hideTooltip(${configNr})" alt="${%Info}" />
                           </span>
                           <div style="margin-top: 15px;visibility: hidden; position: absolute; background-color: beige; padding: 3px; border: 1px solid black;" id="tooltip${configNr}">${%Old name}: ${config.oldName}<br />${%New name}: ${config.currentName}</div>
                         </j:if>
