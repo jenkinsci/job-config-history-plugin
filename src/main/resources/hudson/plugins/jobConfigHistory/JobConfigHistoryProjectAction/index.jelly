@@ -117,9 +117,11 @@
                             <td style="text-align:center">
                               <j:set var="revisionEqualsCurrent" value="${it.revisionEqualsCurrent(config.getDate())}"/>
                               <j:if test="${!revisionEqualsCurrent and !fileMissing}">
-                                <span class="icon-md">
-                                  <l:icon id="restore${configNr}" src="symbol-restore plugin-jobConfigHistory"  href="restoreQuestion?timestamp=${config.getDate()}" title="${%Restore}" />
-                                </span>
+                                <a href="restoreQuestion?timestamp=${config.getDate()}">
+                                  <span class="icon-md">
+                                    <l:icon id="restore${configNr}" src="symbol-restore plugin-jobConfigHistory" title="${%Restore}" />
+                                  </span>
+                                </a>
                                 <j:if test="${configNr == 1 and pageNum == 0}">
                                   <!--The current version is not present in history!-->
                                   <br/>
