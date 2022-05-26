@@ -75,8 +75,8 @@
                           <td>
                             <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
                               <span>${config.operation}</span>
-                              <span class="icon-sm" data-html="true" tooltip="${%Old name}: ${config.oldName} => ${%New name}: ${config.currentName}" >
-                                <l:icon src="symbol-info plugin-jobConfigHistory" alt="${%Info}" />
+                              <span class="icon-sm" >
+                                <l:icon src="symbol-info plugin-jobConfigHistory" tooltip="${%Old name}: ${config.oldName} => ${%New name}: ${config.currentName}" alt="${%Info}" />
                               </span>
                             </j:if>
                             <j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">
