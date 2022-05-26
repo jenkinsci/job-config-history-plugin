@@ -81,7 +81,7 @@
                         <td style=" text-align:center">
                           <j:set var="revisionEqualsCurrent" value="${it.revisionEqualsCurrent(config.getDate())}"/>
                           <j:if test="${!revisionEqualsCurrent and !fileMissing}">
-                            <a href="restoreQuestion?timestamp=${config.getDate()}">
+                            <a href="restoreQuestion?timestamp=${config.getDate()}" style="text-decoration: none">
                               <span class="icon-md">
                                 <l:icon id="restore${configNr}" src="symbol-restore plugin-jobConfigHistory" title="${%Restore}" />
                               </span>
