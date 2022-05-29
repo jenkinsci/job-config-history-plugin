@@ -139,7 +139,7 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
      * @return Icon path as string
      */
     public String getIcon() {
-        return "/plugin/jobConfigHistory/img/buildbadge.svg";
+        return "symbol-buildbadge plugin-jobConfigHistory";
     }
 
     /**

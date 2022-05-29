@@ -8,10 +8,10 @@
     <l:side-panel>
       <l:tasks>
         <l:task icon="icon-up icon-md" href="${rootURL}/" title="${%Back to Dashboard}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=system" title="${%Show system configs only}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=jobs" title="${%Show job configs only}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=created" title="${%Show created jobs only}" />
-        <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="?filter=deleted" title="${%Show deleted jobs only}" />
+        <l:task icon="symbol-filter plugin-jobConfigHistory" href="?filter=system" title="${%Show system configs only}" />
+        <l:task icon="symbol-filter plugin-jobConfigHistory" href="?filter=jobs" title="${%Show job configs only}" />
+        <l:task icon="symbol-filter plugin-jobConfigHistory" href="?filter=created" title="${%Show created jobs only}" />
+        <l:task icon="symbol-filter plugin-jobConfigHistory" href="?filter=deleted" title="${%Show deleted jobs only}" />
         <l:task icon="icon-document icon-md" href="?filter=all" title="${%Show all configs}" />
       </l:tasks>
     </l:side-panel>
@@ -187,8 +187,10 @@
                             <!--this prevents people from destroying their history by trying to restore deleted folder jobs
                              TODO Fix that. (see code)-->
                             <j:if test="${config.job.replace('/jobs', '/job').equals(config.job)}">
-                              <a id="restore" href="restoreQuestion?name=${config.getJob()}">
-                                <img src="/plugin/jobConfigHistory/img/restore.svg" height="16" width="16" alt="${%Restore}" />
+                              <a href="restoreQuestion?name=${config.getJob()}" style="text-decoration: none">
+                                <span class="icon-md">
+                                  <l:icon id="restore" src="symbol-restore plugin-jobConfigHistory" title="${%Restore}" />
+                                </span>
                               </a>
                             </j:if>
                           </j:if>

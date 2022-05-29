@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg class="ionicon" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <title>Chevron Down</title>
+ <g transform="translate(-70)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="48">
+  <path d="m328 112-144 144 144 144"/>
+  <path d="m468 112-144 144 144 144"/>
+ </g>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:title>Chevron Down</dc:title>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+</svg>

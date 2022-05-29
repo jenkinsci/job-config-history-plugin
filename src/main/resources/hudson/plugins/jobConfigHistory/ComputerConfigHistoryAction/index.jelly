@@ -10,14 +10,6 @@
       <div>
 
         <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"/>
-        <script type="text/javascript">
-          function showTooltip(nr) {
-            document.getElementById('tooltip' + nr).style.visibility = 'visible';
-          }
-          function hideTooltip(nr) {
-            document.getElementById('tooltip' + nr).style.visibility = 'hidden';
-          }
-        </script>
         <j:set var="configs" value="${it.getAgentConfigs()}" />
         <j:choose>
           <j:when test="${configs.size() == 0}">
@@ -67,8 +59,9 @@
                         <td>
                         <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
                           <span>${config.operation}</span>
-                          <img onmouseOver="showTooltip(${configNr})" onmouseLeave="hideTooltip(${configNr})" style="height: 16px;margin-left: 10px;width: 16px" src="${resURL}/plugin/jobConfigHistory/img/info.svg" alt="${%Info}" />
-                          <div style="margin-top: 15px;visibility: hidden; position: absolute; background-color: beige; padding: 3px; border: 1px solid black;" id="tooltip${configNr}">${%Old name}: ${config.oldName}<br />${%New name}: ${config.currentName}</div>
+                          <span class="icon-sm" data-html="true" >
+                            <l:icon src="symbol-info plugin-jobConfigHistory" tooltip="${%Old name}: ${config.oldName} => ${%New name}: ${config.currentName}" alt="${%Info}" />
+                          </span>
                         </j:if>
                         <j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">
                           ${config.operation}
@@ -88,8 +81,10 @@
                         <td style=" text-align:center">
                           <j:set var="revisionEqualsCurrent" value="${it.revisionEqualsCurrent(config.getDate())}"/>
                           <j:if test="${!revisionEqualsCurrent and !fileMissing}">
-                            <a id="restore${configNr}" href="restoreQuestion?timestamp=${config.getDate()}">
-                              <img src="/plugin/jobConfigHistory/img/restore.svg" height="16" width="16" alt="${%Restore}" />
+                            <a href="restoreQuestion?timestamp=${config.getDate()}" style="text-decoration: none">
+                              <span class="icon-md">
+                                <l:icon id="restore${configNr}" src="symbol-restore plugin-jobConfigHistory" title="${%Restore}" />
+                              </span>
                             </a>
                             <j:if test="${configNr == 1}">
                               <!--The current version is not present in history!-->

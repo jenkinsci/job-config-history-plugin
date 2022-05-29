@@ -9,13 +9,13 @@
     <l:side-panel>
       <l:tasks>
         <l:task icon="icon-up icon-md" href="${rootURL}/" title="${%Back to Dashboard}" />
-        <l:task icon="plugin/jobConfigHistory/img/confighistory.svg" href="${rootURL}/jobConfigHistory" title="${%Back to Overview}" />
+        <l:task icon="symbol-confighistory plugin-jobConfigHistory" href="${rootURL}/jobConfigHistory" title="${%Back to Overview}" />
         <j:choose>
           <j:when test="${isDeleted}">
-            <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="${rootURL}/jobConfigHistory/?filter=deleted" title="${%Back to Deleted Jobs}" />
+            <l:task icon="symbol-filter plugin-jobConfigHistory" href="${rootURL}/jobConfigHistory/?filter=deleted" title="${%Back to Deleted Jobs}" />
           </j:when>
           <j:otherwise>
-            <l:task icon="plugin/jobConfigHistory/img/filter.svg" href="${rootURL}/jobConfigHistory/?filter=system" title="${%Back to System History}" />
+            <l:task icon="symbol-filter plugin-jobConfigHistory" href="${rootURL}/jobConfigHistory/?filter=system" title="${%Back to System History}" />
           </j:otherwise>
         </j:choose>
       </l:tasks>

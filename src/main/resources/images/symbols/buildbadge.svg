@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg class="ionicon" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <title>Reader</title>
+ <g transform="matrix(.57511 0 0 .57511 231.41 204)" fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="32">
+  <rect x="96" y="48" width="320" height="416" rx="48" ry="48"/>
+  <path d="m176 128h160m-160 80h160m-160 80h80" stroke-linecap="round"/>
+ </g>
+ <g transform="translate(-344.74 -5.2347)">
+  <circle cx="440.75" cy="421.25" r="16"/>
+  <path d="m806.83 195.97c3.934-22.309 1.7687-44.699-6.1502-60.975-0.30542-0.60921-1.1174-0.74116-1.6-0.26l-60.46 60.51c-12.519 12.439-32.731 12.439-45.25 0l-26.57-26.57c-12.451-12.518-12.451-32.742 0-45.26l60.14-60.17c0.51595-0.49643 0.35828-1.3584-0.3-1.64-38.82-16.64-89.15-8.16-121.11 23.57-30.58 30.35-32.32 76-21.12 115.84 3.2446 11.546-0.25478 23.937-9.06 32.08l-166.6 152.15c-20.756 18.403-21.719 50.489-2.1045 70.104 19.615 19.615 51.701 18.652 70.104-2.1045l147.78-160.4m171.47-63.612c2.5415-5.1116 4.6972-10.423 6.4721-15.839 1.8776-5.729 3.3292-11.575 4.3611-17.427" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"/>
+ </g>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:title>Reader</dc:title>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+</svg>
