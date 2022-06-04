@@ -39,23 +39,19 @@
             <br/>
             <div>
               <form method="post" action="diffFiles" name="diffFiles">
-                <table class="jch" style="width:100%">
-                  <thead>
-                    <caption class="caption">
-                      ${it.getProject().getFullName()}
-                    </caption>
-                  </thead>
-                </table>
                 <div>
-                  <table id="confighistory" class="pane sortable jch">
+                  <table id="confighistory" class="jenkins-table sortable jenkins-!-margin-bottom-0">
+                    <caption class="caption">
+                      <h2>${it.getProject().getFullName()}</h2>
+                    </caption>
                     <thead>
                       <tr style="position:sticky; top:26px;">
-                        <th initialSortDir="up" align="left">${%Date}</th>
-                        <th>${%Operation}</th>
+                        <th initialSortDir="up" style="text-align:left">${%Date}</th>
+                        <th style="text-align:left"> ${%Operation}</th>
                         <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                           <th>${%User}</th>
                         </j:if>
-                        <th class="sortheader" align="left">${%Show File}</th>
+                        <th style="text-align:left">${%Show File}</th>
                         <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                           <th style="text-align:center">${%Restore old config}</th>
                         </j:if>
@@ -71,44 +67,40 @@
                       <j:forEach var="config" items="${configs}">
                         <j:set var="configNr" value="${configNr + 1}"/>
                         <tr class="alternate" id="table-row-${configNr}">
-                          <td>${config.date}</td>
-                          <td>
+                          <!-- Date -->
+                          <td style="text-align:left">${config.date}</td>
+                          <!-- Operation type -->
+                          <td style="text-align:left">
                             <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
                               <span>${config.operation}</span>
-                              <span class="icon-sm" >
-                                <l:icon src="symbol-info plugin-jobConfigHistory" tooltip="${%Old name}: ${config.oldName} => ${%New name}: ${config.currentName}" alt="${%Info}" />
-                              </span>
+                              <l:icon src="symbol-info plugin-jobConfigHistory" class="icon-md" tooltip="${%Old name}: ${config.oldName} => ${%New name}: ${config.currentName}" alt="${%Info}" />
                             </j:if>
                             <j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">
-                              ${config.operation}
+                              <span>${config.operation}</span>
                             </j:if>
                             <j:if test="${config.changeReasonComment != null and !config.changeReasonComment.equals(&quot;&quot;)}">
-                              <span class="icon-sm">
-                                <l:icon src="symbol-info plugin-jobConfigHistory" title="${%Change Message}: &quot;${config.changeReasonComment}&quot;" />
-                              </span>
+                              <l:icon src="symbol-info plugin-jobConfigHistory" class="icon-md" title="${%Change Message}: &quot;${config.changeReasonComment}&quot;" />
                             </j:if>
                           </td>
+                          <!-- User id -->
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                            <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                            <td style="text-align:left"><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
                           </j:if>
-                          <td>
+                          <!-- Show config -->
+                          <td style="text-align:left">
                             <j:set var="fileMissing" value="${!config.hasConfig()}"/>
                             <j:if test="${!fileMissing}">
-                              <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}"> ${%View as XML} </a>
-                              <st:nbsp />
-                              <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}">
-                                (${%RAW})
-                              </a>
+                              <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}" class="jenkins-table__link"> ${%View as XML} </a>
+                              <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}" class="jenkins-table__link jenkins-table__badge" >${%RAW}</a>
                             </j:if>
                           </td>
+                          <!-- Restore config -->
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                             <td style="text-align:center">
                               <j:set var="revisionEqualsCurrent" value="${it.revisionEqualsCurrent(config.getDate())}"/>
                               <j:if test="${!revisionEqualsCurrent and !fileMissing}">
-                                <a href="restoreQuestion?timestamp=${config.getDate()}" style="text-decoration: none">
-                                  <span class="icon-md">
-                                    <l:icon id="restore${configNr}" src="symbol-restore plugin-jobConfigHistory" title="${%Restore}" />
-                                  </span>
+                                <a href="restoreQuestion?timestamp=${config.getDate()}" class="jenkins-table__link">
+                                  <l:icon id="restore${configNr}" src="symbol-restore plugin-jobConfigHistory" class="icon-md" title="${%Restore}"  />
                                 </a>
                                 <j:if test="${configNr == 1 and pageNum == 0}">
                                   <!--The current version is not present in history!-->
@@ -123,24 +115,27 @@
                           <j:if test="${configNr == 2 and fileMissing}">
                             <j:set var="offsetIfFileMissing" value="1"/>
                           </j:if>
+                          <!-- File A -->
                           <td style="text-align:center">
                             <j:if test="${!fileMissing}">
-                              <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfFileMissing) ? true:false}" />
+                              <f:radio  name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfFileMissing) ? true:false}" />
                             </j:if>
                           </td>
+                          <!-- File B -->
                           <td style="text-align:center">
                             <j:if test="${!fileMissing}">
                               <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" />
                             </j:if>
                           </td>
+                          <!-- Trash icon -->
+                          <td style="text-align:center">
                           <j:if test="${it.hasDeleteEntryPermission()}">
-                            <td style="text-align:center">
                                 <j:set var="message" value="${%Do you really want to delete the history entry} "/>
-                                <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
-                                  <l:icon class="icon-stop icon-sm" alt="${%Delete Revision}"/>
+                              <button class="jenkins-button jenkins-button--transparent" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
+                                <l:icon src="symbol-trash" class="icon-md" alt="${%Delete Revision}"/>
                                 </button>
-                            </td>
                           </j:if>
+                          </td>
                         </tr>
                         <f:invisibleEntry>
                           <f:textbox name="name" value="${config.getJob()}" />
