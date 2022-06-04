@@ -8,7 +8,6 @@
     <l:main-panel>
       <h1>${%Job Configuration History}</h1>
       <div>
-
         <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"/>
         <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}"/>
         <j:set var="pageNum" value="${request.getParameter('pageNum')}"/>
@@ -129,12 +128,12 @@
                           </td>
                           <!-- Trash icon -->
                           <td style="text-align:center">
-                          <j:if test="${it.hasDeleteEntryPermission()}">
-                                <j:set var="message" value="${%Do you really want to delete the history entry} "/>
+                            <j:if test="${it.hasDeleteEntryPermission()}">
+                              <j:set var="message" value="${%Do you really want to delete the history entry} "/>
                               <button class="jenkins-button jenkins-button--transparent" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
                                 <l:icon src="symbol-trash" class="icon-md" alt="${%Delete Revision}"/>
-                                </button>
-                          </j:if>
+                              </button>
+                            </j:if>
                           </td>
                         </tr>
                         <f:invisibleEntry>
@@ -146,83 +145,92 @@
                 </div>
                 <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
                 <div class="jch-footer">
-                  <table class="footer-content-wrapper"><tr><td style="padding:0px;">
-                      <div style="float:left; width:34%">
-                        <table class="jch navigation">
-                          <tr>
-                            <td style="width:150px; font-weight:bold;">${%Entries per page}:</td>
-                            <!--                          <td><div class="menu-url-button current">${entriesPerPage}</div></td>-->
-                            <td><div class="${(entriesPerPage.equals(&quot;10&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${10}">10</a>
-                            </div></td>
-                            <td><div class="${(entriesPerPage.equals(&quot;25&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${25}">25</a>
-                            </div></td>
-                            <td><div class="${(entriesPerPage.equals(&quot;100&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${100}">100</a>
-                            </div></td>
-                            <td><div class="${(entriesPerPage.equals(&quot;250&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${250}">250</a>
-                            </div></td>
-                            <td><div class="${(entriesPerPage.equals(&quot;all&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="${request.getRequestURL().toString()}?entriesPerPage=${&quot;all&quot;}">${%all}</a>
-                            </div></td>
-                          </tr>
-                        </table>
+                  <div style="float:left; width:30%">
+                    <f:bottomButtonBar>
+                      <div class="jenkins-buttons-row">
+                        <h3>"${%Entries per page}:"</h3>
+                        <button class="jenkins-button">
+                          <a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${10}">10</a>
+                        </button>
+                        <button class="jenkins-button">
+                          <a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${25}">25</a>
+                        </button>
+                        <button class="jenkins-button">
+                          <a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${100}">100</a>
+                        </button>
+                        <button class="jenkins-button">
+                          <a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${250}">250</a>
+                        </button>
+                        <button class="jenkins-button">
+                          <a href="${request.getRequestURL().toString()}?entriesPerPage=${&quot;all&quot;}">${%all}</a>
+                        </button>
                       </div>
-                    <j:if test="${maxPageNum != 0}">
-                      <!--page navigation: "[ < 1 ... 5 6 7 8 9 ... 20 > ]"-->
-                      <div style="float:left; width:55%">
-                        <table  class="jch navigation">
-                          <tr>
-                            <td style=" font-weight:bold; width:60px">Page:</td>
+                    </f:bottomButtonBar>
+                  </div>
+                  <j:if test="${maxPageNum != 0}">
+                    <!--page navigation: "[ < 1 ... 5 6 7 8 9 ... 20 > ]"-->
+                    <div style="float:center; width:55%">
+                      <f:bottomButtonBar>
+                        <div class="jenkins-buttons-row">
+                          <h3>"${%Page}:"</h3>
+                          <!--"<" for one step back-->
+                          <j:choose>
+                            <j:when test="${pageNum > 0}">
+                              <button class="jenkins-button">
+                                <a href="${request.getRequestURL().toString()}?pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a>
+                              </button>
+                            </j:when>
+                            <j:otherwise>
+                              <button class="jenkins-button dead">
+                                <b>&lt;</b>
+                              </button>
+                            </j:otherwise>
+                          </j:choose>
+
+                          <!--page navigation: "1 ... 5 6 7 8 9 ... 20"-->
+                          <j:forEach var="currentPageNum" items="${relevantPageNums}">
                             <j:choose>
-                              <!--"<" for one step back-->
-                              <j:when test="${pageNum > 0}">
-                                <td><div class="menu-url-button">
-                                  <a href="${request.getRequestURL().toString()}?pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a>
-                                </div></td>
+                              <j:when test="${currentPageNum == -1}">
+                                <button class="jenkins-button dead">
+                                  <b>&#8230;</b>
+                                </button>
+                              </j:when>
+                              <j:when test="${currentPageNum == pageNum}">
+                                <button class="jenkins-button">
+                                  <b>${currentPageNum+1}</b>
+                                </button>
                               </j:when>
                               <j:otherwise>
-                                <td><div class="menu-url-button dead"><b>&lt;</b></div></td>
+                                <button class="jenkins-button">
+                                  <a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum+1}</a>
+                                </button>
                               </j:otherwise>
                             </j:choose>
+                          </j:forEach>
 
-                            <j:forEach var="currentPageNum" items="${relevantPageNums}">
-                              <j:choose>
-                                <j:when test="${currentPageNum == -1}">
-                                  <td><div class="menu-url-button-dead>">&#8230;</div></td>
-                                </j:when>
-                                <j:when test="${currentPageNum == pageNum}">
-                                  <td><div class="menu-url-button current">${currentPageNum+1}</div></td>
-                                </j:when>
-                                <j:otherwise>
-                                  <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum+1}</a></div></td>
-                                </j:otherwise>
-                              </j:choose>
-                            </j:forEach>
+                          <!--">" for one step forward-->
+                          <j:choose>
+                            <j:when test="${maxPageNum > pageNum}">
+                              <button class="jenkins-button">
+                                <a href="${request.getRequestURL().toString()}?pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a>
+                              </button>
+                            </j:when>
+                            <j:otherwise>
+                              <button class="jenkins-button dead">
+                                <b>&gt;</b>
+                              </button>
+                            </j:otherwise>
+                          </j:choose>
 
-                            <j:choose>
-                              <!--">" for one step forward-->
-                              <j:when test="${maxPageNum > pageNum}">
-                                <td><div class="menu-url-button">
-                                  <a href="${request.getRequestURL().toString()}?pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a>
-                                </div></td>
-                              </j:when>
-                              <j:otherwise>
-                                <td><div class="menu-url-button dead"><b>&gt;</b></div></td>
-                              </j:otherwise>
-                            </j:choose>
-                          </tr>
-                        </table>
-                      </div>
-                    </j:if>
-                    <j:if test="${configs.size() > 1}">
-                      <div style="float:right">
-                        <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
-                      </div>
-                    </j:if>
-                  </td></tr></table>
+                        </div>
+                      </f:bottomButtonBar>
+                    </div>
+                  </j:if>
+                  <j:if test="${configs.size() > 1}">
+                    <div style="float:right">
+                      <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
+                    </div>
+                  </j:if>
                 </div>
               </form>
             </div>
