@@ -226,10 +226,10 @@
                     <!-- Show Diff -->
                       <div style="align-self: flex-end">
                   <j:if test="${configs.size() > 1}">
-                        <button type="button" class="jenkins-button">${%Show Diffs}</button>
+                          <button class="jenkins-button">${%Show Diffs}</button>
                   </j:if>
                       <j:if test="${configs.size() == 1 || configs.size() == 0 }">
-                        <button type="button" class="jenkins-button dead">${%Show Diffs}</button>
+                          <button class="jenkins-button dead">${%Show Diffs}</button>
                       </j:if>
                 </div>
                     </div>
