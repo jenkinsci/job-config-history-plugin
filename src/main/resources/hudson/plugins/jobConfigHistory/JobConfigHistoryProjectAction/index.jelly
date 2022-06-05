@@ -143,12 +143,11 @@
                     </tbody>
                   </table>
                 </div>
-                <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
-                <div class="jch-footer">
-                  <div style="float:left; width:30%">
+                <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
                     <f:bottomButtonBar>
-                      <div class="jenkins-buttons-row">
-                        <h3>"${%Entries per page}:"</h3>
+                  <div style="display: flex; justify-content: space-between; align-items: flex-end" class="jenkins-buttons-row">
+                    <div>
+                      <h3>${%Entries per page}:</h3>
                         <button type="button" class="${(entriesPerPage.equals(&quot;10&quot;)) ? (&quot;jenkins-button current&quot;) : &quot;jenkins-button&quot;} ">
                           <a href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${10}">10</a>
                         </button>
@@ -165,19 +164,19 @@
                           <a href="${request.getRequestURL().toString()}?entriesPerPage=${&quot;all&quot;}">${%all}</a>
                         </button>
                       </div>
-                    </f:bottomButtonBar>
-                  </div>
-                  <j:if test="${maxPageNum != 0}">
+
+                    <div style="display: flex; justify-content: flex-end">
                     <!--page navigation: "[ < 1 ... 5 6 7 8 9 ... 20 > ]"-->
-                    <div style="float:center; width:55%">
-                      <f:bottomButtonBar>
-                        <div class="jenkins-buttons-row">
-                          <h3>"${%Page}:"</h3>
+                    <div>
+                      <j:if test="${maxPageNum != 0}">
+                            <h3>${%Page}:</h3>
                           <!--"<" for one step back-->
                           <j:choose>
                             <j:when test="${pageNum > 0}">
                               <button type="button" class="jenkins-button">
-                                <a href="${request.getRequestURL().toString()}?pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a>
+                              <a href="${request.getRequestURL().toString()}?pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}">
+                                <b>&lt;</b>
+                              </a>
                               </button>
                             </j:when>
                             <j:otherwise>
@@ -196,9 +195,7 @@
                                 </button>
                               </j:when>
                               <j:when test="${currentPageNum == pageNum}">
-                                <button type="button" class="jenkins-button current">
-                                  ${currentPageNum+1}
-                                </button>
+                              <button type="button" class="jenkins-button current">${currentPageNum+1}</button>
                               </j:when>
                               <j:otherwise>
                                 <button type="button" class="jenkins-button">
@@ -212,7 +209,9 @@
                           <j:choose>
                             <j:when test="${maxPageNum > pageNum}">
                               <button type="button" class="jenkins-button">
-                                <a href="${request.getRequestURL().toString()}?pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a>
+                              <a href="${request.getRequestURL().toString()}?pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}">
+                                <b>&gt;</b>
+                              </a>
                               </button>
                             </j:when>
                             <j:otherwise>
@@ -221,17 +220,22 @@
                               </button>
                             </j:otherwise>
                           </j:choose>
-
+                      </j:if>
                         </div>
-                      </f:bottomButtonBar>
-                    </div>
-                  </j:if>
+
+                    <!-- Show Diff -->
+                      <div style="align-self: flex-end">
                   <j:if test="${configs.size() > 1}">
-                    <div style="float:right">
-                      <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
-                    </div>
+                        <button type="button" class="jenkins-button">${%Show Diffs}</button>
                   </j:if>
+                      <j:if test="${configs.size() == 1 || configs.size() == 0 }">
+                        <button type="button" class="jenkins-button dead">${%Show Diffs}</button>
+                      </j:if>
                 </div>
+                    </div>
+
+                  </div>
+                </f:bottomButtonBar>
               </form>
             </div>
           </j:otherwise>
