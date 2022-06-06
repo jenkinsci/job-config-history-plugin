@@ -17,7 +17,7 @@
           <j:set var="pageNum" value="0"/>
         </j:if>
         <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
-          <j:set var="entriesPerPage" value="${defaultEntriesPerPage}"/>
+          <j:set var="entriesPerPage" value="${defaultEntriesPerPage.toString()}"/>
         </j:if>
         <j:choose>
           <j:when test="${entriesPerPage.equals(&quot;all&quot;)}">
