@@ -222,9 +222,6 @@
                   <j:if test="${configs.size() > 1}">
                           <button class="jenkins-button">${%Show Diffs}</button>
                   </j:if>
-                      <j:if test="${configs.size() == 1 || configs.size() == 0 }">
-                          <button class="jenkins-button jenkins-button--transparent">${%Show Diffs}</button>
-                      </j:if>
                 </div>
                     </div>
 
