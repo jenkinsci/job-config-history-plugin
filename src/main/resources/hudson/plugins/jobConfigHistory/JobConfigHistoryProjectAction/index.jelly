@@ -65,6 +65,8 @@
                       <j:set var="configNr" value="0"/>
                       <j:forEach var="config" items="${configs}">
                         <j:set var="configNr" value="${configNr + 1}"/>
+                        <j:set var="fileMissing" value="${!config.hasConfig()}"/>
+
                         <tr class="alternate" id="table-row-${configNr}">
                           <!-- Date -->
                           <td style="text-align:left">${config.date}</td>
@@ -86,7 +88,6 @@
                             <td style="text-align:left"><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
                           </j:if>
                           <!-- Show config -->
-                          <j:set var="fileMissing" value="${!config.hasConfig()}"/>
                           <td style="text-align:left">
                             <j:if test="${!fileMissing}">
                               <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}" class="jenkins-table__link"> ${%View as XML} </a>
