@@ -144,24 +144,24 @@
                   </table>
                 </div>
                 <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
+                <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
                     <f:bottomButtonBar>
                   <div style="display: flex; justify-content: space-between; align-items: flex-end" class="jenkins-buttons-row">
 
                     <!-- Page view filter selector -->
                     <div>
                       <h3>${%Entries per page}:</h3>
-                      <a class="${(entriesPerPage.equals(&quot;10&quot;)) ? (&quot;jenkins-button jenkins-button--primary&quot;) : &quot;jenkins-button&quot;}" href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${10}" rel="noopener noreferrer">
-                        10</a>
-                      <a class="${(entriesPerPage.equals(&quot;25&quot;)) ? (&quot;jenkins-button jenkins-button--primary&quot;) : &quot;jenkins-button&quot;}" href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${25}" rel="noopener noreferrer">
-                        25</a>
-                      <a class="${(entriesPerPage.equals(&quot;100&quot;)) ? (&quot;jenkins-button jenkins-button--primary&quot;) : &quot;jenkins-button&quot;}" href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${100}" rel="noopener noreferrer">
-                        100</a>
-                      <a class="${(entriesPerPage.equals(&quot;250&quot;)) ? (&quot;jenkins-button jenkins-button--primary&quot;) : &quot;jenkins-button&quot;}" href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${250}" rel="noopener noreferrer">
-                        250</a>
-                      <a class="${(entriesPerPage.equals(&quot;${%all}&quot;)) ? (&quot;jenkins-button jenkins-button--primary&quot;) : &quot;jenkins-button&quot;}" href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${%all}" rel="noopener noreferrer">
-                        ${%all}</a>
+                      <j:forEach var="entryPerPageVal" items="${entryPerPageArray}">
+                        <j:choose>
+                          <j:when test="${entriesPerPage.equals(entryPerPageVal)}">
+                            <a class="jenkins-button jenkins-button--primary" href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                          </j:when>
+                          <j:otherwise>
+                            <a class="jenkins-button" href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                          </j:otherwise>
+                        </j:choose>
+                      </j:forEach>
                       </div>
-
                     <div style="display: flex; justify-content: flex-end">
                     <!--page navigation: "[ < 1 ... 5 6 7 8 9 ... 20 > ]"-->
                     <div>
