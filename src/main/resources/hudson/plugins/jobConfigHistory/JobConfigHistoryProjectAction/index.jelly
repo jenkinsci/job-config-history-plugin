@@ -13,6 +13,7 @@
         <j:set var="pageNum" value="${request.getParameter('pageNum')}" />
         <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}" />
         <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}" />
+        <j:set var="requestUrl" value="${rootURL}${request.getPathInfo().toString()}"/>
         <j:if test="${pageNum == null or pageNum.equals(&quot;&quot;)}">
           <j:set var="pageNum" value="0" />
         </j:if>
@@ -157,10 +158,10 @@
                       <j:forEach var="entryPerPageVal" items="${entryPerPageArray}">
                         <j:choose>
                           <j:when test="${entriesPerPage.equals(entryPerPageVal)}">
-                            <a class="jenkins-button jenkins-button--primary" href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                            <a class="jenkins-button jenkins-button--primary" href="${requestUrl}?pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
                           </j:when>
                           <j:otherwise>
-                            <a class="jenkins-button" href="${request.getRequestURL().toString()}?pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                            <a class="jenkins-button" href="${requestUrl}?pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
                           </j:otherwise>
                         </j:choose>
                       </j:forEach>
@@ -174,7 +175,7 @@
                           <!--"<" for one step back-->
                           <j:choose>
                             <j:when test="${pageNum > 0}">
-                              <a class="jenkins-button" href="${request.getRequestURL().toString()}?pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                              <a class="jenkins-button" href="${requestUrl}?pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
                                 <b>&lt;</b>
                               </a>
                             </j:when>
@@ -193,7 +194,7 @@
                                   ${currentPageNum+1}</a>
                               </j:when>
                               <j:otherwise>
-                                <a class="jenkins-button" href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                                <a class="jenkins-button" href="${requestUrl}?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
                                   ${currentPageNum+1}</a>
                               </j:otherwise>
                             </j:choose>
@@ -202,7 +203,7 @@
                           <!--">" for one step forward-->
                           <j:choose>
                             <j:when test="${maxPageNum > pageNum}">
-                              <a class="jenkins-button" href="${request.getRequestURL().toString()}?pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                              <a class="jenkins-button" href="${requestUrl}?pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
                                 <b>&gt;</b>
                               </a>
                             </j:when>
