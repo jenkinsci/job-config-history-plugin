@@ -93,7 +93,7 @@
                           <td style="text-align:left">
                             <j:if test="${!fileMissing}">
                               <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}" class="jenkins-table__link"> ${%View as XML}</a>
-                              <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}" class="jenkins-table__link jenkins-table__badge">${%RAW}</a>
+                              <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}" class="jenkins-table__link jenkins-table__badge">(${%RAW})</a>
                             </j:if>
                           </td>
                           <!-- Restore config -->
