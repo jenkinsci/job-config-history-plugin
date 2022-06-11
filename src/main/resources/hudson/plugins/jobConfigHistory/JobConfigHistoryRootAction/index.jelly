@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
   <l:layout title="${%All Configuration History}">
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
@@ -15,26 +15,30 @@
         <l:task icon="icon-document icon-md" href="?filter=all" title="${%Show all configs}" />
       </l:tasks>
     </l:side-panel>
+
+    <j:set var="requestUrl" value="${rootURL}${request.getPathInfo().toString()}"/>
+    <j:set var="filter" value="${request.getParameter('filter')}"/>
+    <j:set var="filter" value="${filter == null ? 'system' : filter}"/>
+
+    <j:choose>
+      <j:when test="${filter == 'all'}">
+        <l:app-bar title="${%All Configuration History}"></l:app-bar>
+      </j:when>
+      <j:when test="${filter == 'jobs'}">
+        <l:app-bar title="${%Job Configuration History}"></l:app-bar>
+      </j:when>
+      <j:when test="${filter == 'created'}">
+        <l:app-bar title="${%Job Creation History}"></l:app-bar>
+      </j:when>
+      <j:when test="${filter == 'deleted'}">
+        <l:app-bar title="${%Job Deletion History}"></l:app-bar>
+      </j:when>
+      <j:otherwise>
+        <l:app-bar title="${%All Configuration History}"></l:app-bar>
+      </j:otherwise>
+    </j:choose>
+
     <l:main-panel>
-      <j:set var="filter" value="${request.getParameter('filter')}"/>
-      <j:set var="filter" value="${filter == null ? 'system' : filter}"/>
-      <j:choose>
-        <j:when test="${filter == 'all'}">
-          <h1>${%All Configuration History}</h1>
-        </j:when>
-        <j:when test="${filter == 'jobs'}">
-          <h1>${%Job Configuration History}</h1>
-        </j:when>
-        <j:when test="${filter == 'created'}">
-          <h1>${%Job Creation History}</h1>
-        </j:when>
-        <j:when test="${filter == 'deleted'}">
-          <h1>${%Job Deletion History}</h1>
-        </j:when>
-        <j:otherwise>
-          <h1>${%System Configuration History}</h1>
-        </j:otherwise>
-      </j:choose>
 
       <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}"/>
       <j:set var="pageNum" value="${request.getParameter('pageNum')}"/>
@@ -45,7 +49,7 @@
         <j:set var="pageNum" value="0"/>
       </j:if>
       <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
-        <j:set var="entriesPerPage" value="${defaultEntriesPerPage}"/>
+        <j:set var="entriesPerPage" value="${defaultEntriesPerPage.toString()}"/>
       </j:if>
       <j:choose>
         <j:when test="${entriesPerPage.equals(&quot;all&quot;) or filter.equals(&quot;created&quot;)}">
@@ -58,50 +62,6 @@
         </j:otherwise>
       </j:choose>
 
-      <div style="position:sticky; top:26px; z-index:1">
-        <table style="width:100%" class="header-content-wrapper">
-          <j:set var="selectedStyleEntry" value="font-size:14px"/>
-          <j:set var="unSelectedStyleEntry" value=""/>
-
-          <tr>
-            <td>
-              <j:set var="currentFilterSelected" value="${(filter.equalsIgnoreCase(&quot;system&quot;))}"/>
-              <div class="${(currentFilterSelected) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                <a href="?filter=system&amp;pageNum=0&amp;entriesPerPage=${entriesPerPage}" style="text-decoration:none; ${(currentFilterSelected) ? selectedStyleEntry : unselectedStyleEntry}">
-                  ${%Show system configs only}</a>
-              </div>
-            </td>
-            <td>
-              <j:set var="currentFilterSelected" value="${(filter.equalsIgnoreCase(&quot;jobs&quot;))}"/>
-              <div class="${(currentFilterSelected) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                <a href="?filter=jobs&amp;pageNum=0&amp;entriesPerPage=${entriesPerPage}" style="text-decoration:none; ${(currentFilterSelected) ? selectedStyleEntry : unselectedStyleEntry}">
-                  ${%Show job configs only}</a>
-              </div>
-            </td>
-            <td>
-              <j:set var="currentFilterSelected" value="${(filter.equalsIgnoreCase(&quot;created&quot;))}"/>
-              <div class="${(currentFilterSelected) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                <a href="?filter=created&amp;pageNum=0&amp;entriesPerPage=${entriesPerPage}" style="text-decoration:none; ${(currentFilterSelected) ? selectedStyleEntry : unselectedStyleEntry}">
-                  ${%Show created jobs only}</a>
-              </div>
-            </td>
-            <td>
-              <j:set var="currentFilterSelected" value="${(filter.equalsIgnoreCase(&quot;deleted&quot;))}"/>
-              <div class="${(currentFilterSelected) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                <a href="?filter=deleted&amp;pageNum=0&amp;entriesPerPage=${entriesPerPage}" style="text-decoration:none; ${(currentFilterSelected) ? selectedStyleEntry : unselectedStyleEntry}">
-                  ${%Show deleted jobs only}</a>
-              </div>
-            </td>
-            <td>
-              <j:set var="currentFilterSelected" value="${(filter.equalsIgnoreCase(&quot;all&quot;))}"/>
-              <div class="${(currentFilterSelected) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                <a href="?filter=all&amp;pageNum=0&amp;entriesPerPage=${entriesPerPage}" style="text-decoration:none; ${(currentFilterSelected) ? selectedStyleEntry : unselectedStyleEntry}">
-                  ${%Show all configs}</a>
-              </div>
-            </td>
-          </tr>
-        </table>
-      </div>
       <div>
 
         <j:choose>
@@ -116,7 +76,7 @@
           </j:when>
           <j:otherwise>
             <div>
-              <table class="pane sortable jch" style="width:100%;">
+              <table class="jenkins-table sortable" style="width:100%;">
                 <thead>
                   <tr style="position:sticky; top:66px;">
                     <th initialSortDir="up" >${%Date}</th>
@@ -201,83 +161,77 @@
                 </j:forEach>
               </table>
               <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
-              <div class="jch-footer">
-                <table class="footer-content-wrapper"><tr><td style="padding:0px;">
-                  <j:if test="${!filter.equals(&quot;created&quot;)}">
-                    <div style="float:left; width:34%">
-                      <table class="jch navigation">
-                        <tr>
-                          <td style="width:150px; font-weight:bold;">${%Entries per page}:</td>
-<!--                          <td><div class="menu-url-button current">${entriesPerPage}</div></td>-->
-                          <td><div class="${(entriesPerPage.equals(&quot;10&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                            <a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${10}">10</a>
-                          </div></td>
-                          <td><div class="${(entriesPerPage.equals(&quot;25&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                            <a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${25}">25</a>
-                          </div></td>
-                          <td><div class="${(entriesPerPage.equals(&quot;100&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                            <a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${100}">100</a>
-                          </div></td>
-                          <td><div class="${(entriesPerPage.equals(&quot;250&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                            <a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${250}">250</a>
-                          </div></td>
-                          <td><div class="${(entriesPerPage.equals(&quot;all&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                            <a href="${request.getRequestURL().toString()}?filter=${filter}&amp;entriesPerPage=${&quot;all&quot;}">
-                              ${%all}</a>
-                          </div></td>
-                        </tr>
-                      </table>
+              <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
+              <f:bottomButtonBar>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end" class="jenkins-buttons-row">
+                    <!-- Page view filter selector -->
+                    <div>
+                      <j:if test="${!filter.equals(&quot;created&quot;)}">
+                      <h3>${%Entries per page}:</h3>
+                      <j:forEach var="entryPerPageVal" items="${entryPerPageArray}">
+                        <j:choose>
+                          <j:when test="${entriesPerPage.equals(entryPerPageVal)}">
+                            <a class="jenkins-button jenkins-button--primary" href="${requestUrl}?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                          </j:when>
+                          <j:otherwise>
+                            <a class="jenkins-button" href="${requestUrl}?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                          </j:otherwise>
+                        </j:choose>
+                      </j:forEach>
+                      </j:if>
                     </div>
-                  </j:if>
-                  <j:if test="${maxPageNum != 0}">
+
                     <!--page navigation-->
-                    <div style="float:right; width:65%">
-                      <table  class="jch navigation">
-                        <tr>
-                          <td style=" font-weight:bold; width:60px">Page:</td>
+                    <div>
+                      <j:if test="${maxPageNum != 0}">
+                          <h3>${%Page}:</h3>
+
+                          <!--"<" for one step back-->
                           <j:choose>
-                            <!--"<" for one step back-->
                             <j:when test="${pageNum > 0}">
-                              <td><div class="menu-url-button">
-                                <a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a>
-                              </div></td>
+                              <a class="jenkins-button" href="${requestUrl}?filter=${filter}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                                <b>&lt;</b>
+                              </a>
                             </j:when>
                             <j:otherwise>
-                              <td><div class="menu-url-button dead"><b>&lt;</b></div></td>
+                              <a class="jenkins-button" rel="noopener noreferrer">
+                                <b>&lt;</b>
+                              </a>
                             </j:otherwise>
                           </j:choose>
 
+                          <!--page navigation: "1 ... 5 6 7 8 9 ... 20"-->
                           <j:forEach var="currentPageNum" items="${relevantPageNums}">
                             <j:choose>
-                              <j:when test="${currentPageNum == -1}">
-                                <td><div class="menu-url-button-dead>">&#8230;</div></td>
-                              </j:when>
                               <j:when test="${currentPageNum == pageNum}">
-                                <td><div class="menu-url-button current">${currentPageNum+1}</div></td>
+                                <a class="jenkins-button jenkins-button--primary" rel="noopener noreferrer">
+                                  ${currentPageNum+1}</a>
                               </j:when>
                               <j:otherwise>
-                                <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum+1}</a></div></td>
+                                <a class="jenkins-button" href="${requestUrl}?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                                  ${currentPageNum+1}</a>
                               </j:otherwise>
                             </j:choose>
                           </j:forEach>
 
+                          <!--">" for one step forward-->
                           <j:choose>
-                            <!--">" for one step forward-->
                             <j:when test="${maxPageNum > pageNum}">
-                              <td><div class="menu-url-button">
-                                <a href="${request.getRequestURL().toString()}?filter=${filter}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a>
-                              </div></td>
+                              <a class="jenkins-button" href="${requestUrl}?filter=${filter}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                                <b>&gt;</b>
+                              </a>
                             </j:when>
                             <j:otherwise>
-                              <td><div class="menu-url-button dead"><b>&gt;</b></div></td>
+                              <a class="jenkins-button" rel="noopener noreferrer">
+                                <b>&gt;</b>
+                              </a>
                             </j:otherwise>
                           </j:choose>
-                        </tr>
-                      </table>
+                      </j:if>
                     </div>
-                  </j:if>
-                </td></tr></table>
-              </div>
+                </div>
+              </f:bottomButtonBar>
+
             </div>
           </j:otherwise>
         </j:choose>
