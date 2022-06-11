@@ -132,8 +132,7 @@
                             <j:if test="${it.hasDeleteEntryPermission()}">
                               <j:set var="message" value="${%Do you really want to delete the history entry} "/>
                               <button type="button" class="jenkins-button jenkins-button--destructive" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
-
-                                <l:icon src="symbol-trash" class="icon-md" alt="${%Delete Revision}"/>
+                                <l:icon src="symbol-trash" class="icon-md" alt="${%Delete Revision}" />
                               </button>
                             </j:if>
                           </td>
@@ -178,7 +177,7 @@
                               </a>
                             </j:when>
                             <j:otherwise>
-                              <a class="jenkins-button jenkins-button--transparent" rel="noopener noreferrer">
+                              <a class="jenkins-button" rel="noopener noreferrer">
                                 <b>&lt;</b>
                               </a>
                             </j:otherwise>
@@ -187,11 +186,6 @@
                           <!--page navigation: "1 ... 5 6 7 8 9 ... 20"-->
                           <j:forEach var="currentPageNum" items="${relevantPageNums}">
                             <j:choose>
-                              <j:when test="${currentPageNum == -1}">
-                                <a class="jenkins-button jenkins-button--transparent" rel="noopener noreferrer">
-                                  <b>&#8230;</b>
-                                </a>
-                              </j:when>
                               <j:when test="${currentPageNum == pageNum}">
                                 <a class="jenkins-button jenkins-button--primary" rel="noopener noreferrer">
                                   ${currentPageNum+1}</a>
@@ -211,7 +205,7 @@
                               </a>
                             </j:when>
                             <j:otherwise>
-                              <a class="jenkins-button jenkins-button--transparent" rel="noopener noreferrer">
+                              <a class="jenkins-button" rel="noopener noreferrer">
                                 <b>&gt;</b>
                               </a>
                             </j:otherwise>
