@@ -2,40 +2,40 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
   <l:layout title="${%Job Configuration History}">
 
-    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css" />
 
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <l:main-panel>
       <h1>${%Job Configuration History}</h1>
       <div>
-        <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"/>
-        <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}"/>
-        <j:set var="pageNum" value="${request.getParameter('pageNum')}"/>
-        <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}"/>
-        <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}"/>
+        <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js" />
+        <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}" />
+        <j:set var="pageNum" value="${request.getParameter('pageNum')}" />
+        <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}" />
+        <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}" />
         <j:if test="${pageNum == null or pageNum.equals(&quot;&quot;)}">
-          <j:set var="pageNum" value="0"/>
+          <j:set var="pageNum" value="0" />
         </j:if>
         <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
-          <j:set var="entriesPerPage" value="${defaultEntriesPerPage.toString()}"/>
+          <j:set var="entriesPerPage" value="${defaultEntriesPerPage.toString()}" />
         </j:if>
         <j:choose>
           <j:when test="${entriesPerPage.equals(&quot;all&quot;)}">
             <j:set var="configs" value="${it.getJobConfigs()}" />
-            <j:set var="maxPageNum" value="${0}"/>
+            <j:set var="maxPageNum" value="${0}" />
           </j:when>
           <j:otherwise>
             <j:set var="configs" value="${it.getJobConfigs(pageNum*entriesPerPage, pageNum*entriesPerPage+entriesPerPage)}" />
-            <j:set var="maxPageNum" value="${it.getMaxPageNum()}"/>
+            <j:set var="maxPageNum" value="${it.getMaxPageNum()}" />
           </j:otherwise>
         </j:choose>
 
         <j:choose>
           <j:when test="${configs.size() == 0}">
               ${%No job configuration history available}
-          </j:when>
+</j:when>
           <j:otherwise>
-            <br/>
+            <br />
             <div>
               <form method="post" action="diffFiles" name="diffFiles">
                 <div>
@@ -62,10 +62,10 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <j:set var="configNr" value="0"/>
+                      <j:set var="configNr" value="0" />
                       <j:forEach var="config" items="${configs}">
-                        <j:set var="configNr" value="${configNr + 1}"/>
-                        <j:set var="fileMissing" value="${!config.hasConfig()}"/>
+                        <j:set var="configNr" value="${configNr + 1}" />
+                        <j:set var="fileMissing" value="${!config.hasConfig()}" />
 
                         <tr class="alternate" id="table-row-${configNr}">
                           <!-- Date -->
@@ -85,40 +85,42 @@
                           </td>
                           <!-- User id -->
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                            <td style="text-align:left"><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                            <td style="text-align:left">
+                              <a href="${rootURL}/user/${config.userID}">${config.userID}</a>
+                            </td>
                           </j:if>
                           <!-- Show config -->
                           <td style="text-align:left">
                             <j:if test="${!fileMissing}">
-                              <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}" class="jenkins-table__link"> ${%View as XML} </a>
-                              <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}" class="jenkins-table__link jenkins-table__badge" >${%RAW}</a>
+                              <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}" class="jenkins-table__link"> ${%View as XML}</a>
+                              <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}" class="jenkins-table__link jenkins-table__badge">${%RAW}</a>
                             </j:if>
                           </td>
                           <!-- Restore config -->
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                             <td style="text-align:center">
-                              <j:set var="revisionEqualsCurrent" value="${it.revisionEqualsCurrent(config.getDate())}"/>
+                              <j:set var="revisionEqualsCurrent" value="${it.revisionEqualsCurrent(config.getDate())}" />
                               <j:if test="${!revisionEqualsCurrent and !fileMissing}">
                                 <a href="restoreQuestion?timestamp=${config.getDate()}" class="jenkins-table__link">
-                                  <l:icon id="restore${configNr}" src="symbol-restore plugin-jobConfigHistory" class="icon-md" title="${%Restore}"  />
+                                  <l:icon id="restore${configNr}" src="symbol-restore plugin-jobConfigHistory" class="icon-md" title="${%Restore}" />
                                 </a>
                                 <j:if test="${configNr == 1 and pageNum == 0}">
                                   <!--The current version is not present in history!-->
-                                  <br/>
+                                  <br />
                                   <span style="color: rgb(196, 109, 0); font-weight:bold;">
                                     ${%Warning}: ${%This is the latest revision in history, but not the current config. Save config to create a current entry.}
-                                  </span>
+</span>
                                 </j:if>
                               </j:if>
                             </td>
                           </j:if>
                           <j:if test="${configNr == 2 and fileMissing}">
-                            <j:set var="offsetIfFileMissing" value="1"/>
+                            <j:set var="offsetIfFileMissing" value="1" />
                           </j:if>
                           <!-- File A -->
                           <td style="text-align:center">
                             <j:if test="${!fileMissing}">
-                              <f:radio  name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfFileMissing) ? true:false}" />
+                              <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfFileMissing) ? true:false}" />
                             </j:if>
                           </td>
                           <!-- File B -->
@@ -130,7 +132,7 @@
                           <!-- Trash icon -->
                           <td style="text-align:center">
                             <j:if test="${it.hasDeleteEntryPermission()}">
-                              <j:set var="message" value="${%Do you really want to delete the history entry} "/>
+                              <j:set var="message" value="${%Do you really want to delete the history entry} " />
                               <button type="button" class="jenkins-button jenkins-button--destructive" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
                                 <l:icon src="symbol-trash" class="icon-md" alt="${%Delete Revision}" />
                               </button>
@@ -146,7 +148,7 @@
                 </div>
                 <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
                 <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
-                    <f:bottomButtonBar>
+                <f:bottomButtonBar>
                   <div style="display: flex; justify-content: space-between; align-items: flex-end" class="jenkins-buttons-row">
 
                     <!-- Page view filter selector -->
@@ -162,12 +164,12 @@
                           </j:otherwise>
                         </j:choose>
                       </j:forEach>
-                      </div>
+                    </div>
                     <div style="display: flex; justify-content: flex-end">
-                    <!--page navigation: "[ < 1 ... 5 6 7 8 9 ... 20 > ]"-->
-                    <div>
-                      <j:if test="${maxPageNum != 0}">
-                            <h3>${%Page}:</h3>
+                      <!--page navigation: "[ < 1 ... 5 6 7 8 9 ... 20 > ]"-->
+                      <div>
+                        <j:if test="${maxPageNum != 0}">
+                          <h3>${%Page}:</h3>
 
                           <!--"<" for one step back-->
                           <j:choose>
@@ -210,15 +212,15 @@
                               </a>
                             </j:otherwise>
                           </j:choose>
-                      </j:if>
-                        </div>
+                        </j:if>
+                      </div>
 
-                    <!-- Show Diff -->
+                      <!-- Show Diff -->
                       <div style="align-self: flex-end">
-                  <j:if test="${configs.size() > 1}">
+                        <j:if test="${configs.size() > 1}">
                           <button class="jenkins-button">${%Show Diffs}</button>
-                  </j:if>
-                </div>
+                        </j:if>
+                      </div>
                     </div>
 
                   </div>
