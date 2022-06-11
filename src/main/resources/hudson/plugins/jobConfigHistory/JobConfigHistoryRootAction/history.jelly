@@ -146,19 +146,19 @@
                             <td style="width:150px; font-weight:bold;">${%Entries per page}:</td>
                             <!--                          <td><div class="menu-url-button current">${entriesPerPage}</div></td>-->
                             <td><div class="${(entriesPerPage.equals(&quot;10&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${10}">10</a>
+                              <a href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${10}">10</a>
                             </div></td>
                             <td><div class="${(entriesPerPage.equals(&quot;25&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${25}">25</a>
+                              <a href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${25}">25</a>
                             </div></td>
                             <td><div class="${(entriesPerPage.equals(&quot;100&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${100}">100</a>
+                              <a href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${100}">100</a>
                             </div></td>
                             <td><div class="${(entriesPerPage.equals(&quot;250&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${250}">250</a>
+                              <a href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${250}">250</a>
                             </div></td>
                             <td><div class="${(entriesPerPage.equals(&quot;all&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="${request.getRequestURL().toString()}?name=${name}&amp;entriesPerPage=${&quot;all&quot;}">
+                              <a href="?name=${name}&amp;entriesPerPage=${&quot;all&quot;}">
                                 ${%all}</a>
                             </div></td>
                           </tr>
@@ -175,7 +175,7 @@
                               <!--"<" for one step back-->
                               <j:when test="${pageNum > 0}">
                                 <td><div class="menu-url-button">
-                                  <a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a>
+                                  <a href="?name=${name}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a>
                                 </div></td>
                               </j:when>
                               <j:otherwise>
@@ -192,7 +192,7 @@
                                   <td><div class="menu-url-button current">${currentPageNum+1}</div></td>
                                 </j:when>
                                 <j:otherwise>
-                                  <td><div class="menu-url-button"><a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum+1}</a></div></td>
+                                  <td><div class="menu-url-button"><a href="?name=${name}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum+1}</a></div></td>
                                 </j:otherwise>
                               </j:choose>
                             </j:forEach>
@@ -201,7 +201,7 @@
                               <!--">" for one step forward-->
                               <j:when test="${maxPageNum > pageNum}">
                                 <td><div class="menu-url-button">
-                                  <a href="${request.getRequestURL().toString()}?name=${name}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a>
+                                  <a href="?name=${name}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a>
                                 </div></td>
                               </j:when>
                               <j:otherwise>
