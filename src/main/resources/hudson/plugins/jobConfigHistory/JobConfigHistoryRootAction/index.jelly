@@ -63,17 +63,13 @@
       </j:choose>
 
       <div>
-
         <j:choose>
           <j:when test="${!it.hasConfigurePermission() and (filter == 'system' || filter == null)}">
-            ${%No permission to view system changes}
-</j:when>
+            ${%No permission to view system changes}</j:when>
           <j:when test="${!it.hasJobConfigurePermission() and !it.hasReadExtensionPermission()}">
-            ${%No permission to view config history}
-</j:when>
+            ${%No permission to view config history}</j:when>
           <j:when test="${configs.size() == 0}">
-            ${%No configuration history available}
-</j:when>
+            ${%No configuration history available}</j:when>
           <j:otherwise>
             <div>
               <table class="jenkins-table sortable" style="width:100%;">
@@ -144,8 +140,7 @@
                       <a href="${it.createLinkToFiles(config,'xml')}"> ${%View as XML}</a>
                       <st:nbsp />
                       <a href="${it.createLinkToFiles(config,'raw')}">
-                        (${%RAW})
-</a>
+                        (${%RAW})</a>
                     </td>
                     <j:if test="${filter == 'deleted'}">
                       <td style="text-align:center">
@@ -167,8 +162,10 @@
                   </tr>
                 </j:forEach>
               </table>
+
               <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
               <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
+
               <f:bottomButtonBar>
                 <div style="display: flex; justify-content: space-between; align-items: flex-end" class="jenkins-buttons-row">
                   <!-- Page view filter selector -->
