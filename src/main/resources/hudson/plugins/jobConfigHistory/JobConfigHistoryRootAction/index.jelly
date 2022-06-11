@@ -3,7 +3,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
   <l:layout title="${%All Configuration History}">
 
-    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css" />
 
     <l:side-panel>
       <l:tasks>
@@ -16,9 +16,9 @@
       </l:tasks>
     </l:side-panel>
 
-    <j:set var="requestUrl" value="${rootURL}${request.getPathInfo().toString()}"/>
-    <j:set var="filter" value="${request.getParameter('filter')}"/>
-    <j:set var="filter" value="${filter == null ? 'system' : filter}"/>
+    <j:set var="requestUrl" value="${rootURL}${request.getPathInfo().toString()}" />
+    <j:set var="filter" value="${request.getParameter('filter')}" />
+    <j:set var="filter" value="${filter == null ? 'system' : filter}" />
 
     <j:choose>
       <j:when test="${filter == 'all'}">
@@ -40,25 +40,25 @@
 
     <l:main-panel>
 
-      <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}"/>
-      <j:set var="pageNum" value="${request.getParameter('pageNum')}"/>
-      <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}"/>
-      <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}"/>
-      <j:set var="defaultEntriesPerPage" value="${(defaultEntriesPerPage > totalEntriesNumber) ? &quot;all&quot; : defaultEntriesPerPage}"/>
+      <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}" />
+      <j:set var="pageNum" value="${request.getParameter('pageNum')}" />
+      <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}" />
+      <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}" />
+      <j:set var="defaultEntriesPerPage" value="${(defaultEntriesPerPage > totalEntriesNumber) ? &quot;all&quot; : defaultEntriesPerPage}" />
       <j:if test="${pageNum == null or pageNum.equals(&quot;&quot;)}">
-        <j:set var="pageNum" value="0"/>
+        <j:set var="pageNum" value="0" />
       </j:if>
       <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
-        <j:set var="entriesPerPage" value="${defaultEntriesPerPage.toString()}"/>
+        <j:set var="entriesPerPage" value="${defaultEntriesPerPage.toString()}" />
       </j:if>
       <j:choose>
         <j:when test="${entriesPerPage.equals(&quot;all&quot;) or filter.equals(&quot;created&quot;)}">
           <j:set var="configs" value="${it.getConfigs()}" />
-          <j:set var="maxPageNum" value="${0}"/>
+          <j:set var="maxPageNum" value="${0}" />
         </j:when>
         <j:otherwise>
           <j:set var="configs" value="${it.getConfigs(pageNum*entriesPerPage, pageNum*entriesPerPage+entriesPerPage)}" />
-          <j:set var="maxPageNum" value="${it.getMaxPageNum()}"/>
+          <j:set var="maxPageNum" value="${it.getMaxPageNum()}" />
         </j:otherwise>
       </j:choose>
 
@@ -67,19 +67,19 @@
         <j:choose>
           <j:when test="${!it.hasConfigurePermission() and (filter == 'system' || filter == null)}">
             ${%No permission to view system changes}
-          </j:when>
+</j:when>
           <j:when test="${!it.hasJobConfigurePermission() and !it.hasReadExtensionPermission()}">
             ${%No permission to view config history}
-          </j:when>
+</j:when>
           <j:when test="${configs.size() == 0}">
             ${%No configuration history available}
-          </j:when>
+</j:when>
           <j:otherwise>
             <div>
               <table class="jenkins-table sortable" style="width:100%;">
                 <thead>
                   <tr style="position:sticky; top:66px;">
-                    <th initialSortDir="up" >${%Date}</th>
+                    <th initialSortDir="up">${%Date}</th>
                     <j:choose>
                       <j:when test="${filter == 'jobs' || filter == 'deleted' || filter == 'created'}">
                         <th>${%Job configuration}</th>
@@ -102,9 +102,9 @@
                   </tr>
                 </thead>
 
-                <j:set var="configNr" value="0"/>
+                <j:set var="configNr" value="0" />
                 <j:forEach var="config" items="${configs}">
-                  <j:set var="configNr" value="${configNr + 1}"/>
+                  <j:set var="configNr" value="${configNr + 1}" />
                   <tr class="alternate">
                     <td>${config.date}</td>
                     <j:choose>
@@ -120,28 +120,35 @@
                       <j:otherwise>
                         <j:choose>
                           <j:when test="${config.job.contains('_deleted_')}">
-                            <td><a href="history?name=${config.job}" id="deleted">${config.job}</a></td>
+                            <td>
+                              <a href="history?name=${config.job}" id="deleted">${config.job}</a>
+                            </td>
                           </j:when>
                           <j:otherwise>
-                            <td><a href="history?name=${config.job}">${config.job}</a>&amp;nbsp;(system)</td>
+                            <td>
+                              <a href="history?name=${config.job}">${config.job}</a>
+                              &amp;nbsp;(system)
+                            </td>
                           </j:otherwise>
                         </j:choose>
                       </j:otherwise>
                     </j:choose>
                     <td>${config.operation}</td>
                     <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                      <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
+                      <td>
+                        <a href="${rootURL}/user/${config.userID}">${config.userID}</a>
+                      </td>
                     </j:if>
                     <td>
                       <!-- TODO check whether job has a JobConfigHistoryProjectAction before hyperlinking -->
-                      <a href="${it.createLinkToFiles(config,'xml')}"> ${%View as XML} </a>
+                      <a href="${it.createLinkToFiles(config,'xml')}"> ${%View as XML}</a>
                       <st:nbsp />
                       <a href="${it.createLinkToFiles(config,'raw')}">
                         (${%RAW})
-                      </a>
+</a>
                     </td>
                     <j:if test="${filter == 'deleted'}">
-                      <td  style="text-align:center">
+                      <td style="text-align:center">
                         <j:if test="${it.getLastAvailableConfigXml(config.getJob()) != null}">
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                             <!--this prevents people from destroying their history by trying to restore deleted folder jobs
@@ -160,13 +167,13 @@
                   </tr>
                 </j:forEach>
               </table>
-              <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
+              <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
               <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
               <f:bottomButtonBar>
                 <div style="display: flex; justify-content: space-between; align-items: flex-end" class="jenkins-buttons-row">
-                    <!-- Page view filter selector -->
-                    <div>
-                      <j:if test="${!filter.equals(&quot;created&quot;)}">
+                  <!-- Page view filter selector -->
+                  <div>
+                    <j:if test="${!filter.equals(&quot;created&quot;)}">
                       <h3>${%Entries per page}:</h3>
                       <j:forEach var="entryPerPageVal" items="${entryPerPageArray}">
                         <j:choose>
@@ -178,57 +185,57 @@
                           </j:otherwise>
                         </j:choose>
                       </j:forEach>
-                      </j:if>
-                    </div>
+                    </j:if>
+                  </div>
 
-                    <!--page navigation-->
-                    <div>
-                      <j:if test="${maxPageNum != 0}">
-                          <h3>${%Page}:</h3>
+                  <!--page navigation-->
+                  <div>
+                    <j:if test="${maxPageNum != 0}">
+                      <h3>${%Page}:</h3>
 
-                          <!--"<" for one step back-->
-                          <j:choose>
-                            <j:when test="${pageNum > 0}">
-                              <a class="jenkins-button" href="${requestUrl}?filter=${filter}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
-                                <b>&lt;</b>
-                              </a>
-                            </j:when>
-                            <j:otherwise>
-                              <a class="jenkins-button" rel="noopener noreferrer">
-                                <b>&lt;</b>
-                              </a>
-                            </j:otherwise>
-                          </j:choose>
+                      <!--"<" for one step back-->
+                      <j:choose>
+                        <j:when test="${pageNum > 0}">
+                          <a class="jenkins-button" href="${requestUrl}?filter=${filter}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                            <b>&lt;</b>
+                          </a>
+                        </j:when>
+                        <j:otherwise>
+                          <a class="jenkins-button" rel="noopener noreferrer">
+                            <b>&lt;</b>
+                          </a>
+                        </j:otherwise>
+                      </j:choose>
 
-                          <!--page navigation: "1 ... 5 6 7 8 9 ... 20"-->
-                          <j:forEach var="currentPageNum" items="${relevantPageNums}">
-                            <j:choose>
-                              <j:when test="${currentPageNum == pageNum}">
-                                <a class="jenkins-button jenkins-button--primary" rel="noopener noreferrer">
+                      <!--page navigation: "1 ... 5 6 7 8 9 ... 20"-->
+                      <j:forEach var="currentPageNum" items="${relevantPageNums}">
+                        <j:choose>
+                          <j:when test="${currentPageNum == pageNum}">
+                            <a class="jenkins-button jenkins-button--primary" rel="noopener noreferrer">
                                   ${currentPageNum+1}</a>
-                              </j:when>
-                              <j:otherwise>
-                                <a class="jenkins-button" href="${requestUrl}?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                          </j:when>
+                          <j:otherwise>
+                            <a class="jenkins-button" href="${requestUrl}?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
                                   ${currentPageNum+1}</a>
-                              </j:otherwise>
-                            </j:choose>
-                          </j:forEach>
+                          </j:otherwise>
+                        </j:choose>
+                      </j:forEach>
 
-                          <!--">" for one step forward-->
-                          <j:choose>
-                            <j:when test="${maxPageNum > pageNum}">
-                              <a class="jenkins-button" href="${requestUrl}?filter=${filter}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
-                                <b>&gt;</b>
-                              </a>
-                            </j:when>
-                            <j:otherwise>
-                              <a class="jenkins-button" rel="noopener noreferrer">
-                                <b>&gt;</b>
-                              </a>
-                            </j:otherwise>
-                          </j:choose>
-                      </j:if>
-                    </div>
+                      <!--">" for one step forward-->
+                      <j:choose>
+                        <j:when test="${maxPageNum > pageNum}">
+                          <a class="jenkins-button" href="${requestUrl}?filter=${filter}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                            <b>&gt;</b>
+                          </a>
+                        </j:when>
+                        <j:otherwise>
+                          <a class="jenkins-button" rel="noopener noreferrer">
+                            <b>&gt;</b>
+                          </a>
+                        </j:otherwise>
+                      </j:choose>
+                    </j:if>
+                  </div>
                 </div>
               </f:bottomButtonBar>
 
