@@ -71,26 +71,22 @@
             ${%No configuration history available}</j:when>
           <j:otherwise>
             <div>
-              <table class="jenkins-table sortable" style="width:100%;">
+              <table class="jenkins-table sortable">
                 <thead>
-                  <tr style="position:sticky; top:66px;">
-                    <th initialSortDir="up">${%Date}</th>
-                    <j:choose>
-                      <j:when test="${filter == 'jobs' || filter == 'deleted' || filter == 'created'}">
-                        <th>${%Job configuration}</th>
-                      </j:when>
-                      <j:when test="${filter == 'all'}">
-                        <th>${%Job and system configuration}</th>
-                      </j:when>
-                      <j:otherwise>
-                        <th>${%System configuration}</th>
-                      </j:otherwise>
-                    </j:choose>
-                    <th>${%Operation}</th>
+                  <tr>
+                    <th initialSortDir="up" style="text-align:left">${%Date}</th>
+                    <th style="text-align:left">
+                      <j:choose>
+                        <j:when test="${filter == 'jobs' || filter == 'deleted' || filter == 'created'}">${%Job configuration}</j:when>
+                        <j:when test="${filter == 'all'}">${%Job and system configuration}</j:when>
+                        <j:otherwise>${%System configuration}</j:otherwise>
+                      </j:choose>
+                    </th>
+                    <th style="text-align:left">${%Operation}</th>
                     <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                      <th>${%User}</th>
+                      <th style="text-align:left">${%User}</th>
                     </j:if>
-                    <th>${%File(raw)}</th>
+                    <th style="text-align:left">${%File(RAW)}</th>
                     <j:if test="${filter == 'deleted'}">
                       <th style="text-align:center">${%Restore project}</th>
                     </j:if>
