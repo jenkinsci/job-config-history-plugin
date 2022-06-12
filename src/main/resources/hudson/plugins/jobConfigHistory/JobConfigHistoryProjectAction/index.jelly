@@ -32,8 +32,7 @@
 
         <j:choose>
           <j:when test="${configs.size() == 0}">
-              ${%No job configuration history available}
-</j:when>
+              ${%No job configuration history available}</j:when>
           <j:otherwise>
             <br />
             <div>
@@ -44,7 +43,7 @@
                       <h2>${it.getProject().getFullName()}</h2>
                     </caption>
                     <thead>
-                      <tr style="position:sticky; top:26px;">
+                      <tr>
                         <th initialSortDir="up" style="text-align:left">${%Date}</th>
                         <th style="text-align:left"> ${%Operation}</th>
                         <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
@@ -108,8 +107,7 @@
                                   <!--The current version is not present in history!-->
                                   <br />
                                   <span style="color: rgb(196, 109, 0); font-weight:bold;">
-                                    ${%Warning}: ${%This is the latest revision in history, but not the current config. Save config to create a current entry.}
-</span>
+                                    ${%Warning}: ${%This is the latest revision in history, but not the current config. Save config to create a current entry.}</span>
                                 </j:if>
                               </j:if>
                             </td>
