@@ -66,7 +66,7 @@ public class JobConfigHistory extends Plugin {
                     Messages.JobConfigHistory_deleteEntryPermission(),
                     Messages._JobConfigHistory_deleteEntryPermissionDescription(),
                     Jenkins.ADMINISTER,
-                    PermissionScope.JENKINS);
+                    new PermissionScope[]{PermissionScope.ITEM, PermissionScope.COMPUTER});
     /**
      * our logger.
      */
