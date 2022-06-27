@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.40</version>
+        <version>4.41</version>
     </parent>
 
     <artifactId>jobConfigHistory</artifactId>
@@ -68,7 +68,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-2.346.x</artifactId>
-                <version>1438.v6a_2c29d73f82</version>
+                <version>1451.v15f1fdb_772a_f</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
