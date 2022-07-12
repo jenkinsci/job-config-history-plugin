@@ -36,6 +36,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
+import org.kohsuke.stapler.verb.POST;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -463,6 +464,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * @param rsp Outgoing StaplerResponse
      * @throws IOException If something goes wrong
      */
+    @POST
     public final void doRestore(StaplerRequest req, StaplerResponse rsp)
             throws IOException {
         checkConfigurePermission();
@@ -492,6 +494,7 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
     }
 
+    @POST
     public final void doDeleteRevision(StaplerRequest req, StaplerResponse rsp) {
         checkDeleteEntryPermission();
         final String timestamp = req.getParameter("timestamp");
