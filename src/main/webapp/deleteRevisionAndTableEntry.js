@@ -11,7 +11,8 @@ function removeEntryFromTable(id, timestamp, name, message) {
         if (name != null) {
             url += "&name=" + name;
         }
-        xmlHttp.open("GET", url, true);
+        xmlHttp.open("POST", url, true);
+        xmlHttp.setRequestHeader(document.head.getAttribute('data-crumb-header'), document.head.getAttribute('data-crumb-value'));
         xmlHttp.send(null);
     } else {
         return false;
