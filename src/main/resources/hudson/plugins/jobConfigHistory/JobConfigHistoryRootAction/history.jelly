@@ -149,100 +149,100 @@
 
                 </tbody>
               </table>
+            </f:form>
 
-              <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
-              <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
-              <f:bottomButtonBar>
-                <div style="display: flex; justify-content: space-between; flex-flow: row wrap;" class="jenkins-buttons-row">
-                  <div style="flex-direction: column; display: flex; justify-content: space-between">
-                    <!-- Page view filter selector -->
-                    <!-- <j:if test="${!filter.equals(&quot;created&quot;)}"> -->
-                    <div>
-                      <h3>${%Entries per page}:</h3>
-                    </div>
-                    <div>
-                      <j:forEach var="entryPerPageVal" items="${entryPerPageArray}">
+            <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
+            <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
+            <f:bottomButtonBar>
+              <div style="display: flex; justify-content: space-between; flex-flow: row wrap;" class="jenkins-buttons-row">
+                <div style="flex-direction: column; display: flex; justify-content: space-between">
+                  <!-- Page view filter selector -->
+                  <!-- <j:if test="${!filter.equals(&quot;created&quot;)}"> -->
+                  <div>
+                    <h3>${%Entries per page}:</h3>
+                  </div>
+                  <div>
+                    <j:forEach var="entryPerPageVal" items="${entryPerPageArray}">
+                      <j:choose>
+                        <j:when test="${entriesPerPage.equals(entryPerPageVal)}">
+                          <a class="jenkins-button jenkins-button--primary" href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                        </j:when>
+                        <j:otherwise>
+                          <a class="jenkins-button" href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                        </j:otherwise>
+                      </j:choose>
+                    </j:forEach>
+                  </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; flex-flow: row wrap;">
+                  <div style="flex-flow: column wrap">
+                    <!--page navigation: "[ < 1 ... 5 6 7 8 9 ... 20 > ]"-->
+                    <j:if test="${maxPageNum != 0}">
+                      <h3>${%Page}:</h3>
+
+                      <!--"<" for one step back-->
+                      <j:choose>
+                        <j:when test="${pageNum > 0}">
+                          <a class="jenkins-button" href="?name=${name}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                            <b>&lt;</b>
+                          </a>
+                        </j:when>
+                        <j:otherwise>
+                          <a class="jenkins-button" rel="noopener noreferrer">
+                            <b>&lt;</b>
+                          </a>
+                        </j:otherwise>
+                      </j:choose>
+
+                      <!--page navigation: "1 ... 5 6 7 8 9 ... 20"-->
+                      <j:forEach var="currentPageNum" items="${relevantPageNums}">
                         <j:choose>
-                          <j:when test="${entriesPerPage.equals(entryPerPageVal)}">
-                            <a class="jenkins-button jenkins-button--primary" href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                          <j:when test="${currentPageNum == pageNum}">
+                            <a class="jenkins-button jenkins-button--primary" rel="noopener noreferrer">
+                                  ${currentPageNum+1}</a>
                           </j:when>
                           <j:otherwise>
-                            <a class="jenkins-button" href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                            <a class="jenkins-button" href="?name=${name}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                                  ${currentPageNum+1}</a>
                           </j:otherwise>
                         </j:choose>
                       </j:forEach>
-                    </div>
+
+                      <!--">" for one step forward-->
+                      <j:choose>
+                        <j:when test="${maxPageNum > pageNum}">
+                          <a class="jenkins-button" href="?name=${name}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                            <b>&gt;</b>
+                          </a>
+                        </j:when>
+                        <j:otherwise>
+                          <a class="jenkins-button" rel="noopener noreferrer">
+                            <b>&gt;</b>
+                          </a>
+                        </j:otherwise>
+                      </j:choose>
+                    </j:if>
                   </div>
-                  <div style="display: flex; justify-content: space-between; flex-flow: row wrap;">
-                    <div style="flex-flow: column wrap">
-                      <!--page navigation: "[ < 1 ... 5 6 7 8 9 ... 20 > ]"-->
-                      <j:if test="${maxPageNum != 0}">
-                        <h3>${%Page}:</h3>
+                  <div style="display: flex; justify-content: space-between; align-items: space-between; flex-flow: column-reverse wrap">
 
-                        <!--"<" for one step back-->
-                        <j:choose>
-                          <j:when test="${pageNum > 0}">
-                            <a class="jenkins-button" href="?name=${name}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
-                              <b>&lt;</b>
-                            </a>
-                          </j:when>
-                          <j:otherwise>
-                            <a class="jenkins-button" rel="noopener noreferrer">
-                              <b>&lt;</b>
-                            </a>
-                          </j:otherwise>
-                        </j:choose>
-
-                        <!--page navigation: "1 ... 5 6 7 8 9 ... 20"-->
-                        <j:forEach var="currentPageNum" items="${relevantPageNums}">
-                          <j:choose>
-                            <j:when test="${currentPageNum == pageNum}">
-                              <a class="jenkins-button jenkins-button--primary" rel="noopener noreferrer">
-                                  ${currentPageNum+1}</a>
-                            </j:when>
-                            <j:otherwise>
-                              <a class="jenkins-button" href="?name=${name}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
-                                  ${currentPageNum+1}</a>
-                            </j:otherwise>
-                          </j:choose>
-                        </j:forEach>
-
-                        <!--">" for one step forward-->
-                        <j:choose>
-                          <j:when test="${maxPageNum > pageNum}">
-                            <a class="jenkins-button" href="?name=${name}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
-                              <b>&gt;</b>
-                            </a>
-                          </j:when>
-                          <j:otherwise>
-                            <a class="jenkins-button" rel="noopener noreferrer">
-                              <b>&gt;</b>
-                            </a>
-                          </j:otherwise>
-                        </j:choose>
-                      </j:if>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: space-between; flex-flow: column-reverse wrap">
-
-                      <!-- Restore Project -->
-                      <!-- this prevents people from destroying their history by trying to restore deleted folder jobs -->
-                      <!-- TODO: Fix that. (see code)-->
-                      <!-- Restore button (visible only after deletion) -->
-                      <j:if test="${isDeleted and (configs.size() > 1) and configs.get(0).job.replace('/jobs', '/job').equals(configs.get(0).job)}">
-                        <form id="rootHistoryRestoreProjectForm" method="post" action="forwardToRestoreQuestion?name=${name}" name="forward">
-                          <button type="submit" form="rootHistoryRestoreProjectForm" style="align-self: stretch" class="jenkins-button">${%Restore project}</button>
-                        </form>
-                      </j:if>
-                      <!-- Show Diff -->
-                      <j:if test="${configs.size() > 1}">
-                        <button type="submit" form="rootHistoryDiffForm" style="align-self: stretch" class="jenkins-button">${%Show Diffs}</button>
-                      </j:if>
-                    </div>
+                    <!-- Restore Project -->
+                    <!-- this prevents people from destroying their history by trying to restore deleted folder jobs -->
+                    <!-- TODO: Fix that. (see code)-->
+                    <!-- Restore button (visible only after deletion) -->
+                    <j:if test="${isDeleted and (configs.size() > 1) and configs.get(0).job.replace('/jobs', '/job').equals(configs.get(0).job)}">
+                      <form id="rootHistoryRestoreProjectForm" method="post" action="forwardToRestoreQuestion?name=${name}" name="forward">
+                        <button type="submit" form="rootHistoryRestoreProjectForm" style="align-self: stretch" class="jenkins-button">${%Restore project}</button>
+                      </form>
+                    </j:if>
+                    <!-- Show Diff -->
+                    <j:if test="${configs.size() > 1}">
+                      <button type="submit" form="rootHistoryDiffForm" style="align-self: stretch" class="jenkins-button">${%Show Diffs}</button>
+                    </j:if>
                   </div>
-
                 </div>
-              </f:bottomButtonBar>
-            </f:form>
+
+              </div>
+            </f:bottomButtonBar>
 
           </j:otherwise>
         </j:choose>
