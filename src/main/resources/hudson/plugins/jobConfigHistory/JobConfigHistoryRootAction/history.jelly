@@ -222,7 +222,7 @@
                         </j:choose>
                       </j:if>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: space-between; flex-flow: column wrap">
+                    <div style="display: flex; justify-content: space-between; align-items: space-between; flex-flow: column-reverse wrap">
 
                       <!-- Restore Project -->
                       <!-- this prevents people from destroying their history by trying to restore deleted folder jobs -->
