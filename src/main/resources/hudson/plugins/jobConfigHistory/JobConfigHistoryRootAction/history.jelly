@@ -9,6 +9,7 @@
 
     <j:set var="name" value="${request.getParameter('name')}" />
     <j:set var="isDeleted" value="${name.contains('_deleted_')}" />
+    <j:set var="offsetIfDeleted" value="${isDeleted ? 1 : 0}" />
     <l:side-panel>
       <l:tasks>
         <l:task icon="icon-up" href="${rootURL}/" title="${%Back to Dashboard}" />
@@ -112,15 +113,10 @@
                           <a href="configOutput?type=raw&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}" class="jenkins-table__link jenkins-table__badge">(${%RAW})</a>
                         </j:if>
                       </td>
-
-                      <j:if test="${isDeleted}">
-                        <j:set var="offsetIfDeleted" value="1" />
-                      </j:if>
-
                       <!-- File A -->
                       <td style="text-align:center">
                         <j:if test="${config.operation != 'Deleted'}">
-                          <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfFileMissing) ? true:false}" />
+                          <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfDeleted) ? true:false}" />
                         </j:if>
                       </td>
 
