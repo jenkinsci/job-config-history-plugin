@@ -1,14 +1,18 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core"
+  xmlns:st="jelly:stapler"
+  xmlns:l="/lib/layout"
+  xmlns:f="/lib/form">
   <l:layout title="${%Job Configuration History}">
 
-    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css" />
 
-    <j:set var="name" value="${request.getParameter('name')}"/>
-    <j:set var="isDeleted" value="${name.contains('_deleted_')}"/>
+    <j:set var="name" value="${request.getParameter('name')}" />
+    <j:set var="isDeleted" value="${name.contains('_deleted_')}" />
+    <j:set var="offsetIfDeleted" value="${isDeleted ? 1 : 0}" />
     <l:side-panel>
       <l:tasks>
-        <l:task icon="icon-up icon-md" href="${rootURL}/" title="${%Back to Dashboard}" />
+        <l:task icon="icon-up" href="${rootURL}/" title="${%Back to Dashboard}" />
         <l:task icon="symbol-confighistory plugin-jobConfigHistory" href="${rootURL}/jobConfigHistory" title="${%Back to Overview}" />
         <j:choose>
           <j:when test="${isDeleted}">
@@ -30,30 +34,29 @@
         </j:otherwise>
       </j:choose>
 
-      <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}"/>
-      <j:set var="pageNum" value="${request.getParameter('pageNum')}"/>
-      <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}"/>
-      <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}"/>
-      <j:set var="defaultEntriesPerPage" value="${(defaultEntriesPerPage > totalEntriesNumber) ? &quot;all&quot; : defaultEntriesPerPage}"/>
+      <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}" />
+      <j:set var="pageNum" value="${request.getParameter('pageNum')}" />
+      <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}" />
+      <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}" />
+      <j:set var="defaultEntriesPerPage" value="${(defaultEntriesPerPage > totalEntriesNumber) ? &quot;all&quot; : defaultEntriesPerPage}" />
       <j:if test="${pageNum == null or pageNum.equals(&quot;&quot;)}">
-        <j:set var="pageNum" value="0"/>
+        <j:set var="pageNum" value="0" />
       </j:if>
       <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
-        <j:set var="entriesPerPage" value="${defaultEntriesPerPage}"/>
+        <j:set var="entriesPerPage" value="${defaultEntriesPerPage.toString()}" />
       </j:if>
       <j:choose>
         <j:when test="${entriesPerPage.equals(&quot;all&quot;)}">
           <j:set var="configs" value="${it.getSingleConfigs(name)}" />
-          <j:set var="maxPageNum" value="${0}"/>
+          <j:set var="maxPageNum" value="${0}" />
         </j:when>
         <j:otherwise>
           <j:set var="configs" value="${it.getSingleConfigs(name, pageNum*entriesPerPage, pageNum*entriesPerPage+entriesPerPage)}" />
-          <j:set var="maxPageNum" value="${it.getMaxPageNum()}"/>
+          <j:set var="maxPageNum" value="${it.getMaxPageNum()}" />
         </j:otherwise>
       </j:choose>
 
-
-      <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"/>
+      <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js" />
       <div>
         <j:choose>
           <j:when test="${!it.hasConfigurePermission() and !isDeleted}">
@@ -66,171 +69,178 @@
               ${%No configuration history available}
           </j:when>
           <j:otherwise>
-            <br/>
-            <div>
-              <f:form method="post" action="diffFiles" enctype="multipart/form-data">
-                <table class="jch" style="width:100%">
-                  <thead>
-                    <caption class="caption">${name}</caption>
-                  </thead>
-                </table>
-                <div>
-                  <table id="confighistory"  class="pane sortable jch" style="width:100%">
-                    <thead>
-                      <tr style="position:sticky; top:26px;">
-                        <th initialSortDir="up">${%Date}</th>
-                        <th>${%Operation}</th>
-                        <th>${%User}</th>
-                        <th>${%Show File}</th>
-                        <th style="text-align:center">${%File A}</th>
-                        <th style="text-align:center">${%File B}</th>
-                        <j:if test="${it.hasDeleteEntryPermission()}">
-                          <th style="text-align:center">${%Delete Entry}</th>
-                        </j:if>
-                      </tr>
-                    </thead>
+            <f:form id="rootHistoryDiffForm" method="post" action="diffFiles" enctype="multipart/form-data">
 
-                    <j:set var="configNr" value="0"/>
-                    <j:forEach var="config" items="${configs}">
-                      <j:set var="configNr" value="${configNr + 1}"/>
-                      <tr class="alternate" id="table-row-${configNr}">
-                        <td>${config.date}</td>
-                        <td>${config.operation}</td>
-                        <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
-                        <td>
-                          <j:if test="${config.operation != 'Deleted'}">
-                            <a href="configOutput?type=xml&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}"> ${%View as XML} </a>
-                            <st:nbsp />
-                            <a href="configOutput?type=raw&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}">
-                              (${%RAW})
-                            </a>
-                          </j:if>
-                        </td>
-                        <j:if test="${isDeleted}">
-                          <j:set var="offsetIfDeleted" value="1"/>
+              <table id="confighistory" class="jenkins-table sortable">
+                <caption class="caption">
+                  <h2>${name}</h2>
+                </caption>
+                <thead>
+                  <tr>
+                    <th initialSortDir="up" style="text-align:left">${%Date}</th>
+                    <th style="text-align:left"> ${%Operation}</th>
+                    <th style="text-align:left">${%User}</th>
+                    <th style="text-align:left">${%Show File}</th>
+                    <th style="text-align:center">${%File A}</th>
+                    <th style="text-align:center">${%File B}</th>
+                    <j:if test="${it.hasDeleteEntryPermission()}">
+                      <th style="text-align:center">${%Delete Entry}</th>
+                    </j:if>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <j:set var="configNr" value="0" />
+                  <j:forEach var="config" items="${configs}">
+                    <j:set var="configNr" value="${configNr + 1}" />
+
+                    <tr class="alternate" id="table-row-${configNr}">
+                      <!-- Date -->
+                      <td style="text-align:left">${config.date}</td>
+
+                      <!-- Operation type -->
+                      <td>${config.operation}</td>
+
+                      <!-- User id -->
+                      <td style="text-align:left">
+                        <a href="${rootURL}/user/${config.userID}">${config.userID}</a>
+                      </td>
+
+                      <!-- Show config -->
+                      <td style="text-align:left">
+                        <j:if test="${config.operation != 'Deleted'}">
+                          <a href="configOutput?type=xml&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}" class="jenkins-table__link"> ${%View as XML}</a>
+                          <a href="configOutput?type=raw&amp;name=${config.getJob()}&amp;timestamp=${config.getDate()}" class="jenkins-table__link jenkins-table__badge">(${%RAW})</a>
                         </j:if>
-                        <td style="text-align:center">
-                          <j:if test="${config.operation != 'Deleted'}">
-                            <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfDeleted) ? true:false}" />
-                          </j:if>
-                        </td>
-                        <td style="text-align:center">
-                          <j:if test="${config.operation != 'Deleted'}">
-                            <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == (1 + offsetIfDeleted) ? true:false}" />
-                          </j:if>
-                        </td>
-                        <j:if test="${it.hasDeleteEntryPermission()}">
-                          <j:if test="${!config.operation.toString().equals(&quot;Deleted&quot;)}">
-                            <td style="text-align:center">
-                                  <j:set var="message" value="${%Do you really want to delete the history entry} "/>
-                                  <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', '${config.getJob()}', '${message}')" value="X">
-                                    <l:icon class="icon-stop icon-sm" alt="${%Delete Revision}"/>
-                                  </button>
-                            </td>
-                          </j:if>
+                      </td>
+                      <!-- File A -->
+                      <td style="text-align:center">
+                        <j:if test="${config.operation != 'Deleted'}">
+                          <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfDeleted) ? true:false}" />
                         </j:if>
-                      </tr>
-                      <f:invisibleEntry>
-                        <f:textbox name="name" value="${config.getJob()}" />
-                      </f:invisibleEntry>
+                      </td>
+
+                      <!-- File B -->
+                      <td style="text-align:center">
+                        <j:if test="${config.operation != 'Deleted'}">
+                          <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == (1 + offsetIfDeleted) ? true:false}" />
+                        </j:if>
+                      </td>
+
+                      <!-- Trash icon -->
+                      <td style="text-align:center">
+                        <j:if test="${it.hasDeleteEntryPermission() and !config.operation.toString().equals(&quot;Deleted&quot;)}">
+                          <j:set var="message" value="${%Do you really want to delete the history entry} " />
+                          <button type="button" class="jenkins-button jenkins-button--destructive" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', '${config.getJob()}', '${message}')" value="X">
+                            <l:icon src="symbol-trash" class="icon-md" alt="${%Delete Revision}" />
+                          </button>
+                        </j:if>
+                      </td>
+                    </tr>
+
+                    <f:invisibleEntry>
+                      <f:textbox name="name" value="${config.getJob()}" />
+                    </f:invisibleEntry>
+                  </j:forEach>
+
+                </tbody>
+              </table>
+            </f:form>
+
+            <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
+            <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
+            <f:bottomButtonBar>
+              <div style="display: flex; justify-content: space-between; flex-flow: row wrap;" class="jenkins-buttons-row">
+                <div style="flex-direction: column; display: flex; justify-content: space-between">
+                  <!-- Page view filter selector -->
+                  <!-- <j:if test="${!filter.equals(&quot;created&quot;)}"> -->
+                  <div>
+                    <h3>${%Entries per page}:</h3>
+                  </div>
+                  <div>
+                    <j:forEach var="entryPerPageVal" items="${entryPerPageArray}">
+                      <j:choose>
+                        <j:when test="${entriesPerPage.equals(entryPerPageVal)}">
+                          <a class="jenkins-button jenkins-button--primary" href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                        </j:when>
+                        <j:otherwise>
+                          <a class="jenkins-button" href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
+                        </j:otherwise>
+                      </j:choose>
                     </j:forEach>
-                  </table>
+                  </div>
                 </div>
-                <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}"/>
-                <div class="jch-footer">
-                  <table class="footer-content-wrapper"><tr><td style="padding:0px;">
-                    <j:if test="${!filter.equals(&quot;created&quot;)}">
-                      <div style="float:left; width:34%">
-                        <table class="jch navigation">
-                          <tr>
-                            <td style="width:150px; font-weight:bold;">${%Entries per page}:</td>
-                            <!--                          <td><div class="menu-url-button current">${entriesPerPage}</div></td>-->
-                            <td><div class="${(entriesPerPage.equals(&quot;10&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${10}">10</a>
-                            </div></td>
-                            <td><div class="${(entriesPerPage.equals(&quot;25&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${25}">25</a>
-                            </div></td>
-                            <td><div class="${(entriesPerPage.equals(&quot;100&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${100}">100</a>
-                            </div></td>
-                            <td><div class="${(entriesPerPage.equals(&quot;250&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="?name=${name}&amp;pageNum=${0}&amp;entriesPerPage=${250}">250</a>
-                            </div></td>
-                            <td><div class="${(entriesPerPage.equals(&quot;all&quot;)) ? (&quot;menu-url-button current&quot;) : &quot;menu-url-button&quot;}">
-                              <a href="?name=${name}&amp;entriesPerPage=${&quot;all&quot;}">
-                                ${%all}</a>
-                            </div></td>
-                          </tr>
-                        </table>
-                      </div>
-                    </j:if>
+                <div style="display: flex; justify-content: space-between; flex-flow: row wrap;">
+                  <div style="flex-flow: column wrap">
+                    <!--page navigation: "[ < 1 ... 5 6 7 8 9 ... 20 > ]"-->
                     <j:if test="${maxPageNum != 0}">
-                      <!--page navigation-->
-                      <div style="float:left; width:55%">
-                        <table  class="jch navigation">
-                          <tr>
-                            <td style=" font-weight:bold; width:60px">Page:</td>
-                            <j:choose>
-                              <!--"<" for one step back-->
-                              <j:when test="${pageNum > 0}">
-                                <td><div class="menu-url-button">
-                                  <a href="?name=${name}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}"><b>&lt;</b></a>
-                                </div></td>
-                              </j:when>
-                              <j:otherwise>
-                                <td><div class="menu-url-button dead"><b>&lt;</b></div></td>
-                              </j:otherwise>
-                            </j:choose>
+                      <h3>${%Page}:</h3>
 
-                            <j:forEach var="currentPageNum" items="${relevantPageNums}">
-                              <j:choose>
-                                <j:when test="${currentPageNum == -1}">
-                                  <td><div class="menu-url-button-dead>">&#8230;</div></td>
-                                </j:when>
-                                <j:when test="${currentPageNum == pageNum}">
-                                  <td><div class="menu-url-button current">${currentPageNum+1}</div></td>
-                                </j:when>
-                                <j:otherwise>
-                                  <td><div class="menu-url-button"><a href="?name=${name}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}">${currentPageNum+1}</a></div></td>
-                                </j:otherwise>
-                              </j:choose>
-                            </j:forEach>
+                      <!--"<" for one step back-->
+                      <j:choose>
+                        <j:when test="${pageNum > 0}">
+                          <a class="jenkins-button" href="?name=${name}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                            <b>&lt;</b>
+                          </a>
+                        </j:when>
+                        <j:otherwise>
+                          <a class="jenkins-button" rel="noopener noreferrer">
+                            <b>&lt;</b>
+                          </a>
+                        </j:otherwise>
+                      </j:choose>
 
-                            <j:choose>
-                              <!--">" for one step forward-->
-                              <j:when test="${maxPageNum > pageNum}">
-                                <td><div class="menu-url-button">
-                                  <a href="?name=${name}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}"><b>&gt;</b></a>
-                                </div></td>
-                              </j:when>
-                              <j:otherwise>
-                                <td><div class="menu-url-button dead"><b>&gt;</b></div></td>
-                              </j:otherwise>
-                            </j:choose>
-                          </tr>
-                        </table>
-                      </div>
+                      <!--page navigation: "1 ... 5 6 7 8 9 ... 20"-->
+                      <j:forEach var="currentPageNum" items="${relevantPageNums}">
+                        <j:choose>
+                          <j:when test="${currentPageNum == pageNum}">
+                            <a class="jenkins-button jenkins-button--primary" rel="noopener noreferrer">
+                                  ${currentPageNum+1}</a>
+                          </j:when>
+                          <j:otherwise>
+                            <a class="jenkins-button" href="?name=${name}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                                  ${currentPageNum+1}</a>
+                          </j:otherwise>
+                        </j:choose>
+                      </j:forEach>
+
+                      <!--">" for one step forward-->
+                      <j:choose>
+                        <j:when test="${maxPageNum > pageNum}">
+                          <a class="jenkins-button" href="?name=${name}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                            <b>&gt;</b>
+                          </a>
+                        </j:when>
+                        <j:otherwise>
+                          <a class="jenkins-button" rel="noopener noreferrer">
+                            <b>&gt;</b>
+                          </a>
+                        </j:otherwise>
+                      </j:choose>
                     </j:if>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: space-between; flex-flow: column-reverse wrap">
+
+                    <!-- Show Diff -->
                     <j:if test="${configs.size() > 1}">
-                      <div style="float:right">
-                        <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
-                      </div>
+                      <button type="submit" form="rootHistoryDiffForm" style="align-self: stretch" class="jenkins-button">${%Show Diffs}</button>
                     </j:if>
-                  </td></tr></table>
+
+                    <!-- Restore Project -->
+                    <!-- this prevents people from destroying their history by trying to restore deleted folder jobs -->
+                    <!-- TODO: Fix that. (see code)-->
+                    <!-- Restore button (visible only after deletion) -->
+                    <j:if test="${isDeleted and (configs.size() > 1) and configs.get(0).job.replace('/jobs', '/job').equals(configs.get(0).job)}">
+                      <form id="rootHistoryRestoreProjectForm" method="post" action="forwardToRestoreQuestion?name=${name}" name="forward">
+                        <button type="submit" form="rootHistoryRestoreProjectForm" style="align-self: stretch" class="jenkins-button">${%Restore project}</button>
+                      </form>
+                    </j:if>
+                  </div>
                 </div>
-              </f:form>
-            </div>
-            <!--this prevents people from destroying their history by trying to restore deleted folder jobs
-             TODO Fix that. (see code)-->
-            <j:if test="${isDeleted and (configs.size() > 1) and configs.get(0).job.replace('/jobs', '/job').equals(configs.get(0).job)}">
-              <div style="padding:2px"/>
-              <form method="post" action="forwardToRestoreQuestion?name=${name}" name="forward">
-                <div align="right">
-                  <input class="jch standard-button" type="submit" value="${%Restore project}"/>
-                </div>
-              </form>
-            </j:if>
+
+              </div>
+            </f:bottomButtonBar>
+
           </j:otherwise>
         </j:choose>
       </div>
