@@ -178,6 +178,11 @@
 
                       <!--"<" for one step back-->
                       <j:choose>
+                        <j:when test="${currentPageNum == -1}">
+                          <a class="jenkins-button" rel="noopener noreferrer">
+                            <b>&#8230;</b>
+                          </a>
+                        </j:when>
                         <j:when test="${pageNum > 0}">
                           <a class="jenkins-button" href="?name=${name}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
                             <b>&lt;</b>
