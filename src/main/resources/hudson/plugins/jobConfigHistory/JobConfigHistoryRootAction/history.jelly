@@ -131,9 +131,19 @@
                       <td style="text-align:center">
                         <j:if test="${it.hasDeleteEntryPermission() and !config.operation.toString().equals(&quot;Deleted&quot;)}">
                           <j:set var="message" value="${%Do you really want to delete the history entry} " />
-                          <button type="button" class="jenkins-button jenkins-button--destructive" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', '${config.getJob()}', '${message}')" value="X">
-                            <l:icon src="symbol-trash" class="icon-md" alt="${%Delete Revision}" />
-                          </button>
+                          <div id="target-div" jobName="${config.getJob()}">
+                            <script>
+                              var targetDiv = document.querySelector('#target-div');
+                              var JsJobName = targetDiv.getAttribute('jobName');
+
+                              function removeEntryFromTable2(JsConfigNr, JsConfigDate, JsMessage){
+                                removeEntryFromTable('table-row-' + JsConfigNr, JsConfigDate, JsJobName, JsMessage)
+                              }
+                            </script>
+                            <button type="button" class="jenkins-button jenkins-button--destructive" onClick="removeEntryFromTable2('${configNr}', '${config.date}', '${message}')" value="X">
+                              <l:icon src="symbol-trash" class="icon-md" alt="${%Delete Revision}" />
+                            </button>
+                          </div>
                         </j:if>
                       </td>
                     </tr>
