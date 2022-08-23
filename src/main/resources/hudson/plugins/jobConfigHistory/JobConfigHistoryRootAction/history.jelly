@@ -141,7 +141,7 @@
                               }
                             </script>
                             <button type="button" class="jenkins-button jenkins-button--destructive" onClick="removeEntryFromTable2('${configNr}', '${config.date}', '${message}')" value="X">
-                              <l:icon src="symbol-trash" class="icon-md" alt="${%Delete Revision}" />
+                              <l:icon src="symbol-trash-outline plugin-ionicons-api" class="icon-md" alt="${%Delete Revision}" />
                             </button>
                           </div>
                         </j:if>
