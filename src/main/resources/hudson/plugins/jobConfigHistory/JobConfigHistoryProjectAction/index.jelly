@@ -186,6 +186,11 @@
                           <!--page navigation: "1 ... 5 6 7 8 9 ... 20"-->
                           <j:forEach var="currentPageNum" items="${relevantPageNums}">
                             <j:choose>
+                              <j:when test="${currentPageNum == -1}">
+                                <a class="jenkins-button" rel="noopener noreferrer">
+                                  <b>&#8230;</b>
+                                </a>
+                              </j:when>
                               <j:when test="${currentPageNum == pageNum}">
                                 <a class="jenkins-button jenkins-button--primary" rel="noopener noreferrer">
                                   ${currentPageNum+1}</a>
