@@ -60,7 +60,7 @@
                         <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
                           <span>${config.operation}</span>
                           <span class="icon-sm" data-html="true" >
-                            <l:icon src="symbol-info plugin-jobConfigHistory" tooltip="${%Old name}: ${config.oldName} => ${%New name}: ${config.currentName}" alt="${%Info}" />
+                            <l:icon src="symbol-information-circle-outline plugin-ionicons-api" tooltip="${%Old name}: ${config.oldName} => ${%New name}: ${config.currentName}" alt="${%Info}" />
                           </span>
                         </j:if>
                         <j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">

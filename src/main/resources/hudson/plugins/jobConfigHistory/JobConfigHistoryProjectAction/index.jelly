@@ -73,13 +73,13 @@
                           <td style="text-align:left">
                             <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
                               <span>${config.operation}</span>
-                              <l:icon src="symbol-info plugin-jobConfigHistory" class="icon-md" tooltip="${%Old name}: ${config.oldName} => ${%New name}: ${config.currentName}" alt="${%Info}" />
+                              <l:icon src="symbol-information-circle-outline plugin-ionicons-api" class="icon-md" tooltip="${%Old name}: ${config.oldName} => ${%New name}: ${config.currentName}" alt="${%Info}" />
                             </j:if>
                             <j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">
                               <span>${config.operation}</span>
                             </j:if>
                             <j:if test="${config.changeReasonComment != null and !config.changeReasonComment.equals(&quot;&quot;)}">
-                              <l:icon src="symbol-info plugin-jobConfigHistory" class="icon-md" title="${%Change Message}: &quot;${config.changeReasonComment}&quot;" />
+                              <l:icon src="symbol-information-circle-outline plugin-ionicons-api" class="icon-md" title="${%Change Message}: &quot;${config.changeReasonComment}&quot;" />
                             </j:if>
                           </td>
                           <!-- User id -->
@@ -132,7 +132,7 @@
                             <j:if test="${it.hasDeleteEntryPermission()}">
                               <j:set var="message" value="${%Do you really want to delete the history entry} " />
                               <button type="button" class="jenkins-button jenkins-button--destructive" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
-                                <l:icon src="symbol-trash" class="icon-md" alt="${%Delete Revision}" />
+                                <l:icon src="symbol-trash-outline plugin-ionicons-api" class="icon-md" alt="${%Delete Revision}" />
                               </button>
                             </j:if>
                           </td>
