@@ -21,7 +21,7 @@ public class JobConfigHistoryPurgerIT
     @Override
     public void before() throws Throwable {
         super.before();
-        jch = jenkins.getPlugin(JobConfigHistory.class);
+        jch = PluginUtils.getPlugin();
         purger = new JobConfigHistoryPurger();
     }
 

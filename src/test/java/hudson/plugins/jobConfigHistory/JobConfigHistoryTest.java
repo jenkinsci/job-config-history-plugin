@@ -37,10 +37,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.MockFolder;
+import org.kohsuke.stapler.RequestImpl;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
+import org.mockito.Mockito;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.regex.Pattern;
 
 import static org.hamcrest.CoreMatchers.endsWith;
@@ -50,6 +58,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -62,6 +71,16 @@ public class JobConfigHistoryTest {
     public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.create();
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
+    
+    private StaplerRequest mockStaplerRequest() throws ServletException {
+        Stapler stapler = mock(Stapler.class, CALLS_REAL_METHODS);
+        ServletContext servletContext = mock(ServletContext.class);
+        ServletConfig servletConfig = mock(ServletConfig.class);
+        Mockito.when(servletConfig.getServletContext()).thenReturn(servletContext);
+        stapler.init(servletConfig);
+        HttpServletRequest rawRequest = mock(HttpServletRequest.class);
+        return new RequestImpl(stapler, rawRequest, Collections.emptyList(), null);
+    }
 
     /**
      * Test of configure method, of class JobConfigHistory.
@@ -69,7 +88,7 @@ public class JobConfigHistoryTest {
     @Test
     public void testConfigure() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
-        sut.configure(null, createFormData());
+        sut.configure(mockStaplerRequest(), createFormData());
     }
 
     /**
@@ -78,7 +97,7 @@ public class JobConfigHistoryTest {
     @Test
     public void testGetHistoryRootDir() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
-        sut.configure(null, createFormData());
+        sut.configure(mockStaplerRequest(), createFormData());
         assertThat(sut.getHistoryRootDir(), endsWith("config-history"));
     }
 
@@ -97,7 +116,7 @@ public class JobConfigHistoryTest {
     @Test
     public void testGetMaxHistoryEntries() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
-        sut.configure(null, createFormData());
+        sut.configure(mockStaplerRequest(), createFormData());
         String expResult = "5";
         String result = sut.getMaxHistoryEntries();
         assertEquals(expResult, result);
@@ -126,7 +145,7 @@ public class JobConfigHistoryTest {
     @Test
     public void testGetEntriesPerSite() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
-        sut.configure(null, createFormData());
+        sut.configure(mockStaplerRequest(), createFormData());
         String expResult = "50";
         String result = sut.getMaxEntriesPerPage();
         assertEquals(expResult, result);
@@ -155,7 +174,7 @@ public class JobConfigHistoryTest {
     @Test
     public void testGetMaxDaysToKeepEntries() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
-        sut.configure(null, createFormData());
+        sut.configure(mockStaplerRequest(), createFormData());
         assertEquals("5", sut.getMaxDaysToKeepEntries());
     }
 
@@ -205,7 +224,7 @@ public class JobConfigHistoryTest {
     @Test
     public void testGetExcludePattern() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
-        sut.configure(null, createFormData());
+        sut.configure(mockStaplerRequest(), createFormData());
         String result = sut.getExcludePattern();
         assertEquals(JobConfigHistoryConsts.DEFAULT_EXCLUDE, result);
     }
@@ -307,17 +326,17 @@ public class JobConfigHistoryTest {
                 new File(sut.getConfiguredHistoryRootDir().getPath()).getName(),
                 "config-history");
         JSONObject formData = createFormData();
-        sut.configure(null, formData);
+        sut.configure(mockStaplerRequest(), formData);
         assertEquals(
                 new File(sut.getConfiguredHistoryRootDir().getPath()).getName(),
                 "config-history");
         formData.put("historyRootDir", "");
-        sut.configure(null, formData);
+        sut.configure(mockStaplerRequest(), formData);
         assertEquals(
                 new File(sut.getConfiguredHistoryRootDir().getPath()).getName(),
                 "config-history");
         formData.put("historyRootDir", "/tmp/");
-        sut.configure(null, formData);
+        sut.configure(mockStaplerRequest(), formData);
         assertEquals(
                 new File(sut.getConfiguredHistoryRootDir().getPath()).getName(),
                 "config-history");
@@ -337,7 +356,7 @@ public class JobConfigHistoryTest {
         JobConfigHistory sut = createNonSavingSut();
         JSONObject formData = createFormData();
 
-        sut.configure(null, formData);
+        sut.configure(mockStaplerRequest(), formData);
         assertTrue(sut.isSaveable(freeStyleProject, xmlFile));
         assertTrue(sut.isSaveable(matrixProject, xmlFile));
         assertTrue(sut.isSaveable(mock(MockFolder.class), xmlFile));
@@ -357,7 +376,7 @@ public class JobConfigHistoryTest {
         assertTrue(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
         JSONObject formData = createFormData();
         formData.put("excludePattern", Pattern.quote(File.separator + "branches" + File.separator));
-        sut.configure(null, formData);
+        sut.configure(mockStaplerRequest(), formData);
         assertFalse(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
     }
 

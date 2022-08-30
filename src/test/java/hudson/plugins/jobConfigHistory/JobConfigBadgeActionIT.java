@@ -168,7 +168,7 @@ public class JobConfigBadgeActionIT
     }
 
     private void shouldPageContainBadge(String user) throws Exception {
-        final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+        final JobConfigHistory jch = PluginUtils.getPlugin();
         HtmlPage htmlPage = webClient.goTo("job/newjob");
 
         // default = always
