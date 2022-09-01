@@ -132,7 +132,6 @@ public class JobConfigHistory extends GlobalConfiguration {
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData) {
         req.bindJSON(this, formData);
-        loadRegexpPatterns();
         save();
         return true;
     }
@@ -311,6 +310,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     @DataBoundSetter
     public void setExcludePattern(String excludePattern) {
         this.excludePattern = excludePattern;
+        loadRegexpPatterns();
     }
 
     /**
