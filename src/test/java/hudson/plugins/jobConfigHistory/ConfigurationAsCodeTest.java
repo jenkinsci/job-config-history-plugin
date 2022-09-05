@@ -31,6 +31,7 @@ public class ConfigurationAsCodeTest {
         assertEquals("20", plugin.getMaxEntriesPerPage());
         assertEquals("10000", plugin.getMaxHistoryEntries());
         assertEquals("test1\\.xml|test2\\.xml", plugin.getExcludePattern());
+        assertEquals("test1\\.xml|test2\\.xml", plugin.getExcludeRegexpPattern().pattern());
         assertEquals("SYSTEM,user1,user2", plugin.getExcludedUsers());
         assertEquals("never", plugin.getShowBuildBadges());
         assertTrue(plugin.getShowChangeReasonCommentWindow());
