@@ -23,6 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import hudson.BulkChange;
 import hudson.Extension;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
@@ -48,6 +49,7 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -130,9 +132,13 @@ public class JobConfigHistory extends GlobalConfiguration {
     }
 
     @Override
-    public boolean configure(StaplerRequest req, JSONObject formData) {
-        req.bindJSON(this, formData);
-        save();
+    public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+        try (BulkChange bc = new BulkChange(this)) {
+            req.bindJSON(this, formData);
+            bc.commit();
+        } catch (IOException e) {
+            LOG.log(Level.WARNING, "Failed to save " + getConfigFile(), e);
+        }
         return true;
     }
     
@@ -167,6 +173,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     @DataBoundSetter
     public void setHistoryRootDir(String historyRootDir) {
         this.historyRootDir = historyRootDir;
+        save();
     }
 
     /**
@@ -189,6 +196,7 @@ public class JobConfigHistory extends GlobalConfiguration {
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             maxHistoryEntries = trimmedValue;
         }
+        save();
     }
 
     /**
@@ -211,6 +219,7 @@ public class JobConfigHistory extends GlobalConfiguration {
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             maxEntriesPerPage = trimmedValue;
         }
+        save();
     }
 
     /**
@@ -233,6 +242,7 @@ public class JobConfigHistory extends GlobalConfiguration {
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             maxDaysToKeepEntries = trimmedValue;
         }
+        save();
     }
 
     /**
@@ -281,6 +291,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     @DataBoundSetter
     public void setSkipDuplicateHistory(boolean skipDuplicateHistory) {
         this.skipDuplicateHistory = skipDuplicateHistory;
+        save();
     }
 
     /**
@@ -311,6 +322,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     public void setExcludePattern(String excludePattern) {
         this.excludePattern = excludePattern;
         loadRegexpPatterns();
+        save();
     }
 
     /**
@@ -330,6 +342,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     @DataBoundSetter
     public void setSaveModuleConfiguration(boolean saveModuleConfiguration) {
         this.saveModuleConfiguration = saveModuleConfiguration;
+        save();
     }
 
     /**
@@ -349,6 +362,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     @DataBoundSetter
     public void setShowBuildBadges(String showBuildBadges) {
         this.showBuildBadges = showBuildBadges;
+        save();
     }
 
     /**
@@ -368,6 +382,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     @DataBoundSetter
     public void setShowChangeReasonCommentWindow(boolean showChangeReasonCommentWindow) {
         this.showChangeReasonCommentWindow = showChangeReasonCommentWindow;
+        save();
     }
 
     /**
@@ -473,6 +488,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     @DataBoundSetter
     public void setExcludedUsers(String excludedUsers) {
         this.excludedUsers = excludedUsers;
+        save();
     }
 
     /**
