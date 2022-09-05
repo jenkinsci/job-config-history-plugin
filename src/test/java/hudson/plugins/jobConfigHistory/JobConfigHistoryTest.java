@@ -300,9 +300,9 @@ public class JobConfigHistoryTest {
     @Test
     public void testGetExcludeRegexpPattern() {
         JobConfigHistory sut = createSut();
-        Pattern expResult = null;
+        Pattern expResult = Pattern.compile(JobConfigHistoryConsts.DEFAULT_EXCLUDE);
         Pattern result = sut.getExcludeRegexpPattern();
-        assertEquals(expResult, result);
+        assertEquals(expResult.pattern(), result.pattern());
     }
 
     /**

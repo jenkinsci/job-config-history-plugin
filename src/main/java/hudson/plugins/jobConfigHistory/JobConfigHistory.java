@@ -129,6 +129,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     @Restricted(NoExternalUse.class)
     public JobConfigHistory() {
         load();
+        loadRegexpPatterns();
     }
 
     @Override

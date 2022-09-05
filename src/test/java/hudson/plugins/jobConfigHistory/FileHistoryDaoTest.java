@@ -385,7 +385,9 @@ public class FileHistoryDaoTest {
 //        System.out.println("jenkinsloc...=" + getJenkinsRuleSut().getSystemHistory("jenkins.model.JenkinsLocationConfiguration").size());;
         assertEquals(3, getJenkinsRuleSut().getSystemRevisionAmount("config"));
         assertEquals(1, getJenkinsRuleSut().getSystemRevisionAmount("jenkins.telemetry.Correlator"));
-        assertEquals(2, getJenkinsRuleSut().getSystemRevisionAmount("hudson.model.UpdateCenter"));
+        // Excluded by default exclude patterns
+        assertEquals(0, getJenkinsRuleSut().getSystemRevisionAmount("hudson.model.UpdateCenter"));
+        assertEquals(0, getJenkinsRuleSut().getSystemRevisionAmount("nodeMonitors"));
     }
 
     /* TODO Fixme
@@ -441,7 +443,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testGetSystemConfigsMap() {
         Iterator<String> it =
-                Arrays.asList(new String[]{"config", "hudson.model.UpdateCenter", "jenkins.model.JenkinsLocationConfiguration", "jenkins.telemetry.Correlator", "nodeMonitors"}).iterator();
+                Arrays.asList(new String[]{"config", "jenkins.model.JenkinsLocationConfiguration", "jenkins.telemetry.Correlator"}).iterator();
         getJenkinsRuleSut().getSystemConfigsMap().forEach((k, v) -> {
             assertEquals(it.next(), k);
             assertTrue(v instanceof LazyHistoryDescr);
