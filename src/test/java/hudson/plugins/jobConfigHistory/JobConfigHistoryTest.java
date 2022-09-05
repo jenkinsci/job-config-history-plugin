@@ -230,17 +230,6 @@ public class JobConfigHistoryTest {
     }
 
     /**
-     * Test of getDefaultExcludePattern method, of class JobConfigHistory.
-     */
-    @Test
-    public void testGetDefaultExcludePattern() {
-        JobConfigHistory sut = createSut();
-        String expResult = JobConfigHistoryConsts.DEFAULT_EXCLUDE;
-        String result = sut.getDefaultExcludePattern();
-        assertEquals(expResult, result);
-    }
-
-    /**
      * Test of getSaveModuleConfiguration method, of class JobConfigHistory.
      */
     @Test

@@ -295,16 +295,6 @@ public class JobConfigHistory extends GlobalConfiguration {
     }
 
     /**
-     * Used by the configuration page.
-     *
-     * @return The default regular expression for 'system' file names to exclude
-     * from saving.
-     */
-    public String getDefaultExcludePattern() {
-        return JobConfigHistoryConsts.DEFAULT_EXCLUDE;
-    }
-
-    /**
      * Gets the regular expression pattern for 'system' configuration files to exclude from saving.
      *
      * @return The regular expression pattern.
