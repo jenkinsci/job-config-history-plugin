@@ -8,5 +8,5 @@ unclassified:
     maxHistoryEntries: "10000"
     saveModuleConfiguration: false
     showBuildBadges: "never"
-    showChangeReasonCommentWindow: false
-    skipDuplicateHistory: false
+    showChangeReasonCommentWindow: true
+    skipDuplicateHistory: true

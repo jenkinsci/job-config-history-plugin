@@ -33,8 +33,8 @@ public class ConfigurationAsCodeTest {
         assertEquals("test1\\.xml|test2\\.xml", plugin.getExcludePattern());
         assertEquals("SYSTEM,user1,user2", plugin.getExcludedUsers());
         assertEquals("never", plugin.getShowBuildBadges());
-        assertFalse(plugin.getShowChangeReasonCommentWindow());
-        assertFalse(plugin.getSkipDuplicateHistory());
+        assertTrue(plugin.getShowChangeReasonCommentWindow());
+        assertTrue(plugin.getSkipDuplicateHistory());
         assertFalse(plugin.getSaveModuleConfiguration());
     }
 
