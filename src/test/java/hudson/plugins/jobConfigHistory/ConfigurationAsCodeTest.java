@@ -13,6 +13,7 @@ import static io.jenkins.plugins.casc.misc.Util.getUnclassifiedRoot;
 import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ConfigurationAsCodeTest {
@@ -32,9 +33,9 @@ public class ConfigurationAsCodeTest {
         assertEquals("test1\\.xml|test2\\.xml", plugin.getExcludePattern());
         assertEquals("SYSTEM,user1,user2", plugin.getExcludedUsers());
         assertEquals("never", plugin.getShowBuildBadges());
-        assertTrue(!plugin.getShowChangeReasonCommentWindow());
-        assertTrue(!plugin.getSkipDuplicateHistory());
-        assertTrue(!plugin.getSaveModuleConfiguration());
+        assertFalse(plugin.getShowChangeReasonCommentWindow());
+        assertFalse(plugin.getSkipDuplicateHistory());
+        assertFalse(plugin.getSaveModuleConfiguration());
     }
 
     @Issue("JENKINS-55667")
