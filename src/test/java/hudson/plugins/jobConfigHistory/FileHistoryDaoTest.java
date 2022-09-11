@@ -385,6 +385,7 @@ public class FileHistoryDaoTest {
 //        System.out.println("jenkinsloc...=" + getJenkinsRuleSut().getSystemHistory("jenkins.model.JenkinsLocationConfiguration").size());;
         assertEquals(3, getJenkinsRuleSut().getSystemRevisionAmount("config"));
         assertEquals(1, getJenkinsRuleSut().getSystemRevisionAmount("jenkins.telemetry.Correlator"));
+        assertEquals(1, getJenkinsRuleSut().getSystemRevisionAmount("jenkins.model.JenkinsLocationConfiguration"));
         // Excluded by default exclude patterns
         assertEquals(0, getJenkinsRuleSut().getSystemRevisionAmount("hudson.model.UpdateCenter"));
         assertEquals(0, getJenkinsRuleSut().getSystemRevisionAmount("nodeMonitors"));
