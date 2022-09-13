@@ -23,11 +23,11 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import hudson.Plugin;
+import hudson.BulkChange;
+import hudson.Extension;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractProject;
-import hudson.model.Descriptor.FormException;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Saveable;
@@ -36,13 +36,18 @@ import hudson.security.Permission;
 import hudson.security.PermissionGroup;
 import hudson.security.PermissionScope;
 import hudson.util.FormValidation;
+import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
-import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -57,7 +62,9 @@ import java.util.regex.PatternSyntaxException;
  *
  * @author John Borghi
  */
-public class JobConfigHistory extends Plugin {
+@Symbol("jobConfigHistory")
+@Extension
+public class JobConfigHistory extends GlobalConfiguration {
 
     private static final PermissionGroup PERMISSION_GROUP = new PermissionGroup(JobConfigHistory.class, Messages._displayName());
     protected static final Permission DELETEENTRY_PERMISSION =
@@ -99,7 +106,7 @@ public class JobConfigHistory extends Plugin {
     /**
      * Regular expression pattern for 'system' configuration files to exclude from saving.
      */
-    private String excludePattern;
+    private String excludePattern = JobConfigHistoryConsts.DEFAULT_EXCLUDE;
     /**
      * Compiled regular expression pattern.
      */
@@ -118,28 +125,27 @@ public class JobConfigHistory extends Plugin {
      */
     private boolean showChangeReasonCommentWindow = true;
 
-    @Override
-    public void start() throws Exception {
+    @DataBoundConstructor
+    @Restricted(NoExternalUse.class)
+    public JobConfigHistory() {
         load();
         loadRegexpPatterns();
     }
 
     @Override
-    public void configure(StaplerRequest req, JSONObject formData)
-            throws IOException, ServletException, FormException {
-
-        historyRootDir = formData.getString("historyRootDir").trim();
-        setMaxHistoryEntries(formData.getString("maxHistoryEntries").trim());
-        setMaxDaysToKeepEntries(formData.getString("maxDaysToKeepEntries").trim());
-        setMaxEntriesPerPage(formData.getString("maxEntriesPerPage").trim());
-        skipDuplicateHistory = formData.getBoolean("skipDuplicateHistory");
-        excludePattern = formData.getString("excludePattern");
-        saveModuleConfiguration = formData.getBoolean("saveModuleConfiguration");
-        showBuildBadges = formData.getString("showBuildBadges");
-        excludedUsers = formData.getString("excludedUsers");
-        showChangeReasonCommentWindow = formData.getBoolean("showChangeReasonCommentWindow");
-        save();
-        loadRegexpPatterns();
+    public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+        try (BulkChange bc = new BulkChange(this)) {
+            req.bindJSON(this, formData);
+            bc.commit();
+        } catch (IOException e) {
+            LOG.log(Level.WARNING, "Failed to save " + getConfigFile(), e);
+        }
+        return true;
+    }
+    
+    @Override
+    protected XmlFile getConfigFile() {
+        return new XmlFile(new File(Jenkins.get().getRootDir(),"jobConfigHistory.xml"));
     }
 
     /**
@@ -159,6 +165,17 @@ public class JobConfigHistory extends Plugin {
     public String getHistoryRootDir() {
         return historyRootDir;
     }
+    
+    /**
+     * Sets the root directory for storing histories.
+     *
+     * @param historyRootDir The root directory.
+     */
+    @DataBoundSetter
+    public void setHistoryRootDir(String historyRootDir) {
+        this.historyRootDir = historyRootDir;
+        save();
+    }
 
     /**
      * Gets the maximum number of history entries to keep.
@@ -174,11 +191,13 @@ public class JobConfigHistory extends Plugin {
      *
      * @param maxEntryInput The maximum number of history entries to keep.
      */
+    @DataBoundSetter
     public void setMaxHistoryEntries(String maxEntryInput) {
         String trimmedValue = StringUtils.trimToNull(maxEntryInput);
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             maxHistoryEntries = trimmedValue;
         }
+        save();
     }
 
     /**
@@ -195,11 +214,13 @@ public class JobConfigHistory extends Plugin {
      *
      * @param maxEntryInput The maximum number of history entries to show per page.
      */
+    @DataBoundSetter
     public void setMaxEntriesPerPage(String maxEntryInput) {
         String trimmedValue = StringUtils.trimToNull(maxEntryInput);
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             maxEntriesPerPage = trimmedValue;
         }
+        save();
     }
 
     /**
@@ -216,11 +237,13 @@ public class JobConfigHistory extends Plugin {
      *
      * @param maxDaysInput The maximum number of days to keep history entries.
      */
+    @DataBoundSetter
     public void setMaxDaysToKeepEntries(String maxDaysInput) {
         String trimmedValue = StringUtils.trimToNull(maxDaysInput);
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             maxDaysToKeepEntries = trimmedValue;
         }
+        save();
     }
 
     /**
@@ -261,13 +284,15 @@ public class JobConfigHistory extends Plugin {
     }
 
     /**
-     * Used by the configuration page.
+     * Sets whether to skip saving history when it is a duplication of the previous saved configuration.
      *
-     * @return The default regular expression for 'system' file names to exclude
-     * from saving.
+     * @param skipDuplicateHistory Whether to skip saving history when it is a duplication of the previous saved 
+     *                             configuration.
      */
-    public String getDefaultExcludePattern() {
-        return JobConfigHistoryConsts.DEFAULT_EXCLUDE;
+    @DataBoundSetter
+    public void setSkipDuplicateHistory(boolean skipDuplicateHistory) {
+        this.skipDuplicateHistory = skipDuplicateHistory;
+        save();
     }
 
     /**
@@ -278,6 +303,18 @@ public class JobConfigHistory extends Plugin {
     public String getExcludePattern() {
         return excludePattern;
     }
+    
+    /**
+     * Sets the regular expression pattern for 'system' configuration files to exclude from saving.
+     * 
+     * @param excludePattern The regular expression pattern.
+     */
+    @DataBoundSetter
+    public void setExcludePattern(String excludePattern) {
+        this.excludePattern = excludePattern;
+        loadRegexpPatterns();
+        save();
+    }
 
     /**
      * Gets whether to save the config history of Maven modules.
@@ -286,6 +323,17 @@ public class JobConfigHistory extends Plugin {
      */
     public boolean getSaveModuleConfiguration() {
         return saveModuleConfiguration;
+    }
+
+    /**
+     * Sets whether to save the config history of Maven modules.
+     * 
+     * @param saveModuleConfiguration Whether to save the config history of Maven modules.
+     */
+    @DataBoundSetter
+    public void setSaveModuleConfiguration(boolean saveModuleConfiguration) {
+        this.saveModuleConfiguration = saveModuleConfiguration;
+        save();
     }
 
     /**
@@ -302,8 +350,10 @@ public class JobConfigHistory extends Plugin {
      *
      * @param showBuildBadges Possible values: "never", "always", "userWithConfigPermission", "adminUser"
      */
+    @DataBoundSetter
     public void setShowBuildBadges(String showBuildBadges) {
         this.showBuildBadges = showBuildBadges;
+        save();
     }
 
     /**
@@ -313,6 +363,17 @@ public class JobConfigHistory extends Plugin {
      */
     public boolean getShowChangeReasonCommentWindow() {
         return showChangeReasonCommentWindow;
+    }
+    
+    /**
+     * Sets whether a change reason comment window should be shown on a jobs' configure page.
+     * 
+     * @param showChangeReasonCommentWindow Whether a comment window should be shown.
+     */
+    @DataBoundSetter
+    public void setShowChangeReasonCommentWindow(boolean showChangeReasonCommentWindow) {
+        this.showChangeReasonCommentWindow = showChangeReasonCommentWindow;
+        save();
     }
 
     /**
@@ -408,6 +469,17 @@ public class JobConfigHistory extends Plugin {
      */
     public String getExcludedUsers() {
         return excludedUsers;
+    }
+    
+    /**
+     * Sets usernames whose changes should not get detected.
+     *
+     * @param excludedUsers Comma separated list of usernames.
+     */
+    @DataBoundSetter
+    public void setExcludedUsers(String excludedUsers) {
+        this.excludedUsers = excludedUsers;
+        save();
     }
 
     /**

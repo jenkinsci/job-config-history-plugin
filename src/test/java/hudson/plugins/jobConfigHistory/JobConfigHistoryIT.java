@@ -46,7 +46,7 @@ public class JobConfigHistoryIT
     }
 
     public void testJobConfigHistoryPreConfigured() {
-        final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+        final JobConfigHistory jch = PluginUtils.getPlugin();
         try {
             final HtmlForm form = webClient.goTo("configure")
                     .getFormByName("config");
@@ -99,7 +99,7 @@ public class JobConfigHistoryIT
     }
 
     public void testJobConfigHistoryDefaults() {
-        final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+        final JobConfigHistory jch = PluginUtils.getPlugin();
 
         Assert.assertNull(
                 "Verify number of history entries to keep default setting.",
@@ -131,7 +131,7 @@ public class JobConfigHistoryIT
 
     public void testSkipDuplicateHistory()
             throws Exception {
-        final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+        final JobConfigHistory jch = PluginUtils.getPlugin();
         HtmlForm form = webClient.goTo("configure").getFormByName("config");
         submit(form);
 
@@ -208,7 +208,7 @@ public class JobConfigHistoryIT
     }
 
     public void testFormValidation() {
-        final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+        final JobConfigHistory jch = PluginUtils.getPlugin();
         try {
             final HtmlForm form = webClient.goTo("configure")
                     .getFormByName("config");
@@ -273,7 +273,7 @@ public class JobConfigHistoryIT
     }
 
     public void testAbsPathHistoryRootDir() throws Exception {
-        final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+        final JobConfigHistory jch = PluginUtils.getPlugin();
         // create a unique name, then delete the empty file - will be recreated
         // later
         final File root = File
@@ -426,7 +426,7 @@ public class JobConfigHistoryIT
     }
 
     public void testInputOfMaxHistoryEntries() {
-        final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+        final JobConfigHistory jch = PluginUtils.getPlugin();
 
         // check good value
         jch.setMaxHistoryEntries("5");
@@ -450,7 +450,7 @@ public class JobConfigHistoryIT
     }
 
     public void testInputOfMaxDaysToKeepEntries() {
-        final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+        final JobConfigHistory jch = PluginUtils.getPlugin();
 
         // check good value
         jch.setMaxDaysToKeepEntries("5");
@@ -474,7 +474,7 @@ public class JobConfigHistoryIT
     }
 
     private File getHistoryDir(XmlFile xmlFile) {
-        final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+        final JobConfigHistory jch = PluginUtils.getPlugin();
         final File configFile = xmlFile.getFile();
         return ((FileHistoryDao) PluginUtils.getHistoryDao(jch))
                 .getHistoryDir(configFile);

@@ -1,0 +1,7 @@
+Enter a regular expression for 'uninteresting' patterns to exclude.<br/>
+
+These patterns are attempted to be found in a file path. So "test" will exclude all configs whose file paths contain "test".
+For single job name patterns to be excluded, it might be better to enter something like "<i>testJob/config.xml</i>".<br/><br/>
+
+The default "queue\.xml|nodeMonitors\.xml|UpdateCenter\.xml|global-build-stats|LockableResourcesManager\.xml|MilestoneStep\.xml|cloudbees-disk-usage-simple\.xml" matches files that are used internally, frequently updated 
+by Jenkins and have little value to maintain history for.
