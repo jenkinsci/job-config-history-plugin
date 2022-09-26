@@ -79,7 +79,7 @@
         <dependency>
             <groupId>io.jenkins.plugins</groupId>
             <artifactId>ionicons-api</artifactId>
-            <version>24.va_745a_b_a_97fc3</version>
+            <version>28.va_f3a_84439e5f</version>
         </dependency>
         <dependency>
             <groupId>org.xmlunit</groupId>
