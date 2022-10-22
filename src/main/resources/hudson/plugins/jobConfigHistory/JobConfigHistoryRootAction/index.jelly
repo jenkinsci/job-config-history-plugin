@@ -19,25 +19,24 @@
     <j:set var="filter" value="${request.getParameter('filter')}" />
     <j:set var="filter" value="${filter == null ? 'system' : filter}" />
 
-    <j:choose>
-      <j:when test="${filter == 'all'}">
-        <l:app-bar title="${%All Configuration History}"></l:app-bar>
-      </j:when>
-      <j:when test="${filter == 'jobs'}">
-        <l:app-bar title="${%Job Configuration History}"></l:app-bar>
-      </j:when>
-      <j:when test="${filter == 'created'}">
-        <l:app-bar title="${%Job Creation History}"></l:app-bar>
-      </j:when>
-      <j:when test="${filter == 'deleted'}">
-        <l:app-bar title="${%Job Deletion History}"></l:app-bar>
-      </j:when>
-      <j:otherwise>
-        <l:app-bar title="${%All Configuration History}"></l:app-bar>
-      </j:otherwise>
-    </j:choose>
-
     <l:main-panel>
+      <j:choose>
+        <j:when test="${filter == 'all'}">
+          <l:app-bar title="${%All Configuration History}" />
+        </j:when>
+        <j:when test="${filter == 'jobs'}">
+          <l:app-bar title="${%Job Configuration History}" />
+        </j:when>
+        <j:when test="${filter == 'created'}">
+          <l:app-bar title="${%Job Creation History}" />
+        </j:when>
+        <j:when test="${filter == 'deleted'}">
+          <l:app-bar title="${%Job Deletion History}" />
+        </j:when>
+        <j:otherwise>
+          <l:app-bar title="${%All Configuration History}" />
+        </j:otherwise>
+      </j:choose>
 
       <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}" />
       <j:set var="pageNum" value="${request.getParameter('pageNum')}" />

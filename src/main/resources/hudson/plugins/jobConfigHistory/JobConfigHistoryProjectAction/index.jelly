@@ -5,8 +5,8 @@
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css" />
 
     <st:include it="${it.project}" page="sidepanel.jelly" />
-    <l:app-bar title="${%Job Configuration History}"/>
     <l:main-panel>
+      <l:app-bar title="${%Job Configuration History}"/>
       <div>
         <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js" />
         <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}" />
