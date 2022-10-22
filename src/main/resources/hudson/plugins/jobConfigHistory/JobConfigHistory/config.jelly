@@ -1,54 +1,45 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
   <f:section title="${%Job Config History}">
-    <f:entry title="${%Use different history directory than default}:" help="/plugin/jobConfigHistory/help/help-historyRootDir.html">
-      <f:textbox value="${it.historyRootDir}" name="historyRootDir"/>
+    <f:entry title="${%Use different history directory than default}" field="historyRootDir">
+      <f:textbox/>
     </f:entry>
     <f:advanced>
-      <f:entry title="${%Max number of history entries to keep}" help="/plugin/jobConfigHistory/help/help-maxHistoryEntries.html">
-        <f:textbox name="maxHistoryEntries" value="${it.maxHistoryEntries}"
-           checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxHistoryEntries?value='+escape(this.value)"/>
+      <f:entry title="${%Max number of history entries to keep}" field="maxHistoryEntries">
+        <f:textbox/>
       </f:entry>
-      <f:entry title="${%Max number of days to keep history entries}" help="/plugin/jobConfigHistory/help/help-maxDaysToKeepEntries.html">
-        <f:textbox name="maxDaysToKeepEntries" value="${it.maxDaysToKeepEntries}"
-           checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxDaysToKeepEntries?value='+escape(this.value)"/>
+      <f:entry title="${%Max number of days to keep history entries}" field="maxDaysToKeepEntries">
+        <f:textbox/>
       </f:entry>
-      <f:entry title="${%Max number of history entries to show per page}" help="/plugin/jobConfigHistory/help/help-maxEntriesPerPage.html">
-        <f:textbox name="maxEntriesPerPage" value="${it.maxEntriesPerPage}"
-           checkUrl="'${rootURL}/plugin/jobConfigHistory/checkMaxEntriesPerPage?value='+escape(this.value)"/>
+      <f:entry title="${%Max number of history entries to show per page}" field="maxEntriesPerPage">
+        <f:textbox/>
       </f:entry>
-      <f:entry title="${%Configuration exclude file pattern}" help="/plugin/jobConfigHistory/help/help-excludePattern.html">
-        <f:textbox name="excludePattern" value="${it.excludePattern}" default="${it.defaultExcludePattern}"
-           checkUrl="'${rootURL}/plugin/jobConfigHistory/checkExcludePattern?value='+escape(this.value)"/>
+      <f:entry title="${%Configuration exclude file pattern}" field="excludePattern">
+        <f:textbox/>
       </f:entry>
-      <f:entry help="/plugin/jobConfigHistory/help/help-skipDuplicateHistory.html">
-        <f:checkbox name="skipDuplicateHistory"
-            title="${%Do not save duplicate history}"
-            checked="${it.skipDuplicateHistory}"/>
+      <f:entry title="${%Do not save duplicate history}" field="skipDuplicateHistory">
+        <f:checkbox/>
       </f:entry>
-      <f:entry help="/plugin/jobConfigHistory/help/help-saveModuleConfiguration.html">
-        <f:checkbox
-            title="${%Save Maven module configuration changes}"
-            name="saveModuleConfiguration"
-            checked="${it.saveModuleConfiguration}"/>
+      <f:entry title="${%Save Maven module configuration changes}" field="saveModuleConfiguration">
+        <f:checkbox/>
       </f:entry>
-      <f:entry title="${%Show build badges}" help="/plugin/jobConfigHistory/help/help-showBuildBadges.html">
-        <f:radio name="showBuildBadges" title="${%Never}" value="never" checked="${it.getShowBuildBadges() == 'never'}"/>
-        <br />
-        <f:radio name="showBuildBadges" title="${%Always}" value="always" checked="${it.getShowBuildBadges() == 'always'}"/>
-        <br />
-        <f:radio name="showBuildBadges" title="${%Only for users with configuration permission}" value="userWithConfigPermission" checked="${it.getShowBuildBadges() == 'userWithConfigPermission'}"/>
-        <br />
-        <f:radio name="showBuildBadges" title="${%Only for administrators}" value="adminUser" checked="${it.getShowBuildBadges() == 'adminUser'}"/>
+      <f:entry title="${%Show build badges}" field="showBuildBadges" >
+        <f:radio name="showBuildBadges" title="${%Never}" value="never"
+                 checked="${descriptor.showBuildBadges == 'never'}"/>
+        <f:radio name="showBuildBadges" title="${%Always}" value="always"
+                 checked="${descriptor.showBuildBadges == 'always'}"/>
+        <f:radio name="showBuildBadges" title="${%Only for users with configuration permission}"
+                 value="userWithConfigPermission"
+                 checked="${descriptor.showBuildBadges == 'userWithConfigPermission'}"/>
+        <f:radio name="showBuildBadges" title="${%Only for administrators}" value="adminUser"
+                 checked="${descriptor.showBuildBadges == 'adminUser'}"/>
       </f:entry>
-      <f:entry title="${%Exclude users}" help="/plugin/jobConfigHistory/help/help-excludedUsers.html">
-        <f:textbox name="excludedUsers" value="${it.excludedUsers}" />
+      <f:entry title="${%Exclude users}" field="excludedUsers">
+        <f:textbox/>
       </f:entry>
-      <f:entry title="${%Show change message window}" help="/plugin/jobConfigHistory/help/help-showChangeReasonCommentWindow.html">
-        <f:checkbox
-                title="${%Show the change message window in jobs' configure pages.}"
-                name="showChangeReasonCommentWindow"
-                checked="${it.showChangeReasonCommentWindow}"/>
+      <f:entry title="${%Show the change message window in jobs' configure pages}"
+               field="showChangeReasonCommentWindow">
+        <f:checkbox/>
       </f:entry>
     </f:advanced>
   </f:section>

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.47</version>
+        <version>4.48</version>
     </parent>
 
     <artifactId>jobConfigHistory</artifactId>
@@ -68,7 +68,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-2.346.x</artifactId>
-                <version>1607.va_c1576527071</version>
+                <version>1643.v1cffef51df73</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>io.jenkins.plugins</groupId>
             <artifactId>ionicons-api</artifactId>
-            <version>22.v868b_0c347756</version>
+            <version>31.v4757b_6987003</version>
         </dependency>
         <dependency>
             <groupId>org.xmlunit</groupId>
@@ -94,7 +94,7 @@
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>maven-plugin</artifactId>
-            <version>3.16</version>
+            <version>3.20</version>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
@@ -114,6 +114,16 @@
             <artifactId>matrix-project</artifactId>
             <scope>test</scope>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>io.jenkins</groupId>
+            <artifactId>configuration-as-code</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jenkins.configuration-as-code</groupId>
+            <artifactId>test-harness</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

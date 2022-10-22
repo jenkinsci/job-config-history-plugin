@@ -26,6 +26,7 @@ package hudson.plugins.jobConfigHistory;
 import hudson.Plugin;
 import hudson.model.User;
 import hudson.security.ACL;
+import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 
 import java.io.File;
@@ -54,7 +55,7 @@ final public class PluginUtils {
      * @return plugin
      */
     public static JobConfigHistory getPlugin() {
-        return Jenkins.get().getPlugin(JobConfigHistory.class);
+        return GlobalConfiguration.all().get(JobConfigHistory.class);
     }
 
     /**

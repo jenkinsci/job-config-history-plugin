@@ -31,7 +31,7 @@ public class JobConfigHistoryJobListenerIT
     @Override
     public void before() throws Throwable {
         super.before();
-        File rootDir = jenkins.getPlugin(JobConfigHistory.class)
+        File rootDir = PluginUtils.getPlugin()
                 .getConfiguredHistoryRootDir();
         jobHistoryDir = new File(rootDir,
                 JobConfigHistoryConsts.JOBS_HISTORY_DIR);
@@ -137,7 +137,7 @@ public class JobConfigHistoryJobListenerIT
     }
 
     private File getHistoryDir(XmlFile xmlFile) {
-        final JobConfigHistory jch = jenkins.getPlugin(JobConfigHistory.class);
+        final JobConfigHistory jch = PluginUtils.getPlugin();
         final File configFile = xmlFile.getFile();
         return ((FileHistoryDao) jch.getHistoryDao()).getHistoryDir(configFile);
     }
