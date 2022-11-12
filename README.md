@@ -47,9 +47,9 @@ This functionality also allows you to exclude jobs, folders or other parts of yo
 The pattern is attempted to be found in a config file's file path. Adding `|test` to the pattern will also cause `testFolder/jobs/job1` to be excluded.
 So if you want to exclude jobs, only, it might be better to enter something like `|testJob/config\.xml`.
 
-If you use this plugin together with the [Global Build Stats Plugin](https://plugins.jenkins.io/Global+Build+Stats+Plugin) you should add `global-build-stats` to the excludes in the **Configuration exclude file pattern** section of this plugin in **Configure System** page. Fixed in version 1.9 of the plugin.
+If you use this plugin together with the [Global Build Stats Plugin](https://plugins.jenkins.io/global-build-stats/) you should add `global-build-stats` to the excludes in the **Configuration exclude file pattern** section of this plugin in **Configure System** page. Fixed in version 1.9 of the plugin.
 
-If you use this plugin together with the [Cluster Statistics Plugin](https://plugins.jenkins.io/Cluster+Statistics+Plugin) you should add `cluster-stats` to the excludes in the **Configuration exclude file pattern** section of this plugin in **Configure System** page. Otherwise it might exceed your storage.
+If you use this plugin together with the [Cluster Statistics Plugin](https://plugins.jenkins.io/cluster-stats/) you should add `cluster-stats` to the excludes in the **Configuration exclude file pattern** section of this plugin in **Configure System** page. Otherwise it might exceed your storage.
 
 ------------------------------------------------------------------------
 
