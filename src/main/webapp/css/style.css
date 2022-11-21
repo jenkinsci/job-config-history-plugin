@@ -633,6 +633,8 @@ table.no-borders-warning caption {
 }
 
 .bottom-sticker-inner {
+    display: flex;
+    justify-content: start;
     align-items: end;
 }
 
