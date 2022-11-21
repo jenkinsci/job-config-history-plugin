@@ -631,3 +631,18 @@ table.no-borders-warning caption {
 
     border-radius:2px;
 }
+
+.bottom-sticker-inner {
+    align-items: end;
+}
+
+.jch-entries-per-page, .jch-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3125rem;
+}
+
+.jch-entries-per-page .jenkins-button, .jch-pagination .jenkins-button {
+    min-width: 52px;
+}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:c="/components" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
   <l:layout title="${%All Configuration History}">
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css" />
@@ -49,6 +49,7 @@
       <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
         <j:set var="entriesPerPage" value="${defaultEntriesPerPage.toString()}" />
       </j:if>
+
       <j:choose>
         <j:when test="${entriesPerPage.equals(&quot;all&quot;) or filter.equals(&quot;created&quot;)}">
           <j:set var="configs" value="${it.getConfigs()}" />
@@ -59,6 +60,9 @@
           <j:set var="maxPageNum" value="${it.getMaxPageNum()}" />
         </j:otherwise>
       </j:choose>
+
+      <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
+      <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
 
       <div>
         <j:choose>
@@ -157,84 +161,10 @@
                 </j:forEach>
               </table>
 
-              <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
-              <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
-
               <f:bottomButtonBar>
-                <div style="display: flex; justify-content: space-between; align-items: flex-end" class="jenkins-buttons-row">
-                  <!-- Page view filter selector -->
-                  <div>
-                    <j:if test="${!filter.equals(&quot;created&quot;)}">
-                      <h3>${%Entries per page}:</h3>
-                      <j:forEach var="entryPerPageVal" items="${entryPerPageArray}">
-                        <j:choose>
-                          <j:when test="${entriesPerPage.equals(entryPerPageVal)}">
-                            <a class="jenkins-button jenkins-button--primary" href="?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
-                          </j:when>
-                          <j:otherwise>
-                            <a class="jenkins-button" href="?filter=${filter}&amp;pageNum=${0}&amp;entriesPerPage=${entryPerPageVal}" rel="noopener noreferrer">${entryPerPageVal}</a>
-                          </j:otherwise>
-                        </j:choose>
-                      </j:forEach>
-                    </j:if>
-                  </div>
-
-                  <!--page navigation-->
-                  <div>
-                    <j:if test="${maxPageNum != 0}">
-                      <h3>${%Page}:</h3>
-
-                      <!--"<" for one step back-->
-                      <j:choose>
-                        <j:when test="${pageNum > 0}">
-                          <a class="jenkins-button" href="?filter=${filter}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
-                            <b>&lt;</b>
-                          </a>
-                        </j:when>
-                        <j:otherwise>
-                          <a class="jenkins-button" rel="noopener noreferrer">
-                            <b>&lt;</b>
-                          </a>
-                        </j:otherwise>
-                      </j:choose>
-
-                      <!--page navigation: "1 ... 5 6 7 8 9 ... 20"-->
-                      <j:forEach var="currentPageNum" items="${relevantPageNums}">
-                        <j:choose>
-                          <j:when test="${currentPageNum == -1}">
-                            <a class="jenkins-button" rel="noopener noreferrer">
-                              <b>&#8230;</b>
-                            </a>
-                          </j:when>
-                          <j:when test="${currentPageNum == pageNum}">
-                            <a class="jenkins-button jenkins-button--primary" rel="noopener noreferrer">
-                                  ${currentPageNum+1}</a>
-                          </j:when>
-                          <j:otherwise>
-                            <a class="jenkins-button" href="?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
-                                  ${currentPageNum+1}</a>
-                          </j:otherwise>
-                        </j:choose>
-                      </j:forEach>
-
-                      <!--">" for one step forward-->
-                      <j:choose>
-                        <j:when test="${maxPageNum > pageNum}">
-                          <a class="jenkins-button" href="?filter=${filter}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
-                            <b>&gt;</b>
-                          </a>
-                        </j:when>
-                        <j:otherwise>
-                          <a class="jenkins-button" rel="noopener noreferrer">
-                            <b>&gt;</b>
-                          </a>
-                        </j:otherwise>
-                      </j:choose>
-                    </j:if>
-                  </div>
-                </div>
+                <c:entries-per-page />
+                <c:pagination />
               </f:bottomButtonBar>
-
             </div>
           </j:otherwise>
         </j:choose>
