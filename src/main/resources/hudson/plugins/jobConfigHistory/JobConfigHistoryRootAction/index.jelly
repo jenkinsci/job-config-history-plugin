@@ -49,7 +49,6 @@
       <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
         <j:set var="entriesPerPage" value="${defaultEntriesPerPage.toString()}" />
       </j:if>
-
       <j:choose>
         <j:when test="${entriesPerPage.equals(&quot;all&quot;) or filter.equals(&quot;created&quot;)}">
           <j:set var="configs" value="${it.getConfigs()}" />
@@ -60,9 +59,6 @@
           <j:set var="maxPageNum" value="${it.getMaxPageNum()}" />
         </j:otherwise>
       </j:choose>
-
-      <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
-      <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
 
       <div>
         <j:choose>
@@ -160,6 +156,9 @@
                   </tr>
                 </j:forEach>
               </table>
+
+              <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
+              <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
 
               <f:bottomButtonBar>
                 <c:entries-per-page />
