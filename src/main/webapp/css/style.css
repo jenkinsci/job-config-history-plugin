@@ -634,7 +634,7 @@ table.no-borders-warning caption {
 
 .bottom-sticker-inner {
     display: flex;
-    justify-content: start;
+    justify-content: space-between;
     align-items: end;
 }
 
