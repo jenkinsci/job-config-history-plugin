@@ -54,7 +54,7 @@
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-surefire-report-plugin.version>${maven-surefire-plugin.version}</maven-surefire-report-plugin.version>
         <maven-hpi-plugin.injectedTestName>InjectedIT</maven-hpi-plugin.injectedTestName>
-        <maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
+        <maven-checkstyle-plugin.version>3.2.1</maven-checkstyle-plugin.version>
         <jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
     </properties>
 
