@@ -1,5 +1,8 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:y="wasauchimmeroa4">
+<j:jelly xmlns:j="jelly:core"
+  xmlns:st="jelly:stapler"
+  xmlns:l="/lib/layout"
+  xmlns:y="wasauchimmeroa4">
 
   <l:layout title="${%Job Configuration History}">
 
@@ -14,6 +17,8 @@
     <st:include it="${it.project}" page="sidepanel.jelly" />
     <j:set var="syntaxCheck1" value="${it.checkXmlSyntax(it.getTimestamp(1))}"/>
     <j:set var="syntaxCheck2" value="${it.checkXmlSyntax(it.getTimestamp(2))}"/>
+    <j:set var="name" value="${it.getProject().getFullName()}"/>
+
     <l:main-panel>
       <h1>${%Job Configuration Difference}</h1>
       <j:if test="${!syntaxCheck1.isWellFormatted() || !syntaxCheck2.isWellFormatted()}">
@@ -30,7 +35,10 @@
                 <j:set var="revisionStr" value="${%Revision}"/>
                 ${!syntaxCheck1.isWellFormatted() ? revisionStr + " " + it.getTimestamp(1) + ": " + syntaxCheck1.getMessage() : ""}
                 <j:if test="${!syntaxCheck2.isWellFormatted()}">
-                  <j:if test="${!syntaxCheck1.isWellFormatted()}"><br/><br/></j:if>
+                  <j:if test="${!syntaxCheck1.isWellFormatted()}">
+                    <br/>
+                    <br/>
+                  </j:if>
                 </j:if>
                 ${!syntaxCheck2.isWellFormatted() ? revisionStr + " " + it.getTimestamp(2) + ": " + syntaxCheck2.getMessage() : ""}
               </td>
@@ -90,7 +98,7 @@
               <table style="width:100%;" class="center jch">
                 <thead>
                   <caption class="caption" style="text-align:center">
-                    ${it.getProject().getFullName()}
+                    ${name}
                   </caption>
                   <tr>
                     <th colspan="2" class="subcaption">
@@ -119,7 +127,10 @@
                             ${it.getTimestamp(1)}
                           </a>
                         </div>
-                        <div><b>${%Operation}:</b> <span class="describedElement">${it.getOperation(1)}</span></div>
+                        <div>
+                          <b>${%Operation}:</b>
+                          <span class="describedElement">${it.getOperation(1)}</span>
+                        </div>
                         <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                           <div>
                             <b>${%User}:</b>
@@ -128,7 +139,10 @@
                         </j:if>
 
                         <j:if test="${it.hasChangeReasonComment(1)}">
-                          <div><b>${%Change Reason}:</b><span class="describedElement">${it.getChangeReasonComment(1)}</span> </div>
+                          <div>
+                            <b>${%Change Reason}:</b>
+                            <span class="describedElement">${it.getChangeReasonComment(1)}</span>
+                          </div>
                         </j:if>
                       </div>
                     </th>
@@ -157,7 +171,10 @@
                             ${it.getTimestamp(2)}
                           </a>
                         </div>
-                        <div><b>${%Operation}:</b> <span class="describedElement">${it.getOperation(2)}</span></div>
+                        <div>
+                          <b>${%Operation}:</b>
+                          <span class="describedElement">${it.getOperation(2)}</span>
+                        </div>
                         <div>
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                             <b>${%User}:</b>
@@ -166,7 +183,10 @@
 
                         </div>
                         <j:if test="${it.hasChangeReasonComment(2)}">
-                          <div><b>${%Change Reason}:</b><span class="describedElement">${it.getChangeReasonComment(2)}</span> </div>
+                          <div>
+                            <b>${%Change Reason}:</b>
+                            <span class="describedElement">${it.getChangeReasonComment(2)}</span>
+                          </div>
                         </j:if>
                       </div>
                     </th>
@@ -179,54 +199,54 @@
                   <tr>
                     <td class="diffLineWrapper" colspan="4">
                       <div class="resizeWrapper" style="overflow-y:scroll;">
-                      <table class="center jch diffLineTable">
-                        <j:choose>
-                          <j:when test="${it.getLines().size() == 0}">
-                            <tr>
-                              <td colspan="4">
-                                <p>${%No lines changed}</p>
-                              </td>
-                            </tr>
-                          </j:when>
-                          <j:otherwise>
-                            <j:forEach items="${it.getLines(false)}" var="line">
+                        <table class="center jch diffLineTable">
+                          <j:choose>
+                            <j:when test="${it.getLines().size() == 0}">
                               <tr>
-                                <j:choose>
-                                  <j:when test="${line.skipping}">
-                                    <th class="lineNum">...</th>
-                                    <td class="skipping"/>
-                                    <th class="lineNum">...</th>
-                                    <td class="skipping"/>
-                                  </j:when>
-                                  <j:otherwise>
-                                    <th class="lineNum ${line.left.cssClass}">${line.left.lineNumber}</th>
-                                    <td class="${line.left.cssClass}">
-                                      <div style="margin-left: ${it.getLeadingWhitespace(line.left.text)*0.5}em;">
-                                        <pre>
-                                          <code>
-                                            <j:out value="${line.left.text.trim()}"/>
-                                          </code>
-                                        </pre>
-                                      </div>
-                                    </td>
-                                    <th class="lineNum ${line.right.cssClass}">${line.right.lineNumber}</th>
-                                    <td class="${line.right.cssClass}">
-                                      <!--For correct indentation in case of line-breaks.-->
-                                      <div style="margin-left: ${it.getLeadingWhitespace(line.right.text)*0.5}em;">
-                                        <pre>
-                                          <code>
-                                            <j:out value="${line.right.text.trim()}"/>
-                                          </code>
-                                        </pre>
-                                      </div>
-                                    </td>
-                                  </j:otherwise>
-                                </j:choose>
+                                <td colspan="4">
+                                  <p>${%No lines changed}</p>
+                                </td>
                               </tr>
-                            </j:forEach>
-                          </j:otherwise>
-                        </j:choose>
-                      </table>
+                            </j:when>
+                            <j:otherwise>
+                              <j:forEach items="${it.getLines(false)}" var="line">
+                                <tr>
+                                  <j:choose>
+                                    <j:when test="${line.skipping}">
+                                      <th class="lineNum">...</th>
+                                      <td class="skipping"/>
+                                      <th class="lineNum">...</th>
+                                      <td class="skipping"/>
+                                    </j:when>
+                                    <j:otherwise>
+                                      <th class="lineNum ${line.left.cssClass}">${line.left.lineNumber}</th>
+                                      <td class="${line.left.cssClass}">
+                                        <div style="margin-left: ${it.getLeadingWhitespace(line.left.text)*0.5}em;">
+                                          <pre>
+                                            <code>
+                                              <j:out value="${line.left.text.trim()}"/>
+                                            </code>
+                                          </pre>
+                                        </div>
+                                      </td>
+                                      <th class="lineNum ${line.right.cssClass}">${line.right.lineNumber}</th>
+                                      <td class="${line.right.cssClass}">
+                                        <!--For correct indentation in case of line-breaks.-->
+                                        <div style="margin-left: ${it.getLeadingWhitespace(line.right.text)*0.5}em;">
+                                          <pre>
+                                            <code>
+                                              <j:out value="${line.right.text.trim()}"/>
+                                            </code>
+                                          </pre>
+                                        </div>
+                                      </td>
+                                    </j:otherwise>
+                                  </j:choose>
+                                </tr>
+                              </j:forEach>
+                            </j:otherwise>
+                          </j:choose>
+                        </table>
                       </div>
                     </td>
                   </tr>
@@ -311,22 +331,22 @@
                     </td>
                   </j:if>
                   <j:if test="${prev1 != prev2}">
-                  <td>
-                    <div class="menu-url-button">
-                      <a href="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${prev2}" style="text-decoration:none">
+                    <td>
+                      <div class="menu-url-button">
+                        <a href="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${prev2}" style="text-decoration:none">
                         &lt; ${%Prev}
-                      </a>
-                    </div>
-                  </td>
+                        </a>
+                      </div>
+                    </td>
                   </j:if>
                   <j:if test="${next1 != next2}">
-                  <td>
-                    <div class="menu-url-button">
-                      <a href="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${next2}" style="text-decoration:none">
+                    <td>
+                      <div class="menu-url-button">
+                        <a href="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${next2}" style="text-decoration:none">
                         ${%Next} &gt;
-                      </a>
-                    </div>
-                  </td>
+                        </a>
+                      </div>
+                    </td>
                   </j:if>
                   <j:if test="${prev2 != timestamp2}">
                     <td>

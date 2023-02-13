@@ -1,5 +1,7 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+<j:jelly xmlns:j="jelly:core"
+  xmlns:st="jelly:stapler"
+  xmlns:l="/lib/layout">
   <l:layout title="${%Job Configuration History}">
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/diff_highlight.css"/>
@@ -11,8 +13,8 @@
     <script>hljs.initHighlightingOnLoad();</script>
 
     <st:include it="${app}" page="sidepanel.jelly" />
-    <j:set var="syntaxCheck1" value="${it.checkXmlSyntax(it.getTimestamp(1))}"/>
-    <j:set var="syntaxCheck2" value="${it.checkXmlSyntax(it.getTimestamp(2))}"/>
+    <j:set var="name" value="${it.getAgent().getNodeName())}"/>
+
     <l:main-panel>
       <h1>${%Agent Configuration Difference}</h1>
 
@@ -30,7 +32,10 @@
                 <j:set var="revisionStr" value="${%Revision}"/>
                 ${!syntaxCheck1.isWellFormatted() ? revisionStr + " " + it.getTimestamp(1) + ": " + syntaxCheck1.getMessage() : ""}
                 <j:if test="${!syntaxCheck2.isWellFormatted()}">
-                  <j:if test="${!syntaxCheck1.isWellFormatted()}"><br/><br/></j:if>
+                  <j:if test="${!syntaxCheck1.isWellFormatted()}">
+                    <br/>
+                    <br/>
+                  </j:if>
                 </j:if>
                 ${!syntaxCheck2.isWellFormatted() ? revisionStr + " " + it.getTimestamp(2) + ": " + syntaxCheck2.getMessage() : ""}
               </td>
@@ -90,7 +95,7 @@
               <table style="width:100%;" class="center jch">
                 <thead>
                   <caption class="caption" style="text-align:center">
-                    ${it.getAgent().getNodeName()}
+                    ${name}
                   </caption>
                   <tr>
                     <th colspan="2" class="subcaption">
@@ -104,9 +109,9 @@
                             <td style="width:40%; border:none; text-align:right; padding:0px">
                               <j:if test="${it.hasConfigurePermission()}">
 
-                              <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" style="text-decoration:none">
+                                <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" style="text-decoration:none">
                                 ${%Restore this configuration}
-                              </a>
+                                </a>
                               </j:if>
                             </td>
                           </tr>
@@ -119,16 +124,22 @@
                             ${it.getTimestamp(1)}
                           </a>
                         </div>
-                        <div><b>${%Operation}:</b> <span class="describedElement">${it.getOperation(1)}</span></div>
-                        <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                         <div>
-                          <b>${%User}:</b>
-                          <a class="url-button" href="${rootURL}/user/${it.getUserID(1)}">${it.getUser(1)}</a>
+                          <b>${%Operation}:</b>
+                          <span class="describedElement">${it.getOperation(1)}</span>
                         </div>
+                        <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
+                          <div>
+                            <b>${%User}:</b>
+                            <a class="url-button" href="${rootURL}/user/${it.getUserID(1)}">${it.getUser(1)}</a>
+                          </div>
                         </j:if>
 
                         <j:if test="${it.hasChangeReasonComment(1)}">
-                          <div><b>${%Change Reason}:</b><span class="describedElement">${it.getChangeReasonComment(1)}</span> </div>
+                          <div>
+                            <b>${%Change Reason}:</b>
+                            <span class="describedElement">${it.getChangeReasonComment(1)}</span>
+                          </div>
                         </j:if>
                       </div>
                     </th>
@@ -142,9 +153,9 @@
                             <td style="width:40%; border:none; text-align:right; padding:0px">
                               <j:if test="${it.hasConfigurePermission()}">
 
-                              <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" style="text-decoration:none">
+                                <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" style="text-decoration:none">
                                 ${%Restore this configuration}
-                              </a>
+                                </a>
                               </j:if>
                             </td>
                           </tr>
@@ -157,7 +168,10 @@
                             ${it.getTimestamp(2)}
                           </a>
                         </div>
-                        <div><b>${%Operation}:</b> <span class="describedElement">${it.getOperation(2)}</span></div>
+                        <div>
+                          <b>${%Operation}:</b>
+                          <span class="describedElement">${it.getOperation(2)}</span>
+                        </div>
                         <div>
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                             <b>${%User}:</b>
@@ -166,7 +180,10 @@
 
                         </div>
                         <j:if test="${it.hasChangeReasonComment(2)}">
-                          <div><b>${%Change Reason}:</b><span class="describedElement">${it.getChangeReasonComment(2)}</span> </div>
+                          <div>
+                            <b>${%Change Reason}:</b>
+                            <span class="describedElement">${it.getChangeReasonComment(2)}</span>
+                          </div>
                         </j:if>
                       </div>
                     </th>
