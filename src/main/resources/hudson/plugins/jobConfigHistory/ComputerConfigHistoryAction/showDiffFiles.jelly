@@ -83,7 +83,6 @@
               <div class="small-button-wrapper">
                 <j:set var="hideTextStr" value="${%Hide Version Changes}"/>
                 <j:set var="showTextStr" value="${%Show Version Changes}"/>
-
                 <input id="showHideVersionDiffsJsButton" class="small-button" type="button" value="${%Hide Version Changes}" onClick="toggleShowHideVersionDiffsJs('${hideTextStr}', '${showTextStr}');"/>
               </div>
               <div style="padding:2px"/>
@@ -99,13 +98,16 @@
                       <div style="float:top">
                         <table style="border:0px; width:100%">
                           <tr>
-                            <td class="subcaption" style="padding:0px;  width:60%;  background-color:inherit;">
+                            <td class="subcaption" style="padding:0px;  width:60%; background-color:inherit;">
                               ${%Older Change}
                             </td>
                             <td style="width:40%; border:none; text-align:right; padding:0px">
+                              <j:if test="${it.hasConfigurePermission()}">
+
                               <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" style="text-decoration:none">
                                 ${%Restore this configuration}
                               </a>
+                              </j:if>
                             </td>
                           </tr>
                         </table>
@@ -118,13 +120,18 @@
                           </a>
                         </div>
                         <div><b>${%Operation}:</b> <span class="describedElement">${it.getOperation(1)}</span></div>
+                        <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                         <div>
                           <b>${%User}:</b>
                           <a class="url-button" href="${rootURL}/user/${it.getUserID(1)}">${it.getUser(1)}</a>
                         </div>
+                        </j:if>
+
+                        <j:if test="${it.hasChangeReasonComment(1)}">
+                          <div><b>${%Change Reason}:</b><span class="describedElement">${it.getChangeReasonComment(1)}</span> </div>
+                        </j:if>
                       </div>
                     </th>
-
                     <th colspan="2" class="subcaption">
                       <div style="float:top">
                         <table style="border:0px; width:100%">
@@ -133,9 +140,12 @@
                               ${%Newer Change}
                             </td>
                             <td style="width:40%; border:none; text-align:right; padding:0px">
+                              <j:if test="${it.hasConfigurePermission()}">
+
                               <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" style="text-decoration:none">
                                 ${%Restore this configuration}
                               </a>
+                              </j:if>
                             </td>
                           </tr>
                         </table>
@@ -149,15 +159,19 @@
                         </div>
                         <div><b>${%Operation}:</b> <span class="describedElement">${it.getOperation(2)}</span></div>
                         <div>
+                          <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                             <b>${%User}:</b>
                             <a class="url-button" href="${rootURL}/user/${it.getUserID(1)}">${it.getUser(2)}</a>
+                          </j:if>
+
                         </div>
+                        <j:if test="${it.hasChangeReasonComment(2)}">
+                          <div><b>${%Change Reason}:</b><span class="describedElement">${it.getChangeReasonComment(2)}</span> </div>
+                        </j:if>
                       </div>
                     </th>
                   </tr>
-
                 </thead>
-
 
                 <!-- The following 2 tbodys are switched via a js button-->
                 <!-- First is default and shows version diffs, second doesn't.-->
@@ -218,7 +232,7 @@
                   </tr>
                 </tbody>
 
-                <tbody style="display:none" id="tbody_versionDiffsHidden">
+                <tbody style="width:100%; display:none" id="tbody_versionDiffsHidden">
                   <tr>
                     <td class="diffLineWrapper" colspan="4">
                       <div class="resizeWrapper" style="overflow-y:scroll;">

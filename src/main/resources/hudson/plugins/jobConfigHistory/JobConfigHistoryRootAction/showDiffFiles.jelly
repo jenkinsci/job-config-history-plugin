@@ -11,6 +11,7 @@
     <script>hljs.initHighlightingOnLoad();</script>
     <j:set var="syntaxCheck1" value="${it.checkXmlSyntax(request.getParameter('name'), it.getTimestamp(1))}"/>
     <j:set var="syntaxCheck2" value="${it.checkXmlSyntax(request.getParameter('name'), it.getTimestamp(2))}"/>
+    <j:set var="name" value="${request.getParameter('name')}"/>
 
     <l:side-panel>
       <l:tasks>
@@ -50,7 +51,6 @@
       </j:if>
 
       <div>
-      <j:set var="name" value="${request.getParameter('name')}"/>
         <j:choose>
           <j:when test="${!it.hasConfigurePermission() and !name.contains('_deleted_')}">
             ${%No permission to view system changes}

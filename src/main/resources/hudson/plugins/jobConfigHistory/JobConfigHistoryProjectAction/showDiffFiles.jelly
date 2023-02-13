@@ -72,7 +72,6 @@
                     document.getElementById("tbody_versionDiffsHidden").style.display = 'none';
 
                     document.getElementById("showHideVersionDiffsJsButton").value = hideText;
-
                   } else {
                     document.getElementById("tbody_versionDiffsShown").style.display = 'none';
                     document.getElementById("tbody_versionDiffsHidden").style.display = '';
@@ -84,11 +83,9 @@
               <div class="small-button-wrapper">
                 <j:set var="hideTextStr" value="${%Hide Version Changes}"/>
                 <j:set var="showTextStr" value="${%Show Version Changes}"/>
-
                 <input id="showHideVersionDiffsJsButton" class="small-button" type="button" value="${%Hide Version Changes}" onClick="toggleShowHideVersionDiffsJs('${hideTextStr}', '${showTextStr}');"/>
               </div>
               <div style="padding:2px"/>
-
 
               <table style="width:100%;" class="center jch">
                 <thead>
@@ -99,7 +96,7 @@
                     <th colspan="2" class="subcaption">
 
                       <div style="float:top">
-                        <table style="border:0px; width:100%;">
+                        <table style="border:0px; width:100%">
                           <tr>
                             <td class="subcaption" style="padding:0px;  width:60%; background-color:inherit;">
                               ${%Older Change}
@@ -178,7 +175,6 @@
 
                 <!-- The following 2 tbodys are switched via a js button-->
                 <!-- First is default and shows version diffs, second doesn't.-->
-
                 <tbody style="display:''" id="tbody_versionDiffsShown">
                   <tr>
                     <td class="diffLineWrapper" colspan="4">
@@ -236,7 +232,7 @@
                   </tr>
                 </tbody>
 
-                <tbody style="display:none" id="tbody_versionDiffsHidden">
+                <tbody style="width:100%; display:none" id="tbody_versionDiffsHidden">
                   <tr>
                     <td class="diffLineWrapper" colspan="4">
                       <div class="resizeWrapper" style="overflow-y:scroll;">
