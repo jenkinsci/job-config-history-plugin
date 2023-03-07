@@ -23,6 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import hudson.ExtensionList;
 import hudson.Plugin;
 import hudson.model.User;
 import hudson.security.ACL;
@@ -55,7 +56,7 @@ final public class PluginUtils {
      * @return plugin
      */
     public static JobConfigHistory getPlugin() {
-        return GlobalConfiguration.all().get(JobConfigHistory.class);
+        return ExtensionList.lookupSingleton(JobConfigHistory.class);
     }
 
     /**
