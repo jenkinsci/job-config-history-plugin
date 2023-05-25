@@ -14,7 +14,7 @@ import hudson.security.LegacyAuthorizationStrategy;
 import hudson.security.Permission;
 import hudson.tasks.LogRotator;
 import jenkins.model.Jenkins;
-import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.jvnet.hudson.test.Issue;
 import org.xml.sax.SAXException;
@@ -23,8 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
 
 /**
  * @author mfriedenhagen
@@ -178,7 +178,7 @@ public class JobConfigHistoryBaseActionIT
             throws IOException, SAXException {
         // without security the jobConfigHistory-badge should show.
         final HtmlPage withoutSecurity = webClient.goTo("/");
-        assertThat(withoutSecurity.asXml(), CoreMatchers
+        assertThat(withoutSecurity.asXml(), Matchers
                 .containsString(JobConfigHistoryConsts.ICONFILENAME));
         withoutSecurity.getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
         // with security enabled the jobConfigHistory-badge should not show
@@ -187,7 +187,7 @@ public class JobConfigHistoryBaseActionIT
                 new HudsonPrivateSecurityRealm(false, false, null));
         jenkins.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
         final HtmlPage withSecurityEnabled = webClient.goTo("/");
-        assertThat(withSecurityEnabled.asXml(), not(CoreMatchers
+        assertThat(withSecurityEnabled.asXml(), not(Matchers
                 .containsString(JobConfigHistoryConsts.ICONFILENAME)));
         try {
             withSecurityEnabled
