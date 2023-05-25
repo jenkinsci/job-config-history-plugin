@@ -131,7 +131,6 @@ public class TUtils {
             d.appendText("path with suffix " + expectedSuffix);
         }
 
-        @Override
         public void describeMismatch(Object o, Description d) {
             d.appendText("path " + o + " has no such suffix");
         }
