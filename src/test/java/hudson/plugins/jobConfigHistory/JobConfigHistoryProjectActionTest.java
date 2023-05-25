@@ -10,7 +10,7 @@ import hudson.model.ItemGroup;
 import hudson.model.Project;
 import jenkins.model.AbstractTopLevelItem;
 import org.apache.commons.io.FileUtils;
-import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,11 +21,11 @@ import org.kohsuke.stapler.StaplerResponse;
 import java.io.IOException;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -282,8 +282,8 @@ public class JobConfigHistoryProjectActionTest {
                 .thenReturn("2012-11-21_11-40-28");
         final JobConfigHistoryProjectAction sut = createAction();
         String result = sut.getFile();
-        assertThat(result, CoreMatchers.startsWith("<?xml version="));
-        assertThat(result, CoreMatchers.endsWith("</project>"));
+        assertThat(result, Matchers.startsWith("<?xml version="));
+        assertThat(result, Matchers.endsWith("</project>"));
     }
 
     /**
