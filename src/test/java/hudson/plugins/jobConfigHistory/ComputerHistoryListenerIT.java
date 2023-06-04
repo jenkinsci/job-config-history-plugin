@@ -1,7 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlInput;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlInput;
 import hudson.model.Slave;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class ComputerHistoryListenerIT {
         HtmlForm form = rule.createWebClient().getPage(agentTwo, "configure")
                 .getFormByName("config");
         HtmlInput element = form.getInputByName("_.name");
-        element.setValueAttribute("newAgentName");
+        element.setValue("newAgentName");
         rule.submit(form);
         agentTwo = (Slave) rule.jenkins.getNode("newAgentName");
         JobConfigHistoryStrategy dao = PluginUtils.getHistoryDao();
@@ -96,7 +96,7 @@ public class ComputerHistoryListenerIT {
         HtmlForm form = rule.createWebClient().getPage(agentTwo, "configure")
                 .getFormByName("config");
         HtmlInput element = form.getInputByName("_.nodeDescription");
-        element.setValueAttribute("Node description");
+        element.setValue("Node description");
         rule.submit(form);
         JobConfigHistoryStrategy dao = PluginUtils.getHistoryDao();
         assertEquals(

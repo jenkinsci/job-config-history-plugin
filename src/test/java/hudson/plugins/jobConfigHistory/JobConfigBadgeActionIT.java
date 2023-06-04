@@ -1,7 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlAnchor;
+import org.htmlunit.html.HtmlPage;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import jenkins.model.Jenkins;

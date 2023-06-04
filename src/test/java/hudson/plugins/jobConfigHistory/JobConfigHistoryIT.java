@@ -1,6 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlForm;
 import hudson.XmlFile;
 import hudson.maven.MavenModuleSet;
 import hudson.model.FreeStyleProject;
@@ -50,13 +50,13 @@ public class JobConfigHistoryIT
         try {
             final HtmlForm form = webClient.goTo("configure")
                     .getFormByName("config");
-            form.getInputByName("maxHistoryEntries").setValueAttribute("10");
+            form.getInputByName("maxHistoryEntries").setValue("10");
             form.getInputByName("saveModuleConfiguration").setChecked(false);
             form.getInputByName("skipDuplicateHistory").setChecked(false);
             form.getInputByName("excludePattern")
-                    .setValueAttribute(JobConfigHistoryConsts.DEFAULT_EXCLUDE);
+                    .setValue(JobConfigHistoryConsts.DEFAULT_EXCLUDE);
             form.getInputByName("historyRootDir")
-                    .setValueAttribute("jobConfigHistory");
+                    .setValue("jobConfigHistory");
             form.getInputByValue("never").setChecked(true);
             submit(form);
         } catch (Exception e) {
@@ -216,14 +216,14 @@ public class JobConfigHistoryIT
                     "Check no error message present for history entry.",
                     form.getTextContent()
                             .contains("Enter a valid positive integer"));
-            form.getInputByName("maxHistoryEntries").setValueAttribute("-2");
+            form.getInputByName("maxHistoryEntries").setValue("-2");
             Assert.assertTrue("Check error message on invalid history entry.",
                     form.getTextContent()
                             .contains("Enter a valid positive integer"));
             Assert.assertFalse(
                     "Check no error message present for regexp excludePattern.",
                     form.getTextContent().contains("Invalid regexp"));
-            form.getInputByName("excludePattern").setValueAttribute("**");
+            form.getInputByName("excludePattern").setValue("**");
             Assert.assertTrue(
                     "Check error message on invalid regexp excludePattern.",
                     form.getTextContent().contains("Invalid regexp"));
@@ -242,7 +242,7 @@ public class JobConfigHistoryIT
         try {
             final HtmlForm form = webClient.goTo("configure")
                     .getFormByName("config");
-            form.getInputByName("maxHistoryEntries").setValueAttribute("5");
+            form.getInputByName("maxHistoryEntries").setValue("5");
             form.getInputByName("skipDuplicateHistory").setChecked(false);
             submit(form);
 
@@ -284,7 +284,7 @@ public class JobConfigHistoryIT
 
         final HtmlForm form = webClient.goTo("configure")
                 .getFormByName("config");
-        form.getInputByName("historyRootDir").setValueAttribute(absolutePath);
+        form.getInputByName("historyRootDir").setValue(absolutePath);
         submit(form);
         Assert.assertEquals("Verify history root configured at absolute path.",
                 new File(root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR),
@@ -408,7 +408,7 @@ public class JobConfigHistoryIT
 
             final HtmlForm form = webClient.goTo("configure")
                     .getFormByName("config");
-            form.getInputByName("historyRootDir").setValueAttribute("newDir");
+            form.getInputByName("historyRootDir").setValue("newDir");
             submit(form);
 
             Assert.assertEquals("Verify project history entry is empty.", 0,

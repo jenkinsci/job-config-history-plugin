@@ -3,13 +3,13 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import com.gargoylesoftware.htmlunit.TextPage;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
-import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
-import com.gargoylesoftware.htmlunit.xml.XmlPage;
+import org.htmlunit.TextPage;
+import org.htmlunit.html.HtmlAnchor;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlRadioButtonInput;
+import org.htmlunit.html.HtmlTextArea;
+import org.htmlunit.xml.XmlPage;
 import org.junit.Assert;
 import org.jvnet.hudson.test.recipes.LocalData;
 import org.xml.sax.SAXException;
