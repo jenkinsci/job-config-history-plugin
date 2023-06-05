@@ -3,7 +3,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlForm;
 import hudson.FilePath;
 import hudson.XmlFile;
 import hudson.model.AbstractProject;
@@ -82,7 +82,7 @@ public class JobConfigHistoryJobListenerIT
         final HtmlForm form = webClient.goTo("configure")
                 .getFormByName("config");
         form.getInputByName("historyRootDir")
-                .setValueAttribute("jobConfigHistory");
+                .setValue("jobConfigHistory");
         submit(form);
         FreeStyleProject project = createFreeStyleProject("newproject");
         File historyDir = getHistoryDir(project.getConfigFile());

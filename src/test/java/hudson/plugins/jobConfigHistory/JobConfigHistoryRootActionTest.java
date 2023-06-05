@@ -23,10 +23,10 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.HtmlButton;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.htmlunit.html.DomElement;
+import org.htmlunit.html.HtmlButton;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlPage;
 import hudson.XmlFile;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
