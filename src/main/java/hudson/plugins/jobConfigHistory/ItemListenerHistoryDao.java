@@ -58,9 +58,9 @@ public interface ItemListenerHistoryDao {
     /**
      * Changes the item's history's location.
      *
-     * @param item
-     * @param oldFullName
-     * @param newFullName
+     * @param item        project
+     * @param oldFullName old full name
+     * @param newFullName new full name
      */
     void changeItemLocation(Item item, String oldFullName, String newFullName);
 }
