@@ -29,7 +29,7 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
     }
 
     public String getChangeReasonComment() {
-        return changeReasonComment;
+        return "";
     }
 
     @Extension
