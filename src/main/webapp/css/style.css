@@ -648,3 +648,8 @@ table.no-borders-warning caption {
 .jch-entries-per-page .jenkins-button, .jch-pagination .jenkins-button {
     min-width: 52px;
 }
+
+.jch pre {
+  background-color: var(--white);
+  padding: 0.1rem;
+}
