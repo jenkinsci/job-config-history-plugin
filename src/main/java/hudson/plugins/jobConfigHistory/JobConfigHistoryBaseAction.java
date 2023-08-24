@@ -51,6 +51,7 @@ import org.xmlunit.diff.DifferenceEvaluator;
 import org.xmlunit.diff.ElementSelectors;
 
 import javax.servlet.ServletException;
+import javax.xml.XMLConstants;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -89,7 +90,13 @@ import static java.util.logging.Level.WARNING;
 public abstract class JobConfigHistoryBaseAction implements Action {
 
     private static final Logger LOG = Logger.getLogger(JobConfigHistoryBaseAction.class.getName());
-    private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+    private final TransformerFactory transformerFactory;
+
+    public JobConfigHistoryBaseAction() {
+        transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    }
 
     @Override
     public String getDisplayName() {

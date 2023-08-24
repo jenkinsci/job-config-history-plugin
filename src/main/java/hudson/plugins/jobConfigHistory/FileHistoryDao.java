@@ -618,7 +618,13 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     public XmlFile getOldRevision(final AbstractItem item,
                                   final String identifier) {
         final File configFile = item.getConfigFile().getFile();
-        final File historyDir = new File(getHistoryDir(configFile), identifier);
+        final File historyDirFromConfigFile = getHistoryDir(configFile);
+        final File historyDir = new File(historyDirFromConfigFile, identifier);
+
+        if(!fileIsContainedInDirectory(historyDir, historyDirFromConfigFile)) {
+            return new XmlFile(null);
+        }
+
         if (PluginUtils.isMavenPluginAvailable()
                 && item instanceof MavenModule) {
             final String path = historyDir
@@ -1338,8 +1344,14 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
     @Override
     public XmlFile getOldRevision(final Node node, final String identifier) {
-        final File historyDir = new File(getHistoryDirForNode(node),
+        final File historyDirForNode = getHistoryDirForNode(node);
+        final File historyDir = new File(historyDirForNode,
                 identifier);
+
+        if(!fileIsContainedInDirectory(historyDir, historyDirForNode)) {
+            return new XmlFile(null);
+        }
+
         return new XmlFile(getConfigFile(historyDir));
     }
 
