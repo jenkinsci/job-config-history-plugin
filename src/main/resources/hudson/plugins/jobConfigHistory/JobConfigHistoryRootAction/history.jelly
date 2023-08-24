@@ -140,7 +140,7 @@
                                 removeEntryFromTable('table-row-' + JsConfigNr, JsConfigDate, JsJobName, JsMessage)
                               }
                             </script>
-                            <button type="button" class="jenkins-button jenkins-button--destructive" onClick="removeEntryFromTable2('${configNr}', '${config.date}', '${message}')" value="X">
+                            <button type="button" class="jenkins-button jenkins-button--destructive" data-config-date="${config.date}" onClick="removeEntryFromTable2('${configNr}', this.getAttribute('data-config-date'), '${message}')" value="X">
                               <l:icon src="symbol-trash-outline plugin-ionicons-api" class="icon-md" alt="${%Delete Revision}" />
                             </button>
                           </div>

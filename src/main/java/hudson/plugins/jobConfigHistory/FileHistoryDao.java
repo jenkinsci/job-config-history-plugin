@@ -537,7 +537,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     private SortedMap<String, HistoryDescr> getRevisions(
             final File configFile) {
         final File historiesDir = getHistoryDir(configFile);
-        return getRevisions(historiesDir, configFile);
+        return getRevisionsFromHistoriesDir(historiesDir);
     }
 
     /**
@@ -547,8 +547,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param configFile   for exception
      * @return sorted map
      */
-    private SortedMap<String, HistoryDescr> getRevisions(
-            final File historiesDir, final File configFile) {
+    private SortedMap<String, HistoryDescr> getRevisionsFromHistoriesDir(
+            final File historiesDir) {
         final File[] historyDirsOfItem = historiesDir
                 .listFiles(HistoryFileFilter.INSTANCE);
         final TreeMap<String, HistoryDescr> map = new TreeMap<>();
@@ -1055,13 +1055,21 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
     @Override
     public SortedMap<String, HistoryDescr> getJobHistory(final String jobName) {
-        return getRevisions(new File(getJobHistoryRootDir(), jobName),
-                new File(jobName));
+        File jobHistoryRootDir = getJobHistoryRootDir();
+        File jobNameSubFolder = new File(jobHistoryRootDir, jobName);
+        if(!fileIsContainedInDirectory(jobNameSubFolder, jobHistoryRootDir)) {
+            return new TreeMap<>();
+        }
+        return getRevisionsFromHistoriesDir(jobNameSubFolder);
     }
 
     @Override
     public SortedMap<String, HistoryDescr> getSystemHistory(final String name) {
-        return getRevisions(new File(historyRootDir, name), new File(name));
+        File systemSubFolder = new File(historyRootDir, name);
+        if(!fileIsContainedInDirectory(systemSubFolder, historyRootDir)) {
+            return new TreeMap<>();
+        }
+        return getRevisionsFromHistoriesDir(systemSubFolder);
     }
 
     @Deprecated
@@ -1333,6 +1341,13 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         final File historyDir = new File(getHistoryDirForNode(node),
                 identifier);
         return new XmlFile(getConfigFile(historyDir));
+    }
+
+    private boolean fileIsContainedInDirectory(File file, File directory) {
+        try {
+            return file.toPath().toRealPath().startsWith(directory.toPath().toRealPath());
+        } catch (IOException ignored) {}
+        return false;
     }
 
     @Override
