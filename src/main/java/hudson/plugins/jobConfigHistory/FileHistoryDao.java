@@ -376,6 +376,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                     new Object[]{JobConfigHistoryConsts.JOB_LOCAL_CONFIGURATION_XML_TAG, configFile.getFile()});
             return Optional.empty();
         } else if (jobLocalConfigurationNodes.getLength() == 1) {
+            // Tag is found. Content ought to be nonempty (see JobLocalConfiguration.DescriptorImpl.newInstance).
             org.w3c.dom.Node jobLocalConfiguration = jobLocalConfigurationNodes.item(0);
             NodeList jlcChildren = jobLocalConfiguration.getChildNodes();
             org.w3c.dom.Node changeReasonCommentNode = null;
@@ -386,7 +387,6 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                 }
             }
             if (changeReasonCommentNode != null) {
-                //tag is found. Might contain no comment (getTextContent() returns "").
                 String changeReasonComment = changeReasonCommentNode.getTextContent();
                 if (changeReasonComment != null) {
                     //delete jobLocalConfiguration node from document

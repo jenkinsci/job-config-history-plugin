@@ -8,6 +8,7 @@ import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import hudson.util.FormValidation;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -46,6 +47,12 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
 
         public boolean isApplicable(AbstractProject<?, ?> item) {
             return true;
+        }
+
+        @Override
+        public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+            JobLocalConfiguration jp = (JobLocalConfiguration) super.newInstance(req, formData);
+            return StringUtils.isBlank(jp.changeReasonComment) ? null : jp;
         }
 
         public boolean configure(StaplerRequest request, JSONObject jsonObject) throws FormException {
