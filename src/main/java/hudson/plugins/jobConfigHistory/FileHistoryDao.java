@@ -35,16 +35,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -353,69 +343,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         }
     }
 
-    /**
-     * Find this in the configFile:<br>
-     * &emsp; &lt;hudson.plugins.jobConfigHistory.JobLocalConfiguration plugin="jobConfigHistory@2.25-SNAPSHOT"&gt;<br>
-     * &emsp; &emsp; &lt;changeReasonComment&gt;MY_CHANGE_REASON_COMMENT&lt;/changeReasonComment&gt;<br>
-     * &emsp; &lt;/hudson.plugins.jobConfigHistory.JobLocalConfiguration&gt;<br>
-     * and delete it, receiving the changeReasonComment, if present.
-     *
-     * @param configFile the config file
-     * @return the String in changeReasonComment, if found. Optional.empty(), else.
-     * @throws IOException                  configFile is read.
-     * @throws SAXException                 parsing the configFile.
-     * @throws TransformerException         parsing the configFile.
-     * @throws ParserConfigurationException configuring the xml parser.
-     */
-    private Optional<String> removeChangeReasonComment(final XmlFile configFile) throws IOException, SAXException, TransformerException, ParserConfigurationException {
-        Document configFiledocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile.getFile());
-
-        NodeList jobLocalConfigurationNodes = configFiledocument.getElementsByTagName(JobConfigHistoryConsts.JOB_LOCAL_CONFIGURATION_XML_TAG);
-        if (jobLocalConfigurationNodes.getLength() > 1) {
-            LOG.log(FINEST, "tag \"{0}\" found twice in {1}, not saving the change reason comment.",
-                    new Object[]{JobConfigHistoryConsts.JOB_LOCAL_CONFIGURATION_XML_TAG, configFile.getFile()});
-            return Optional.empty();
-        } else if (jobLocalConfigurationNodes.getLength() == 1) {
-            // Tag is found. Content ought to be nonempty (see JobLocalConfiguration.DescriptorImpl.newInstance).
-            org.w3c.dom.Node jobLocalConfiguration = jobLocalConfigurationNodes.item(0);
-            NodeList jlcChildren = jobLocalConfiguration.getChildNodes();
-            org.w3c.dom.Node changeReasonCommentNode = null;
-            for (int i = 0; i < jlcChildren.getLength(); ++i) {
-                org.w3c.dom.Node node = jlcChildren.item(i);
-                if (node.getNodeName().equals(JobConfigHistoryConsts.CHANGE_REASON_COMMENT_XML_TAG)) {
-                    changeReasonCommentNode = node;
-                }
-            }
-            if (changeReasonCommentNode != null) {
-                String changeReasonComment = changeReasonCommentNode.getTextContent();
-                if (changeReasonComment != null) {
-                    //delete jobLocalConfiguration node from document
-                    jobLocalConfiguration.getParentNode().removeChild(jobLocalConfiguration);
-                    //save xml
-                    TransformerFactory.newInstance().newTransformer()
-                            .transform(new DOMSource(configFiledocument), new StreamResult(configFile.getFile()));
-
-                    return changeReasonComment.isEmpty() ? Optional.empty() : Optional.of(changeReasonComment);
-                } else return Optional.empty();
-            } else return Optional.empty();
-        } else {
-            //no jobLocalConfiguration node found. Should be there even if the message field was empty!
-            LOG.log(FINEST, "tag \"{0}\" not found in {1}, no comment could be found.",
-                    new Object[]{JobConfigHistoryConsts.JOB_LOCAL_CONFIGURATION_XML_TAG, configFile.getFile()});
-            return Optional.empty();
-        }
-    }
-
     @Override
     public void saveItem(final XmlFile file) {
-        //remove the changeReasonComment entry from the xml file. (before checking duplicates!)
-        Optional<String> changeReasonCommentOptional;
-        try {
-            changeReasonCommentOptional = removeChangeReasonComment(file);
-        } catch (IOException | SAXException | TransformerException | ParserConfigurationException e) {
-            LOG.log(WARNING, "Error occurred while trying to extract changeReasonComment from config file: {0}", e);
-            changeReasonCommentOptional = Optional.empty();
-        }
+        Optional<String> changeReasonCommentOptional = JobLocalConfiguration.lastChangeReasonComment(file);
 
         if (checkDuplicate(file)) {
             createNewHistoryEntryAndCopyConfig(file,

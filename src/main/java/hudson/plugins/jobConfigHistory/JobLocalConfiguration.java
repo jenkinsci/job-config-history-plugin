@@ -1,14 +1,20 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
+import hudson.Util;
+import hudson.XmlFile;
 import hudson.model.AbstractProject;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import hudson.util.FormValidation;
+import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -20,6 +26,12 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
 
     private static final Logger LOG = Logger
             .getLogger(JobLocalConfiguration.class.getName());
+
+    private static final Map<File, String> lastChangeReasonCommentByXmlFile = Collections.synchronizedMap(new HashMap<>());
+
+    static Optional<String> lastChangeReasonComment(XmlFile file) {
+        return Optional.ofNullable(lastChangeReasonCommentByXmlFile.remove(file.getFile()));
+    }
 
     private final String changeReasonComment;
 
@@ -52,7 +64,11 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
         @Override
         public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             JobLocalConfiguration jp = (JobLocalConfiguration) super.newInstance(req, formData);
-            return StringUtils.isBlank(jp.changeReasonComment) ? null : jp;
+            Job<?, ?> job = req.findAncestorObject(Job.class);
+            if (job != null) {
+                lastChangeReasonCommentByXmlFile.put(job.getConfigFile().getFile(), Util.fixEmptyAndTrim(jp.changeReasonComment));
+            }
+            return null;
         }
 
         public boolean configure(StaplerRequest request, JSONObject jsonObject) throws FormException {
