@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,7 +43,7 @@ public class PluginUtilsTest {
     @Test
     public void testParsedDate() {
         String timeStamp = "2012-11-21_11-29-12";
-        Date expResult = new Date(112, Calendar.NOVEMBER, 21, 11, 29, 12);
+        Date expResult = new GregorianCalendar(2012, Calendar.NOVEMBER, 21, 11, 29, 12).getTime();
         Date result = PluginUtils.parsedDate(timeStamp);
         assertEquals(expResult, result);
     }

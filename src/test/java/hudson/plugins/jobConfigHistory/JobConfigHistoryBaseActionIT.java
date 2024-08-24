@@ -46,7 +46,7 @@ public class JobConfigHistoryBaseActionIT
     public void before() throws Throwable {
         super.before();
         webClient = createWebClient();
-        oldLineSeparator = System.getProperty("line.separator");
+        oldLineSeparator = System.lineSeparator();
         System.setProperty("line.separator", "\n");
     }
 
