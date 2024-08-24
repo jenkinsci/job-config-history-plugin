@@ -41,7 +41,7 @@ public class SideBySideView {
     /**
      * All lines of the view.
      */
-    private final List<Line> lines = new ArrayList<Line>();
+    private final List<Line> lines = new ArrayList<>();
 
     /**
      * Returns the lines of the {@link SideBySideView}.

@@ -450,7 +450,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     public int getMaxEntriesPerPage() {
         final String maxEntriesPerPage = getPlugin().getMaxEntriesPerPage();
         try {
-            return (maxEntriesPerPage == null || maxEntriesPerPage.equals(""))
+            return (maxEntriesPerPage == null || maxEntriesPerPage.isEmpty())
                     ? JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE
                     : Integer.parseInt(maxEntriesPerPage);
         } catch (NumberFormatException e) {
@@ -465,7 +465,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     public int getMaxPageNum() {
         String entriesPerPageStr = getCurrentRequest().getParameter("entriesPerPage");
         if (entriesPerPageStr != null && entriesPerPageStr.equals("all")) return 0;
-        int entriesPerPage = (entriesPerPageStr != null && !entriesPerPageStr.equals("")) ? Integer.parseInt(entriesPerPageStr) : getMaxEntriesPerPage();
+        int entriesPerPage = (entriesPerPageStr != null && !entriesPerPageStr.isEmpty()) ? Integer.parseInt(entriesPerPageStr) : getMaxEntriesPerPage();
         int revisionAmount = getRevisionAmount();
 
         int div = revisionAmount / entriesPerPage;
