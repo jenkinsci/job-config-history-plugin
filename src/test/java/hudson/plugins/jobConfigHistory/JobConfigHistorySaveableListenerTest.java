@@ -1,8 +1,8 @@
 package hudson.plugins.jobConfigHistory;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.XmlFile;
 import hudson.model.Saveable;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.mockito.Matchers.any;
@@ -50,7 +50,7 @@ public class JobConfigHistorySaveableListenerTest {
             JobConfigHistorySaveableListener {
 
         @Override
-        @NotNull
+        @NonNull
         JobConfigHistory getPlugin() {
             return mockedPlugin;
         }
