@@ -39,7 +39,7 @@
         <maven-checkstyle-plugin.version>3.2.2</maven-checkstyle-plugin.version>
         <jdepend-maven-plugin.version>2.0</jdepend-maven-plugin.version>
         <!-- TODO fix violations -->
-        <spotbugs.threshold>High</spotbugs.threshold>
+        <spotbugs.threshold>Medium</spotbugs.threshold>
     </properties>
 
     <dependencyManagement>

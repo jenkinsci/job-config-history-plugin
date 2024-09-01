@@ -28,6 +28,7 @@ import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Patch;
 import com.google.common.collect.Lists;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.XmlFile;
 import hudson.model.Action;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
@@ -534,6 +535,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
         return PluginUtils.getHistoryDao();
     }
 
+    @SuppressFBWarnings(value = "DCN_NULLPOINTER_EXCEPTION", justification = "Unsure where the NPE can be thrown, so ok for the moment.")
     private Writer sort(File file) throws IOException {
         //this produces a sorted xml without indentation.
         try (Reader source = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {

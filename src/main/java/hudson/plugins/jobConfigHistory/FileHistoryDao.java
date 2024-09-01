@@ -33,7 +33,6 @@ import hudson.model.Node;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -62,6 +61,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -256,8 +256,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
             // get the *.xml file that is not the
             // JobConfigHistoryConsts.HISTORY_FILE
             // assumes random .xml files won't appear in the history directory
-            try {
-                final File[] listing = historyDir.listFiles();
+            final File[] listing = historyDir.listFiles();
+            if (listing != null) {
                 for (final File file : listing) {
                     if (!file.getName()
                             .equals(JobConfigHistoryConsts.HISTORY_FILE)
@@ -265,8 +265,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                         configFile = file;
                     }
                 }
-            } catch (NullPointerException e) {
-                LOG.log(Level.WARNING, "History dir is null. ", e);
+            } else {
+                LOG.log(Level.WARNING, "History dir is null. {0}", historyDir);
             }
         }
         return configFile;
@@ -730,7 +730,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     public boolean revisionEqualsCurrent(Node node, String identifier1) {
         String currentContent = Jenkins.XSTREAM2.toXML(node);
         try {
-            return StringUtils.equals(
+            return Objects.equals(
                     FileUtils.readFileToString(getOldRevision(node, identifier1).getFile(), "UTF-8"),
                     currentContent
             );
@@ -849,19 +849,21 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param dir The directory which should be deleted.
      */
     private void deleteDirectory(final File dir) {
-        try {
-            for (File file : dir.listFiles()) {
+        File[] files = null;
+        if (dir != null) {
+            files = dir.listFiles();
+        }
+        if (files == null) {
+            LOG.log(Level.WARNING, "Directory already deleted or null: {0}", dir);
+        } else {
+            for (File file : files) {
                 if (!file.delete()) {
-                    LOG.log(Level.WARNING, "problem deleting history file: {0}",
-                            file);
+                    LOG.log(Level.WARNING, "problem deleting history file: {0}", file);
                 }
             }
             if (!dir.delete()) {
-                LOG.log(Level.WARNING,
-                        "problem deleting history directory: {0}", dir);
+                LOG.log(Level.WARNING, "problem deleting history directory: {0}", dir);
             }
-        } catch (NullPointerException e) {
-            LOG.log(Level.WARNING, "Directory already deleted or null. ", e);
         }
     }
 
