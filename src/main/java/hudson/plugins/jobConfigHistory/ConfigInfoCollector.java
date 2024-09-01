@@ -184,15 +184,19 @@ final class ConfigInfoCollector {
     }
 
     private boolean isJobInFolder(File file) {
-        try {
-            File jobConfigHistoryRootDirection = PluginUtils.getPlugin().getConfiguredHistoryRootDir();
-            return (!file.getParentFile().getParentFile().toString()
-                    .equals(jobConfigHistoryRootDirection.toString()));
-        } catch (NullPointerException e) {
-            //this happens sometimes, idk...
+        File jobConfigHistoryRootDirection = PluginUtils.getPlugin().getConfiguredHistoryRootDir();
+        final File parent = file.getParentFile();
+        String grandparent = null;
+        if (parent != null) {
+            final File grandparentDir = parent.getParentFile();
+            if (grandparentDir != null) {
+                grandparent = parent.getParentFile().toString();
+            }
+        }
+        if (grandparent != null) {
+            return !grandparent.equals(jobConfigHistoryRootDirection.toString());
+        } else {
             return false;
         }
-
-
     }
 }
