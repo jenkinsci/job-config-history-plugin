@@ -39,7 +39,6 @@ import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
@@ -193,7 +192,7 @@ public class JobConfigHistory extends GlobalConfiguration {
      */
     @DataBoundSetter
     public void setMaxHistoryEntries(String maxEntryInput) {
-        String trimmedValue = StringUtils.trimToNull(maxEntryInput);
+        String trimmedValue = maxEntryInput == null || maxEntryInput.trim().isEmpty() ? null : maxEntryInput.trim();
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             maxHistoryEntries = trimmedValue;
         }
@@ -216,7 +215,7 @@ public class JobConfigHistory extends GlobalConfiguration {
      */
     @DataBoundSetter
     public void setMaxEntriesPerPage(String maxEntryInput) {
-        String trimmedValue = StringUtils.trimToNull(maxEntryInput);
+        String trimmedValue = maxEntryInput == null || maxEntryInput.trim().isEmpty() ? null : maxEntryInput.trim();
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             maxEntriesPerPage = trimmedValue;
         }
@@ -239,7 +238,7 @@ public class JobConfigHistory extends GlobalConfiguration {
      */
     @DataBoundSetter
     public void setMaxDaysToKeepEntries(String maxDaysInput) {
-        String trimmedValue = StringUtils.trimToNull(maxDaysInput);
+        String trimmedValue = maxDaysInput == null || maxDaysInput.trim().isEmpty() ? null : maxDaysInput.trim();
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             maxDaysToKeepEntries = trimmedValue;
         }
@@ -540,7 +539,7 @@ public class JobConfigHistory extends GlobalConfiguration {
      * @return ok if the entry is blank or a non-negative integer.
      */
     public FormValidation doCheckMaxHistoryEntries(@QueryParameter String value) {
-        String trimmedValue = StringUtils.trimToNull(value);
+        String trimmedValue = value == null || value.trim().isEmpty() ? null : value.trim();
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             return FormValidation.ok();
         } else {
@@ -556,7 +555,7 @@ public class JobConfigHistory extends GlobalConfiguration {
      * @return ok if the entry is blank or a non-negative integer.
      */
     public FormValidation doCheckMaxEntriesPerPage(@QueryParameter String value) {
-        String trimmedValue = StringUtils.trimToNull(value);
+        String trimmedValue = value == null || value.trim().isEmpty() ? null : value.trim();
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             return FormValidation.ok();
         } else {
@@ -572,7 +571,7 @@ public class JobConfigHistory extends GlobalConfiguration {
      * @return ok if the entry is blank or a non-negative integer.
      */
     public FormValidation doCheckMaxDaysToKeepEntries(@QueryParameter String value) {
-        String trimmedValue = StringUtils.trimToNull(value);
+        String trimmedValue = value == null || value.trim().isEmpty() ? null : value.trim();
         if (trimmedValue == null || isPositiveInteger(trimmedValue)) {
             return FormValidation.ok();
         } else {
