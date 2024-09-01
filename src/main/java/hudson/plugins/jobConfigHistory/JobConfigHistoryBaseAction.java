@@ -42,7 +42,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
-import org.xmlunit.diff.Comparison;
 import org.xmlunit.diff.ComparisonResult;
 import org.xmlunit.diff.ComparisonType;
 import org.xmlunit.diff.DefaultNodeMatcher;
@@ -210,37 +209,34 @@ public abstract class JobConfigHistoryBaseAction implements Action {
     }
 
     private Diff getVersionDiffsOnly(final String file1Str, final String file2Str) {
-        DifferenceEvaluator versionDifferenceEvaluator = new DifferenceEvaluator() {
-            //takes the comparison and the result that a possible previous DifferenceEvaluator created for this node
-            // and compares the node based on whether there was a version change or not.
-            // if there wasn't, "comparisonResult" is returned.
-            @Override
-            public ComparisonResult evaluate(Comparison comparison, ComparisonResult comparisonResult) {
-                if (comparison.getType() != ComparisonType.ATTR_VALUE) {
-                    //only want to compare attribute values!
-                    return ComparisonResult.EQUAL;
-                }
-
-                Node controlNode = comparison.getControlDetails().getTarget();
-                Node testNode = comparison.getTestDetails().getTarget();
-                if (controlNode == null || testNode == null) {
-                    return ComparisonResult.EQUAL;
-                }
-
-                String[] controlValue = controlNode.getNodeValue().split("@");
-                String[] testValue = testNode.getNodeValue().split("@");
-                if (!controlValue[0].equals(testValue[0])
-                        || controlValue.length != 2 || testValue.length != 2) {
-                    //different plugins or misformatted plugin attribute: version number not determinable
-                    return ComparisonResult.EQUAL;
-                }
-                if (controlValue[1].equals(testValue[1])) {
-                    return ComparisonResult.EQUAL;
-                } else {
-                    return ComparisonResult.DIFFERENT;
-                }
-
+        //takes the comparison and the result that a possible previous DifferenceEvaluator created for this node
+// and compares the node based on whether there was a version change or not.
+// if there wasn't, "comparisonResult" is returned.
+        DifferenceEvaluator versionDifferenceEvaluator = (comparison, comparisonResult) -> {
+            if (comparison.getType() != ComparisonType.ATTR_VALUE) {
+                //only want to compare attribute values!
+                return ComparisonResult.EQUAL;
             }
+
+            Node controlNode = comparison.getControlDetails().getTarget();
+            Node testNode = comparison.getTestDetails().getTarget();
+            if (controlNode == null || testNode == null) {
+                return ComparisonResult.EQUAL;
+            }
+
+            String[] controlValue = controlNode.getNodeValue().split("@");
+            String[] testValue = testNode.getNodeValue().split("@");
+            if (!controlValue[0].equals(testValue[0])
+                    || controlValue.length != 2 || testValue.length != 2) {
+                //different plugins or misformatted plugin attribute: version number not determinable
+                return ComparisonResult.EQUAL;
+            }
+            if (controlValue[1].equals(testValue[1])) {
+                return ComparisonResult.EQUAL;
+            } else {
+                return ComparisonResult.DIFFERENT;
+            }
+
         };
 
         return DiffBuilder.compare(Input.fromString(file1Str)).withTest(Input.fromString(file2Str))
