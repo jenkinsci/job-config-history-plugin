@@ -58,6 +58,7 @@ public class JobConfigHistoryActionFactory
     /**
      * {@inheritDoc}
      */
+    @NonNull
     @Override
     public Collection<? extends Action> createFor(@NonNull AbstractItem target) {
         final JobConfigHistoryProjectAction newAction = new JobConfigHistoryProjectAction(

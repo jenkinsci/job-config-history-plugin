@@ -23,6 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.XmlFile;
 import hudson.model.Saveable;
@@ -56,7 +57,7 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
     public void onChange(final Saveable o, final XmlFile file) {
         final JobConfigHistory plugin = getPlugin();
         LOG.log(FINEST, "In onChange for {0}", o);
-        if (plugin != null && plugin.isSaveable(o, file) && !PluginUtils.isUserExcluded(plugin)) {
+        if (plugin.isSaveable(o, file) && !PluginUtils.isUserExcluded(plugin)) {
             final HistoryDao configHistoryListenerHelper = getHistoryDao(
                     plugin);
             configHistoryListenerHelper.saveItem(file);
@@ -69,7 +70,7 @@ public class JobConfigHistorySaveableListener extends SaveableListener {
      *
      * @return plugin
      */
-    JobConfigHistory getPlugin() {
+    @NonNull JobConfigHistory getPlugin() {
         return PluginUtils.getPlugin();
     }
 

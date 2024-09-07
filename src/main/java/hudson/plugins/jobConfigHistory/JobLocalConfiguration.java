@@ -1,5 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.Util;
 import hudson.XmlFile;
@@ -52,6 +54,7 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
             super(JobLocalConfiguration.class);
         }
 
+        @NonNull
         @Override
         public String getDisplayName() {
             return "changeReasonComment_holder";
@@ -62,6 +65,7 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
         }
 
         @Override
+        @SuppressFBWarnings(value = "NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE", justification = "JavaDoc says it is always Non-null")
         public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             JobLocalConfiguration jp = (JobLocalConfiguration) super.newInstance(req, formData);
             Job<?, ?> job = req.findAncestorObject(Job.class);

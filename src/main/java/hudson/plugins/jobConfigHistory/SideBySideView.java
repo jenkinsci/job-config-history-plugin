@@ -71,7 +71,7 @@ public class SideBySideView {
         while (iter.hasNext()) {
             final Line line = iter.next();
             final String lineNum = line.left.getLineNumber();
-            if (lineNum.length() != 0) {
+            if (!lineNum.isEmpty()) {
                 final int lineNumInt = Integer.parseInt(lineNum);
                 if (linesByNumbers.containsKey(lineNumInt)) {
                     if (line.getTag() == DiffRow.Tag.EQUAL) {

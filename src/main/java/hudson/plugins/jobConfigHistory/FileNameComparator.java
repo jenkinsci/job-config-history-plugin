@@ -38,6 +38,7 @@ final class FileNameComparator implements Comparator<File>, Serializable {
      * The one and only instance.
      */
     public static final FileNameComparator INSTANCE = new FileNameComparator();
+    private static final long serialVersionUID = 3016329861063432215L;
 
     @Override
     public int compare(File f1, File f2) {

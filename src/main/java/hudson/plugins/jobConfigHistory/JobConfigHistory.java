@@ -23,6 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.BulkChange;
 import hudson.Extension;
 import hudson.XmlFile;
@@ -126,6 +127,7 @@ public class JobConfigHistory extends GlobalConfiguration {
 
     @DataBoundConstructor
     @Restricted(NoExternalUse.class)
+    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = "The Descriptor#load documentation states that \"The constructor of the derived class must call this method\".")
     public JobConfigHistory() {
         load();
         loadRegexpPatterns();

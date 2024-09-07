@@ -23,6 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Build;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
@@ -33,7 +34,6 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -226,7 +226,7 @@ public class JobConfigBadgeActionTest {
                 23, 0, 5);
         final Build<?, ?> previousBuild = new Build(mockedProject, calendar) {
             @Override
-            public @NotNull Project<?, ?> getParent() {
+            public @NonNull Project<?, ?> getParent() {
                 return mockedProject;
             }
         };

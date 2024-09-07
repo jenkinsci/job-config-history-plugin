@@ -1,5 +1,6 @@
 package hudson.plugins.jobConfigHistory;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.XmlFile;
 import hudson.model.Saveable;
 import org.junit.Test;
@@ -49,6 +50,7 @@ public class JobConfigHistorySaveableListenerTest {
             JobConfigHistorySaveableListener {
 
         @Override
+        @NonNull
         JobConfigHistory getPlugin() {
             return mockedPlugin;
         }
