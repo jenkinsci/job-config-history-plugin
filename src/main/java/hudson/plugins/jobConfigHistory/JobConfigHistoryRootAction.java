@@ -169,7 +169,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         HashMap<String, ConfigType> timestampNameToConfigTypeMap = new HashMap<>();
 
         SortedMap<String, Pair<String, HistoryDescr>> historyDescrSortedMap;
-        if (filter == null || filter.equals("") || filter.equals("system")) {
+        if (filter == null || filter.isEmpty() || filter.equals("system")) {
             historyDescrSortedMap = getSystemConfigsHistoryDescr();
             historyDescrSortedMap.keySet().forEach(timestampAndName -> timestampNameToConfigTypeMap.put(timestampAndName, ConfigType.SYSTEM));
         } else if (filter.equals("all")) {
@@ -409,7 +409,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         }
 
         //overview page handling
-        if (filter == null || filter.equals("") || filter.equals("system")) {
+        if (filter == null || filter.isEmpty() || filter.equals("system")) {
             return getOverviewHistoryDao().getSystemRevisionAmount();
         } else if (filter.equals("jobs")) {
             return getOverviewHistoryDao().getJobRevisionAmount();

@@ -27,7 +27,6 @@ import hudson.ExtensionList;
 import hudson.Plugin;
 import hudson.model.User;
 import hudson.security.ACL;
-import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 
 import java.io.File;

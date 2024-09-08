@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
@@ -63,7 +64,7 @@ public class ConfigInfoTest {
         // "2012-11-21_11-29-12"
         ConfigInfo sut = ConfigInfo.create("jobName", true, historyDescr,
                 false);
-        Date expResult = new Date(112, Calendar.NOVEMBER, 21, 11, 29, 12);
+        Date expResult = new GregorianCalendar(2012, Calendar.NOVEMBER, 21, 11, 29, 12).getTime();
         Date result = sut.parsedDate();
         assertEquals(expResult, result);
     }

@@ -23,6 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Build;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
@@ -93,7 +94,7 @@ public class JobConfigBadgeActionTest {
     public void testShowBadge() throws Exception {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
         jenkinsRule.buildAndAssertSuccess(project);
-        Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().get(0);
+        Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().getLastBuild();
 
         sut.onAttached(build);
         assertTrue(sut.showBadge());
@@ -106,7 +107,7 @@ public class JobConfigBadgeActionTest {
     public void testOldConfigsExist() throws Exception {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
         jenkinsRule.buildAndAssertSuccess(project);
-        Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().get(0);
+        Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().getLastBuild();
 
         SortedMap<String, HistoryDescr> revisions = PluginUtils.getHistoryDao().getJobHistory(project.getFullName());
         assertEquals(2, revisions.size());
@@ -121,7 +122,7 @@ public class JobConfigBadgeActionTest {
     public void testOldConfigsExistFalse() throws Exception {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
         jenkinsRule.buildAndAssertSuccess(project);
-        Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().get(0);
+        Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().getLastBuild();
 
         SortedMap<String, HistoryDescr> revisions = PluginUtils.getHistoryDao().getJobHistory(project.getFullName());
         assertEquals(2, revisions.size());
@@ -143,7 +144,7 @@ public class JobConfigBadgeActionTest {
                         + "&timestamp2=" + timestampRegex;
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
         jenkinsRule.buildAndAssertSuccess(project);
-        Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().get(0);
+        Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().getLastBuild();
 
         sut.onAttached(build);
         assertTrue(sut.createLink().matches(expectedRegex));
@@ -225,7 +226,7 @@ public class JobConfigBadgeActionTest {
                 23, 0, 5);
         final Build<?, ?> previousBuild = new Build(mockedProject, calendar) {
             @Override
-            public Project<?, ?> getParent() {
+            public @NonNull Project<?, ?> getParent() {
                 return mockedProject;
             }
         };

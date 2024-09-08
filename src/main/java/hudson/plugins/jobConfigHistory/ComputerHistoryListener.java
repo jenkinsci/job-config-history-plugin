@@ -75,6 +75,9 @@ public class ComputerHistoryListener extends ComputerListener {
      */
     private void onAdd() {
         Jenkins jenkins = Jenkins.get();
+        if (nodes == null) {
+            nodes = jenkins.getNodes();
+        }
         for (Node node : jenkins.getNodes()) {
             if (!nodes.contains(node) && isTracked(node)) {
                 switchHistoryDao(node).createNewNode(node);
@@ -97,6 +100,9 @@ public class ComputerHistoryListener extends ComputerListener {
      */
     private void onRemove() {
         Jenkins jenkins = Jenkins.get();
+        if (nodes == null) {
+            nodes = jenkins.getNodes();
+        }
         for (Node node : nodes) {
             if (!jenkins.getNodes().contains(node)
                     && isTracked(node)) {
@@ -127,6 +133,9 @@ public class ComputerHistoryListener extends ComputerListener {
     private void onRename() {
         Node originalNode = null;
         Jenkins jenkins = Jenkins.get();
+        if (nodes == null) {
+            nodes = jenkins.getNodes();
+        }
         for (Node node : nodes) {
             if (!jenkins.getNodes().contains(node)
                     && isTracked(node)) {

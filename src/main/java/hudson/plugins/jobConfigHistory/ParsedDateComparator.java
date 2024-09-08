@@ -39,10 +39,12 @@ final public class ParsedDateComparator
         Comparator<ParsedDate>,
         Serializable {
 
+
     /**
      * No need to create more than one instance for descending.
      */
     public static final ParsedDateComparator DESCENDING = new ParsedDateComparator();
+    private static final long serialVersionUID = 3193386602761561750L;
 
     /**
      * {@inheritDoc}

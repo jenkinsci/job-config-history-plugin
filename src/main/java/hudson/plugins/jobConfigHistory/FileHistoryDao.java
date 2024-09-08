@@ -33,18 +33,7 @@ import hudson.model.Node;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -53,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +52,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -256,8 +247,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
             // get the *.xml file that is not the
             // JobConfigHistoryConsts.HISTORY_FILE
             // assumes random .xml files won't appear in the history directory
-            try {
-                final File[] listing = historyDir.listFiles();
+            final File[] listing = historyDir.listFiles();
+            if (listing != null) {
                 for (final File file : listing) {
                     if (!file.getName()
                             .equals(JobConfigHistoryConsts.HISTORY_FILE)
@@ -265,8 +256,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                         configFile = file;
                     }
                 }
-            } catch (NullPointerException e) {
-                LOG.log(Level.WARNING, "History dir is null. ", e);
+            } else {
+                LOG.log(WARNING, "History dir is null. {0}", historyDir);
             }
         }
         return configFile;
@@ -353,69 +344,9 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         }
     }
 
-    /**
-     * Find this in the configFile:<br>
-     * &emsp; &lt;hudson.plugins.jobConfigHistory.JobLocalConfiguration plugin="jobConfigHistory@2.25-SNAPSHOT"&gt;<br>
-     * &emsp; &emsp; &lt;changeReasonComment&gt;MY_CHANGE_REASON_COMMENT&lt;/changeReasonComment&gt;<br>
-     * &emsp; &lt;/hudson.plugins.jobConfigHistory.JobLocalConfiguration&gt;<br>
-     * and delete it, receiving the changeReasonComment, if present.
-     *
-     * @param configFile the config file
-     * @return the String in changeReasonComment, if found. Optional.empty(), else.
-     * @throws IOException                  configFile is read.
-     * @throws SAXException                 parsing the configFile.
-     * @throws TransformerException         parsing the configFile.
-     * @throws ParserConfigurationException configuring the xml parser.
-     */
-    private Optional<String> removeChangeReasonComment(final XmlFile configFile) throws IOException, SAXException, TransformerException, ParserConfigurationException {
-        Document configFiledocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configFile.getFile());
-
-        NodeList jobLocalConfigurationNodes = configFiledocument.getElementsByTagName(JobConfigHistoryConsts.JOB_LOCAL_CONFIGURATION_XML_TAG);
-        if (jobLocalConfigurationNodes.getLength() > 1) {
-            LOG.log(FINEST, "tag \"{0}\" found twice in {1}, not saving the change reason comment.",
-                    new Object[]{JobConfigHistoryConsts.JOB_LOCAL_CONFIGURATION_XML_TAG, configFile.getFile()});
-            return Optional.empty();
-        } else if (jobLocalConfigurationNodes.getLength() == 1) {
-            org.w3c.dom.Node jobLocalConfiguration = jobLocalConfigurationNodes.item(0);
-            NodeList jlcChildren = jobLocalConfiguration.getChildNodes();
-            org.w3c.dom.Node changeReasonCommentNode = null;
-            for (int i = 0; i < jlcChildren.getLength(); ++i) {
-                org.w3c.dom.Node node = jlcChildren.item(i);
-                if (node.getNodeName().equals(JobConfigHistoryConsts.CHANGE_REASON_COMMENT_XML_TAG)) {
-                    changeReasonCommentNode = node;
-                }
-            }
-            if (changeReasonCommentNode != null) {
-                //tag is found. Might contain no comment (getTextContent() returns "").
-                String changeReasonComment = changeReasonCommentNode.getTextContent();
-                if (changeReasonComment != null) {
-                    //delete jobLocalConfiguration node from document
-                    jobLocalConfiguration.getParentNode().removeChild(jobLocalConfiguration);
-                    //save xml
-                    TransformerFactory.newInstance().newTransformer()
-                            .transform(new DOMSource(configFiledocument), new StreamResult(configFile.getFile()));
-
-                    return changeReasonComment.isEmpty() ? Optional.empty() : Optional.of(changeReasonComment);
-                } else return Optional.empty();
-            } else return Optional.empty();
-        } else {
-            //no jobLocalConfiguration node found. Should be there even if the message field was empty!
-            LOG.log(FINEST, "tag \"{0}\" not found in {1}, no comment could be found.",
-                    new Object[]{JobConfigHistoryConsts.JOB_LOCAL_CONFIGURATION_XML_TAG, configFile.getFile()});
-            return Optional.empty();
-        }
-    }
-
     @Override
     public void saveItem(final XmlFile file) {
-        //remove the changeReasonComment entry from the xml file. (before checking duplicates!)
-        Optional<String> changeReasonCommentOptional;
-        try {
-            changeReasonCommentOptional = removeChangeReasonComment(file);
-        } catch (IOException | SAXException | TransformerException | ParserConfigurationException e) {
-            LOG.log(WARNING, "Error occurred while trying to extract changeReasonComment from config file: {0}", e);
-            changeReasonCommentOptional = Optional.empty();
-        }
+        Optional<String> changeReasonCommentOptional = JobLocalConfiguration.lastChangeReasonComment(file);
 
         if (checkDuplicate(file)) {
             createNewHistoryEntryAndCopyConfig(file,
@@ -438,7 +369,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         final File deletedHistoryDir = new File(
                 currentHistoryDir.getParentFile(), deletedHistoryName);
         if (!currentHistoryDir.renameTo(deletedHistoryDir)) {
-            LOG.log(Level.WARNING,
+            LOG.log(WARNING,
                     "unable to rename deleted history dir to: {0}",
                     deletedHistoryDir);
         }
@@ -484,7 +415,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                 } catch (InterruptedException e) {
                     final String irExceptionStr = "interrupted while moving old history on location change."
                             + onLocationChangedDescription;
-                    LOG.log(Level.WARNING, irExceptionStr, e);
+                    LOG.log(WARNING, irExceptionStr, e);
                 }
             }
         }
@@ -519,7 +450,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                 } catch (InterruptedException e) {
                     final String irExceptionStr = "interrupted while moving old history on rename."
                             + onRenameDesc;
-                    LOG.log(Level.WARNING, irExceptionStr, e);
+                    LOG.log(WARNING, irExceptionStr, e);
                 }
             }
 
@@ -552,17 +483,15 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         final File[] historyDirsOfItem = historiesDir
                 .listFiles(HistoryFileFilter.INSTANCE);
         final TreeMap<String, HistoryDescr> map = new TreeMap<>();
-        if (historyDirsOfItem == null) {
-            return map;
-        } else {
+        if (historyDirsOfItem != null) {
             for (File historyDir : historyDirsOfItem) {
                 final XmlFile historyXml = getHistoryXmlFile(historyDir);
                 final LazyHistoryDescr historyDescription = new LazyHistoryDescr(
                         historyXml);
                 map.put(historyDir.getName(), historyDescription);
             }
-            return map;
         }
+        return map;
     }
 
     @Override
@@ -608,10 +537,19 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
 
     private int countSubDirs(File[] files) {
 
-        return Arrays.stream(files)
-                .map(file -> file.listFiles(HistoryFileFilter.INSTANCE).length)
-                .reduce(Integer::sum)
-                .orElse(0);
+        boolean seen = false;
+        Integer acc = null;
+        for (File file : files) {
+            final File[] listFiles = file.listFiles(HistoryFileFilter.INSTANCE);
+            Integer length = listFiles != null ? listFiles.length : 0;
+            if (!seen) {
+                seen = true;
+                acc = length;
+            } else {
+                acc = acc + length;
+            }
+        }
+        return seen ? acc : 0;
     }
 
     @Override
@@ -676,10 +614,10 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
             try {
                 FileUtils.deleteDirectory(timestampDir);
             } catch (IOException e) {
-                LOG.log(Level.WARNING, "unable to delete revision {0}: {1}", new Object[]{identifier, e.getMessage()});
+                LOG.log(WARNING, "unable to delete revision {0}: {1}", new Object[]{identifier, e.getMessage()});
             }
         } catch (FileNotFoundException e) {
-            LOG.log(Level.WARNING, "unable to delete revision {0}: file not found.", identifier);
+            LOG.log(WARNING, "unable to delete revision {0}: file not found.", identifier);
         }
         LOG.log(FINEST, "{0} 's revision {1} deleted.", new Object[]{abstractItem.getFullName(), identifier});
     }
@@ -690,7 +628,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         try {
             FileUtils.deleteDirectory(timestampDir);
         } catch (IOException e) {
-            LOG.log(Level.WARNING, "unable to delete revision {0}: {1}", new Object[]{identifier, e.getMessage()});
+            LOG.log(WARNING, "unable to delete revision {0}: {1}", new Object[]{identifier, e.getMessage()});
         }
         LOG.log(FINEST, "{0} 's revision {1} deleted.", new Object[]{node.getDisplayName(), identifier});
     }
@@ -703,10 +641,10 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
             try {
                 FileUtils.deleteDirectory(timestampDir);
             } catch (IOException e) {
-                LOG.log(Level.WARNING, "unable to delete revision {0}: {1}", new Object[]{identifier, e.getMessage()});
+                LOG.log(WARNING, "unable to delete revision {0}: {1}", new Object[]{identifier, e.getMessage()});
             }
         } catch (FileNotFoundException e) {
-            LOG.log(Level.WARNING, "unable to delete revision {0}: file not found.", identifier);
+            LOG.log(WARNING, "unable to delete revision {0}: file not found.", identifier);
         }
         LOG.log(FINEST, "{0} 's revision {1} deleted.", new Object[]{historyDir.getName(), identifier});
     }
@@ -720,7 +658,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                     project.getConfigFile().getFile()
             );
         } catch (IOException e) {
-            LOG.log(Level.WARNING, " could not access config file while trying to check revision equality.");
+            LOG.log(WARNING, " could not access config file while trying to check revision equality.");
             e.printStackTrace();
             return false;
         }
@@ -730,12 +668,12 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     public boolean revisionEqualsCurrent(Node node, String identifier1) {
         String currentContent = Jenkins.XSTREAM2.toXML(node);
         try {
-            return StringUtils.equals(
+            return Objects.equals(
                     FileUtils.readFileToString(getOldRevision(node, identifier1).getFile(), "UTF-8"),
                     currentContent
             );
         } catch (IOException e) {
-            LOG.log(Level.WARNING, " could not access config file while trying to check revision equality.");
+            LOG.log(WARNING, " could not access config file while trying to check revision equality.");
             e.printStackTrace();
             return false;
         }
@@ -829,14 +767,14 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         final XmlFile historyXml = getHistoryXmlFile(historyDir);
         try {
             final HistoryDescr histDescr = (HistoryDescr) historyXml.read();
-            LOG.log(Level.FINEST, "historyDir: {0}", historyDir);
-            LOG.log(Level.FINEST, "histDescr.getOperation(): {0}",
+            LOG.log(FINEST, "historyDir: {0}", historyDir);
+            LOG.log(FINEST, "histDescr.getOperation(): {0}",
                     histDescr.getOperation());
             if ("Created".equals(histDescr.getOperation())) {
                 return true;
             }
         } catch (IOException ex) {
-            LOG.log(Level.FINEST, "Unable to retrieve history file for {0}",
+            LOG.log(FINEST, "Unable to retrieve history file for {0}",
                     historyDir);
         }
         return false;
@@ -849,19 +787,21 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param dir The directory which should be deleted.
      */
     private void deleteDirectory(final File dir) {
-        try {
-            for (File file : dir.listFiles()) {
+        File[] files = null;
+        if (dir != null) {
+            files = dir.listFiles();
+        }
+        if (files == null) {
+            LOG.log(WARNING, "Directory already deleted or null: {0}", dir);
+        } else {
+            for (File file : files) {
                 if (!file.delete()) {
-                    LOG.log(Level.WARNING, "problem deleting history file: {0}",
-                            file);
+                    LOG.log(WARNING, "problem deleting history file: {0}", file);
                 }
             }
             if (!dir.delete()) {
-                LOG.log(Level.WARNING,
-                        "problem deleting history directory: {0}", dir);
+                LOG.log(WARNING, "problem deleting history directory: {0}", dir);
             }
-        } catch (NullPointerException e) {
-            LOG.log(Level.WARNING, "Directory already deleted or null. ", e);
         }
     }
 
@@ -886,7 +826,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                     isDuplicated = true;
                 }
             } catch (IOException e) {
-                LOG.log(Level.WARNING,
+                LOG.log(WARNING,
                         "unable to check for duplicate previous history file: {0}\n{1}",
                         new Object[]{lastRevision, e});
             }
@@ -1113,7 +1053,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                 newName, oldName, null);
         final File nodeConfigHistoryFile = new File(timestampedDir,
                 "config.xml");
-        try (PrintStream stream = new PrintStream(nodeConfigHistoryFile, "UTF-8")) {
+        try (PrintStream stream = new PrintStream(nodeConfigHistoryFile, StandardCharsets.UTF_8)) {
             stream.print(content);
         } catch (IOException ex) {
             throw new RuntimeException(
@@ -1136,7 +1076,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         final File deletedHistoryDir = new File(
                 currentHistoryDir.getParentFile(), deletedHistoryName);
         if (!currentHistoryDir.renameTo(deletedHistoryDir)) {
-            LOG.log(Level.WARNING,
+            LOG.log(WARNING,
                     "unable to rename deleted history dir to: {0}",
                     deletedHistoryDir);
         }
@@ -1160,7 +1100,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                 try {
                     fp.copyRecursiveTo(new FilePath(currentHistoryDir));
                     fp.deleteRecursive();
-                    LOG.log(Level.FINEST,
+                    LOG.log(FINEST,
                             "completed move of old history files on rename.{0}",
                             onRenameDesc);
                 } catch (IOException e) {
@@ -1170,7 +1110,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                 } catch (InterruptedException e) {
                     final String irExceptionStr = "interrupted while moving old history on rename."
                             + onRenameDesc;
-                    LOG.log(Level.WARNING, irExceptionStr, e);
+                    LOG.log(WARNING, irExceptionStr, e);
                 }
             }
 
@@ -1187,9 +1127,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         final File[] historyDirsOfItem = historiesDir
                 .listFiles(HistoryFileFilter.INSTANCE);
         final TreeMap<String, HistoryDescr> map = new TreeMap<>();
-        if (historyDirsOfItem == null) {
-            return map;
-        } else {
+        if (historyDirsOfItem != null) {
             for (File historyDir : historyDirsOfItem) {
                 final XmlFile historyXml = getHistoryXmlFile(historyDir);
                 final HistoryDescr historyDescription;
@@ -1201,8 +1139,8 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                 }
                 map.put(historyDir.getName(), historyDescription);
             }
-            return map;
         }
+        return map;
     }
 
     private File getRootDir(final Node node,
@@ -1309,7 +1247,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
                     isDuplicated = true;
                 }
             } catch (IOException e) {
-                LOG.log(Level.WARNING,
+                LOG.log(WARNING,
                         "unable to check for duplicate previous history file: {0}\n{1}",
                         new Object[]{lastRevision, e});
             }

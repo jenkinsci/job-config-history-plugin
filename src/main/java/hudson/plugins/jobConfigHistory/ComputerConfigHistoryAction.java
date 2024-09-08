@@ -395,10 +395,12 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         nodes.add(newAgent);
         agent = newAgent;
         Jenkins.get().setNodes(nodes);
-        try {
-            rsp.sendRedirect(Jenkins.get().getRootUrl() + agent.toComputer().getUrl());
-        } catch (NullPointerException e) {
-            LOG.log(Level.WARNING, "Failed to redirect to agent url. ", e);
+        final Computer computer = agent.toComputer();
+        if (computer == null) {
+            LOG.log(Level.WARNING, "Failed to redirect to agent url of agent: " + agent.getNodeName());
+        }
+        else {
+            rsp.sendRedirect(Jenkins.get().getRootUrl() + computer.getUrl());
         }
     }
 
