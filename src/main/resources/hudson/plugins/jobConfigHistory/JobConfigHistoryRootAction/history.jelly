@@ -163,6 +163,12 @@
             <f:bottomButtonBar>
               <c:entries-per-page />
               <c:pagination />
+
+              <!-- Show Diff -->
+              <j:if test="${configs.size() > 1}">
+                <button class="jenkins-button">${%Show Diffs}</button>
+              </j:if>
+
             </f:bottomButtonBar>
           </j:otherwise>
         </j:choose>
