@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css" />
 
+    <j:set var="useNameInComponentUrl" value="1" />
     <j:set var="name" value="${request.getParameter('name')}" />
     <j:set var="isDeleted" value="${name.contains('_deleted_')}" />
     <j:set var="offsetIfDeleted" value="${isDeleted ? 1 : 0}" />
@@ -157,8 +158,8 @@
               </table>
 
               <f:bottomButtonBar>
-                <c:entries-per-page-name />
-                <c:pagination-name />
+                <c:entries-per-page />
+                <c:pagination />
 
                 <!-- Show Diff -->
                 <j:if test="${configs.size() > 1}">
