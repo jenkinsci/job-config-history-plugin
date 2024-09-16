@@ -144,8 +144,6 @@
                     </tbody>
                   </table>
                 </div>
-                <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
-                <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
                 <f:bottomButtonBar>
                   <c:entries-per-page />
                   <c:pagination />

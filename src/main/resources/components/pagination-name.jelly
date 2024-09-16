@@ -1,8 +1,14 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
+    <!--
+        this file differs from ./pagination only by query parameter `name`
+        this file purpose is to restore functionality dropped during refactor, for RootHistoryAction
+        FIXME: refactor JobConfigHistoryProjectRootAction to use `filter` instead of `name`
+     -->
+
+
     <div>
         <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
-
         <j:if test="${maxPageNum != 0}">
             <h3 class="jenkins-!-margin-bottom-2">${%Page}:</h3>
 
@@ -10,7 +16,7 @@
                 <!--"<" for one step back-->
                 <j:choose>
                     <j:when test="${pageNum > 0}">
-                        <a class="jenkins-button jenkins-button--tertiary" href="?filter=${filter}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                        <a class="jenkins-button jenkins-button--tertiary" href="?name=${name}&amp;pageNum=${pageNum-1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
                             <l:icon src="symbol-chevron-back-outline plugin-ionicons-api" />
                         </a>
                     </j:when>
@@ -34,7 +40,7 @@
                                 ${currentPageNum+1}</a>
                         </j:when>
                         <j:otherwise>
-                            <a class="jenkins-button jenkins-button--tertiary" href="?filter=${filter}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                            <a class="jenkins-button jenkins-button--tertiary" href="?name=${name}&amp;pageNum=${currentPageNum}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
                                 ${currentPageNum+1}</a>
                         </j:otherwise>
                     </j:choose>
@@ -43,7 +49,7 @@
                 <!--">" for one step forward-->
                 <j:choose>
                     <j:when test="${maxPageNum > pageNum}">
-                        <a class="jenkins-button jenkins-button--tertiary" href="?filter=${filter}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
+                        <a class="jenkins-button jenkins-button--tertiary" href="?name=${name}&amp;pageNum=${pageNum+1}&amp;entriesPerPage=${entriesPerPage}" rel="noopener noreferrer">
                             <l:icon src="symbol-chevron-forward-outline plugin-ionicons-api" />
                         </a>
                     </j:when>
