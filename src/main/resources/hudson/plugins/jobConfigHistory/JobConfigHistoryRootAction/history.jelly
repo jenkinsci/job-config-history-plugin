@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css" />
 
+    <j:set var="useNameInComponentUrl" value="1" />
     <j:set var="name" value="${request.getParameter('name')}" />
     <j:set var="isDeleted" value="${name.contains('_deleted_')}" />
     <j:set var="offsetIfDeleted" value="${isDeleted ? 1 : 0}" />
@@ -155,9 +156,6 @@
 
                 </tbody>
               </table>
-
-              <j:set var="relevantPageNums" value="${it.getRelevantPageNums(pageNum*1)}" />
-              <j:set var="entryPerPageArray" value="10, 25, 100, 250, ${%all}" />
 
               <f:bottomButtonBar>
                 <c:entries-per-page />
