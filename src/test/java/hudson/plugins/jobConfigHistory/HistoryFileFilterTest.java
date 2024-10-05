@@ -10,6 +10,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Tests for HistoryFileFilter.
+ *
  * @author Mirko Friedenhagen
  */
 public class HistoryFileFilterTest {
@@ -18,29 +20,20 @@ public class HistoryFileFilterTest {
     public final UnpackResourceZip unpackResourceZip = UnpackResourceZip
             .create();
 
-    /**
-     * Test of accept method, of class HistoryFileFilter.
-     */
     @Test
-    public void testAcceptRootNotExistent() {
+    public void nonExistingRootShouldNotBeAccepted() {
         File file = new File("target/I_DO_NOT_EXIST");
         assertFalse(HistoryFileFilter.accepts(file));
     }
 
-    /**
-     * Test of accept method, of class HistoryFileFilter.
-     */
     @Test
-    public void testAcceptNoHistoryEntries() {
+    public void noHistoryEntriesShouldNotBeAccepted() {
         File file = unpackResourceZip.getResource("jobs/Test2/");
         assertFalse(HistoryFileFilter.accepts(file));
     }
 
-    /**
-     * Test of accept method, of class HistoryFileFilter.
-     */
     @Test
-    public void testAccept() {
+    public void validHistoryShouldBeAccepted() {
         final File singleDirectory = unpackResourceZip
                 .getResource("config-history/jobs/Test1/2012-11-21_11-29-12/");
         assertTrue(HistoryFileFilter.accepts(singleDirectory));

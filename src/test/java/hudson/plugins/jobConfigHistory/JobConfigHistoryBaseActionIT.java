@@ -27,6 +27,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 
 /**
+ * Integration Tests for JobConfigHistoryBaseAction.
+ *
  * @author mfriedenhagen
  */
 public class JobConfigHistoryBaseActionIT

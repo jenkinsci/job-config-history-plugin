@@ -34,6 +34,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests for JobConfigHistoryProjectAction.
+ *
  * @author Mirko Friedenhagen
  */
 public class JobConfigHistoryProjectActionTest {
@@ -63,9 +65,6 @@ public class JobConfigHistoryProjectActionTest {
                 testConfigs.getRoot(), null, 0, false);
     }
 
-    /**
-     * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetIconFileNameNoPermission() {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
@@ -74,9 +73,6 @@ public class JobConfigHistoryProjectActionTest {
         assertNull(sut.getIconFileName());
     }
 
-    /**
-     * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetIconFileNameSaveProjectNonMavenModules() {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
@@ -87,9 +83,6 @@ public class JobConfigHistoryProjectActionTest {
                 sut.getIconFileName());
     }
 
-    /**
-     * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetIconFileNameSaveMavenModules() {
         assertNotNull(jenkinsRule.jenkins.getPlugin("maven-plugin"));
@@ -101,9 +94,6 @@ public class JobConfigHistoryProjectActionTest {
                 sut.getIconFileName());
     }
 
-    /**
-     * Test of getIconFileName method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetIconFileNameDoNotSaveMavenModules() {
         when(mockedMavenModule.hasPermission(AbstractProject.CONFIGURE))
@@ -133,36 +123,24 @@ public class JobConfigHistoryProjectActionTest {
         assertNull(action.getIconFileName());
     }
 
-    /**
-     * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetJobConfigs() {
         when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("");
         testJobXHasYHistoryEntries("jobs/Test1", 5);
     }
 
-    /**
-     * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetJobConfigsLimitedTo3() {
         when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("3");
         testJobXHasYHistoryEntries("jobs/Test1", 3);
     }
 
-    /**
-     * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetJobConfigsLimitedTo1000() {
         when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("1000");
         testJobXHasYHistoryEntries("jobs/Test1", 5);
     }
 
-    /**
-     * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetJobConfigsDeleted() {
         final List<ConfigInfo> historyEntries = testJobXHasYHistoryEntries(
@@ -170,9 +148,6 @@ public class JobConfigHistoryProjectActionTest {
         assertEquals("Deleted", historyEntries.get(0).getOperation());
     }
 
-    /**
-     * Test of getJobConfigs method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetJobConfigsEmpty() throws Exception {
         FileUtils.cleanDirectory(
@@ -269,9 +244,6 @@ public class JobConfigHistoryProjectActionTest {
         return result;
     }
 
-    /**
-     * Test of getFile method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetFile() throws Exception {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
@@ -286,29 +258,18 @@ public class JobConfigHistoryProjectActionTest {
         assertThat(result, Matchers.endsWith("</project>"));
     }
 
-    /**
-     * Test of getProject method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetProject() {
         JobConfigHistoryProjectAction sut = createAction();
         assertEquals(mockedProject, sut.getProject());
     }
 
-    /**
-     * Test of getAccessControlledObject method, of class
-     * JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetAccessControlledObject() {
         JobConfigHistoryProjectAction sut = createAction();
         assertEquals(mockedProject, sut.getAccessControlledObject());
     }
 
-    /**
-     * Test of checkConfigurePermission method, of class
-     * JobConfigHistoryProjectAction.
-     */
     @Test
     public void testCheckConfigurePermission() {
         JobConfigHistoryProjectAction sut = createAction();
@@ -317,10 +278,6 @@ public class JobConfigHistoryProjectActionTest {
         verify(mockedProject, times(1)).checkPermission(AbstractItem.CONFIGURE);
     }
 
-    /**
-     * Test of hasConfigurePermission method, of class
-     * JobConfigHistoryProjectAction.
-     */
     @Test
     public void testHasConfigurePermission() {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
@@ -329,10 +286,6 @@ public class JobConfigHistoryProjectActionTest {
         assertTrue(sut.hasConfigurePermission());
     }
 
-    /**
-     * Test of hasConfigurePermission method, of class
-     * JobConfigHistoryProjectAction.
-     */
     @Test
     public void testHasNoConfigurePermission() {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
@@ -341,9 +294,6 @@ public class JobConfigHistoryProjectActionTest {
         assertFalse(sut.hasConfigurePermission());
     }
 
-    /**
-     * Test of doDiffFiles method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testDoDiffFiles() throws Exception {
         when(mockedRequest.getParameter("timestamp1"))
@@ -366,9 +316,6 @@ public class JobConfigHistoryProjectActionTest {
         assertEquals("2012-11-21_11-41-14", sut.getTimestamp(1));
     }
 
-    /**
-     * Test of getLines method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testGetLines() throws Throwable {
         final String timestamp1 = "2012-11-21_11-41-14";
@@ -378,9 +325,6 @@ public class JobConfigHistoryProjectActionTest {
         assertEquals(8, result.size());
     }
 
-    /**
-     * Test of getLines method, of class JobConfigHistoryProjectAction.
-     */
     @Test(expected = IllegalArgumentException.class)
     public void testGetLinesNonExistingTimestamp() throws IOException {
         final String timestamp1 = "2012-11-21_11-41-14";
@@ -400,9 +344,6 @@ public class JobConfigHistoryProjectActionTest {
         return sut.getLines();
     }
 
-    /**
-     * Test of doRestore method, of class JobConfigHistoryProjectAction.
-     */
     @Test
     public void testDoRestore() throws Exception {
         when(mockedRequest.getParameter("timestamp"))
@@ -416,10 +357,6 @@ public class JobConfigHistoryProjectActionTest {
         verify(mockedProject).save();
     }
 
-    /**
-     * Test of doForwardToRestoreQuestion method, of class
-     * JobConfigHistoryProjectAction.
-     */
     @Test
     public void testDoForwardToRestoreQuestion() throws Exception {
         when(mockedRequest.getParameter("timestamp"))

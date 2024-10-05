@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNull;
 
 public class MimickedUserTest {
 
-
     private final MimickedUser sutNameId = createSut("SYSTEM", "SYSTEM");
     private final MimickedUser sutUserNull = createSut(null);
     private final MimickedUser sutNameIdNullNull = createSut(null, null);

@@ -33,26 +33,22 @@ import java.util.GregorianCalendar;
 import static org.junit.Assert.assertEquals;
 
 /**
+ * Tests for PluginUtils.
+ *
  * @author mirko
  */
 public class PluginUtilsTest {
 
-    /**
-     * Test of parsedDate method, of class PluginUtils.
-     */
     @Test
-    public void testParsedDate() {
+    public void utilShouldPraseDateCorrectly() {
         String timeStamp = "2012-11-21_11-29-12";
         Date expResult = new GregorianCalendar(2012, Calendar.NOVEMBER, 21, 11, 29, 12).getTime();
         Date result = PluginUtils.parsedDate(timeStamp);
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of parsedDate method, of class PluginUtils.
-     */
     @Test(expected = IllegalArgumentException.class)
-    public void testParsedDateError() {
+    public void parsingInvalidDateShouldThrow() {
         String timeStamp = "abc";
         PluginUtils.parsedDate(timeStamp);
     }

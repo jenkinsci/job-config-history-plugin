@@ -29,22 +29,39 @@ import org.junit.Test;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
+ *
+ * Test of compare method, of class FileNameComparator.
+ *
  * @author Mirko Friedenhagen
  */
 public class FileNameComparatorTest {
 
-    /**
-     * Test of compare method, of class FileNameComparator.
-     */
+    private static final int RESULT_SAME_NAME = 0;
+
     @Test
-    public void testCompare() {
+    public void sameFileNamesShouldBeEqual() {
         File f1 = new File("a");
         File f2 = new File("a");
-        int expResult = 0;
         int result = FileNameComparator.INSTANCE.compare(f1, f2);
-        assertEquals(expResult, result);
+        assertEquals(RESULT_SAME_NAME, result);
+    }
+
+    @Test
+    public void differentFileNamesShouldNotBeEqual() {
+        assertNotEquals(RESULT_SAME_NAME,
+                FileNameComparator.INSTANCE.compare(
+                        new File("abc"),
+                        new File("def")
+                ));
+    }
+
+    @Test
+    public void sameFileShouldEqualItsOwnname() {
+        File file = new File("test.txt");
+        assertEquals(RESULT_SAME_NAME, FileNameComparator.INSTANCE.compare(file, file));
     }
 
 }

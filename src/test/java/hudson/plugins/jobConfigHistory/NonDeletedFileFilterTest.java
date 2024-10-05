@@ -32,26 +32,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Tests for NonDeletedFileFilter.
+ *
  * @author Mirko Friedenhagen
  */
 public class NonDeletedFileFilterTest {
 
-    /**
-     * Test of accept method, of class DeletedFileFilter.
-     */
     @Test
-    public void testAcceptNoDeletedFile() {
+    public void existingFileShouldBeAccepted() {
         File file = new File("123");
         assertTrue(NonDeletedFileFilter.accepts(file));
     }
 
-    /**
-     * Test of accept method, of class DeletedFileFilter.
-     */
     @Test
-    public void testAcceptDeletedFile() {
+    public void deletedShouldNotBeAccepted() {
         File file = new File("_deleted_");
         assertFalse(NonDeletedFileFilter.accepts(file));
     }
-
 }

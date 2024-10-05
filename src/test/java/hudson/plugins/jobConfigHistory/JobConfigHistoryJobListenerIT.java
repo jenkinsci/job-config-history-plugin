@@ -70,14 +70,6 @@ public class JobConfigHistoryJobListenerIT
                 historyFilesNew.size() >= 1);
     }
 
-    // TODO: ???
-    public void testNonAbstractProjects() {
-        final JobConfigHistoryJobListener listener = new JobConfigHistoryJobListener();
-        listener.onCreated(null);
-        listener.onRenamed(null, "oldName", "newName");
-        listener.onDeleted(null);
-    }
-
     public void testRenameErrors() throws Exception {
         final HtmlForm form = webClient.goTo("configure")
                 .getFormByName("config");

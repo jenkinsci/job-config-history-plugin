@@ -14,6 +14,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 /**
+ *
+ * Integration tests for ComputerHistoryListenerIT.
+ *
  * @author lucinka
  */
 public class ComputerHistoryListenerIT {

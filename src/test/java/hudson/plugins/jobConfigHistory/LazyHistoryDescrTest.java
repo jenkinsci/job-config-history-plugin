@@ -52,25 +52,21 @@ import org.junit.Test;
 import java.io.File;
 
 /**
+ * Tests for LazyHistoryDescr.
+ *
  * @author Mirko Friedenhagen
  */
 public class LazyHistoryDescrTest {
 
-    /**
-     * File does not exist.
-     */
     @Test(expected = RuntimeException.class)
-    public void testInvalidLocationOfHistoryDescr() {
+    public void nonExistingFileShouldThrow() {
         LazyHistoryDescr sut = new LazyHistoryDescr(
                 new XmlFile(new File("target/I_DO_NOT_EXIST.xml")));
         sut.getUser();
     }
 
-    /**
-     * File is not {@link HistoryDescr}.
-     */
     @Test(expected = RuntimeException.class)
-    public void testInvalidHistoryDescr() {
+    public void invalidHistoryDescrShouldThrow() {
         LazyHistoryDescr sut = new LazyHistoryDescr(
                 new XmlFile(new File("pom.xml")));
         sut.getUser();

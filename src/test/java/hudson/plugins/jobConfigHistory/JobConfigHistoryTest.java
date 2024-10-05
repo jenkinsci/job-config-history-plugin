@@ -63,6 +63,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests for JobConfigHistory.
+ *
  * @author Mirko Friedenhagen
  */
 public class JobConfigHistoryTest {
@@ -82,18 +84,12 @@ public class JobConfigHistoryTest {
         return new RequestImpl(stapler, rawRequest, Collections.emptyList(), null);
     }
 
-    /**
-     * Test of configure method, of class JobConfigHistory.
-     */
     @Test
     public void testConfigure() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
         sut.configure(mockStaplerRequest(), createFormData());
     }
 
-    /**
-     * Test of getHistoryRootDir method, of class JobConfigHistory.
-     */
     @Test
     public void testGetHistoryRootDir() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
@@ -101,18 +97,12 @@ public class JobConfigHistoryTest {
         assertThat(sut.getHistoryRootDir(), endsWith("config-history"));
     }
 
-    /**
-     * Test of getDefaultRootDir method, of class JobConfigHistory.
-     */
     @Test
     public void testGetDefaultRootDir() {
         JobConfigHistory sut = createSut();
         assertThat(sut.getDefaultRootDir(), endsWith("config-history"));
     }
 
-    /**
-     * Test of getMaxHistoryEntries method, of class JobConfigHistory.
-     */
     @Test
     public void testGetMaxHistoryEntries() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
@@ -122,9 +112,6 @@ public class JobConfigHistoryTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of setMaxHistoryEntries method, of class JobConfigHistory.
-     */
     @Test
     public void testSetMaxHistoryEntries() {
         JobConfigHistory sut = createSut();
@@ -139,9 +126,6 @@ public class JobConfigHistoryTest {
         assertEquals("4", sut.getMaxHistoryEntries());
     }
 
-    /**
-     * Test of getEntriesPerSite method, of class JobConfigHistory.
-     */
     @Test
     public void testGetEntriesPerSite() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
@@ -151,9 +135,6 @@ public class JobConfigHistoryTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of setMaxEntriesPerSite method, of class JobConfigHistory.
-     */
     @Test
     public void testSetMaxEntriesPerSite() {
         JobConfigHistory sut = createSut();
@@ -168,9 +149,6 @@ public class JobConfigHistoryTest {
         assertEquals("50", sut.getMaxEntriesPerPage());
     }
 
-    /**
-     * Test of getMaxDaysToKeepEntries method, of class JobConfigHistory.
-     */
     @Test
     public void testGetMaxDaysToKeepEntries() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
@@ -178,9 +156,6 @@ public class JobConfigHistoryTest {
         assertEquals("5", sut.getMaxDaysToKeepEntries());
     }
 
-    /**
-     * Test of setMaxDaysToKeepEntries method, of class JobConfigHistory.
-     */
     @Test
     public void testSetMaxDaysToKeepEntries() {
         JobConfigHistory sut = createSut();
@@ -195,9 +170,6 @@ public class JobConfigHistoryTest {
         assertEquals("4", sut.getMaxDaysToKeepEntries());
     }
 
-    /**
-     * Test of isPositiveInteger method, of class JobConfigHistory.
-     */
     @Test
     public void testIsPositiveInteger() {
         JobConfigHistory sut = createSut();
@@ -207,9 +179,6 @@ public class JobConfigHistoryTest {
         assertTrue(sut.isPositiveInteger("1"));
     }
 
-    /**
-     * Test of getSkipDuplicateHistory method, of class JobConfigHistory.
-     */
     @Test
     public void testGetSkipDuplicateHistory() {
         JobConfigHistory sut = createSut();
@@ -218,9 +187,6 @@ public class JobConfigHistoryTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getExcludePattern method, of class JobConfigHistory.
-     */
     @Test
     public void testGetExcludePattern() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
@@ -229,9 +195,6 @@ public class JobConfigHistoryTest {
         assertEquals(JobConfigHistoryConsts.DEFAULT_EXCLUDE, result);
     }
 
-    /**
-     * Test of getSaveModuleConfiguration method, of class JobConfigHistory.
-     */
     @Test
     public void testGetSaveModuleConfiguration() {
         JobConfigHistory sut = createSut();
@@ -239,9 +202,6 @@ public class JobConfigHistoryTest {
         assertFalse(result);
     }
 
-    /**
-     * Test of getShowBuildBadges method, of class JobConfigHistory.
-     */
     @Test
     public void testGetShowBuildBadges() {
         JobConfigHistory sut = createSut();
@@ -250,9 +210,6 @@ public class JobConfigHistoryTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of showBuildBadges method, of class JobConfigHistory.
-     */
     @Test
     public void testShowBuildBadgesAlways() {
         AbstractProject<?, ?> mockedProject = mock(AbstractProject.class);
@@ -261,9 +218,6 @@ public class JobConfigHistoryTest {
         assertTrue(sut.showBuildBadges(mockedProject));
     }
 
-    /**
-     * Test of showBuildBadges method, of class JobConfigHistory.
-     */
     @Test
     public void testShowBuildBadgesUserWithConfigPermission() {
         AbstractProject<?, ?> mockedProject = mock(AbstractProject.class);
@@ -274,9 +228,6 @@ public class JobConfigHistoryTest {
         assertFalse(sut.showBuildBadges(mockedProject));
     }
 
-    /**
-     * Test of showBuildBadges method, of class JobConfigHistory.
-     */
     @Test
     public void testShowBuildBadgesAdminUser() throws IOException {
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
@@ -294,9 +245,6 @@ public class JobConfigHistoryTest {
         assertFalse(unauthorizedSut.showBuildBadges(freeStyleProject));
     }
 
-    /**
-     * Test of getExcludeRegexpPattern method, of class JobConfigHistory.
-     */
     @Test
     public void testGetExcludeRegexpPattern() {
         JobConfigHistory sut = createSut();
@@ -305,9 +253,6 @@ public class JobConfigHistoryTest {
         assertEquals(expResult.pattern(), result.pattern());
     }
 
-    /**
-     * Test of getConfiguredHistoryRootDir method, of class JobConfigHistory.
-     */
     @Test
     public void testGetConfiguredHistoryRootDir() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
@@ -331,9 +276,6 @@ public class JobConfigHistoryTest {
                 "config-history");
     }
 
-    /**
-     * Test of isSaveable method, of class JobConfigHistory.
-     */
     @Test
     public void testIsSaveable() throws Exception {
         XmlFile xmlFile = new XmlFile(
@@ -369,9 +311,6 @@ public class JobConfigHistoryTest {
         assertFalse(sut.isSaveable(mock(TopLevelItem.class), xmlFile));
     }
 
-    /**
-     * Test of doCheckMaxHistoryEntries method, of class JobConfigHistory.
-     */
     @Test
     public void testDoCheckMaxHistoryEntries() {
         JobConfigHistory sut = createSut();
@@ -383,9 +322,6 @@ public class JobConfigHistoryTest {
         assertNotEquals(expectedResult, sut.doCheckMaxHistoryEntries("A"));
     }
 
-    /**
-     * Test of doCheckMaxEntriesPerPage method, of class JobConfigHistory.
-     */
     @Test
     public void testDoCheckMaxEntriesPerPage() {
         JobConfigHistory sut = createSut();
@@ -397,9 +333,6 @@ public class JobConfigHistoryTest {
         assertNotEquals(expectedResult, sut.doCheckMaxEntriesPerPage("A"));
     }
 
-    /**
-     * Test of doCheckMaxDaysToKeepEntries method, of class JobConfigHistory.
-     */
     @Test
     public void testDoCheckMaxDaysToKeepEntries() {
         JobConfigHistory sut = createSut();
@@ -411,9 +344,6 @@ public class JobConfigHistoryTest {
         assertNotEquals(expectedResult, sut.doCheckMaxDaysToKeepEntries("A"));
     }
 
-    /**
-     * Test of doCheckExcludePattern method, of class JobConfigHistory.
-     */
     @Test
     public void testDoCheckExcludePattern() {
         JobConfigHistory sut = createSut();

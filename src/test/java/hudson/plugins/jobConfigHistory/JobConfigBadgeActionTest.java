@@ -52,6 +52,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Integration Tests for JobConfigBadgeAction.
+ *
  * @author Mirko Friedenhagen
  */
 public class JobConfigBadgeActionTest {
@@ -71,25 +73,16 @@ public class JobConfigBadgeActionTest {
         when(mockedBuild.getProject()).thenReturn(mockedProject);
     }
 
-    /**
-     * Test of onAttached method, of class JobConfigBadgeAction.
-     */
     @Test
     public void testOnAttached() {
         sut.onAttached(mockedBuild);
     }
 
-    /**
-     * Test of onLoad method, of class JobConfigBadgeAction.
-     */
     @Test
     public void testOnLoad() {
         sut.onLoad(mockedBuild);
     }
 
-    /**
-     * Test of showBadge method, of class JobConfigBadgeAction.
-     */
     @Test
     public void testShowBadge() throws Exception {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
@@ -100,9 +93,6 @@ public class JobConfigBadgeActionTest {
         assertTrue(sut.showBadge());
     }
 
-    /**
-     * Test of oldConfigsExist method, of class JobConfigBadgeAction.
-     */
     @Test
     public void testOldConfigsExist() throws Exception {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
@@ -131,10 +121,6 @@ public class JobConfigBadgeActionTest {
         assertFalse(sut.oldConfigsExist());
     }
 
-
-    /**
-     * Test of createLink method, of class JobConfigBadgeAction.
-     */
     @Test
     public void testCreateLink() throws Exception {
         String timestampRegex = "[0-9\\-_]+";
@@ -150,9 +136,6 @@ public class JobConfigBadgeActionTest {
         assertTrue(sut.createLink().matches(expectedRegex));
     }
 
-    /**
-     * Test of getTooltip method, of class JobConfigBadgeAction.
-     */
     @Test
     public void testGetTooltip() {
         String expResult = "Config changed since last build";
@@ -160,9 +143,6 @@ public class JobConfigBadgeActionTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getIcon method, of class JobConfigBadgeAction.
-     */
     @Test
     public void testGetIcon() {
         String expResult = "symbol-buildbadge plugin-jobConfigHistory";
@@ -170,9 +150,6 @@ public class JobConfigBadgeActionTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getIconFileName method, of class JobConfigBadgeAction.
-     */
     @Test
     public void testGetIconFileName() {
         System.out.println("plugins");
@@ -183,18 +160,12 @@ public class JobConfigBadgeActionTest {
         assertNull(result);
     }
 
-    /**
-     * Test of getDisplayName method, of class JobConfigBadgeAction.
-     */
     @Test
     public void testGetDisplayName() {
         String result = sut.getDisplayName();
         assertNull(result);
     }
 
-    /**
-     * Test of getUrlName method, of class JobConfigBadgeAction.
-     */
     @Test
     public void testGetUrlName() {
         String expResult = "";

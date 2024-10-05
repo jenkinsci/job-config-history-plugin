@@ -12,6 +12,8 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests for JobConfigHistorySaveableListener.
+ *
  * @author Mirko Friedenhagen
  */
 public class JobConfigHistorySaveableListenerTest {
@@ -21,9 +23,6 @@ public class JobConfigHistorySaveableListenerTest {
 
     private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
 
-    /**
-     * Test of onChange method, of class JobConfigHistorySaveableListener.
-     */
     @Test
     public void testOnChangeNotSaveable() {
         when(mockedPlugin.isSaveable(any(Saveable.class), any(XmlFile.class)))
@@ -33,9 +32,6 @@ public class JobConfigHistorySaveableListenerTest {
         verifyZeroInteractions(mockedConfigHistoryListenerHelper);
     }
 
-    /**
-     * Test of onChange method, of class JobConfigHistorySaveableListener.
-     */
     @Test
     public void testOnChangeSaveable() {
         when(mockedPlugin.isSaveable(any(Saveable.class), any(XmlFile.class)))
@@ -60,5 +56,4 @@ public class JobConfigHistorySaveableListenerTest {
             return mockedConfigHistoryListenerHelper;
         }
     }
-
 }

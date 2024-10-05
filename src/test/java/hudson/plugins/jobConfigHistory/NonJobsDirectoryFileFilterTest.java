@@ -35,6 +35,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Tests for NonJobsDirectoryFileFilter.
+ *
  * @author mirko
  */
 public class NonJobsDirectoryFileFilterTest {
@@ -42,13 +44,14 @@ public class NonJobsDirectoryFileFilterTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder(new File("target"));
 
-    /**
-     * Test of accepts method, of class NonJobsDirectoryFileFilter.
-     */
     @Test
-    public void testAccepts() throws IOException {
+    public void configShouldBeAccepted() throws IOException {
         assertTrue(
                 NonJobsDirectoryFileFilter.accepts(folder.newFolder("config")));
+    }
+
+    @Test
+    public void jobsShouldNotBeAccepted() throws IOException {
         assertFalse(
                 NonJobsDirectoryFileFilter.accepts(folder.newFolder("jobs")));
     }

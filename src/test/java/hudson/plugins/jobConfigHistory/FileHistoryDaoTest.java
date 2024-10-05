@@ -71,6 +71,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests for FileHistoryDao.
+ *
  * @author Mirko Friedenhagen
  */
 public class FileHistoryDaoTest {
@@ -376,25 +378,6 @@ public class FileHistoryDaoTest {
         assertEquals(2, getJenkinsRuleSut().getRevisionAmount(freeStyleProject.getConfigFile()));
     }
 
-    @Ignore("TODO Fixme")
-    public void testGetSystemRevisionAmount_Single() {
-        assertEquals(5, sutWithUserAndNoDuplicateHistory.getSystemRevisionAmount("config"));
-        assertEquals(3, getJenkinsRuleSut().getSystemRevisionAmount("config"));
-        assertEquals(1, getJenkinsRuleSut().getSystemRevisionAmount("jenkins.telemetry.Correlator"));
-        assertEquals(1, getJenkinsRuleSut().getSystemRevisionAmount("jenkins.model.JenkinsLocationConfiguration"));
-        // Excluded by default exclude patterns
-        assertEquals(0, getJenkinsRuleSut().getSystemRevisionAmount("hudson.model.UpdateCenter"));
-        assertEquals(0, getJenkinsRuleSut().getSystemRevisionAmount("nodeMonitors"));
-    }
-
-    /* TODO Fixme
-    @Test
-    public void testGetSystemRevisionAmount() {
-        assertEquals(5, sutWithUserAndNoDuplicateHistory.getSystemRevisionAmount());
-        assertTrue(getJenkinsRuleSut().getSystemRevisionAmount() >= 8); // either 8 or 9...
-    }
-     */
-
     @Test
     public void testGetJobRevisionAmount() throws IOException, InterruptedException {
         assertEquals(6, sutWithUserAndNoDuplicateHistory.getJobRevisionAmount());
@@ -423,19 +406,6 @@ public class FileHistoryDaoTest {
         freeStyleProject.delete();
         assertEquals(0, getJenkinsRuleSut().getJobRevisionAmount(freeStyleProject.getFullName()));
     }
-
-    /* TODO Fix me
-    @Test
-    public void testGetTotalRevisionAmount() throws IOException, InterruptedException {
-        assertEquals(11, sutWithUserAndNoDuplicateHistory.getTotalRevisionAmount());
-
-        assertTrue(getJenkinsRuleSut().getTotalRevisionAmount() >= 8); // either 8 or 9...
-        FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject();
-        assertTrue(getJenkinsRuleSut().getTotalRevisionAmount() >= 10); // either 10 or 11
-        freeStyleProject.delete();
-        assertTrue(getJenkinsRuleSut().getTotalRevisionAmount() >= 9); // either 9 or 10
-    }
-     */
 
     @Test
     public void testGetSystemConfigsMap() {

@@ -36,6 +36,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
+ *
+ * Tests for HistoryDescrToConfigInfo.
+ *
  * @author Mirko Friedenhagen
  */
 public class HistoryDescrToConfigInfoTest {
@@ -53,11 +56,8 @@ public class HistoryDescrToConfigInfoTest {
                 true);
     }
 
-    /**
-     * Test of convert method, of class HistoryDescrToConfigInfo.
-     */
     @Test
-    public void testConvert() {
+    public void shouldConvertCorrectly() {
         List<ConfigInfo> result = HistoryDescrToConfigInfo.convert("Test1",
                 true,
                 new ArrayList<>(historyDao

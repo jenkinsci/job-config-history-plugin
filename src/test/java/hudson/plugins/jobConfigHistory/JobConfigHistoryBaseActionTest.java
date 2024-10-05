@@ -22,6 +22,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests for JobConfigHistoryBaseAction.
+ *
  * @author Mirko Friedenhagen
  */
 public class JobConfigHistoryBaseActionTest {
@@ -32,9 +34,6 @@ public class JobConfigHistoryBaseActionTest {
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
-    /**
-     * Test of getDisplayName method, of class JobConfigHistoryBaseAction.
-     */
     @Test
     public void testGetDisplayName() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
@@ -43,9 +42,6 @@ public class JobConfigHistoryBaseActionTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getUrlName method, of class JobConfigHistoryBaseAction.
-     */
     @Test
     public void testGetUrlName() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
@@ -54,9 +50,6 @@ public class JobConfigHistoryBaseActionTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getOutputType method, of class JobConfigHistoryBaseAction.
-     */
     @Test
     public void testGetOutputTypeXml() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
@@ -66,9 +59,6 @@ public class JobConfigHistoryBaseActionTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getOutputType method, of class JobConfigHistoryBaseAction.
-     */
     @Test
     public void testGetOutputTypeOther() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
@@ -79,9 +69,6 @@ public class JobConfigHistoryBaseActionTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of checkTimestamp method, of class JobConfigHistoryBaseAction.
-     */
     @Test
     public void testCheckTimestamp() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
@@ -90,9 +77,6 @@ public class JobConfigHistoryBaseActionTest {
         assertTrue(sut.checkTimestamp("2013-08-31_23-59-59"));
     }
 
-    /**
-     * Test of getRequestParameter method, of class JobConfigHistoryBaseAction.
-     */
     @Test
     public void testGetRequestParameter() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
@@ -103,20 +87,12 @@ public class JobConfigHistoryBaseActionTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of checkConfigurePermission method, of class
-     * JobConfigHistoryBaseAction.
-     */
     @Test
     public void testCheckConfigurePermission() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         sut.checkConfigurePermission();
     }
 
-    /**
-     * Test of hasConfigurePermission method, of class
-     * JobConfigHistoryBaseAction.
-     */
     @Test
     public void testHasConfigurePermission() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
@@ -125,10 +101,6 @@ public class JobConfigHistoryBaseActionTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getAccessControlledObject method, of class
-     * JobConfigHistoryBaseAction.
-     */
     @Test
     public void testGetAccessControlledObject() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
@@ -137,9 +109,6 @@ public class JobConfigHistoryBaseActionTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getDiffLines method, of class JobConfigHistoryBaseAction.
-     */
     @Test
     public void testGetDiffLines() throws Exception {
         final String resourceName = "diff.txt";
@@ -149,9 +118,6 @@ public class JobConfigHistoryBaseActionTest {
         assertEquals(24, result.size());
     }
 
-    /**
-     * Test of getDiffAsString method, of class JobConfigHistoryBaseAction.
-     */
     @Test
     public void testGetDiffAsString() throws IOException {
         String result = testGetDiffAsString("file1.txt", "file2.txt");
@@ -160,9 +126,6 @@ public class JobConfigHistoryBaseActionTest {
         assertThat(result, containsString("+++ "));
     }
 
-    /**
-     * Test of getDiffAsString method, of class JobConfigHistoryBaseAction.
-     */
     @Test
     public void testGetDiffAsStringOfEqualFiles() throws IOException {
         String result = testGetDiffAsString("file1.txt", "file1.txt");

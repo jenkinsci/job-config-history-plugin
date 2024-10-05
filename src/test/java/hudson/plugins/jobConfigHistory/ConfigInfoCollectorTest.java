@@ -35,6 +35,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
+ *
+ * Tests for the ConfigInfoCollector.
+ *
  * @author Mirko Friedenhagen
  */
 public class ConfigInfoCollectorTest {
@@ -96,7 +99,6 @@ public class ConfigInfoCollectorTest {
     @Test
     public void testCollectJobFolder() throws Exception {
         String folderName = "FolderName";
-        // Create folders
         FileUtils.copyDirectory(
                 unpackResourceZip.getResource("config-history/jobs/Test1"),
                 unpackResourceZip.getResource(
