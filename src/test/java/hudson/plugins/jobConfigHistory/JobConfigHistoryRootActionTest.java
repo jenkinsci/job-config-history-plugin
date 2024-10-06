@@ -60,6 +60,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
+ * Tests for JobConfigHistoryRootAction.
+ *
  * @author Mirko Friedenhagen
  */
 public class JobConfigHistoryRootActionTest {
@@ -68,9 +70,6 @@ public class JobConfigHistoryRootActionTest {
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
-    /**
-     * Test of getUrlName method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testGetUrlName() {
         JobConfigHistoryRootAction sut = createSut();
@@ -79,66 +78,20 @@ public class JobConfigHistoryRootActionTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of getIconFileName method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testGetIconFileNameWithoutPermissions() {
         assertNull(createUnauthorizedStaplerMockedSut().getIconFileName());
     }
 
-    /**
-     * Test of getIconFileName method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testGetIconFileName() {
         assertNotNull(createSut().getIconFileName());
     }
 
-    /**
-     * Test of getIconFileName method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testGetIconFileNameWithJobPermission() {
         assertNotNull(createSut().getIconFileName());
     }
-
-    /* TODO Fixme
-    @Test
-    public void testGetConfigs_fromTo() throws IOException, InterruptedException {
-//        given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME + "/history"); todo test for that!
-        given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME);
-        Project<FreeStyleProject, FreeStyleBuild> project = jenkinsRule.createFreeStyleProject("Test1");
-        JobConfigHistoryRootAction sut = createStaplerMockedSut();
-
-        given(mockedStaplerRequest.getParameter("filter")).willReturn(null);
-        assertEquals(sut.getRevisionAmount(), sut.getConfigs(0, sut.getRevisionAmount()).size());
-        assertTrue(createStaplerMockedSut().getConfigs(0, 10).size() >= 8); // either 8 or 9
-
-        given(mockedStaplerRequest.getParameter("filter")).willReturn("system");
-        assertEquals(sut.getRevisionAmount(), sut.getConfigs(0, sut.getRevisionAmount()).size());
-        assertTrue(createStaplerMockedSut().getConfigs(0, 10).size() >= 8); // either 8 or 9
-
-        given(mockedStaplerRequest.getParameter("filter")).willReturn("all");
-        assertEquals(sut.getRevisionAmount(), sut.getConfigs(0, sut.getRevisionAmount()).size());
-        assertTrue(createStaplerMockedSut().getConfigs(0, 10).size() >= 10);
-
-        given(mockedStaplerRequest.getParameter("filter")).willReturn("jobs");
-        assertEquals(sut.getRevisionAmount(), sut.getConfigs(0, sut.getRevisionAmount()).size());
-        assertEquals(2, createStaplerMockedSut().getConfigs(0, 10).size());
-        project.renameTo("asd");
-        assertEquals(sut.getRevisionAmount(), sut.getConfigs(0, sut.getRevisionAmount()).size());
-        assertEquals(3, createStaplerMockedSut().getConfigs(0, 10).size());
-
-        given(mockedStaplerRequest.getParameter("filter")).willReturn("deleted");
-        assertEquals(sut.getRevisionAmount(), sut.getConfigs(0, sut.getRevisionAmount()).size());
-        assertEquals(0, createStaplerMockedSut().getConfigs().size());
-        project.delete();
-        assertEquals(sut.getRevisionAmount(), sut.getConfigs(0, sut.getRevisionAmount()).size());
-        assertEquals(1, createStaplerMockedSut().getConfigs().size());
-
-    }
-     */
 
     @Ignore
     public void testGetSingleConfigs_fromTo() throws Exception {
@@ -153,63 +106,6 @@ public class JobConfigHistoryRootActionTest {
         //create a deleted project
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
         freeStyleProject.delete();
-//        String deletedFolderName = PluginUtils.getHistoryDao().getDeletedJobs()[0].getName();
-//        assertEquals(4, sut.getSingleConfigs(deletedFolderName, 0, sut.getRevisionAmount()).size());
-
-    }
-
-    /**
-     * Test of getConfigs method, of class JobConfigHistoryRootAction.
-     */
-    /* TODO Fixme
-    @Test
-    public void testGetConfigs() throws Exception {
-        jenkinsRule.createFreeStyleProject("Test1");
-
-        given(mockedStaplerRequest.getParameter("filter")).willReturn(null);
-        //either 8 or 9...
-        assertTrue(createStaplerMockedSut().getConfigs().size() >= 8);
-        given(mockedStaplerRequest.getParameter("filter")).willReturn("system");
-        assertTrue(createStaplerMockedSut().getConfigs().size() >= 8);
-        given(mockedStaplerRequest.getParameter("filter")).willReturn("all");
-        assertTrue(createStaplerMockedSut().getConfigs().size() >= 10);
-        given(mockedStaplerRequest.getParameter("filter")).willReturn("other");
-        assertEquals(2, createStaplerMockedSut().getConfigs().size());
-    }
-
-     */
-
-    /**
-     * Test of getSystemConfigs method, of class JobConfigHistoryRootAction.
-     * This is kind of an integration test, too, testing if root histories are saved.
-     */
-    @Ignore("Todo fixme")
-    public void testGetSystemConfigs() throws Exception {
-        JobConfigHistoryRootAction sut = createSut();
-        //magic number. Seems to be there are 4 config changes on startup.
-        assertEquals(3,
-                sut.getSystemConfigs().stream()
-                        .filter(configInfo -> configInfo.getJob().equals("config")).count()
-        );
-
-        //change the config once.
-        JenkinsRule.WebClient jenkinsWebClient = jenkinsRule.createWebClient();
-        HtmlPage configurePage = jenkinsWebClient.goTo("configure");
-        HtmlForm configForm = configurePage.getFormByName("config");
-
-        configForm.getTextAreaByName("system_message").setText("This is not an integration test");
-
-        DomElement buttonDomElement = configurePage.getElementByName("Submit").getFirstElementChild().getFirstElementChild();
-        if (!(buttonDomElement instanceof HtmlButton)) {
-            fail("submit button not found in config page.");
-        }
-        HtmlButton configFormSubmit = (HtmlButton) buttonDomElement;
-        configFormSubmit.click();
-
-        assertEquals(4,
-                sut.getSystemConfigs().stream()
-                        .filter(configInfo -> configInfo.getJob().equals("config")).count()
-        );
     }
 
     /**
@@ -229,25 +125,6 @@ public class JobConfigHistoryRootActionTest {
         assertEquals(6, createSut().getJobConfigs("").size());
         assertEquals(1, createSut().getJobConfigs("deleted").size());
     }
-
-    /**
-     * Test of getSingleConfigs method, of class JobConfigHistoryRootAction.
-     */
-    /* TODO Fixme
-    @Test
-    public void testGetSingleConfigs() throws Exception {
-        assertEquals(4, createSut().getSingleConfigs("config").size());
-
-        //create a deleted project
-        FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
-        freeStyleProject.delete();
-        String deletedFolderName = PluginUtils.getHistoryDao().getDeletedJobs()[0].getName();
-        assertEquals(4, createSut()
-                .getSingleConfigs(deletedFolderName).size());
-
-    }
-
-     */
 
     /**
      * Test of getFile method, of class JobConfigHistoryRootAction.
@@ -288,13 +165,9 @@ public class JobConfigHistoryRootActionTest {
         final String result2 = createStaplerMockedSut().getFile();
         assertTrue(result2.startsWith("<?xml"));
 
-        //test equality
         assertEquals(result, result2);
     }
 
-    /**
-     * Test of getFile method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testGetFileDeleted() throws Exception {
 
@@ -315,15 +188,11 @@ public class JobConfigHistoryRootActionTest {
         assertTrue(result.startsWith("<?xml"));
     }
 
-    /**
-     * Test of createLinkToFiles method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testCreateLinkToFilesDeleted() throws IOException, InterruptedException {
         //create a project
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
         freeStyleProject.delete();
-
 
         //get the expected timestamp
         List<File> revisionsFromDeletedProject = Arrays.stream(PluginUtils.getHistoryDao().getDeletedJobs()[0].listFiles())
@@ -345,9 +214,6 @@ public class JobConfigHistoryRootActionTest {
         assertNull(createSut().createLinkToFiles(config, ""));
     }
 
-    /**
-     * Test of createLinkToFiles method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testCreateLinkToFiles() {
         final ConfigInfo config = mock(ConfigInfo.class);
@@ -358,9 +224,6 @@ public class JobConfigHistoryRootActionTest {
         assertTrue(createSut().createLinkToFiles(config, "xml").matches(expectedRegex));
     }
 
-    /**
-     * Test of createLinkToFiles method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testCreateLinkToFilesSystem() {
         final ConfigInfo config = mock(ConfigInfo.class);
@@ -371,78 +234,47 @@ public class JobConfigHistoryRootActionTest {
         assertEquals(expResult, createSut().createLinkToFiles(config, "xml"));
     }
 
-    /**
-     * Test of getAccessControlledObject method, of class
-     * JobConfigHistoryRootAction.
-     */
     @Test
     public void testGetAccessControlledObject() {
         assertEquals(jenkinsRule.getInstance(), createSut().getAccessControlledObject());
     }
 
-    /**
-     * Test of checkConfigurePermission method, of class
-     * JobConfigHistoryRootAction.
-     */
     @Test
     public void testCheckConfigurePermission() {
         createSut().checkConfigurePermission();
     }
 
-    /**
-     * Test of hasConfigurePermission method, of class
-     * JobConfigHistoryRootAction.
-     */
     @Test
     public void testHasConfigurePermission() {
         assertTrue(createSut().hasConfigurePermission());
     }
 
-    /**
-     * Test of hasJobConfigurePermission method, of class
-     * JobConfigHistoryRootAction.
-     */
     @Test
     public void testHasJobConfigurePermission() {
         assertTrue(createSut().hasJobConfigurePermission());
     }
 
-    /**
-     * Test of checkParameters method, of class JobConfigHistoryRootAction.
-     */
     @Test(expected = IllegalArgumentException.class)
     public void testCheckParametersIAE() {
         createSut().checkParameters("foo", "bar");
     }
 
-    /**
-     * Test of checkParameters method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testCheckParametersNameIsNull() {
         assertFalse(createSut().checkParameters(null, "2013-01-18_18-24-33"));
         assertFalse(createSut().checkParameters("null", "2013-01-18_18-24-33"));
     }
 
-    /**
-     * Test of checkParameters method, of class JobConfigHistoryRootAction.
-     */
     @Test(expected = IllegalArgumentException.class)
     public void testCheckParametersNameHasDots() {
         createSut().checkParameters("../foo", "2013-01-18_18-24-33");
     }
 
-    /**
-     * Test of checkParameters method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testCheckParameters() {
         assertTrue(createSut().checkParameters("foo", "2013-01-18_18-24-33"));
     }
 
-    /**
-     * Test of doDiffFiles method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testDoDiffFiles() throws Exception {
         final String boundary = "AAAA";
@@ -457,9 +289,6 @@ public class JobConfigHistoryRootActionTest {
                 "showDiffFiles?name=foo&timestamp1=2014-02-05_10-42-37&timestamp2=2014-03-12_11-02-12");
     }
 
-    /**
-     * Test of getLines method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testGetLines() throws Exception {
 
@@ -470,7 +299,6 @@ public class JobConfigHistoryRootActionTest {
         testLines(0, freeStyleProject, 0, 0, false);
         testLines(0, freeStyleProject, 0, 1, false);
         testLines(7, freeStyleProject, 1, 2, false);
-//        testLines(6, freeStyleProject, 2, 3, false);
     }
 
     private void testLines(long expected, FreeStyleProject freeStyleProject, int i, int j, boolean hideVersionDiffs) throws IOException {
@@ -506,19 +334,12 @@ public class JobConfigHistoryRootActionTest {
         return PluginUtils.getHistoryDao().getOldRevision(freeStyleProject, timestamp);
     }
 
-    /**
-     * Test of getLines method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testGetLinesNoPermissions() throws Exception {
         given(mockedStaplerRequest.getParameter("name")).willReturn("Test1");
         assertEquals(0, createUnauthorizedStaplerMockedSut().getLines().size());
-
     }
 
-    /**
-     * Test of findNewName method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testFindNewName() throws Exception {
         FreeStyleProject test1 = jenkinsRule.createFreeStyleProject("Test1");
@@ -531,9 +352,6 @@ public class JobConfigHistoryRootActionTest {
         assertEquals("Test1", createSut().findNewName("Test1"));
     }
 
-    /**
-     * Test of getOldConfigXml method, of class JobConfigHistoryRootAction.
-     */
     @Test
     public void testGetOldConfigXml() throws IOException, InterruptedException {
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
@@ -557,9 +375,6 @@ public class JobConfigHistoryRootActionTest {
         );
     }
 
-    /**
-     * Test of getOldConfigXml method, of class JobConfigHistoryRootAction.
-     */
     @Test(expected = IllegalArgumentException.class)
     public void testGetOldConfigXmlNonExisting() {
         final String name = "jobs/I_DO_NOT_EXIST";
@@ -567,36 +382,6 @@ public class JobConfigHistoryRootActionTest {
         createSut().getOldConfigXml(name, timestamp);
     }
 
-    /**
-     * Test of doRestore method, of class JobConfigHistoryRootAction.
-     */
-    /* TODO Fixme
-    @Test
-    public void testDoRestore() throws Exception {
-        final StaplerRequest req = mock(StaplerRequest.class);
-        final StaplerResponse rsp = mock(StaplerResponse.class);
-
-        JobConfigHistoryRootAction sut = createSut();
-
-        FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
-        assertNotNull(jenkinsRule.getInstance().getItem("Test1"));
-        assertEquals("Test1", jenkinsRule.getInstance().getItem("Test1").getName());
-
-        freeStyleProject.delete();
-        assertNull(jenkinsRule.getInstance().getItem("Test1"));
-        final String deletedTestProjectName = PluginUtils.getHistoryDao().getDeletedJobs()[0].getName();
-
-        given(req.getParameter("name")).willReturn(deletedTestProjectName);
-        sut.doRestore(req, rsp);
-        assertNotNull(jenkinsRule.getInstance().getItem("Test1"));
-        assertEquals("Test1", jenkinsRule.getInstance().getItem("Test1").getName());
-    }
-     */
-
-    /**
-     * Test of getLastAvailableConfigXml method, of class
-     * JobConfigHistoryRootAction.
-     */
     @Test
     public void testGetLastAvailableConfigXml() throws IOException {
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
@@ -610,20 +395,12 @@ public class JobConfigHistoryRootActionTest {
                 TUtils.pathEndsWith(expectedSuffix));
     }
 
-    /**
-     * Test of getLastAvailableConfigXml method, of class
-     * JobConfigHistoryRootAction.
-     */
     @Test
     public void testGetLastAvailableConfigXmlNoConfigs() {
         String name = "jobs/I_DO_NOT_EXIST";
         assertNull(createSut().getLastAvailableConfigXml(name));
     }
 
-    /**
-     * Test of doForwardToRestoreQuestion method, of class
-     * JobConfigHistoryRootAction.
-     */
     @Test
     public void testDoForwardToRestoreQuestion() throws Exception {
         given(mockedStaplerRequest.getParameter("name")).willReturn("foo");
@@ -659,5 +436,4 @@ public class JobConfigHistoryRootActionTest {
             }
         };
     }
-
 }

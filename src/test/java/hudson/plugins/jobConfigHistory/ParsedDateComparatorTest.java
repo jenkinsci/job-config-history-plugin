@@ -9,6 +9,8 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
+ * Tests for ParsedDateComparator.
+ *
  * @author Mirko Friedenhagen
  */
 public class ParsedDateComparatorTest {
@@ -27,22 +29,16 @@ public class ParsedDateComparatorTest {
             "Firstname Lastname", "userId", "operation", DATE_NEWER, null,
             null);
 
-    /**
-     * Test of compare method, of class ParsedDateComparator.
-     */
     @Test
-    public void testCompare() {
+    public void objectsWithSameValuesShouldBeEqual() {
         assertEquals(0, ParsedDateComparator.DESCENDING.compare(historyDescr,
                 historyDescrClone));
         assertEquals(0, ParsedDateComparator.DESCENDING
                 .compare(historyDescrClone, historyDescr));
     }
 
-    /**
-     * Test of compare method, of class ParsedDateComparator.
-     */
     @Test
-    public void testSortAndMin() {
+    public void historyDescrShouldBeSortedCorrectly() {
         final List<HistoryDescr> list = Arrays.asList(historyDescr,
                 historyDescrNewer);
         list.sort(ParsedDateComparator.DESCENDING);

@@ -9,6 +9,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
+ * Integration tests of ComputerConfigHistoryAction.
+ *
  * @author Greg Fogelberg
  */
 public class ComputerConfigHistoryActionIT {
@@ -18,9 +20,6 @@ public class ComputerConfigHistoryActionIT {
 
     private final Slave agentMock = mock(Slave.class);
 
-    /**
-     * Test of getDisplayName method, of class ComputerConfigHistoryAction.
-     */
     @Test
     public void testGetDisplayName() {
         ComputerConfigHistoryAction sut = new ComputerConfigHistoryActionImpl();

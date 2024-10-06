@@ -10,6 +10,8 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests for  JobConfigHistoryJobListener.
+ *
  * @author Mirko Friedenhagen
  */
 public class JobConfigHistoryJobListenerTest {
@@ -19,9 +21,6 @@ public class JobConfigHistoryJobListenerTest {
 
     final JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
 
-    /**
-     * Test of onCreated method, of class JobConfigHistoryJobListener.
-     */
     @Test
     public void testOnCreated() {
         Item item = createItem();
@@ -29,9 +28,6 @@ public class JobConfigHistoryJobListenerTest {
         verifyZeroInteractions(mockedConfigHistoryListenerHelper);
     }
 
-    /**
-     * Test of onCreated method, of class JobConfigHistoryJobListener.
-     */
     @Test
     public void testOnCreatedAbstractItem() {
         AbstractItem item = createAbstractItem();
@@ -39,9 +35,6 @@ public class JobConfigHistoryJobListenerTest {
         verify(mockedConfigHistoryListenerHelper).createNewItem(item);
     }
 
-    /**
-     * Test of onRenamed method, of class JobConfigHistoryJobListener.
-     */
     @Test
     public void testOnRenamed() {
         Item item = createItem();
@@ -49,9 +42,6 @@ public class JobConfigHistoryJobListenerTest {
         verifyZeroInteractions(mockedConfigHistoryListenerHelper);
     }
 
-    /**
-     * Test of onRenamed method, of class JobConfigHistoryJobListener.
-     */
     @Test
     public void testOnRenamedAbstractItemWithoutConfiguredHistoryRootDir() {
         AbstractItem item = createAbstractItem();
@@ -60,9 +50,6 @@ public class JobConfigHistoryJobListenerTest {
                 "newName");
     }
 
-    /**
-     * Test of onDeleted method, of class JobConfigHistoryJobListener.
-     */
     @Test
     public void testOnDeleted() {
         Item item = createItem();
@@ -70,9 +57,6 @@ public class JobConfigHistoryJobListenerTest {
         verifyZeroInteractions(mockedConfigHistoryListenerHelper);
     }
 
-    /**
-     * Test of onDeleted method, of class JobConfigHistoryJobListener.
-     */
     @Test
     public void testOnDeletedAbstractItem() {
         AbstractItem item = createAbstractItem();

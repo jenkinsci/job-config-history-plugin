@@ -33,15 +33,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 /**
+ * Tests for GetDiffLines.
+ *
  * @author Mirko Friedenhagen
  */
 public class GetDiffLinesTest {
 
-    /**
-     * Test of get method, of class GetDiffLines.
-     */
     @Test
-    public void testGet() throws IOException, DiffException {
+    public void getterShouldReturnCorrectly() throws IOException, DiffException {
         GetDiffLines sut = createGetDiffLines();
         List<SideBySideView.Line> result = sut.get();
         assertEquals(24, result.size());

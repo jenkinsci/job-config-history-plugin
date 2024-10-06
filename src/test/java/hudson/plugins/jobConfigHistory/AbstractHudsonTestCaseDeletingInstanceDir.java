@@ -16,13 +16,8 @@ import java.util.logging.Logger;
  *
  * @author mfriedenhagen
  */
-public abstract class AbstractHudsonTestCaseDeletingInstanceDir
-        extends
-        JenkinsRule {
+public abstract class AbstractHudsonTestCaseDeletingInstanceDir extends JenkinsRule {
 
-    /**
-     * Our logger.
-     */
     private static final Logger LOG = Logger.getLogger(
             AbstractHudsonTestCaseDeletingInstanceDir.class.getName());
 

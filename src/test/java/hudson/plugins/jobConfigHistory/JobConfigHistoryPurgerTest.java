@@ -17,6 +17,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Tests for JobConfigHistoryPurger.
+ *
  * @author Mirko Friedenhagen
  */
 public class JobConfigHistoryPurgerTest {
@@ -28,9 +30,6 @@ public class JobConfigHistoryPurgerTest {
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder(new File("target"));
 
-    /**
-     * Test of getRecurrencePeriod method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testGetRecurrencePeriod() {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
@@ -40,9 +39,6 @@ public class JobConfigHistoryPurgerTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of doRun method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testDoRun() {
         when(mockedPlugin.getMaxDaysToKeepEntries()).thenReturn("1");
@@ -52,9 +48,6 @@ public class JobConfigHistoryPurgerTest {
         assertTrue(sut.purgeCalled);
     }
 
-    /**
-     * Test of doRun method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testDoRunNegative() {
         when(mockedPlugin.getMaxDaysToKeepEntries()).thenReturn("-1");
@@ -64,9 +57,6 @@ public class JobConfigHistoryPurgerTest {
         assertFalse(sut.purgeCalled);
     }
 
-    /**
-     * Test of doRun method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testDoRunNoNumber() {
         when(mockedPlugin.getMaxDaysToKeepEntries()).thenReturn("A");
@@ -76,9 +66,6 @@ public class JobConfigHistoryPurgerTest {
         assertFalse(sut.purgeCalled);
     }
 
-    /**
-     * Test of doRun method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testDoRunEmpty() {
         when(mockedPlugin.getMaxDaysToKeepEntries()).thenReturn("");
@@ -88,9 +75,6 @@ public class JobConfigHistoryPurgerTest {
         assertFalse(sut.purgeCalled);
     }
 
-    /**
-     * Test of purgeSystemOrJobHistory method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testPurgeSystemOrJobHistory() throws IOException {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
@@ -109,9 +93,6 @@ public class JobConfigHistoryPurgerTest {
         assertTrue(newItemDir.exists());
     }
 
-    /**
-     * Test of purgeSystemOrJobHistory method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testPurgeSystemOrJobHistoryNoItems() {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
@@ -122,9 +103,6 @@ public class JobConfigHistoryPurgerTest {
         sut.purgeSystemOrJobHistory(null);
     }
 
-    /**
-     * Test of purgeSystemOrJobHistory method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testPurgeSystemOrJobHistoryItemIsAFile() throws IOException {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
@@ -136,9 +114,6 @@ public class JobConfigHistoryPurgerTest {
         assertTrue(newFile.exists());
     }
 
-    /**
-     * Test of purgeSystemOrJobHistory method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testPurgeSystemOrJobHistoryItemHasNoHistory()
             throws IOException {
@@ -152,25 +127,16 @@ public class JobConfigHistoryPurgerTest {
         assertTrue(newFolder.exists());
     }
 
-    /**
-     * Test of isTooOld method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testIsNotTooOld() {
         assertFalse(testIsOlderThanOneDay(now()));
     }
 
-    /**
-     * Test of isTooOld method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testIsTooOld() {
         assertTrue(testIsOlderThanOneDay(twoDaysAgo()));
     }
 
-    /**
-     * Test of isTooOld method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testIsTooOldInvalidFormat() {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
@@ -179,9 +145,6 @@ public class JobConfigHistoryPurgerTest {
         assertFalse(sut.isTooOld(new File("invalid format")));
     }
 
-    /**
-     * Test of deleteDirectory method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testDeleteDirectoryWithWarnings() {
         File dirMock = mock(File.class);
@@ -192,9 +155,6 @@ public class JobConfigHistoryPurgerTest {
         sut.deleteDirectory(dirMock);
     }
 
-    /**
-     * Test of deleteDirectory method, of class JobConfigHistoryPurger.
-     */
     @Test
     public void testDeleteDirectory() throws IOException {
         final File newFile = tempFolder.newFile();

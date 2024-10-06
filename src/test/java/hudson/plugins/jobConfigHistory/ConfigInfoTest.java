@@ -17,6 +17,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ *
+ * Tests for the ConfigInfo.
+ *
  * @author Mirko Friedenhagen
  */
 public class ConfigInfoTest {
@@ -38,30 +41,23 @@ public class ConfigInfoTest {
      * Test of create method, of class ConfigInfo.
      */
     @Test
-    public void testCreate_4args() {
+    public void configInfoShouldBeInitializedCorrectly() {
         ConfigInfo sut = ConfigInfo.create("jobName", true, historyDescr,
                 false);
         assertNotNull(sut);
         assertFalse(sut.getIsJob());
     }
 
-    /**
-     * Test of toString method, of class ConfigInfo.
-     */
     @Test
-    public void testToString() {
+    public void toStringShouldContainOperationString() {
         ConfigInfo sut = ConfigInfo.create("jobName", true, historyDescr,
                 false);
         String result = sut.toString();
         assertThat(result, startsWith("operation on "));
     }
 
-    /**
-     * Test of parsedDate method, of class ConfigInfo.
-     */
     @Test
-    public void testParsedDate() {
-        // "2012-11-21_11-29-12"
+    public void dateShouldBeParsedCorrectly() {
         ConfigInfo sut = ConfigInfo.create("jobName", true, historyDescr,
                 false);
         Date expResult = new GregorianCalendar(2012, Calendar.NOVEMBER, 21, 11, 29, 12).getTime();

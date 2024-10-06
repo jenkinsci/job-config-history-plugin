@@ -16,6 +16,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
+ * Integration Tests for JobConfigHistoryActionFactory.
+ *
  * @author Mirko Friedenhagen
  */
 public class JobConfigHistoryActionFactoryIT {
