@@ -57,7 +57,8 @@
         </j:otherwise>
       </j:choose>
 
-      <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js" />
+      <st:adjunct includes="hudson.plugins.jobConfigHistory.deleteRevisionAndTableEntry" />
+
       <div>
         <j:choose>
           <j:when test="${!it.hasConfigurePermission() and !isDeleted}">
@@ -71,7 +72,6 @@
           </j:when>
           <j:otherwise>
             <f:form id="rootHistoryDiffForm" method="post" action="diffFiles" enctype="multipart/form-data">
-
               <table id="confighistory" class="jenkins-table sortable">
                 <caption class="caption">
                   <h2>${name}</h2>
@@ -133,15 +133,7 @@
                         <j:if test="${it.hasDeleteEntryPermission() and !config.operation.toString().equals(&quot;Deleted&quot;)}">
                           <j:set var="message" value="${%Do you really want to delete the history entry} " />
                           <div id="target-div" jobName="${config.getJob()}">
-                            <script>
-                              var targetDiv = document.querySelector('#target-div');
-                              var JsJobName = targetDiv.getAttribute('jobName');
-
-                              function removeEntryFromTable2(JsConfigNr, JsConfigDate, JsMessage){
-                                removeEntryFromTable('table-row-' + JsConfigNr, JsConfigDate, JsJobName, JsMessage)
-                              }
-                            </script>
-                            <button type="button" class="jenkins-button jenkins-button--destructive" data-config-date="${config.date}" onClick="removeEntryFromTable2('${configNr}', this.getAttribute('data-config-date'), '${message}')" value="X">
+                            <button type="button" class="jenkins-button jenkins-button--destructive" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
                               <l:icon src="symbol-trash-outline plugin-ionicons-api" class="icon-md" alt="${%Delete Revision}" />
                             </button>
                           </div>
