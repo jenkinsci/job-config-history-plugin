@@ -1,3 +1,4 @@
+//name is an optional parameter for job deletion history and system config history
 function removeEntryFromTable(id, timestamp, name, message) {
     var confirmPhrase = message + timestamp + '?';
     if (confirm(confirmPhrase)) {
