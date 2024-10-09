@@ -9,7 +9,8 @@
       <h1>${%Agent Configuration History}</h1>
       <div>
 
-        <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js"/>
+        <st:adjunct includes="hudson.plugins.jobConfigHistory.deleteRevisionAndTableEntry" />
+
         <j:set var="configs" value="${it.getAgentConfigs()}" />
         <j:choose>
           <j:when test="${configs.size() == 0}">
@@ -111,7 +112,7 @@
                         <j:if test="${it.hasDeleteEntryPermission()}">
                           <td style="text-align:center">
                               <j:set var="message" value="${%Do you really want to delete the history entry} "/>
-                              <button type="button" class="jch delete-button" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
+                            <button type="button" class="jch delete-button" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
                                 <l:icon class="icon-stop icon-sm" alt="${%Delete Revision}"/>
                               </button>
                           </td>

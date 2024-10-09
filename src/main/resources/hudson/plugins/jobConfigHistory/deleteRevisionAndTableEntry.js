@@ -20,7 +20,8 @@ function removeEntryFromTable(id, timestamp, name, message) {
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    const buttons = document.querySelectorAll('.jenkins-button--destructive');
+    const systemConfigDeleteButtons = document.querySelectorAll('.jenkins-button--destructive');
+    const agentConfigDeleteButtons = document.querySelectorAll('.delete-button');
 
     const targetDiv = document.querySelector('#target-div');
     let jobName = null
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         jobName = targetDiv.getAttribute('jobName');
     }
 
-    buttons.forEach(button => {
+    systemConfigDeleteButtons.forEach(button => {
             button.addEventListener('click', function(event) {
                 const configNr = this.getAttribute('data-config-nr');
                 const configDate = this.getAttribute('data-config-date');
@@ -37,4 +38,13 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     );
+
+    agentConfigDeleteButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            const configNr = this.getAttribute('data-config-nr');
+            const configDate = this.getAttribute('data-config-date');
+            const message = this.getAttribute('data-message-text');
+            removeEntryFromTable(`table-row-${configNr}`, configDate, null, message);
+        });
+    });
 });
