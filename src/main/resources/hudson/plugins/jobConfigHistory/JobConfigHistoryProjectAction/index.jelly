@@ -132,7 +132,6 @@
                             <j:if test="${it.hasDeleteEntryPermission()}">
                               <j:set var="message" value="${%Do you really want to delete the history entry} " />
                               <button type="button" class="jenkins-button jenkins-button--destructive" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
-<!--                              <button type="button" class="jenkins-button jenkins-button&#45;&#45;destructive" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">-->
                                 <l:icon src="symbol-trash-outline plugin-ionicons-api" class="icon-md" alt="${%Delete Revision}" />
                               </button>
                             </j:if>
