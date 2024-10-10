@@ -45,11 +45,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>commons-net</groupId>
-                <artifactId>commons-net</artifactId>
-                <version>3.11.1</version>
-            </dependency>
-            <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-2.387.x</artifactId>
                 <version>2543.vfb_1a_5fb_9496d</version>
