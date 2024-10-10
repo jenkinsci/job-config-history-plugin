@@ -22,7 +22,6 @@ function removeEntryFromTable(id, timestamp, name, message) {
 document.addEventListener('DOMContentLoaded', function() {
 
     const systemConfigDeleteButtons = document.querySelectorAll('.jenkins-button--destructive');
-    const agentConfigDeleteButtons = document.querySelectorAll('.delete-button');
 
     const targetDiv = document.querySelector('#target-div');
     let jobName = null
@@ -39,6 +38,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     );
+
+    const agentConfigDeleteButtons = document.querySelectorAll('.delete-button');
 
     agentConfigDeleteButtons.forEach(button => {
         button.addEventListener('click', function(event) {
