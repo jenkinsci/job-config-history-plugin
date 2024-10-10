@@ -14,8 +14,6 @@ function removeEntryFromTable(id, timestamp, name, message) {
         xmlHttp.open("POST", url, true);
         xmlHttp.setRequestHeader(document.head.getAttribute('data-crumb-header'), document.head.getAttribute('data-crumb-value'));
         xmlHttp.send(null);
-    } else {
-        return false;
     }
 }
 
@@ -28,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const systemConfigDeleteButtons = document.querySelectorAll('.system-config-history-delete-button');
     systemConfigDeleteButtons.forEach((button) => {
-        button.addEventListener('click', (event) => {
+        button.addEventListener('click', () => {
             const configNr = button.getAttribute('data-config-nr');
             const configDate = button.getAttribute('data-config-date');
             const message = button.getAttribute('data-message-text');
@@ -38,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const agentConfigDeleteButtons = document.querySelectorAll('.agent-config-history-delete-button');
     agentConfigDeleteButtons.forEach((button) => {
-        button.addEventListener('click', (event) => {
+        button.addEventListener('click', () => {
             const configNr = button.getAttribute('data-config-nr');
             const configDate = button.getAttribute('data-config-date');
             const message = button.getAttribute('data-message-text');
