@@ -58,7 +58,6 @@
       </j:choose>
 
       <st:adjunct includes="hudson.plugins.jobConfigHistory.deleteRevisionAndTableEntry" />
-
       <div>
         <j:choose>
           <j:when test="${!it.hasConfigurePermission() and !isDeleted}">

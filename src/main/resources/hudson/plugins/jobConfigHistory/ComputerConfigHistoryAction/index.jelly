@@ -10,7 +10,6 @@
       <div>
 
         <st:adjunct includes="hudson.plugins.jobConfigHistory.deleteRevisionAndTableEntry" />
-
         <j:set var="configs" value="${it.getAgentConfigs()}" />
         <j:choose>
           <j:when test="${configs.size() == 0}">
