@@ -8,7 +8,7 @@
     <l:main-panel>
       <l:app-bar title="${%Job Configuration History}"/>
       <div>
-        <script src="${rootURL}/plugin/jobConfigHistory/deleteRevisionAndTableEntry.js" />
+        <st:adjunct includes="hudson.plugins.jobConfigHistory.deleteRevisionAndTableEntry" />
         <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}" />
         <j:set var="pageNum" value="${request.getParameter('pageNum')}" />
         <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}" />
@@ -131,7 +131,7 @@
                           <td style="text-align:center">
                             <j:if test="${it.hasDeleteEntryPermission()}">
                               <j:set var="message" value="${%Do you really want to delete the history entry} " />
-                              <button type="button" class="jenkins-button jenkins-button--destructive" onClick="removeEntryFromTable('table-row-${configNr}', '${config.date}', 'null', '${message}')" value="X">
+                              <button type="button" class="jenkins-button jenkins-button--destructive system-config-history-delete-button" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
                                 <l:icon src="symbol-trash-outline plugin-ionicons-api" class="icon-md" alt="${%Delete Revision}" />
                               </button>
                             </j:if>
