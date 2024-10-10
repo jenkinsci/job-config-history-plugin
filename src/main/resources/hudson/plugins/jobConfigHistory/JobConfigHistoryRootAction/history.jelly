@@ -71,6 +71,7 @@
           </j:when>
           <j:otherwise>
             <f:form id="rootHistoryDiffForm" method="post" action="diffFiles" enctype="multipart/form-data">
+
               <table id="confighistory" class="jenkins-table sortable">
                 <caption class="caption">
                   <h2>${name}</h2>
