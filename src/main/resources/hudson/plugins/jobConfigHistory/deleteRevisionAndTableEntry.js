@@ -21,31 +21,31 @@ function removeEntryFromTable(id, timestamp, name, message) {
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    const systemConfigDeleteButtons = document.querySelectorAll('.jenkins-button--destructive');
+    const systemConfigDeleteButtons = document.querySelectorAll('.system-config-history-delete-button');
 
     const targetDiv = document.querySelector('#target-div');
-    let jobName = null
+    let jobName = null;
     if (targetDiv) {
         jobName = targetDiv.getAttribute('jobName');
     }
 
     systemConfigDeleteButtons.forEach(button => {
-            button.addEventListener('click', function(event) {
-                const configNr = this.getAttribute('data-config-nr');
-                const configDate = this.getAttribute('data-config-date');
-                const message = this.getAttribute('data-message-text');
-                removeEntryFromTable(`table-row-${configNr}`, configDate, jobName, message);
-            });
-        }
-    );
+        button.addEventListener('click', (event) => {
+            const configNr = button.getAttribute('data-config-nr');
+            const configDate = button.getAttribute('data-config-date');
+            const message = button.getAttribute('data-message-text');
+            removeEntryFromTable(`table-row-${configNr}`, configDate, jobName, message);
+        });
+    });
 
-    const agentConfigDeleteButtons = document.querySelectorAll('.delete-button');
+
+    const agentConfigDeleteButtons = document.querySelectorAll('.agent-config-history-delete-button');
 
     agentConfigDeleteButtons.forEach(button => {
-        button.addEventListener('click', function(event) {
-            const configNr = this.getAttribute('data-config-nr');
-            const configDate = this.getAttribute('data-config-date');
-            const message = this.getAttribute('data-message-text');
+        button.addEventListener('click', (event) =>{
+            const configNr = button.getAttribute('data-config-nr');
+            const configDate = button.getAttribute('data-config-date');
+            const message = button.getAttribute('data-message-text');
             removeEntryFromTable(`table-row-${configNr}`, configDate, null, message);
         });
     });

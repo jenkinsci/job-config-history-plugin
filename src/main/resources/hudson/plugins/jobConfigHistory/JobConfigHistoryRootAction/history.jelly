@@ -133,7 +133,7 @@
                         <j:if test="${it.hasDeleteEntryPermission() and !config.operation.toString().equals(&quot;Deleted&quot;)}">
                           <j:set var="message" value="${%Do you really want to delete the history entry} " />
                           <div id="target-div" jobName="${config.getJob()}">
-                            <button type="button" class="jenkins-button jenkins-button--destructive" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
+                            <button type="button" class="jenkins-button jenkins-button--destructive system-config-history-delete-button" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
                               <l:icon src="symbol-trash-outline plugin-ionicons-api" class="icon-md" alt="${%Delete Revision}" />
                             </button>
                           </div>
