@@ -1,7 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
-import hudson.model.AbstractItem;
 import hudson.model.ItemGroup;
+import jenkins.model.Jenkins;
 import org.junit.Test;
 
 import java.util.Calendar;
@@ -32,9 +32,8 @@ public class ConfigInfoTest {
     public ConfigInfoTest() {
         ItemGroup<?> itemGroupMock = mock(ItemGroup.class);
         when(itemGroupMock.getFullName()).thenReturn("does not matter parent");
-        AbstractItem itemMock = mock(AbstractItem.class);
-        when(itemMock.getParent()).thenReturn(itemGroupMock);
-        when(itemMock.getFullName()).thenReturn("Job1");
+        Jenkins jenkinsMock = mock(Jenkins.class);
+        when(jenkinsMock.getFullName()).thenReturn("Job1");
     }
 
     /**

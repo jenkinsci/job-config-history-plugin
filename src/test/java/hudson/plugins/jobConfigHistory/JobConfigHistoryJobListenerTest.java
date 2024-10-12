@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -25,7 +25,7 @@ public class JobConfigHistoryJobListenerTest {
     public void testOnCreated() {
         Item item = createItem();
         sut.onCreated(item);
-        verifyZeroInteractions(mockedConfigHistoryListenerHelper);
+        verifyNoInteractions(mockedConfigHistoryListenerHelper);
     }
 
     @Test
@@ -39,7 +39,7 @@ public class JobConfigHistoryJobListenerTest {
     public void testOnRenamed() {
         Item item = createItem();
         sut.onRenamed(item, "", "");
-        verifyZeroInteractions(mockedConfigHistoryListenerHelper);
+        verifyNoInteractions(mockedConfigHistoryListenerHelper);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class JobConfigHistoryJobListenerTest {
     public void testOnDeleted() {
         Item item = createItem();
         sut.onDeleted(item);
-        verifyZeroInteractions(mockedConfigHistoryListenerHelper);
+        verifyNoInteractions(mockedConfigHistoryListenerHelper);
     }
 
     @Test

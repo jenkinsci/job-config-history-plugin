@@ -242,6 +242,7 @@ public class FileHistoryDaoTest {
         AtomicReference<Calendar> timestampHolder = new AtomicReference<>();
         File result = sutWithoutUserAndDuplicateHistory.getRootDir(test1Config,
                 timestampHolder);
+        when(mockedItem.getConfigFile()).thenCallRealMethod();
         assertTrue(result.exists());
         assertThat(result.getPath(), containsString("config-history"
                 + File.separator + "jobs" + File.separator + "Test1"));
@@ -256,6 +257,7 @@ public class FileHistoryDaoTest {
         jobDir.mkdirs();
         FileUtils.copyFile(test1Config.getFile(), new File(jobDir, "config.xml"));
         when(mockedItem.getRootDir()).thenReturn(jobDir);
+        when(mockedItem.getConfigFile()).thenCallRealMethod();
         sutWithUserAndNoDuplicateHistory.createNewItem(mockedItem);
         assertTrue(new File(jobDir, "config.xml").exists());
         final File historyDir = new File(jenkinsHome,
@@ -270,6 +272,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testSaveItem_AbstractItem() {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
+        when(mockedItem.getConfigFile()).thenCallRealMethod();
         sutWithUserAndNoDuplicateHistory.saveItem(mockedItem.getConfigFile());
         assertEquals(5, getHistoryLength());
     }
@@ -302,6 +305,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testDeleteItem() {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
+        when(mockedItem.getConfigFile()).thenCallRealMethod();
         sutWithUserAndNoDuplicateHistory.deleteItem(mockedItem);
     }
 
@@ -315,6 +319,7 @@ public class FileHistoryDaoTest {
         // Rename of Job is already done in Listener.
         FileUtils.touch(new File(newJobDir, "config.xml"));
         when(mockedItem.getRootDir()).thenReturn(newJobDir);
+        when(mockedItem.getConfigFile()).thenCallRealMethod();
         when(mockedItem.getName()).thenReturn("Test1");
         sutWithUserAndNoDuplicateHistory.renameItem(mockedItem, "Test1",
                 "NewName");
@@ -364,6 +369,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testGetOldRevision_Item() throws IOException {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
+        when(mockedItem.getConfigFile()).thenCallRealMethod();
         String identifier = "2012-11-21_11-42-05";
         final XmlFile result = sutWithUserAndNoDuplicateHistory
                 .getOldRevision(mockedItem, identifier);
@@ -441,6 +447,7 @@ public class FileHistoryDaoTest {
     @Test
     public void testHasOldRevision_Item() {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
+        when(mockedItem.getConfigFile()).thenCallRealMethod();
         assertTrue(sutWithUserAndNoDuplicateHistory.hasOldRevision(
                 mockedItem.getConfigFile(), "2012-11-21_11-42-05"));
         assertFalse(sutWithUserAndNoDuplicateHistory.hasOldRevision(
