@@ -5,10 +5,10 @@ import hudson.XmlFile;
 import hudson.model.Saveable;
 import org.junit.Test;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -29,16 +29,16 @@ public class JobConfigHistorySaveableListenerTest {
                 .thenReturn(false);
         JobConfigHistorySaveableListener sut = new JobConfigHistorySaveableListenerImpl();
         sut.onChange(null, null);
-        verifyZeroInteractions(mockedConfigHistoryListenerHelper);
+        verifyNoInteractions(mockedConfigHistoryListenerHelper);
     }
 
     @Test
     public void testOnChangeSaveable() {
-        when(mockedPlugin.isSaveable(any(Saveable.class), any(XmlFile.class)))
+        when(mockedPlugin.isSaveable(null, null))
                 .thenReturn(true);
         JobConfigHistorySaveableListener sut = new JobConfigHistorySaveableListenerImpl();
         sut.onChange(null, null);
-        verify(mockedConfigHistoryListenerHelper).saveItem(any(XmlFile.class));
+        verify(mockedConfigHistoryListenerHelper).saveItem(null);
     }
 
     private class JobConfigHistorySaveableListenerImpl

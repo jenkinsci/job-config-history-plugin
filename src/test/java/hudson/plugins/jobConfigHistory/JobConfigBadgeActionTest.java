@@ -27,7 +27,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Build;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
-import hudson.model.ItemGroup;
 import hudson.model.Job;
 import hudson.model.Project;
 import hudson.model.Run;
@@ -66,10 +65,10 @@ public class JobConfigBadgeActionTest {
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
     public JobConfigBadgeActionTest() {
-        final ItemGroup<?> mockedItemGroup = mock(ItemGroup.class);
-        when(mockedItemGroup.getUrl()).thenReturn("/jobs/");
-        when(mockedProject.getParent()).thenReturn(mockedItemGroup);
+        final Jenkins mockedJenkins = mock(Jenkins.class);
+        when(mockedProject.getParent()).thenReturn(mockedJenkins);
         when(mockedProject.getShortUrl()).thenReturn("jobname");
+        when(mockedBuild.getParent()).thenReturn(mockedProject);
         when(mockedBuild.getProject()).thenReturn(mockedProject);
     }
 

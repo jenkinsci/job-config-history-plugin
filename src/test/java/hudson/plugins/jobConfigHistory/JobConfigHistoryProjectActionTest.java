@@ -6,9 +6,9 @@ import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
 import hudson.model.AbstractProject;
 import hudson.model.FreeStyleProject;
-import hudson.model.ItemGroup;
 import hudson.model.Project;
 import jenkins.model.AbstractTopLevelItem;
+import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -27,8 +27,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,9 +53,9 @@ public class JobConfigHistoryProjectActionTest {
     private HistoryDao historyDao;
 
     public JobConfigHistoryProjectActionTest() {
-        ItemGroup<?> mockedItemGroup = mock(ItemGroup.class);
-        when(mockedItemGroup.getFullName()).thenReturn("");
-        when(mockedProject.getParent()).thenReturn(mockedItemGroup);
+        Jenkins mockedJenkins = mock(Jenkins.class);
+        when(mockedJenkins.getFullName()).thenReturn("");
+        when(mockedProject.getParent()).thenReturn(mockedJenkins);
         when(mockedProject.getFullName()).thenReturn("Test1");
     }
 
@@ -225,6 +226,7 @@ public class JobConfigHistoryProjectActionTest {
                 .thenReturn(true);
         when(mockedProject.getRootDir())
                 .thenReturn(testConfigs.getResource(jobDir));
+        when(mockedProject.getConfigFile()).thenCallRealMethod();
         final JobConfigHistoryProjectAction sut = createAction();
         final List<ConfigInfo> result = sut.getJobConfigs();
         assertEquals(noOfHistoryEntries, result.size());
@@ -234,10 +236,12 @@ public class JobConfigHistoryProjectActionTest {
     private List<ConfigInfo> testJobXHasYHistoryEntries(final String jobDir,
                                                         final int noOfHistoryEntries,
                                                         int from, int to) {
+        reset(mockedProject);
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
         when(mockedProject.getRootDir())
                 .thenReturn(testConfigs.getResource(jobDir));
+        when(mockedProject.getConfigFile()).thenCallRealMethod();
         final JobConfigHistoryProjectAction sut = createAction();
         final List<ConfigInfo> result = sut.getJobConfigs(from, to);
         assertEquals(noOfHistoryEntries, result.size());
@@ -250,6 +254,7 @@ public class JobConfigHistoryProjectActionTest {
                 .thenReturn(true);
         when(mockedProject.getRootDir())
                 .thenReturn(testConfigs.getResource("jobs/Test1"));
+        when(mockedProject.getConfigFile()).thenCallRealMethod();
         when(mockedRequest.getParameter("timestamp"))
                 .thenReturn("2012-11-21_11-40-28");
         final JobConfigHistoryProjectAction sut = createAction();
@@ -340,6 +345,7 @@ public class JobConfigHistoryProjectActionTest {
                 .thenReturn(true);
         when(mockedProject.getRootDir())
                 .thenReturn(testConfigs.getResource("jobs/Test1"));
+        when(mockedProject.getConfigFile()).thenCallRealMethod();
         JobConfigHistoryProjectAction sut = createAction();
         return sut.getLines();
     }
@@ -352,6 +358,7 @@ public class JobConfigHistoryProjectActionTest {
                 .thenReturn(true);
         when(mockedProject.getRootDir())
                 .thenReturn(testConfigs.getResource("jobs/Test1"));
+        when(mockedProject.getConfigFile()).thenCallRealMethod();
         JobConfigHistoryProjectAction sut = createAction();
         sut.doRestore(mockedRequest, mockedResponse);
         verify(mockedProject).save();
