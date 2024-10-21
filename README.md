@@ -1,5 +1,5 @@
 # Job Configuration History Plugin
-==============================
+
 [![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins%2Fjob-config-history-plugin%2Fmaster)](https://ci.jenkins.io/job/plugins/job/job-config-history-plugin/job/master/)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/jobConfigHistory.svg)](https://plugins.jenkins.io/jobConfigHistory)
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/jobConfigHistory.svg?color=blue)](https://plugins.jenkins.io/jobConfigHistory)
