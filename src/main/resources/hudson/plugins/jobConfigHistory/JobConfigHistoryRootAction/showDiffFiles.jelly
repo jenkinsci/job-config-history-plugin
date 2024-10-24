@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:st="jelly:stapler">
   <l:layout title="${%Job Configuration History}">
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/diff_highlight.css"/>
@@ -8,7 +8,7 @@
     <!--syntax highlighting-->
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/highlight.js/styles/purebasic.css"/>
     <script src="${rootURL}/plugin/jobConfigHistory/highlight.js/highlight.pack.js"/>
-    <script>hljs.initHighlightingOnLoad();</script>
+    <st:adjunct includes="hudson.plugins.jobConfigHistory.show-diff-files-behaviour"/>
     <j:set var="syntaxCheck1" value="${it.checkXmlSyntax(request.getParameter('name'), it.getTimestamp(1))}"/>
     <j:set var="syntaxCheck2" value="${it.checkXmlSyntax(request.getParameter('name'), it.getTimestamp(2))}"/>
 
@@ -66,28 +66,9 @@
               <j:set var="timestamp1" value="${it.getTimestamp(1)}"/>
               <j:set var="timestamp2" value="${it.getTimestamp(2)}"/>
 
-              <script>
-                var showVersionDiffsJs = true;
-
-                function toggleShowHideVersionDiffsJs(hideText, showText) {
-                    showVersionDiffsJs = !showVersionDiffsJs;
-                    if (showVersionDiffsJs === true) {
-                        document.getElementById("tbody_versionDiffsShown").style.display = '';
-                        document.getElementById("tbody_versionDiffsHidden").style.display = 'none';
-
-                        document.getElementById("showHideVersionDiffsJsButton").value = hideText;
-                    } else {
-                        document.getElementById("tbody_versionDiffsShown").style.display = 'none';
-                        document.getElementById("tbody_versionDiffsHidden").style.display = '';
-
-                        document.getElementById("showHideVersionDiffsJsButton").value = showText;
-                    }
-                }
-              </script>
               <div class="small-button-wrapper">
-                <j:set var="hideTextStr" value="${%Hide Version Changes}"/>
-                <j:set var="showTextStr" value="${%Show Version Changes}"/>
-                <input id="showHideVersionDiffsJsButton" class="small-button" type="button" value="${%Hide Version Changes}" onClick="toggleShowHideVersionDiffsJs('${hideTextStr}', '${showTextStr}');"/>
+                <input id="showHideVersionDiffsJsButton" class="small-button" type="button" data-hide-text="${%Hide Version Changes}"
+                       data-show-text="${%Show Version Changes}" value="${%Hide Version Changes}"/>
               </div>
               <div style="padding:2px"/>
 
