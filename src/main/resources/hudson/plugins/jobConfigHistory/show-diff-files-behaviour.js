@@ -6,13 +6,13 @@ window.addEventListener("DOMContentLoaded", () => {
     function toggleShowHideVersionDiffsJs(button, hideText, showText) {
         showVersionDiffsJs = !showVersionDiffsJs;
         if (showVersionDiffsJs === true) {
-            document.getElementById("tbody_versionDiffsShown").style.display = '';
-            document.getElementById("tbody_versionDiffsHidden").style.display = 'none';
+            document.getElementById("tbody_versionDiffsShown").style.display = "";
+            document.getElementById("tbody_versionDiffsHidden").style.display = "none";
 
             button.value = hideText;
         } else {
-            document.getElementById("tbody_versionDiffsShown").style.display = 'none';
-            document.getElementById("tbody_versionDiffsHidden").style.display = '';
+            document.getElementById("tbody_versionDiffsShown").style.display = "none";
+            document.getElementById("tbody_versionDiffsHidden").style.display = "";
 
             button.value = showText;
         }
