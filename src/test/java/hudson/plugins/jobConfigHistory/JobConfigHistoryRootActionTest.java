@@ -122,7 +122,7 @@ public class JobConfigHistoryRootActionTest {
 
         //one project and one deleted project.
         jenkinsRule.createFreeStyleProject("Test2").delete();
-        assertEquals(6, createSut().getJobConfigs("").size());
+        assertEquals(5, createSut().getJobConfigs("").size());
         assertEquals(1, createSut().getJobConfigs("deleted").size());
     }
 
