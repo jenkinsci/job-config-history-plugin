@@ -1,6 +1,6 @@
 excludePattern: "queue\\.xml|nodeMonitors\\.xml|UpdateCenter\\.xml|global-build-stats|LockableResourcesManager\\\
   .xml|MilestoneStep\\.xml|cloudbees-disk-usage-simple\\.xml"
 saveModuleConfiguration: false
-showBuildBadges: "always"
+showBuildBadges: "userWithConfigPermission"
 showChangeReasonCommentWindow: true
 skipDuplicateHistory: true

@@ -23,6 +23,17 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import hudson.XmlFile;
 import hudson.matrix.MatrixConfiguration;
 import hudson.matrix.MatrixProject;
@@ -31,6 +42,14 @@ import hudson.model.Descriptor;
 import hudson.model.FreeStyleProject;
 import hudson.model.TopLevelItem;
 import hudson.util.FormValidation;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.regex.Pattern;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.junit.Rule;
@@ -42,26 +61,6 @@ import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.mockito.Mockito;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.regex.Pattern;
-
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 /**
  * Tests for JobConfigHistory.
  *
@@ -71,9 +70,10 @@ public class JobConfigHistoryTest {
 
     @Rule
     public final UnpackResourceZip unpackResourceZip = UnpackResourceZip.create();
+
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
-    
+
     private StaplerRequest mockStaplerRequest() throws ServletException {
         Stapler stapler = mock(Stapler.class, CALLS_REAL_METHODS);
         ServletContext servletContext = mock(ServletContext.class);
@@ -205,7 +205,7 @@ public class JobConfigHistoryTest {
     @Test
     public void testGetShowBuildBadges() {
         JobConfigHistory sut = createSut();
-        String expResult = "always";
+        String expResult = "userWithConfigPermission";
         String result = sut.getShowBuildBadges();
         assertEquals(expResult, result);
     }
@@ -235,7 +235,7 @@ public class JobConfigHistoryTest {
         JobConfigHistory sut = createSut();
         JobConfigHistory unauthorizedSut = createUnauthorizedSut();
 
-        //default: always
+        // default: always
         assertTrue(sut.showBuildBadges(freeStyleProject));
         assertTrue(unauthorizedSut.showBuildBadges(freeStyleProject));
 
@@ -256,30 +256,21 @@ public class JobConfigHistoryTest {
     @Test
     public void testGetConfiguredHistoryRootDir() throws Exception {
         JobConfigHistory sut = createNonSavingSut();
-        assertEquals(
-                new File(sut.getConfiguredHistoryRootDir().getPath()).getName(),
-                "config-history");
+        assertEquals(new File(sut.getConfiguredHistoryRootDir().getPath()).getName(), "config-history");
         JSONObject formData = createFormData();
         sut.configure(mockStaplerRequest(), formData);
-        assertEquals(
-                new File(sut.getConfiguredHistoryRootDir().getPath()).getName(),
-                "config-history");
+        assertEquals(new File(sut.getConfiguredHistoryRootDir().getPath()).getName(), "config-history");
         formData.put("historyRootDir", "");
         sut.configure(mockStaplerRequest(), formData);
-        assertEquals(
-                new File(sut.getConfiguredHistoryRootDir().getPath()).getName(),
-                "config-history");
+        assertEquals(new File(sut.getConfiguredHistoryRootDir().getPath()).getName(), "config-history");
         formData.put("historyRootDir", "/tmp/");
         sut.configure(mockStaplerRequest(), formData);
-        assertEquals(
-                new File(sut.getConfiguredHistoryRootDir().getPath()).getName(),
-                "config-history");
+        assertEquals(new File(sut.getConfiguredHistoryRootDir().getPath()).getName(), "config-history");
     }
 
     @Test
     public void testIsSaveable() throws Exception {
-        XmlFile xmlFile = new XmlFile(
-                unpackResourceZip.getResource("jobs/Test1/config.xml"));
+        XmlFile xmlFile = new XmlFile(unpackResourceZip.getResource("jobs/Test1/config.xml"));
         XmlFile sysConfig = new XmlFile(new File(jenkinsRule.getInstance().getRootDir(), "config.xml"));
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
         MatrixProject matrixProject = jenkinsRule.createProject(MatrixProject.class, "MatrixProjectTest1");
@@ -298,8 +289,7 @@ public class JobConfigHistoryTest {
     }
 
     @Test
-    public void testIsSaveableWithExcludesPattern()
-            throws IOException, ServletException, Descriptor.FormException {
+    public void testIsSaveableWithExcludesPattern() throws IOException, ServletException, Descriptor.FormException {
         JobConfigHistory sut = createNonSavingSut();
         File jenkinsHome = sut.getJenkinsHome();
         String filePath = String.join(File.separator, "jobs", "multiple-branch", "branches", "master", "config.xml");
@@ -369,14 +359,16 @@ public class JobConfigHistoryTest {
         return new JobConfigHistory() {
             @Override
             public void save() {
-                //do nothing
+                // do nothing
             }
         };
     }
 
     private JSONObject createFormData() {
         JSONObject obj = new JSONObject();
-        obj.put("historyRootDir", unpackResourceZip.getResource("config-history").getPath());
+        obj.put(
+                "historyRootDir",
+                unpackResourceZip.getResource("config-history").getPath());
         obj.put("maxHistoryEntries", "5");
         obj.put("maxDaysToKeepEntries", "5");
         obj.put("maxEntriesPerPage", "50");

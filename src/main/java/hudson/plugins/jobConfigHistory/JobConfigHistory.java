@@ -37,6 +37,13 @@ import hudson.security.Permission;
 import hudson.security.PermissionGroup;
 import hudson.security.PermissionScope;
 import hudson.util.FormValidation;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
@@ -48,14 +55,6 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 /**
  * Class supporting global configuration settings, along with methods associated
  * with the plugin itself.
@@ -66,15 +65,15 @@ import java.util.regex.PatternSyntaxException;
 @Extension
 public class JobConfigHistory extends GlobalConfiguration {
 
-    private static final PermissionGroup PERMISSION_GROUP = new PermissionGroup(JobConfigHistory.class, Messages._displayName());
-    protected static final Permission DELETEENTRY_PERMISSION =
-            new Permission(
-                    PERMISSION_GROUP,
-                    Messages.JobConfigHistory_deleteEntryPermission(),
-                    Messages._JobConfigHistory_deleteEntryPermissionDescription(),
-                    Jenkins.ADMINISTER,
-                    true,
-                    new PermissionScope[]{PermissionScope.ITEM, PermissionScope.COMPUTER});
+    private static final PermissionGroup PERMISSION_GROUP =
+            new PermissionGroup(JobConfigHistory.class, Messages._displayName());
+    protected static final Permission DELETEENTRY_PERMISSION = new Permission(
+            PERMISSION_GROUP,
+            Messages.JobConfigHistory_deleteEntryPermission(),
+            Messages._JobConfigHistory_deleteEntryPermissionDescription(),
+            Jenkins.ADMINISTER,
+            true,
+            new PermissionScope[] {PermissionScope.ITEM, PermissionScope.COMPUTER});
     /**
      * our logger.
      */
@@ -119,7 +118,7 @@ public class JobConfigHistory extends GlobalConfiguration {
      * Whether build badges should appear when the config of a job has changed since the last build.
      * Possible values: "never", "always", "userWithConfigPermission", "adminUser"
      */
-    private String showBuildBadges = "always";
+    private String showBuildBadges = "userWithConfigPermission";
     /**
      * Whether a change reason comment window should be shown on a jobs' configure page.
      */
@@ -127,7 +126,10 @@ public class JobConfigHistory extends GlobalConfiguration {
 
     @DataBoundConstructor
     @Restricted(NoExternalUse.class)
-    @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = "The Descriptor#load documentation states that \"The constructor of the derived class must call this method\".")
+    @SuppressFBWarnings(
+            value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR",
+            justification =
+                    "The Descriptor#load documentation states that \"The constructor of the derived class must call this method\".")
     public JobConfigHistory() {
         load();
         loadRegexpPatterns();
@@ -143,10 +145,10 @@ public class JobConfigHistory extends GlobalConfiguration {
         }
         return true;
     }
-    
+
     @Override
     protected XmlFile getConfigFile() {
-        return new XmlFile(new File(Jenkins.get().getRootDir(),"jobConfigHistory.xml"));
+        return new XmlFile(new File(Jenkins.get().getRootDir(), "jobConfigHistory.xml"));
     }
 
     /**
@@ -166,7 +168,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     public String getHistoryRootDir() {
         return historyRootDir;
     }
-    
+
     /**
      * Sets the root directory for storing histories.
      *
@@ -287,7 +289,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     /**
      * Sets whether to skip saving history when it is a duplication of the previous saved configuration.
      *
-     * @param skipDuplicateHistory Whether to skip saving history when it is a duplication of the previous saved 
+     * @param skipDuplicateHistory Whether to skip saving history when it is a duplication of the previous saved
      *                             configuration.
      */
     @DataBoundSetter
@@ -304,10 +306,10 @@ public class JobConfigHistory extends GlobalConfiguration {
     public String getExcludePattern() {
         return excludePattern;
     }
-    
+
     /**
      * Sets the regular expression pattern for 'system' configuration files to exclude from saving.
-     * 
+     *
      * @param excludePattern The regular expression pattern.
      */
     @DataBoundSetter
@@ -328,7 +330,7 @@ public class JobConfigHistory extends GlobalConfiguration {
 
     /**
      * Sets whether to save the config history of Maven modules.
-     * 
+     *
      * @param saveModuleConfiguration Whether to save the config history of Maven modules.
      */
     @DataBoundSetter
@@ -365,10 +367,10 @@ public class JobConfigHistory extends GlobalConfiguration {
     public boolean getShowChangeReasonCommentWindow() {
         return showChangeReasonCommentWindow;
     }
-    
+
     /**
      * Sets whether a change reason comment window should be shown on a jobs' configure page.
-     * 
+     *
      * @param showChangeReasonCommentWindow Whether a comment window should be shown.
      */
     @DataBoundSetter
@@ -439,15 +441,12 @@ public class JobConfigHistory extends GlobalConfiguration {
         File jenkinsHome = getJenkinsHome();
 
         if (historyRootDir == null) {
-            rootDir = new File(jenkinsHome,
-                    JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
+            rootDir = new File(jenkinsHome, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
         } else {
             if (historyRootDir.matches("^(/|\\\\|[a-zA-Z]:).*")) {
-                rootDir = new File(historyRootDir + "/"
-                        + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
+                rootDir = new File(historyRootDir + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
             } else {
-                rootDir = new File(jenkinsHome, historyRootDir + "/"
-                        + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
+                rootDir = new File(jenkinsHome, historyRootDir + "/" + JobConfigHistoryConsts.DEFAULT_HISTORY_DIR);
             }
         }
         return rootDir;
@@ -471,7 +470,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     public String getExcludedUsers() {
         return excludedUsers;
     }
-    
+
     /**
      * Sets usernames whose changes should not get detected.
      *
@@ -502,7 +501,10 @@ public class JobConfigHistory extends GlobalConfiguration {
     public boolean isSaveable(Saveable item, XmlFile xmlFile) {
         boolean canSave = checkRegex(xmlFile);
         if (!canSave) {
-            LOG.log(Level.FINE, "skipped recording change history for job {0}", xmlFile.getFile().getAbsolutePath());
+            LOG.log(
+                    Level.FINE,
+                    "skipped recording change history for job {0}",
+                    xmlFile.getFile().getAbsolutePath());
             return false;
         }
         if (item instanceof TopLevelItem) {
@@ -513,8 +515,7 @@ public class JobConfigHistory extends GlobalConfiguration {
             // system configs
             return canSave;
         }
-        return PluginUtils.isMavenPluginAvailable() && item instanceof MavenModule
-                && saveModuleConfiguration;
+        return PluginUtils.isMavenPluginAvailable() && item instanceof MavenModule && saveModuleConfiguration;
     }
 
     /**
