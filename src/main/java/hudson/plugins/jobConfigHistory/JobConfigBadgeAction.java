@@ -87,6 +87,16 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
     }
 
     /**
+     * Returns true if the config change build badges link should appear (depending
+     * on plugin settings and user permissions). Called from badge.jelly.
+     *
+     * @return True if badges link should appear.
+     */
+    public boolean showBadgeLink() {
+        return getPlugin().showBuildBadgesLink(build.getParent());
+    }
+
+    /**
      * Check if the config history files that are attached to the build still
      * exist.
      *

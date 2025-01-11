@@ -93,6 +93,16 @@ public class JobConfigBadgeActionTest {
     }
 
     @Test
+    public void testShowBadgeLink() throws Exception {
+        FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
+        jenkinsRule.buildAndAssertSuccess(project);
+        Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().getLastBuild();
+
+        sut.onAttached(build);
+        assertTrue(sut.showBadgeLink());
+    }
+
+    @Test
     public void testOldConfigsExist() throws Exception {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
         jenkinsRule.buildAndAssertSuccess(project);

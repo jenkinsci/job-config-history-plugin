@@ -31,6 +31,7 @@ import hudson.model.Descriptor;
 import hudson.model.FreeStyleProject;
 import hudson.model.TopLevelItem;
 import hudson.util.FormValidation;
+import hudson.model.Item;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 import org.junit.Rule;
@@ -243,6 +244,30 @@ public class JobConfigHistoryTest {
         unauthorizedSut.setShowBuildBadges("adminUser");
         assertTrue(sut.showBuildBadges(freeStyleProject));
         assertFalse(unauthorizedSut.showBuildBadges(freeStyleProject));
+    }
+
+    @Test
+    public void testShowBuildBadgesLink() throws IOException {
+        AbstractProject<?, ?> mockedProject = mock(AbstractProject.class);
+
+        when(mockedProject.hasPermission(Item.CONFIGURE)).thenReturn(true, false);
+
+        JobConfigHistory sut = createSut();
+        JobConfigHistory unauthorizedSut = createUnauthorizedSut();
+
+
+        // showBuildBadges set to 'never'
+        sut.setShowBuildBadges("never");
+        assertFalse(sut.showBuildBadgesLink(mockedProject));
+
+        // showBuildBadges set to either 'always', 'userWithConfigPermission' or 'admin'
+        sut.setShowBuildBadges("always");
+
+        // should return True as user have config permission
+        assertTrue(sut.showBuildBadgesLink(mockedProject));
+
+        // should return False as user do not have config permission
+        assertFalse(unauthorizedSut.showBuildBadgesLink(mockedProject));
     }
 
     @Test
