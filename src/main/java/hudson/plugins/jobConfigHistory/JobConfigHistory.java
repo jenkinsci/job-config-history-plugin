@@ -405,7 +405,7 @@ public class JobConfigHistory extends GlobalConfiguration {
         if (showBuildBadges.equals("never")) {
             return false;
         }
-        return project.hasPermission(Item.CONFIGURE) || getJenkins().hasPermission(Jenkins.ADMINISTER);
+        return project.hasPermission(Item.CONFIGURE);
     }
 
     /**
