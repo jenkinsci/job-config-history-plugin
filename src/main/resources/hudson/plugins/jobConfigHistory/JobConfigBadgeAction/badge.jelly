@@ -4,13 +4,13 @@
     <j:if test="${it.showBadgeLink()}">
       <a href="${it.createLink()}" style="text-decoration: none">
         <span class="icon-sm">
-          <l:icon id="showDiff" src="${it.getIcon()}" title="${it.getTooltip()}" />
+          <l:icon id="showDiff" src="${it.getIcon()}" tooltip="${it.getTooltip()}" />
         </span>
       </a>
     </j:if>
     <j:if test="${!it.showBadgeLink()}">
       <span class="icon-sm">
-        <l:icon id="showDiff" src="${it.getIcon()}" title="${it.getTooltip()}" />
+        <l:icon id="showDiff" src="${it.getIcon()}" tooltip="${it.getTooltip()}" />
       </span>
     </j:if>
   </j:if>
