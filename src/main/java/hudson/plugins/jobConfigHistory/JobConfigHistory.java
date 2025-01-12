@@ -395,6 +395,20 @@ public class JobConfigHistory extends GlobalConfiguration {
     }
 
     /**
+     * Whether build badges link should appear for the builds of this project.
+     *
+     * @param project The project to which the build history belongs.
+     * @return False if the option is set to 'never', 'always' or the user doesn't have
+     * the required permissions.
+     */
+    public boolean showBuildBadgesLink(Job<?, ?> project) {
+        if (showBuildBadges.equals("never")) {
+            return false;
+        }
+        return project.hasPermission(Item.CONFIGURE);
+    }
+
+    /**
      * Gets the regular expression pattern used by this class.
      *
      * @return The loaded regexp pattern, or null if pattern was invalid.
