@@ -54,6 +54,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.SortedMap;
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -153,6 +154,9 @@ public class FileHistoryDaoTest {
     @Test
     public void testGetIdFormatter() {
         SimpleDateFormat result = FileHistoryDao.getIdFormatter();
+        // setting a default timezone to avoid timezone issues in different environments
+        result.setTimeZone(TimeZone.getTimeZone("UTC"));
+        
         final String formattedDate = result.format(new Date(0));
         // workaround for timezone issues, as cloudbees is in the far east :-)
         // and returns 1969 :-).
