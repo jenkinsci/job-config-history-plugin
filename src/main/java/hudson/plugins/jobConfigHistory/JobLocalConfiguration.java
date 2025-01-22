@@ -20,7 +20,7 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 import java.util.logging.Logger;
 
@@ -66,7 +66,7 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
 
         @Override
         @SuppressFBWarnings(value = "NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE", justification = "JavaDoc says it is always Non-null")
-        public JobProperty<?> newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+        public JobProperty<?> newInstance(StaplerRequest2 req, JSONObject formData) throws FormException {
             JobLocalConfiguration jp = (JobLocalConfiguration) super.newInstance(req, formData);
             Job<?, ?> job = req.findAncestorObject(Job.class);
             if (job != null) {
@@ -75,7 +75,7 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
             return null;
         }
 
-        public boolean configure(StaplerRequest request, JSONObject jsonObject) throws FormException {
+        public boolean configure(StaplerRequest2 request, JSONObject jsonObject) throws FormException {
             LOG.info("CONFIGURE");
             throw new FormException("form exception", "localValues.changeReasonComment");
         }

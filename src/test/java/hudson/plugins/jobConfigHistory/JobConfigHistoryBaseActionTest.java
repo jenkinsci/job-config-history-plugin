@@ -5,7 +5,7 @@ import jenkins.model.Jenkins;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,8 +29,8 @@ import static org.mockito.Mockito.when;
 public class JobConfigHistoryBaseActionTest {
 
     private final Jenkins jenkinsMock = mock(Jenkins.class);
-    private final StaplerRequest staplerRequestMock = mock(
-            StaplerRequest.class);
+    private final StaplerRequest2 staplerRequestMock = mock(
+            StaplerRequest2.class);
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
@@ -229,7 +229,7 @@ public class JobConfigHistoryBaseActionTest {
         }
 
         @Override
-        protected StaplerRequest getCurrentRequest() {
+        protected StaplerRequest2 getCurrentRequest() {
             return staplerRequestMock;
         }
     }

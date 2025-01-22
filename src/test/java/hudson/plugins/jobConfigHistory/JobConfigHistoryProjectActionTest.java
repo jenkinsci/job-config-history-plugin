@@ -15,8 +15,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,8 +44,8 @@ public class JobConfigHistoryProjectActionTest {
     private final MavenModule mockedMavenModule = mock(MavenModule.class);
     private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
     private final AbstractTopLevelItem mockedProject = mock(AbstractTopLevelItem.class);
-    private final StaplerRequest mockedRequest = mock(StaplerRequest.class);
-    private final StaplerResponse mockedResponse = mock(StaplerResponse.class);
+    private final StaplerRequest2 mockedRequest = mock(StaplerRequest2.class);
+    private final StaplerResponse2 mockedResponse = mock(StaplerResponse2.class);
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
     @Rule
@@ -397,7 +397,7 @@ public class JobConfigHistoryProjectActionTest {
         }
 
         @Override
-        protected StaplerRequest getCurrentRequest() {
+        protected StaplerRequest2 getCurrentRequest() {
             return mockedRequest;
         }
 
@@ -414,7 +414,7 @@ public class JobConfigHistoryProjectActionTest {
         }
 
         @Override
-        protected StaplerRequest getCurrentRequest() {
+        protected StaplerRequest2 getCurrentRequest() {
             return mockedRequest;
         }
     }

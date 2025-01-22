@@ -40,13 +40,13 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.MockFolder;
 import org.kohsuke.stapler.RequestImpl;
 import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 import org.mockito.Mockito;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -75,7 +75,7 @@ public class JobConfigHistoryTest {
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
     
-    private StaplerRequest mockStaplerRequest() throws ServletException {
+    private StaplerRequest2 mockStaplerRequest() throws ServletException {
         Stapler stapler = mock(Stapler.class, CALLS_REAL_METHODS);
         ServletContext servletContext = mock(ServletContext.class);
         ServletConfig servletConfig = mock(ServletConfig.class);

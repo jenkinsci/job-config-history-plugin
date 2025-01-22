@@ -31,8 +31,8 @@ import hudson.model.Slave;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import jenkins.model.Jenkins;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 import org.kohsuke.stapler.verb.POST;
@@ -379,12 +379,12 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * Action when 'restore' button is pressed: Replace current config file by
      * older version.
      *
-     * @param req Incoming StaplerRequest
-     * @param rsp Outgoing StaplerResponse
+     * @param req Incoming StaplerRequest2
+     * @param rsp Outgoing StaplerResponse2
      * @throws IOException If something goes wrong
      */
     @POST
-    public final void doRestore(StaplerRequest req, StaplerResponse rsp) throws IOException {
+    public final void doRestore(StaplerRequest2 req, StaplerResponse2 rsp) throws IOException {
         checkConfigurePermission();
         final String timestamp = req.getParameter("timestamp");
 
@@ -408,17 +408,17 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * Action when 'restore' button in showDiffFiles.jelly is pressed. Gets
      * required parameter and forwards to restoreQuestion.jelly.
      *
-     * @param req StaplerRequest created by pressing the button
-     * @param rsp Outgoing StaplerResponse
+     * @param req StaplerRequest2 created by pressing the button
+     * @param rsp Outgoing StaplerResponse2
      * @throws IOException If XML file can't be read
      */
-    public final void doForwardToRestoreQuestion(StaplerRequest req, StaplerResponse rsp) throws IOException {
+    public final void doForwardToRestoreQuestion(StaplerRequest2 req, StaplerResponse2 rsp) throws IOException {
         final String timestamp = req.getParameter("timestamp");
         rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
     }
 
     @POST
-    public final void doDeleteRevision(StaplerRequest req) {
+    public final void doDeleteRevision(StaplerRequest2 req) {
         checkDeleteEntryPermission();
         final String timestamp = req.getParameter("timestamp");
         PluginUtils.getHistoryDao().deleteRevision(this.getAgent(), timestamp);
@@ -434,11 +434,11 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      * Action when 'Show / hide Version Changes' button in showDiffFiles.jelly is pressed:
      * Reloads the page with "showVersionDiffs" parameter inversed.
      *
-     * @param req StaplerRequest created by pressing the button
-     * @param rsp Outgoing StaplerResponse
+     * @param req StaplerRequest2 created by pressing the button
+     * @param rsp Outgoing StaplerResponse2
      * @throws IOException If XML file can't be read
      */
-    public final void doToggleShowHideVersionDiffs(StaplerRequest req, StaplerResponse rsp) throws IOException {
+    public final void doToggleShowHideVersionDiffs(StaplerRequest2 req, StaplerResponse2 rsp) throws IOException {
         //simply reload current page.
         final String timestamp1 = req.getParameter("timestamp1");
         final String timestamp2 = req.getParameter("timestamp2");

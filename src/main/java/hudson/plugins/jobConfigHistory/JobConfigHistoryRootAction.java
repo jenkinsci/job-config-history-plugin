@@ -35,13 +35,13 @@ import hudson.security.AccessControlled;
 import hudson.security.Permission;
 import hudson.util.MultipartFormDataParser;
 import jenkins.model.Jenkins;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 import org.kohsuke.stapler.verb.POST;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -535,7 +535,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * @throws IOException      when the redirection does not succeed.
      */
     @Override
-    public final void doDiffFiles(StaplerRequest req, StaplerResponse rsp)
+    public final void doDiffFiles(StaplerRequest2 req, StaplerResponse2 rsp)
             throws ServletException, IOException {
         final MultipartFormDataParser parser = new MultipartFormDataParser(req);
         rsp.sendRedirect("showDiffFiles?name=" + parser.get("name")
@@ -659,12 +659,12 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     /**
      * Action when 'restore' button is pressed: Restore deleted project.
      *
-     * @param req Incoming StaplerRequest
-     * @param rsp Outgoing StaplerResponse
+     * @param req Incoming StaplerRequest2
+     * @param rsp Outgoing StaplerResponse2
      * @throws IOException If something goes wrong
      */
     @POST
-    public final void doRestore(StaplerRequest req, StaplerResponse rsp)
+    public final void doRestore(StaplerRequest2 req, StaplerResponse2 rsp)
             throws IOException {
         getAccessControlledObject().checkPermission(Item.CONFIGURE);
 
@@ -735,18 +735,18 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
      * Action when 'restore' button in history.jelly is pressed. Gets required
      * parameter and forwards to restoreQuestion.jelly.
      *
-     * @param req StaplerRequest created by pressing the button
-     * @param rsp Outgoing StaplerResponse
+     * @param req StaplerRequest2 created by pressing the button
+     * @param rsp Outgoing StaplerResponse2
      * @throws IOException If redirect goes wrong
      */
-    public final void doForwardToRestoreQuestion(StaplerRequest req,
-                                                 StaplerResponse rsp) throws IOException {
+    public final void doForwardToRestoreQuestion(StaplerRequest2 req,
+                                                 StaplerResponse2 rsp) throws IOException {
         final String name = req.getParameter("name");
         rsp.sendRedirect("restoreQuestion?name=" + name);
     }
 
     @POST
-    public final void doDeleteRevision(StaplerRequest req, StaplerResponse rsp) {
+    public final void doDeleteRevision(StaplerRequest2 req, StaplerResponse2 rsp) {
         checkDeleteEntryPermission();
         final String timestamp = req.getParameter("timestamp");
         final String name = req.getParameter("name");

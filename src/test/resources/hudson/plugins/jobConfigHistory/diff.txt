@@ -6,7 +6,7 @@ index c383ef4..5398de1 100644
  import bmsi.util.Diff;
  import bmsi.util.DiffPrint;
  import bmsi.util.Diff.change;
-+import org.kohsuke.stapler.StaplerRequest;
++import org.kohsuke.stapler.StaplerRequest2;
  
  /**
   * Implements some basic methods needed by the
@@ -23,8 +23,8 @@ index c383ef4..5398de1 100644
          return output.toString();
      }
  
-+    StaplerRequest getCurrentRequest() {
-+        return Stapler.getCurrentRequest();
++    StaplerRequest2 getCurrentRequest() {
++        return Stapler.getCurrentRequest2();
 +    }
 +
  
