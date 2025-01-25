@@ -38,8 +38,8 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +66,7 @@ import static org.mockito.Mockito.verify;
  */
 public class JobConfigHistoryRootActionTest {
 
-    private final StaplerRequest mockedStaplerRequest = mock(StaplerRequest.class);
+    private final StaplerRequest2 mockedStaplerRequest = mock(StaplerRequest2.class);
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
@@ -282,7 +282,7 @@ public class JobConfigHistoryRootActionTest {
                 .willReturn("multipart/form-data; boundary=" + boundary);
         given(mockedStaplerRequest.getInputStream()).willReturn(
                 TUtils.createServletInputStreamFromMultiPartFormData(boundary));
-        StaplerResponse rsp = mock(StaplerResponse.class);
+        StaplerResponse2 rsp = mock(StaplerResponse2.class);
         JobConfigHistoryRootAction sut = createStaplerMockedSut();
         sut.doDiffFiles(mockedStaplerRequest, rsp);
         verify(rsp).sendRedirect(
@@ -404,7 +404,7 @@ public class JobConfigHistoryRootActionTest {
     @Test
     public void testDoForwardToRestoreQuestion() throws Exception {
         given(mockedStaplerRequest.getParameter("name")).willReturn("foo");
-        StaplerResponse mockedResponse = mock(StaplerResponse.class);
+        StaplerResponse2 mockedResponse = mock(StaplerResponse2.class);
         JobConfigHistoryRootAction sut = createStaplerMockedSut();
         sut.doForwardToRestoreQuestion(mockedStaplerRequest, mockedResponse);
         verify(mockedResponse).sendRedirect("restoreQuestion?name=foo");
@@ -417,7 +417,7 @@ public class JobConfigHistoryRootActionTest {
     JobConfigHistoryRootAction createStaplerMockedSut() {
         return new JobConfigHistoryRootAction() {
             @Override
-            protected StaplerRequest getCurrentRequest() {
+            protected StaplerRequest2 getCurrentRequest() {
                 return mockedStaplerRequest;
             }
         };
@@ -426,7 +426,7 @@ public class JobConfigHistoryRootActionTest {
     JobConfigHistoryRootAction createUnauthorizedStaplerMockedSut() {
         return new JobConfigHistoryRootAction() {
             @Override
-            protected StaplerRequest getCurrentRequest() {
+            protected StaplerRequest2 getCurrentRequest() {
                 return mockedStaplerRequest;
             }
 

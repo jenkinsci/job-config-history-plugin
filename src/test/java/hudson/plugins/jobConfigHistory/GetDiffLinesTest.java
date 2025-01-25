@@ -52,7 +52,7 @@ public class GetDiffLinesTest {
         final SideBySideView.Line.Item right = fourthLine.getRight();
         assertEquals("3", right.getLineNumber());
         assertNull(left.getText());
-        assertEquals("import org.kohsuke.stapler.StaplerRequest;",
+        assertEquals("import org.kohsuke.stapler.StaplerRequest2;",
                 right.getText());
         assertEquals("diff_original", left.getCssClass());
         assertEquals("diff_revised", right.getCssClass());

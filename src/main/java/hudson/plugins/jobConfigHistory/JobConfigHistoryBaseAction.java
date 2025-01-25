@@ -36,8 +36,8 @@ import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xmlunit.builder.DiffBuilder;
@@ -50,7 +50,7 @@ import org.xmlunit.diff.Difference;
 import org.xmlunit.diff.DifferenceEvaluator;
 import org.xmlunit.diff.ElementSelectors;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 import javax.xml.XMLConstants;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -479,7 +479,7 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *                          {@link MultipartFormDataParser} does not succeed.
      * @throws IOException      when the redirection does not succeed.
      */
-    public void doDiffFiles(StaplerRequest req, StaplerResponse rsp) throws ServletException, IOException {
+    public void doDiffFiles(StaplerRequest2 req, StaplerResponse2 rsp) throws ServletException, IOException {
         String timestamp1 = req.getParameter("timestamp1");
         String timestamp2 = req.getParameter("timestamp2");
 
@@ -494,11 +494,11 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      * Action when 'Prev' or 'Next' button in showDiffFiles.jelly is pressed.
      * Forwards to the previous or next diff.
      *
-     * @param req StaplerRequest created by pressing the button
-     * @param rsp Outgoing StaplerResponse
+     * @param req StaplerRequest2 created by pressing the button
+     * @param rsp Outgoing StaplerResponse2
      * @throws IOException If XML file can't be read
      */
-    public final void doDiffFilesPrevNext(StaplerRequest req, StaplerResponse rsp) throws IOException {
+    public final void doDiffFilesPrevNext(StaplerRequest2 req, StaplerResponse2 rsp) throws IOException {
         final String timestamp1 = req.getParameter("timestamp1");
         final String timestamp2 = req.getParameter("timestamp2");
         rsp.sendRedirect("showDiffFiles?timestamp1=" + timestamp1 + "&timestamp2=" + timestamp2);
@@ -509,8 +509,8 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      *
      * @return current request
      */
-    protected StaplerRequest getCurrentRequest() {
-        return Stapler.getCurrentRequest();
+    protected StaplerRequest2 getCurrentRequest() {
+        return Stapler.getCurrentRequest2();
     }
 
     /**
