@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css" />
 
     <j:set var="useNameInComponentUrl" value="1" />
-    <j:set var="name" value="${request.getParameter('name')}" />
+    <j:set var="name" value="${request2.getParameter('name')}" />
     <j:set var="isDeleted" value="${name.contains('_deleted_')}" />
     <j:set var="offsetIfDeleted" value="${isDeleted ? 1 : 0}" />
     <l:side-panel>
@@ -36,8 +36,8 @@
       </j:choose>
 
       <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}" />
-      <j:set var="pageNum" value="${request.getParameter('pageNum')}" />
-      <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}" />
+      <j:set var="pageNum" value="${request2.getParameter('pageNum')}" />
+      <j:set var="entriesPerPage" value="${request2.getParameter('entriesPerPage')}" />
       <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}" />
       <j:set var="defaultEntriesPerPage" value="${(defaultEntriesPerPage > totalEntriesNumber) ? &quot;all&quot; : defaultEntriesPerPage}" />
       <j:if test="${pageNum == null or pageNum.equals(&quot;&quot;)}">

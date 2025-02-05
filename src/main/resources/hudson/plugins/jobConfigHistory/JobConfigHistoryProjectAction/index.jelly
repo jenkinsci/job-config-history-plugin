@@ -10,8 +10,8 @@
       <div>
         <st:adjunct includes="hudson.plugins.jobConfigHistory.deleteRevisionAndTableEntry" />
         <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}" />
-        <j:set var="pageNum" value="${request.getParameter('pageNum')}" />
-        <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}" />
+        <j:set var="pageNum" value="${request2.getParameter('pageNum')}" />
+        <j:set var="entriesPerPage" value="${request2.getParameter('entriesPerPage')}" />
         <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}" />
         <j:if test="${pageNum == null or pageNum.equals(&quot;&quot;)}">
           <j:set var="pageNum" value="0" />

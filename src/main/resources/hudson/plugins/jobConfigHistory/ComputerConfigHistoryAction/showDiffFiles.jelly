@@ -82,7 +82,7 @@
                               ${%Older Change}
                             </td>
                             <td style="width:40%; border:none; text-align:right; padding:0px">
-                              <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" style="text-decoration:none">
+                              <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request2.getParameter('timestamp1')}" style="text-decoration:none">
                                 ${%Restore this configuration}
                               </a>
                             </td>
@@ -112,7 +112,7 @@
                               ${%Newer Change}
                             </td>
                             <td style="width:40%; border:none; text-align:right; padding:0px">
-                              <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" style="text-decoration:none">
+                              <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request2.getParameter('timestamp2')}" style="text-decoration:none">
                                 ${%Restore this configuration}
                               </a>
                             </td>

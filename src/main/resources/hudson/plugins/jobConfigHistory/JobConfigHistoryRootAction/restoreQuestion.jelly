@@ -5,7 +5,7 @@
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
 
     <l:main-panel>
-      <j:set var="name" value="${request.getParameter('name')}" />
+      <j:set var="name" value="${request2.getParameter('name')}" />
 
       <div style="text-align:center">
         <div class="jch-warning">

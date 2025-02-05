@@ -16,7 +16,7 @@
       </l:tasks>
     </l:side-panel>
 
-    <j:set var="filter" value="${request.getParameter('filter')}" />
+    <j:set var="filter" value="${request2.getParameter('filter')}" />
     <j:set var="filter" value="${filter == null ? 'system' : filter}" />
 
     <l:main-panel>
@@ -39,8 +39,8 @@
       </j:choose>
 
       <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}" />
-      <j:set var="pageNum" value="${request.getParameter('pageNum')}" />
-      <j:set var="entriesPerPage" value="${request.getParameter('entriesPerPage')}" />
+      <j:set var="pageNum" value="${request2.getParameter('pageNum')}" />
+      <j:set var="entriesPerPage" value="${request2.getParameter('entriesPerPage')}" />
       <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}" />
       <j:set var="defaultEntriesPerPage" value="${(defaultEntriesPerPage > totalEntriesNumber) ? &quot;all&quot; : defaultEntriesPerPage}" />
       <j:if test="${pageNum == null or pageNum.equals(&quot;&quot;)}">
