@@ -85,7 +85,7 @@
                             <td style="width:40%; border:none; text-align:right; padding:0px">
                               <j:if test="${it.hasConfigurePermission()}">
 
-                                <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp1')}" style="text-decoration:none">
+                                <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request2.getParameter('timestamp1')}" style="text-decoration:none">
                                   ${%Restore this configuration}
                                 </a>
                               </j:if>
@@ -123,7 +123,7 @@
                             <td style="width:40%; border:none; text-align:right; padding:0px">
                               <j:if test="${it.hasConfigurePermission()}">
 
-                                <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request.getParameter('timestamp2')}" style="text-decoration:none">
+                                <a class="url-button" href="forwardToRestoreQuestion?timestamp=${request2.getParameter('timestamp2')}" style="text-decoration:none">
                                   ${%Restore this configuration}
                                 </a>
                               </j:if>

@@ -6,7 +6,7 @@
 
     <st:include it="${it.agent.toComputer()}" page="sidepanel.jelly" />
     <l:main-panel>
-      <j:set var="timestamp" value="${request.getParameter('timestamp')}" />
+      <j:set var="timestamp" value="${request2.getParameter('timestamp')}" />
 
 
       <div style="text-align:center">
