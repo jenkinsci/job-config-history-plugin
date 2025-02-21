@@ -142,7 +142,7 @@
                         <div>
                           <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
                             <b>${%User}:</b>
-                            <a class="url-button" href="${rootURL}/user/${it.getUserID(1)}">${it.getUser(2)}</a>
+                            <a class="url-button" href="${rootURL}/user/${it.getUserID(2)}">${it.getUser(2)}</a>
                           </j:if>
 
                         </div>
