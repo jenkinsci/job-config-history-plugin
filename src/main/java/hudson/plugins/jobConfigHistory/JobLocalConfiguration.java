@@ -82,11 +82,18 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
 
         public FormValidation doCheckChangeReasonComment(@QueryParameter String changeReasonComment, @AncestorInPath Item item) {
             //TODO maybe use this instead of javascript. (need to figure out how to relocate the message...)
+            if (getChangeReasonCommentIsMandatory() && null == Util.fixEmptyAndTrim(changeReasonComment)) {
+                return FormValidation.error("Missing change reason");
+            }
             return FormValidation.ok();
         }
 
         public boolean getShowChangeReasonCommentWindow() {
             return PluginUtils.getPlugin().getShowChangeReasonCommentWindow();
+        }
+
+        public boolean getChangeReasonCommentIsMandatory() {
+            return PluginUtils.getPlugin().getChangeReasonCommentIsMandatory();
         }
     }
 }

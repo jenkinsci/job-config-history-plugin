@@ -124,6 +124,10 @@ public class JobConfigHistory extends GlobalConfiguration {
      * Whether a change reason comment window should be shown on a jobs' configure page.
      */
     private boolean showChangeReasonCommentWindow = true;
+    /**
+     * Whether the change reason comment is mandatory (must not be empty).
+     */
+    private boolean changeReasonCommentIsMandatory = false;
 
     @DataBoundConstructor
     @Restricted(NoExternalUse.class)
@@ -367,6 +371,15 @@ public class JobConfigHistory extends GlobalConfiguration {
     }
     
     /**
+     * Gets whether a change reason comment is mandatory.
+     *
+     * @return Whether a comment window should be shown.
+     */
+    public boolean getChangeReasonCommentIsMandatory() {
+        return changeReasonCommentIsMandatory;
+    }
+
+    /**
      * Sets whether a change reason comment window should be shown on a jobs' configure page.
      * 
      * @param showChangeReasonCommentWindow Whether a comment window should be shown.
@@ -374,6 +387,17 @@ public class JobConfigHistory extends GlobalConfiguration {
     @DataBoundSetter
     public void setShowChangeReasonCommentWindow(boolean showChangeReasonCommentWindow) {
         this.showChangeReasonCommentWindow = showChangeReasonCommentWindow;
+        save();
+    }
+
+    /**
+     * Sets whether the change reason comment is mandatory.
+     *
+     * @param changeReasonCommentIsMandatory Whether the change reason comment is mandatory.
+     */
+    @DataBoundSetter
+    public void setChangeReasonCommentIsMandatory(boolean changeReasonCommentIsMandatory) {
+        this.changeReasonCommentIsMandatory = changeReasonCommentIsMandatory;
         save();
     }
 
