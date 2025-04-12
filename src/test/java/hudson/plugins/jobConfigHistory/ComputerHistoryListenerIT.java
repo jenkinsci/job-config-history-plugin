@@ -98,8 +98,8 @@ public class ComputerHistoryListenerIT {
         Slave agentThree = rule.createOnlineSlave();
         HtmlForm form = rule.createWebClient().getPage(agentTwo, "configure")
                 .getFormByName("config");
-        HtmlInput element = form.getInputByName("_.nodeDescription");
-        element.setValue("Node description");
+        HtmlInput element = form.getInputByName("_.numExecutors");
+        element.setValue("5");
         rule.submit(form);
         JobConfigHistoryStrategy dao = PluginUtils.getHistoryDao();
         assertEquals(
