@@ -1,3 +1,4 @@
+changeReasonCommentIsMandatory: false
 excludePattern: "test1\\.xml|test2\\.xml"
 excludedUsers: "SYSTEM,user1,user2"
 historyRootDir: "/var/jenkins_home"
