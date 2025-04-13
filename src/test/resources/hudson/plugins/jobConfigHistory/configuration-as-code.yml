@@ -9,4 +9,5 @@ unclassified:
     saveModuleConfiguration: false
     showBuildBadges: "never"
     showChangeReasonCommentWindow: true
+    changeReasonCommentIsMandatory: false
     skipDuplicateHistory: true
