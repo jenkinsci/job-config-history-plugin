@@ -1,11 +1,14 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
 
     <j:if test="${descriptor.getShowChangeReasonCommentWindow()}">
         <f:block>
             <f:entry title="${%Job config history change message}" field="changeReasonComment">
-                <f:textbox/>
+                <f:textbox  clazz="change-reason-comment"/>
             </f:entry>
+            <j:if test="${descriptor.getChangeReasonCommentIsMandatory()}">
+                <st:adjunct includes="hudson.plugins.jobConfigHistory.mandatory-config-reason"/>
+            </j:if>
         </f:block>
     </j:if>
 </j:jelly>
