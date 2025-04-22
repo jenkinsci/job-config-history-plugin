@@ -2,7 +2,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.model.AbstractItem;
 import hudson.model.Item;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
  *
  * @author Mirko Friedenhagen
  */
-public class JobConfigHistoryJobListenerTest {
+class JobConfigHistoryJobListenerTest {
 
     final ItemListenerHistoryDao mockedConfigHistoryListenerHelper = mock(
             ItemListenerHistoryDao.class);
@@ -22,28 +22,28 @@ public class JobConfigHistoryJobListenerTest {
     final JobConfigHistoryJobListener sut = new JobConfigHistoryJobListenerWithMocks();
 
     @Test
-    public void testOnCreated() {
+    void testOnCreated() {
         Item item = createItem();
         sut.onCreated(item);
         verifyNoInteractions(mockedConfigHistoryListenerHelper);
     }
 
     @Test
-    public void testOnCreatedAbstractItem() {
+    void testOnCreatedAbstractItem() {
         AbstractItem item = createAbstractItem();
         sut.onCreated(item);
         verify(mockedConfigHistoryListenerHelper).createNewItem(item);
     }
 
     @Test
-    public void testOnRenamed() {
+    void testOnRenamed() {
         Item item = createItem();
         sut.onRenamed(item, "", "");
         verifyNoInteractions(mockedConfigHistoryListenerHelper);
     }
 
     @Test
-    public void testOnRenamedAbstractItemWithoutConfiguredHistoryRootDir() {
+    void testOnRenamedAbstractItemWithoutConfiguredHistoryRootDir() {
         AbstractItem item = createAbstractItem();
         sut.onRenamed(item, "oldName", "newName");
         verify(mockedConfigHistoryListenerHelper).renameItem(item, "oldName",
@@ -51,14 +51,14 @@ public class JobConfigHistoryJobListenerTest {
     }
 
     @Test
-    public void testOnDeleted() {
+    void testOnDeleted() {
         Item item = createItem();
         sut.onDeleted(item);
         verifyNoInteractions(mockedConfigHistoryListenerHelper);
     }
 
     @Test
-    public void testOnDeletedAbstractItem() {
+    void testOnDeletedAbstractItem() {
         AbstractItem item = createAbstractItem();
         sut.onDeleted(item);
         verify(mockedConfigHistoryListenerHelper).deleteItem(item);

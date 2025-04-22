@@ -24,35 +24,43 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for NonJobsDirectoryFileFilter.
  *
  * @author mirko
  */
-public class NonJobsDirectoryFileFilterTest {
+class NonJobsDirectoryFileFilterTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder(new File("target"));
+    @TempDir
+    private File folder;
 
     @Test
-    public void configShouldBeAccepted() throws IOException {
+    void configShouldBeAccepted() throws IOException {
         assertTrue(
-                NonJobsDirectoryFileFilter.accepts(folder.newFolder("config")));
+                NonJobsDirectoryFileFilter.accepts(newFolder(folder, "config")));
     }
 
     @Test
-    public void jobsShouldNotBeAccepted() throws IOException {
+    void jobsShouldNotBeAccepted() throws IOException {
         assertFalse(
-                NonJobsDirectoryFileFilter.accepts(folder.newFolder("jobs")));
+                NonJobsDirectoryFileFilter.accepts(newFolder(folder, "jobs")));
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 }

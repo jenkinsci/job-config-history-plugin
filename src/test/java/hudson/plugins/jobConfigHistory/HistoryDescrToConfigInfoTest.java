@@ -25,15 +25,15 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
@@ -41,23 +41,30 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Mirko Friedenhagen
  */
-public class HistoryDescrToConfigInfoTest {
-    @Rule
-    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip
-            .create();
+class HistoryDescrToConfigInfoTest {
+
+    private UnpackResourceZip unpackResourceZip;
     private FileHistoryDao historyDao;
     private File jenkinsHome;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() throws Exception {
+        unpackResourceZip = UnpackResourceZip.create();
         jenkinsHome = unpackResourceZip.getRoot();
         File historyRoot = unpackResourceZip.getResource("config-history");
         historyDao = new FileHistoryDao(historyRoot, jenkinsHome, null, 0,
                 true);
     }
 
+    @AfterEach
+    void tearDown() throws Exception {
+        if (unpackResourceZip != null) {
+            unpackResourceZip.cleanUp();
+        }
+    }
+
     @Test
-    public void shouldConvertCorrectly() {
+    void shouldConvertCorrectly() {
         List<ConfigInfo> result = HistoryDescrToConfigInfo.convert("Test1",
                 true,
                 new ArrayList<>(historyDao

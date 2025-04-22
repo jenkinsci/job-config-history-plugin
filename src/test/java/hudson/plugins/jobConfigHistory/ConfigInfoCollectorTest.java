@@ -26,13 +26,14 @@ package hudson.plugins.jobConfigHistory;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
@@ -40,14 +41,24 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Mirko Friedenhagen
  */
-public class ConfigInfoCollectorTest {
+class ConfigInfoCollectorTest {
 
-    @Rule
-    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip
-            .create();
+    private UnpackResourceZip unpackResourceZip;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        unpackResourceZip = UnpackResourceZip.create();
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        if (unpackResourceZip != null) {
+            unpackResourceZip.cleanUp();
+        }
+    }
 
     @Test
-    public void testGetConfigsForType() throws IOException {
+    void testGetConfigsForType() throws IOException {
         unpackResourceZip.getResource("config-history/jobs/Test2").mkdirs();
         assertThatFolderXHasYItemsOfTypeZ("Test2", 0, "does not matter");
     }
@@ -56,7 +67,7 @@ public class ConfigInfoCollectorTest {
      * Test of collect method, of class ConfigInfoCollector.
      */
     @Test
-    public void testCollectDeleted() throws Exception {
+    void testCollectDeleted() throws Exception {
         assertThatRootFolderHasYItemsOfTypeZ(1, "deleted");
     }
 
@@ -64,7 +75,7 @@ public class ConfigInfoCollectorTest {
      * Test of collect method, of class ConfigInfoCollector.
      */
     @Test
-    public void testCollectCreated() throws Exception {
+    void testCollectCreated() throws Exception {
         assertThatRootFolderHasYItemsOfTypeZ(1, "created");
     }
 
@@ -72,7 +83,7 @@ public class ConfigInfoCollectorTest {
      * Test of collect method, of class ConfigInfoCollector.
      */
     @Test
-    public void testCollectCreatedWithChangeEventBeforeCreated()
+    void testCollectCreatedWithChangeEventBeforeCreated()
             throws Exception {
         FileUtils.copyDirectory(
                 unpackResourceZip.getResource(
@@ -86,7 +97,7 @@ public class ConfigInfoCollectorTest {
      * Test of collect method, of class ConfigInfoCollector.
      */
     @Test
-    public void testCollectOther() throws Exception {
+    void testCollectOther() throws Exception {
         FileUtils.copyDirectory(
                 unpackResourceZip.getResource("config-history/jobs/Test1"),
                 unpackResourceZip.getResource("config-history/jobs/Test2"));
@@ -97,7 +108,7 @@ public class ConfigInfoCollectorTest {
      * Test of collect method, of class ConfigInfoCollector.
      */
     @Test
-    public void testCollectJobFolder() throws Exception {
+    void testCollectJobFolder() throws Exception {
         String folderName = "FolderName";
         FileUtils.copyDirectory(
                 unpackResourceZip.getResource("config-history/jobs/Test1"),
@@ -121,8 +132,9 @@ public class ConfigInfoCollectorTest {
         ConfigInfoCollector sut = createSut(type);
         List<ConfigInfo> result = sut.collect(folderName);
         result.sort(ParsedDateComparator.DESCENDING);
-        assertEquals(StringUtils.join(result, "\n"), noOfHistoryItems,
-                result.size());
+        assertEquals(noOfHistoryItems,
+                result.size(),
+                StringUtils.join(result, "\n"));
     }
 
     private ConfigInfoCollector createSut(final String type) {

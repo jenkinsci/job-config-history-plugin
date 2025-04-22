@@ -47,28 +47,30 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests for LazyHistoryDescr.
  *
  * @author Mirko Friedenhagen
  */
-public class LazyHistoryDescrTest {
+class LazyHistoryDescrTest {
 
-    @Test(expected = RuntimeException.class)
-    public void nonExistingFileShouldThrow() {
+    @Test
+    void nonExistingFileShouldThrow() {
         LazyHistoryDescr sut = new LazyHistoryDescr(
-                new XmlFile(new File("target/I_DO_NOT_EXIST.xml")));
-        sut.getUser();
+                    new XmlFile(new File("target/I_DO_NOT_EXIST.xml")));
+        assertThrows(RuntimeException.class, sut::getUser);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void invalidHistoryDescrShouldThrow() {
+    @Test
+    void invalidHistoryDescrShouldThrow() {
         LazyHistoryDescr sut = new LazyHistoryDescr(
-                new XmlFile(new File("pom.xml")));
-        sut.getUser();
+                    new XmlFile(new File("pom.xml")));
+        assertThrows(RuntimeException.class, sut::getUser);
     }
 }

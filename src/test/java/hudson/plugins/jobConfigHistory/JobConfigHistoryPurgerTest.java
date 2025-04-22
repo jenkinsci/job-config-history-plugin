@@ -1,8 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -21,17 +20,17 @@ import static org.mockito.Mockito.when;
  *
  * @author Mirko Friedenhagen
  */
-public class JobConfigHistoryPurgerTest {
+class JobConfigHistoryPurgerTest {
 
-    final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
-    final Purgeable mockedDao = mock(Purgeable.class);
-    final OverviewHistoryDao mockedOverviewDao = mock(OverviewHistoryDao.class);
+    private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
+    private final Purgeable mockedDao = mock(Purgeable.class);
+    private final OverviewHistoryDao mockedOverviewDao = mock(OverviewHistoryDao.class);
 
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder(new File("target"));
+    @TempDir
+    private File tempFolder;
 
     @Test
-    public void testGetRecurrencePeriod() {
+    void testGetRecurrencePeriod() {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
                 mockedDao, mockedOverviewDao);
         long expResult = 24 * 60 * 60 * 1000;
@@ -40,7 +39,7 @@ public class JobConfigHistoryPurgerTest {
     }
 
     @Test
-    public void testDoRun() {
+    void testDoRun() {
         when(mockedPlugin.getMaxDaysToKeepEntries()).thenReturn("1");
         JobConfigHistoryPurgerWithoutPurging sut = new JobConfigHistoryPurgerWithoutPurging(
                 mockedPlugin, mockedDao, mockedOverviewDao);
@@ -49,7 +48,7 @@ public class JobConfigHistoryPurgerTest {
     }
 
     @Test
-    public void testDoRunNegative() {
+    void testDoRunNegative() {
         when(mockedPlugin.getMaxDaysToKeepEntries()).thenReturn("-1");
         JobConfigHistoryPurgerWithoutPurging sut = new JobConfigHistoryPurgerWithoutPurging(
                 mockedPlugin, mockedDao, mockedOverviewDao);
@@ -58,7 +57,7 @@ public class JobConfigHistoryPurgerTest {
     }
 
     @Test
-    public void testDoRunNoNumber() {
+    void testDoRunNoNumber() {
         when(mockedPlugin.getMaxDaysToKeepEntries()).thenReturn("A");
         JobConfigHistoryPurgerWithoutPurging sut = new JobConfigHistoryPurgerWithoutPurging(
                 mockedPlugin, mockedDao, mockedOverviewDao);
@@ -67,7 +66,7 @@ public class JobConfigHistoryPurgerTest {
     }
 
     @Test
-    public void testDoRunEmpty() {
+    void testDoRunEmpty() {
         when(mockedPlugin.getMaxDaysToKeepEntries()).thenReturn("");
         JobConfigHistoryPurgerWithoutPurging sut = new JobConfigHistoryPurgerWithoutPurging(
                 mockedPlugin, mockedDao, mockedOverviewDao);
@@ -76,25 +75,24 @@ public class JobConfigHistoryPurgerTest {
     }
 
     @Test
-    public void testPurgeSystemOrJobHistory() throws IOException {
+    void testPurgeSystemOrJobHistory() throws IOException {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
                 mockedDao, mockedOverviewDao);
         sut.setMaxAge(1);
-        final File oldItemDir = tempFolder
-                .newFolder(getFormattedDate(twoDaysAgo()));
+        final File oldItemDir = newFolder(tempFolder, getFormattedDate(twoDaysAgo()));
         new File(oldItemDir, JobConfigHistoryConsts.HISTORY_FILE)
                 .createNewFile();
-        final File newItemDir = tempFolder.newFolder(getFormattedDate(now()));
+        final File newItemDir = newFolder(tempFolder, getFormattedDate(now()));
         new File(newItemDir, JobConfigHistoryConsts.HISTORY_FILE)
                 .createNewFile();
-        File[] itemDirs = {tempFolder.getRoot()};
+        File[] itemDirs = {tempFolder};
         sut.purgeSystemOrJobHistory(itemDirs);
         assertFalse(oldItemDir.exists());
         assertTrue(newItemDir.exists());
     }
 
     @Test
-    public void testPurgeSystemOrJobHistoryNoItems() {
+    void testPurgeSystemOrJobHistoryNoItems() {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
                 mockedDao, mockedOverviewDao);
         sut.setMaxAge(1);
@@ -104,41 +102,40 @@ public class JobConfigHistoryPurgerTest {
     }
 
     @Test
-    public void testPurgeSystemOrJobHistoryItemIsAFile() throws IOException {
+    void testPurgeSystemOrJobHistoryItemIsAFile() throws IOException {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
                 mockedDao, mockedOverviewDao);
         sut.setMaxAge(1);
-        final File newFile = tempFolder.newFile(getFormattedDate(now()));
+        final File newFile = File.createTempFile(getFormattedDate(now()), null, tempFolder);
         File[] itemDirs = {newFile};
         sut.purgeSystemOrJobHistory(itemDirs);
         assertTrue(newFile.exists());
     }
 
     @Test
-    public void testPurgeSystemOrJobHistoryItemHasNoHistory()
+    void testPurgeSystemOrJobHistoryItemHasNoHistory()
             throws IOException {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
                 mockedDao, mockedOverviewDao);
         sut.setMaxAge(1);
-        final File newFolder = tempFolder
-                .newFolder(getFormattedDate(twoDaysAgo()));
+        final File newFolder = newFolder(tempFolder, getFormattedDate(twoDaysAgo()));
         File[] itemDirs = {newFolder};
         sut.purgeSystemOrJobHistory(itemDirs);
         assertTrue(newFolder.exists());
     }
 
     @Test
-    public void testIsNotTooOld() {
+    void testIsNotTooOld() {
         assertFalse(testIsOlderThanOneDay(now()));
     }
 
     @Test
-    public void testIsTooOld() {
+    void testIsTooOld() {
         assertTrue(testIsOlderThanOneDay(twoDaysAgo()));
     }
 
     @Test
-    public void testIsTooOldInvalidFormat() {
+    void testIsTooOldInvalidFormat() {
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
                 mockedDao, mockedOverviewDao);
         sut.setMaxAge(1);
@@ -146,7 +143,7 @@ public class JobConfigHistoryPurgerTest {
     }
 
     @Test
-    public void testDeleteDirectoryWithWarnings() {
+    void testDeleteDirectoryWithWarnings() {
         File dirMock = mock(File.class);
         when(dirMock.listFiles())
                 .thenReturn(new File[]{new File("ABC"), new File("DEF")});
@@ -156,10 +153,10 @@ public class JobConfigHistoryPurgerTest {
     }
 
     @Test
-    public void testDeleteDirectory() throws IOException {
-        final File newFile = tempFolder.newFile();
+    void testDeleteDirectory() throws IOException {
+        final File newFile = File.createTempFile("junit", null, tempFolder);
         assertTrue(newFile.exists());
-        File dir = tempFolder.getRoot();
+        File dir = tempFolder;
         JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin,
                 mockedDao, mockedOverviewDao);
         sut.deleteDirectory(dir);
@@ -205,6 +202,16 @@ public class JobConfigHistoryPurgerTest {
         void purgeHistoryByAge() {
             purgeCalled = true;
         }
+
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 
 }

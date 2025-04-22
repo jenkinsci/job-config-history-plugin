@@ -10,7 +10,9 @@ import org.htmlunit.html.HtmlPage;
 import org.htmlunit.html.HtmlRadioButtonInput;
 import org.htmlunit.html.HtmlTextArea;
 import org.htmlunit.xml.XmlPage;
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.jvnet.hudson.test.recipes.LocalData;
 import org.xml.sax.SAXException;
 
@@ -19,46 +21,55 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author mfriedenhagen
  */
-public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
+@WithJenkins
+class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private static final String JOB_NAME = "bar";
-    private WebClient webClient;
+    private JenkinsRule.WebClient webClient;
 
     @Override
-    public void before() throws Throwable {
-        super.before();
-        webClient = createWebClient();
+    void setUp(JenkinsRule rule) throws Exception {
+        super.setUp(rule);
+        webClient = rule.createWebClient();
     }
 
-    public void testAllProjectsConfigurationHistoryPage()
+    @Test
+    void testAllProjectsConfigurationHistoryPage()
             throws IOException, SAXException {
         new AllJobConfigHistoryPage(webClient.goTo("jobConfigHistory/"));
     }
 
     @LocalData
-    public void testJobPage() throws IOException, SAXException {
+    @Test
+    void testJobPage() throws IOException, SAXException {
         new JobPage().checkHistoryLink();
     }
 
     @LocalData
-    public void testHistoryPageWithOutEntries()
+    @Test
+    void testHistoryPageWithOutEntries()
             throws IOException, SAXException {
         new HistoryPage().assertNoHistoryEntriesAvailable();
     }
 
     @LocalData
-    public void testSaveConfiguration() throws Exception {
+    @Test
+    void testSaveConfiguration() throws Exception {
         final String firstDescription = "just a test";
         final String secondDescription = "just a second test";
         {
             new ConfigPage().setNewDescription(firstDescription);
             final List<HtmlAnchor> hrefs = new HistoryPage()
                     .getConfigOutputLinks("xml");
-            Assert.assertTrue(hrefs.size() >= 1);
+            assertFalse(hrefs.isEmpty());
             final HtmlAnchor xmlAnchor = hrefs.get(0);
             final XmlPage xmlPage = xmlAnchor.click();
             assertThat(xmlPage.asXml(), containsString(firstDescription));
@@ -67,7 +78,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
             new ConfigPage().setNewDescription(secondDescription);
             final List<HtmlAnchor> hrefs = new HistoryPage()
                     .getConfigOutputLinks("raw");
-            Assert.assertTrue(hrefs.size() >= 2);
+            assertTrue(hrefs.size() >= 2);
             final HtmlAnchor rawAnchor = hrefs.get(0);
             final TextPage firstRaw = rawAnchor.click();
             assertThat(firstRaw.getContent(),
@@ -77,10 +88,10 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
                 webClient.goTo("jobConfigHistory/?filter=jobs"));
         final List<HtmlAnchor> allRawHRefs = allJobConfigHistoryPage
                 .getConfigOutputLinks("raw");
-        Assert.assertTrue(allRawHRefs.size() >= 2);
+        assertTrue(allRawHRefs.size() >= 2);
         final List<? extends HtmlAnchor> allXmlHRefs = allJobConfigHistoryPage
                 .getConfigOutputLinks("xml");
-        Assert.assertTrue(allXmlHRefs.size() >= 2);
+        assertTrue(allXmlHRefs.size() >= 2);
         final TextPage firstRawOfAll = allRawHRefs.get(0).click();
         assertThat(firstRawOfAll.getContent(),
                 containsString(secondDescription));
@@ -103,38 +114,33 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
      * Checks whether history of a single system configuration is displayed
      * correctly and contains correct link targets.
      */
-    public void testHistoryPageOfSingleSystemConfig() {
+    @Test
+    void testHistoryPageOfSingleSystemConfig() {
         final String firstDescription = "just a test";
         final String secondDescription = "just a second test";
         final int sleepTime = 1100;
 
-        try {
-            jenkins.setSystemMessage(firstDescription);
+        assertDoesNotThrow(() -> {
+            rule.jenkins.setSystemMessage(firstDescription);
             Thread.sleep(sleepTime);
-            jenkins.setSystemMessage(secondDescription);
+            rule.jenkins.setSystemMessage(secondDescription);
             Thread.sleep(sleepTime);
-        } catch (Exception ex) {
-            Assert.fail("Unable to prepare Jenkins instance: " + ex);
-        }
+        }, "Unable to prepare Jenkins instance: ");
 
-        try {
+        assertDoesNotThrow(() -> {
             final HtmlPage historyPage = webClient.goTo(
                     JobConfigHistoryConsts.URLNAME + "/history?name=config");
             final List<HtmlAnchor> allRawHRefs = historyPage.getByXPath(
                     "//a[contains(@href, \"configOutput?type=raw\")]");
-            Assert.assertTrue(
-                    "Check that there are at least 2 links for raw output.",
-                    allRawHRefs.size() >= 2);
+            assertTrue(
+                    allRawHRefs.size() >= 2,
+                    "Check that there are at least 2 links for raw output.");
             final TextPage firstRawOfAll = allRawHRefs.get(0).click();
             assertThat(
                     "Check that the first raw output link leads to the right target.",
                     firstRawOfAll.getContent(),
                     containsString(secondDescription));
-        } catch (Exception ex) {
-            Assert.fail(
-                    "Unable to complete testHistoryPageOfSingleSystemConfig: "
-                            + ex);
-        }
+        }, "Unable to complete testHistoryPageOfSingleSystemConfig: ");
     }
 
     private static class BasicHistoryPage {
@@ -155,10 +161,9 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 
     private static class AllJobConfigHistoryPage extends BasicHistoryPage {
 
-        public AllJobConfigHistoryPage(HtmlPage historyPage)
-                throws IOException, SAXException {
+        public AllJobConfigHistoryPage(HtmlPage historyPage) {
             super(historyPage);
-            Assert.assertEquals("All Configuration History [Jenkins]",
+            assertEquals("All Configuration History [Jenkins]",
                     historyPage.getTitleText());
         }
 
@@ -179,7 +184,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
         }
 
         public void checkHistoryLink() {
-            assertXPath(jobPage,
+            rule.assertXPath(jobPage,
                     "//a[@href=\"/" + jobConfigHistoryLink + "\"]");
         }
     }
@@ -201,7 +206,7 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
             final HtmlTextArea descriptionTextArea = configForm
                     .getTextAreaByName("description");
             descriptionTextArea.setText(text);
-            submit(configForm);
+            rule.submit(configForm);
         }
     }
 
@@ -209,14 +214,14 @@ public class PluginIT extends AbstractHudsonTestCaseDeletingInstanceDir {
 
         public HistoryPage() throws IOException, SAXException {
             super(webClient.goTo("job/" + JOB_NAME + "/jobConfigHistory"));
-            Assert.assertEquals("Job Configuration History [Jenkins]",
+            assertEquals("Job Configuration History [Jenkins]",
                     historyPage.getTitleText());
         }
 
         public HtmlPage getDiffPage() throws IOException {
             final HtmlForm diffFilesForm = historyPage
                     .getFormByName("diffFiles");
-            return last(diffFilesForm.getElementsByTagName("button")).click();
+            return rule.last(diffFilesForm.getElementsByTagName("button")).click();
         }
 
         public void setCheckedTimestamp1RadioButton(int index,

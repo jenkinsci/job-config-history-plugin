@@ -15,8 +15,10 @@ import hudson.security.Permission;
 import hudson.tasks.LogRotator;
 import jenkins.model.Jenkins;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.xml.sax.SAXException;
 
 import java.io.File;
@@ -25,13 +27,17 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration Tests for JobConfigHistoryBaseAction.
  *
  * @author mfriedenhagen
  */
-public class JobConfigHistoryBaseActionIT
+@WithJenkins
+class JobConfigHistoryBaseActionIT
         extends
         AbstractHudsonTestCaseDeletingInstanceDir {
 
@@ -41,20 +47,20 @@ public class JobConfigHistoryBaseActionIT
     private static final int SLEEP_TIME = 1100;
     private final File file1 = new File("old/config.xml");
     private final File file2 = new File("new/config.xml");
-    private WebClient webClient;
+    private JenkinsRule.WebClient webClient;
     private String oldLineSeparator;
 
     @Override
-    public void before() throws Throwable {
-        super.before();
-        webClient = createWebClient();
+    void setUp(JenkinsRule rule) throws Exception {
+        super.setUp(rule);
+        webClient = rule.createWebClient();
         oldLineSeparator = System.lineSeparator();
         System.setProperty("line.separator", "\n");
     }
 
     @Override
-    public void after() throws Exception {
-        super.after();
+    void tearDown() throws Exception {
+        super.tearDown();
         System.setProperty("line.separator", oldLineSeparator);
     }
 
@@ -62,11 +68,12 @@ public class JobConfigHistoryBaseActionIT
      * Test method for
      * {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffAsString(File, File, String[], String[])}.
      */
-    public void testGetDiffFileStringStringSameLineLength() {
+    @Test
+    void testGetDiffFileStringStringSameLineLength() {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
         final String s1 = "123\n346";
         final String s2 = "123\n3467";
-        Assert.assertEquals(
+        assertEquals(
                 "--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,2 @@\n 123\n-346\n+3467\n",
                 makeResultPlatformIndependent(action.getDiffAsString(file1,
                         file2, s1.split("\n"), s2.split("\n"))));
@@ -76,13 +83,14 @@ public class JobConfigHistoryBaseActionIT
      * Test method for
      * {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffAsString(File, File, String[], String[])}.
      */
-    public void testGetDiffFileStringStringEmpty() {
+    @Test
+    void testGetDiffFileStringStringEmpty() {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
-        Assert.assertEquals("\n", makeResultPlatformIndependent(action
+        assertEquals("\n", makeResultPlatformIndependent(action
                 .getDiffAsString(file1, file2, new String[0], new String[0])));
     }
 
-    JobConfigHistoryBaseAction createJobConfigHistoryBaseAction() {
+    private JobConfigHistoryBaseAction createJobConfigHistoryBaseAction() {
         return new JobConfigHistoryBaseAction() {
 
             @Override
@@ -136,13 +144,14 @@ public class JobConfigHistoryBaseActionIT
      * Test method for
      * {@link hudson.plugins.jobConfigHistory.JobConfigHistoryBaseAction#getDiffAsString(File, File, String[], String[])}.
      */
-    public void testGetDiffFileStringStringDifferentLineLength() {
+    @Test
+    void testGetDiffFileStringStringDifferentLineLength() {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
-        Assert.assertEquals("\n",
+        assertEquals("\n",
                 makeResultPlatformIndependent(action.getDiffAsString(file1,
                         file2, "123\n346".split("\n"),
                         "123\n346\n".split("\n"))));
-        Assert.assertEquals(
+        assertEquals(
                 "--- old/config.xml\n+++ new/config.xml\n@@ -1,2 +1,3 @@\n 123\n 346\n+123\n",
                 makeResultPlatformIndependent(action.getDiffAsString(file1,
                         file2, "123\n346".split("\n"),
@@ -153,30 +162,28 @@ public class JobConfigHistoryBaseActionIT
         return result.replace("\\", "/");
     }
 
-    public void testGetConfigXmlIllegalArgumentExceptionNonExistingJobName()
+    @Test
+    void testGetConfigXmlIllegalArgumentExceptionNonExistingJobName()
             throws IOException, SAXException {
         TextPage page = (TextPage) webClient.goTo(
                 JobConfigHistoryConsts.URLNAME
                         + "/configOutput?type=raw&name=bogus&timestamp=2013-01-11_17-26-27",
                 "text/plain");
-        Assert.assertTrue("Page should be empty.",
-                page.getContent().trim().isEmpty());
+        assertTrue(page.getContent().trim().isEmpty(),
+                "Page should be empty.");
     }
 
-    public void testGetConfigXmlIllegalArgumentExceptionInvalidTimestamp()
-            throws IOException, SAXException {
+    @Test
+    void testGetConfigXmlIllegalArgumentExceptionInvalidTimestamp() {
         final JobConfigHistoryBaseAction action = createJobConfigHistoryBaseAction();
-        try {
-            action.checkTimestamp("bla");
-            Assert.fail("Expected " + IllegalArgumentException.class
-                    + " because of invalid timestamp.");
-        } catch (IllegalArgumentException e) {
-            System.err.println(e);
-        }
+
+        assertThrows(IllegalArgumentException.class,
+                () -> action.checkTimestamp("bla"));
     }
 
     @Issue("JENKINS-5534")
-    public void testSecuredAccessToJobConfigHistoryPage()
+    @Test
+    void testSecuredAccessToJobConfigHistoryPage()
             throws IOException, SAXException {
         // without security the jobConfigHistory-badge should show.
         final HtmlPage withoutSecurity = webClient.goTo("/");
@@ -185,46 +192,43 @@ public class JobConfigHistoryBaseActionIT
         withoutSecurity.getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
         // with security enabled the jobConfigHistory-badge should not show
         // anymore.
-        jenkins.setSecurityRealm(
+        rule.jenkins.setSecurityRealm(
                 new HudsonPrivateSecurityRealm(false, false, null));
-        jenkins.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
+        rule.jenkins.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
         final HtmlPage withSecurityEnabled = webClient.goTo("/");
         assertThat(withSecurityEnabled.asXml(), not(Matchers
                 .containsString(JobConfigHistoryConsts.ICONFILENAME)));
-        try {
-            withSecurityEnabled
-                    .getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
-            Assert.fail("Expected a " + ElementNotFoundException.class
-                    + " to be thrown");
-        } catch (ElementNotFoundException e) {
-            System.err.println(e);
-        }
+
+        assertThrows(ElementNotFoundException.class,
+                () -> withSecurityEnabled
+                    .getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME));
     }
 
     @Issue("JENKINS-17124")
-    public void testClearDuplicateLines() throws Exception {
+    @Test
+    void testClearDuplicateLines() throws Exception {
         final String jobName = "Test";
 
-        final FreeStyleProject project = createFreeStyleProject(jobName);
+        final FreeStyleProject project = rule.createFreeStyleProject(jobName);
         project.setBuildDiscarder(new LogRotator(42, 42, -1, -1));
         project.save();
         Thread.sleep(SLEEP_TIME);
         LogRotator rotator = (LogRotator) project.getBuildDiscarder();
-        Assert.assertEquals(rotator.getDaysToKeep(), 42);
+        assertEquals(42, rotator.getDaysToKeep());
 
         project.setBuildDiscarder(new LogRotator(47, 47, -1, -1));
         project.save();
         Thread.sleep(SLEEP_TIME);
         rotator = (LogRotator) project.getBuildDiscarder();
-        Assert.assertEquals(rotator.getDaysToKeep(), 47);
+        assertEquals(47, rotator.getDaysToKeep());
 
         final HtmlPage historyPage = webClient
                 .goTo("job/" + jobName + "/" + JobConfigHistoryConsts.URLNAME);
         final HtmlForm diffFilesForm = historyPage.getFormByName("diffFiles");
-        final HtmlPage diffPage = last(diffFilesForm.getElementsByTagName("button")).click();
-        assertStringContains(diffPage.asNormalizedText(), "<daysToKeep>42</daysToKeep>");
-        assertStringContains(diffPage.asNormalizedText(), "<numToKeep>42</numToKeep>");
-        assertStringContains(diffPage.asNormalizedText(), "<daysToKeep>47</daysToKeep>");
-        assertStringContains(diffPage.asNormalizedText(), "<numToKeep>47</numToKeep>");
+        final HtmlPage diffPage = rule.last(diffFilesForm.getElementsByTagName("button")).click();
+        rule.assertStringContains(diffPage.asNormalizedText(), "<daysToKeep>42</daysToKeep>");
+        rule.assertStringContains(diffPage.asNormalizedText(), "<numToKeep>42</numToKeep>");
+        rule.assertStringContains(diffPage.asNormalizedText(), "<daysToKeep>47</daysToKeep>");
+        rule.assertStringContains(diffPage.asNormalizedText(), "<numToKeep>47</numToKeep>");
     }
 }

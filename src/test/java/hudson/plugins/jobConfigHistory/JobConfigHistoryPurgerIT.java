@@ -1,7 +1,9 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.jvnet.hudson.test.recipes.LocalData;
 
 import java.io.File;
@@ -11,7 +13,11 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.SortedMap;
 
-public class JobConfigHistoryPurgerIT
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@WithJenkins
+class JobConfigHistoryPurgerIT
         extends
         AbstractHudsonTestCaseDeletingInstanceDir {
     private static final int SLEEP_TIME = 1100;
@@ -19,8 +25,8 @@ public class JobConfigHistoryPurgerIT
     private JobConfigHistoryPurger purger;
 
     @Override
-    public void before() throws Throwable {
-        super.before();
+    void setUp(JenkinsRule rule) throws Exception {
+        super.setUp(rule);
         jch = PluginUtils.getPlugin();
         purger = new JobConfigHistoryPurger();
     }
@@ -30,30 +36,30 @@ public class JobConfigHistoryPurgerIT
      * correctly except for the newest one.
      */
     @LocalData
-    public void testSystemHistoryPurger() throws Exception {
+    @Test
+    void testSystemHistoryPurger() throws Exception {
         final String message = "Some nice message";
         final HistoryDao historyDao = purger.getHistoryDao();
         final XmlFile configXml = new XmlFile(
-                new File(jenkins.root, "config.xml"));
+                new File(rule.jenkins.root, "config.xml"));
         final int historyEntries = historyDao.getRevisions(configXml).size();
-        Assert.assertTrue(
+        assertTrue(
+                historyEntries > 4,
                 "Verify at least 5 original system config history entries, got "
-                        + historyEntries,
-                historyEntries > 4);
+                        + historyEntries);
 
-        jenkins.setSystemMessage(message);
+        rule.jenkins.setSystemMessage(message);
         Thread.sleep(SLEEP_TIME);
-        Assert.assertEquals("Verify one additional system history entry.",
-                historyEntries + 1, historyDao.getRevisions(configXml).size());
+        assertEquals(historyEntries + 1, historyDao.getRevisions(configXml).size(), "Verify one additional system history entry.");
 
         jch.setMaxDaysToKeepEntries("1");
         purger.run();
 
         final SortedMap<String, HistoryDescr> revisions = historyDao
                 .getRevisions(configXml);
-        Assert.assertTrue(
-                "Verify 5 (old) system history entries less after purging.",
-                historyEntries - 5 <= revisions.size());
+        assertTrue(
+                historyEntries - 5 <= revisions.size(),
+                "Verify 5 (old) system history entries less after purging.");
         final ArrayList<String> revisionsKeys = new ArrayList<>(
                 revisions.keySet());
         System.out.println(revisionsKeys);
@@ -61,36 +67,37 @@ public class JobConfigHistoryPurgerIT
         final XmlFile lastEntry = historyDao.getOldRevision(configXml,
                 revisionsKeys.get(revisionsKeys.size() - 1));
         final String lastEntryAsString = lastEntry.asString();
-        Assert.assertTrue(
-                "Verify remaining entry is the newest one" + lastEntryAsString,
-                lastEntryAsString.contains(message));
+        assertTrue(
+                lastEntryAsString.contains(message),
+                "Verify remaining entry is the newest one" + lastEntryAsString);
     }
 
     /**
      * Checks that nothing gets deleted when maxDays is set to 0.
      */
     @LocalData
-    public void testHistoryPurgerWhenMaxDaysSetToZero() {
+    @Test
+    void testHistoryPurgerWhenMaxDaysSetToZero() {
         final HistoryDao historyDao = purger.getHistoryDao();
         final XmlFile configXml = new XmlFile(
-                new File(jenkins.root, "config.xml"));
+                new File(rule.jenkins.root, "config.xml"));
         final int historyEntries = historyDao.getRevisions(configXml).size();
-        Assert.assertTrue(
-                "Verify at least 5 original system config history entries.",
-                historyEntries > 4);
+        assertTrue(
+                historyEntries > 4,
+                "Verify at least 5 original system config history entries.");
 
         jch.setMaxDaysToKeepEntries("0");
         purger.run();
 
-        Assert.assertEquals("Verify that original entries are still there.",
-                historyEntries, historyDao.getRevisions(configXml).size());
+        assertEquals(historyEntries, historyDao.getRevisions(configXml).size(), "Verify that original entries are still there.");
     }
 
     /**
      * Checks that nothing gets deleted when a negative max age is entered.
      */
     @LocalData
-    public void testWithNegativeMaxAge() throws Exception {
+    @Test
+    void testWithNegativeMaxAge() {
         testWithWrongMaxAge("-1");
     }
 
@@ -98,45 +105,47 @@ public class JobConfigHistoryPurgerIT
      * Checks that nothings gets deleted when max age is empty.
      */
     @LocalData
-    public void testWithEmptyMaxAge() throws Exception {
+    @Test
+    void testWithEmptyMaxAge() {
         testWithWrongMaxAge("");
     }
 
     private void testWithWrongMaxAge(String maxAge) {
         final HistoryDao historyDao = purger.getHistoryDao();
         final XmlFile configXml = new XmlFile(
-                new File(jenkins.root, "config.xml"));
+                new File(rule.jenkins.root, "config.xml"));
         final int historyEntries = historyDao.getRevisions(configXml).size();
-        Assert.assertTrue(
-                "Verify at least 5 original system config history entries.",
-                historyEntries > 4);
+        assertTrue(
+                historyEntries > 4,
+                "Verify at least 5 original system config history entries.");
 
         jch.setMaxDaysToKeepEntries(maxAge);
         purger.run();
-        Assert.assertEquals("Verify that original entries are still there.",
-                historyEntries, historyDao.getRevisions(configXml).size());
+        assertEquals(historyEntries, historyDao.getRevisions(configXml).size(), "Verify that original entries are still there.");
     }
 
     /**
      * Tests deletion of JOB config history files.
      */
-    public void testJobHistoryPurger() {
+    @Test
+    void testJobHistoryPurger() {
         final String name = "TestJob";
         final File historyDir = new File(
                 new File(jch.getConfiguredHistoryRootDir(), "jobs"), name);
         createDirectories(historyDir);
-        Assert.assertEquals("Verify 3 original project history entries.", 3,
-                historyDir.listFiles().length);
+        assertEquals(3,
+                historyDir.listFiles().length,
+                "Verify 3 original project history entries.");
 
         jch.setMaxDaysToKeepEntries("3");
         purger.run();
-        Assert.assertEquals("Verify only 1 history entry left after purging.",
-                1, historyDir.listFiles().length);
+        assertEquals(1, historyDir.listFiles().length, "Verify only 1 history entry left after purging.");
 
         jch.setMaxDaysToKeepEntries("1");
         purger.run();
-        Assert.assertEquals("Verify no history entry left after purging.", 0,
-                historyDir.listFiles().length);
+        assertEquals(0,
+                historyDir.listFiles().length,
+                "Verify no history entry left after purging.");
     }
 
     private void createDirectories(File historyDir) {
@@ -165,20 +174,21 @@ public class JobConfigHistoryPurgerIT
      * deleted even if they are too old.
      */
     @LocalData
-    public void testJobHistoryPurgerWithCreatedEntries() {
+    @Test
+    void testJobHistoryPurgerWithCreatedEntries() {
         final HistoryDao historyDao = purger.getHistoryDao();
         final XmlFile configXml = new XmlFile(
-                new File(jenkins.root, "jobs/Test1/config.xml"));
-        Assert.assertEquals("Verify 5 original project history entries.", 5,
-                historyDao.getRevisions(configXml).size());
+                new File(rule.jenkins.root, "jobs/Test1/config.xml"));
+        assertEquals(5,
+                historyDao.getRevisions(configXml).size(),
+                "Verify 5 original project history entries.");
 
         jch.setMaxDaysToKeepEntries("1");
         purger.run();
 
         final SortedMap<String, HistoryDescr> listFilesAfterPurge = historyDao
                 .getRevisions(configXml);
-        Assert.assertEquals(
-                "Verify 1 project history entries left." + listFilesAfterPurge,
-                1, listFilesAfterPurge.size());
+        assertEquals(
+                1, listFilesAfterPurge.size(), "Verify 1 project history entries left." + listFilesAfterPurge);
     }
 }

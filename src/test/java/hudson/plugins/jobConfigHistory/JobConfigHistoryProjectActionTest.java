@@ -11,10 +11,11 @@ import jenkins.model.AbstractTopLevelItem;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.StaplerResponse2;
 
@@ -22,11 +23,12 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -39,35 +41,44 @@ import static org.mockito.Mockito.when;
  *
  * @author Mirko Friedenhagen
  */
-public class JobConfigHistoryProjectActionTest {
+@WithJenkins
+class JobConfigHistoryProjectActionTest {
 
     private final MavenModule mockedMavenModule = mock(MavenModule.class);
     private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
     private final AbstractTopLevelItem mockedProject = mock(AbstractTopLevelItem.class);
     private final StaplerRequest2 mockedRequest = mock(StaplerRequest2.class);
     private final StaplerResponse2 mockedResponse = mock(StaplerResponse2.class);
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
-    @Rule
-    public UnpackResourceZip testConfigs = UnpackResourceZip.create();
+
+    private UnpackResourceZip unpackResourceZip;
     private HistoryDao historyDao;
 
-    public JobConfigHistoryProjectActionTest() {
+    private JenkinsRule jenkinsRule;
+
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) throws Exception{
+        jenkinsRule = rule;
+        unpackResourceZip = UnpackResourceZip.create();
         Jenkins mockedJenkins = mock(Jenkins.class);
         when(mockedJenkins.getFullName()).thenReturn("");
         when(mockedProject.getParent()).thenReturn(mockedJenkins);
         when(mockedProject.getFullName()).thenReturn("Test1");
+
+        historyDao = new FileHistoryDao(
+                unpackResourceZip.getResource("config-history"),
+                unpackResourceZip.getRoot(), null, 0, false);
     }
 
-    @Before
-    public void createHistoryDao() {
-        historyDao = new FileHistoryDao(
-                testConfigs.getResource("config-history"),
-                testConfigs.getRoot(), null, 0, false);
+    @AfterEach
+    void tearDown() throws Exception {
+        if (unpackResourceZip != null) {
+            unpackResourceZip.cleanUp();
+        }
     }
 
     @Test
-    public void testGetIconFileNameNoPermission() {
+    void testGetIconFileNameNoPermission() {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(false);
         JobConfigHistoryProjectAction sut = createAction();
@@ -75,7 +86,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetIconFileNameSaveProjectNonMavenModules() {
+    void testGetIconFileNameSaveProjectNonMavenModules() {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
         when(mockedPlugin.getSaveModuleConfiguration()).thenReturn(false);
@@ -85,7 +96,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetIconFileNameSaveMavenModules() {
+    void testGetIconFileNameSaveMavenModules() {
         assertNotNull(jenkinsRule.jenkins.getPlugin("maven-plugin"));
         when(mockedMavenModule.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
@@ -96,7 +107,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetIconFileNameDoNotSaveMavenModules() {
+    void testGetIconFileNameDoNotSaveMavenModules() {
         when(mockedMavenModule.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
         when(mockedPlugin.getSaveModuleConfiguration()).thenReturn(false);
@@ -105,7 +116,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetIconFileNameMatrixProject() {
+    void testGetIconFileNameMatrixProject() {
         MatrixProject project = mock(MatrixProject.class);
         when(project.hasPermission(AbstractProject.CONFIGURE)).thenReturn(true);
 
@@ -115,7 +126,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetIconFileNameMatrixConfiguration() {
+    void testGetIconFileNameMatrixConfiguration() {
         MatrixConfiguration configuration = mock(MatrixConfiguration.class);
         when(configuration.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
@@ -125,39 +136,39 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetJobConfigs() {
+    void testGetJobConfigs() {
         when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("");
         testJobXHasYHistoryEntries("jobs/Test1", 5);
     }
 
     @Test
-    public void testGetJobConfigsLimitedTo3() {
+    void testGetJobConfigsLimitedTo3() {
         when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("3");
         testJobXHasYHistoryEntries("jobs/Test1", 3);
     }
 
     @Test
-    public void testGetJobConfigsLimitedTo1000() {
+    void testGetJobConfigsLimitedTo1000() {
         when(mockedPlugin.getMaxEntriesPerPage()).thenReturn("1000");
         testJobXHasYHistoryEntries("jobs/Test1", 5);
     }
 
     @Test
-    public void testGetJobConfigsDeleted() {
+    void testGetJobConfigsDeleted() {
         final List<ConfigInfo> historyEntries = testJobXHasYHistoryEntries(
                 "jobs/Foo_deleted_20130830_223932_071", 3);
         assertEquals("Deleted", historyEntries.get(0).getOperation());
     }
 
     @Test
-    public void testGetJobConfigsEmpty() throws Exception {
+    void testGetJobConfigsEmpty() throws Exception {
         FileUtils.cleanDirectory(
-                testConfigs.getResource("config-history/jobs/Test1"));
+                unpackResourceZip.getResource("config-history/jobs/Test1"));
         testJobXHasYHistoryEntries("jobs/Test1", 0);
     }
 
     @Test
-    public void testGetRevisionAmount() throws IOException {
+    void testGetRevisionAmount() throws IOException {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("project");
         final JobConfigHistoryProjectAction sut = createJenkinsRuleAction(project);
         assertEquals(2, sut.getRevisionAmount());
@@ -167,7 +178,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetMaxPageNum() throws IOException {
+    void testGetMaxPageNum() throws IOException {
 
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("project");
         final JobConfigHistoryProjectAction sut = createJenkinsRuleAction(project);
@@ -206,7 +217,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetJobConfigs_fromTo() {
+    void testGetJobConfigs_fromTo() {
         testJobXHasYHistoryEntries("jobs/Test1", 5, 0, 200);
         testJobXHasYHistoryEntries("jobs/Test1", 4, 1, 200);
         testJobXHasYHistoryEntries("jobs/Test1", 3, 2, 200);
@@ -225,7 +236,7 @@ public class JobConfigHistoryProjectActionTest {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
         when(mockedProject.getRootDir())
-                .thenReturn(testConfigs.getResource(jobDir));
+                .thenReturn(unpackResourceZip.getResource(jobDir));
         when(mockedProject.getConfigFile()).thenCallRealMethod();
         final JobConfigHistoryProjectAction sut = createAction();
         final List<ConfigInfo> result = sut.getJobConfigs();
@@ -240,7 +251,7 @@ public class JobConfigHistoryProjectActionTest {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
         when(mockedProject.getRootDir())
-                .thenReturn(testConfigs.getResource(jobDir));
+                .thenReturn(unpackResourceZip.getResource(jobDir));
         when(mockedProject.getConfigFile()).thenCallRealMethod();
         final JobConfigHistoryProjectAction sut = createAction();
         final List<ConfigInfo> result = sut.getJobConfigs(from, to);
@@ -249,11 +260,11 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetFile() throws Exception {
+    void testGetFile() throws Exception {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
         when(mockedProject.getRootDir())
-                .thenReturn(testConfigs.getResource("jobs/Test1"));
+                .thenReturn(unpackResourceZip.getResource("jobs/Test1"));
         when(mockedProject.getConfigFile()).thenCallRealMethod();
         when(mockedRequest.getParameter("timestamp"))
                 .thenReturn("2012-11-21_11-40-28");
@@ -264,19 +275,19 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetProject() {
+    void testGetProject() {
         JobConfigHistoryProjectAction sut = createAction();
         assertEquals(mockedProject, sut.getProject());
     }
 
     @Test
-    public void testGetAccessControlledObject() {
+    void testGetAccessControlledObject() {
         JobConfigHistoryProjectAction sut = createAction();
         assertEquals(mockedProject, sut.getAccessControlledObject());
     }
 
     @Test
-    public void testCheckConfigurePermission() {
+    void testCheckConfigurePermission() {
         JobConfigHistoryProjectAction sut = createAction();
         verify(mockedProject, times(0)).checkPermission(AbstractItem.CONFIGURE);
         sut.checkConfigurePermission();
@@ -284,7 +295,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testHasConfigurePermission() {
+    void testHasConfigurePermission() {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
         JobConfigHistoryProjectAction sut = createAction();
@@ -292,7 +303,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testHasNoConfigurePermission() {
+    void testHasNoConfigurePermission() {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(false);
         JobConfigHistoryProjectAction sut = createAction();
@@ -300,7 +311,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testDoDiffFiles() throws Exception {
+    void testDoDiffFiles() throws Exception {
         when(mockedRequest.getParameter("timestamp1"))
                 .thenReturn("2014-02-05_10-42-37");
         when(mockedRequest.getParameter("timestamp2"))
@@ -312,7 +323,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetTimestamp() {
+    void testGetTimestamp() {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
         when(mockedRequest.getParameter(any(String.class)))
@@ -322,7 +333,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testGetLines() throws Throwable {
+    void testGetLines() throws Throwable {
         final String timestamp1 = "2012-11-21_11-41-14";
         final String timestamp2 = "2012-11-21_11-42-05";
         List<SideBySideView.Line> result = prepareGetLines(timestamp1,
@@ -330,11 +341,12 @@ public class JobConfigHistoryProjectActionTest {
         assertEquals(8, result.size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetLinesNonExistingTimestamp() throws IOException {
+    @Test
+    void testGetLinesNonExistingTimestamp() {
         final String timestamp1 = "2012-11-21_11-41-14";
         final String timestamp2 = "2013-11-21_11-42-05";
-        prepareGetLines(timestamp1, timestamp2);
+        assertThrows(IllegalArgumentException.class, () ->
+            prepareGetLines(timestamp1, timestamp2));
     }
 
     private List<SideBySideView.Line> prepareGetLines(final String timestamp1,
@@ -344,20 +356,20 @@ public class JobConfigHistoryProjectActionTest {
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
         when(mockedProject.getRootDir())
-                .thenReturn(testConfigs.getResource("jobs/Test1"));
+                .thenReturn(unpackResourceZip.getResource("jobs/Test1"));
         when(mockedProject.getConfigFile()).thenCallRealMethod();
         JobConfigHistoryProjectAction sut = createAction();
         return sut.getLines();
     }
 
     @Test
-    public void testDoRestore() throws Exception {
+    void testDoRestore() throws Exception {
         when(mockedRequest.getParameter("timestamp"))
                 .thenReturn("2012-11-21_11-41-14");
         when(mockedProject.hasPermission(AbstractProject.CONFIGURE))
                 .thenReturn(true);
         when(mockedProject.getRootDir())
-                .thenReturn(testConfigs.getResource("jobs/Test1"));
+                .thenReturn(unpackResourceZip.getResource("jobs/Test1"));
         when(mockedProject.getConfigFile()).thenCallRealMethod();
         JobConfigHistoryProjectAction sut = createAction();
         sut.doRestore(mockedRequest, mockedResponse);
@@ -365,7 +377,7 @@ public class JobConfigHistoryProjectActionTest {
     }
 
     @Test
-    public void testDoForwardToRestoreQuestion() throws Exception {
+    void testDoForwardToRestoreQuestion() throws Exception {
         when(mockedRequest.getParameter("timestamp"))
                 .thenReturn("2012-11-21_11-41-14");
         JobConfigHistoryProjectAction sut = createAction();

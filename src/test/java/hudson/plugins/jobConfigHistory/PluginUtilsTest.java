@@ -24,32 +24,34 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests for PluginUtils.
  *
  * @author mirko
  */
-public class PluginUtilsTest {
+class PluginUtilsTest {
 
     @Test
-    public void utilShouldPraseDateCorrectly() {
+    void utilShouldPraseDateCorrectly() {
         String timeStamp = "2012-11-21_11-29-12";
         Date expResult = new GregorianCalendar(2012, Calendar.NOVEMBER, 21, 11, 29, 12).getTime();
         Date result = PluginUtils.parsedDate(timeStamp);
         assertEquals(expResult, result);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void parsingInvalidDateShouldThrow() {
+    @Test
+    void parsingInvalidDateShouldThrow() {
         String timeStamp = "abc";
-        PluginUtils.parsedDate(timeStamp);
+        assertThrows(IllegalArgumentException.class, () ->
+            PluginUtils.parsedDate(timeStamp));
     }
 }

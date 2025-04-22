@@ -33,9 +33,10 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -43,10 +44,10 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.SortedMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -55,16 +56,19 @@ import static org.mockito.Mockito.when;
  *
  * @author Mirko Friedenhagen
  */
-public class JobConfigBadgeActionTest {
+@WithJenkins
+class JobConfigBadgeActionTest {
 
     private final Build mockedBuild = mock(Build.class);
     private final Project mockedProject = mock(Project.class);
     private final String[] configDates = {"2013_01_01", "2013_01_02"};
     private final JobConfigBadgeAction sut = createSut();
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
 
-    public JobConfigBadgeActionTest() {
+    private JenkinsRule jenkinsRule;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkinsRule = rule;
         final Jenkins mockedJenkins = mock(Jenkins.class);
         when(mockedProject.getParent()).thenReturn(mockedJenkins);
         when(mockedProject.getShortUrl()).thenReturn("jobname");
@@ -73,17 +77,17 @@ public class JobConfigBadgeActionTest {
     }
 
     @Test
-    public void testOnAttached() {
+    void testOnAttached() {
         sut.onAttached(mockedBuild);
     }
 
     @Test
-    public void testOnLoad() {
+    void testOnLoad() {
         sut.onLoad(mockedBuild);
     }
 
     @Test
-    public void testShowBadge() throws Exception {
+    void testShowBadge() throws Exception {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
         jenkinsRule.buildAndAssertSuccess(project);
         Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().getLastBuild();
@@ -93,7 +97,7 @@ public class JobConfigBadgeActionTest {
     }
 
     @Test
-    public void testShowBadgeLink() throws Exception {
+    void testShowBadgeLink() throws Exception {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
         jenkinsRule.buildAndAssertSuccess(project);
         Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().getLastBuild();
@@ -103,7 +107,7 @@ public class JobConfigBadgeActionTest {
     }
 
     @Test
-    public void testOldConfigsExist() throws Exception {
+    void testOldConfigsExist() throws Exception {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
         jenkinsRule.buildAndAssertSuccess(project);
         Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().getLastBuild();
@@ -118,7 +122,7 @@ public class JobConfigBadgeActionTest {
     }
 
     @Test
-    public void testOldConfigsExistFalse() throws Exception {
+    void testOldConfigsExistFalse() throws Exception {
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("Test1");
         jenkinsRule.buildAndAssertSuccess(project);
         Run<FreeStyleProject, FreeStyleBuild> build = project.getBuilds().getLastBuild();
@@ -131,7 +135,7 @@ public class JobConfigBadgeActionTest {
     }
 
     @Test
-    public void testCreateLink() throws Exception {
+    void testCreateLink() throws Exception {
         String timestampRegex = "[0-9\\-_]+";
 
         String expectedRegex =
@@ -146,21 +150,21 @@ public class JobConfigBadgeActionTest {
     }
 
     @Test
-    public void testGetTooltip() {
+    void testGetTooltip() {
         String expResult = "Config changed since last build";
         String result = sut.getTooltip();
         assertEquals(expResult, result);
     }
 
     @Test
-    public void testGetIcon() {
+    void testGetIcon() {
         String expResult = "symbol-buildbadge plugin-jobConfigHistory";
         String result = sut.getIcon();
         assertEquals(expResult, result);
     }
 
     @Test
-    public void testGetIconFileName() {
+    void testGetIconFileName() {
         System.out.println("plugins");
         jenkinsRule.jenkins.getPluginManager().getPlugins().forEach(
                 plugin -> System.out.println(plugin.getDisplayName())
@@ -170,26 +174,26 @@ public class JobConfigBadgeActionTest {
     }
 
     @Test
-    public void testGetDisplayName() {
+    void testGetDisplayName() {
         String result = sut.getDisplayName();
         assertNull(result);
     }
 
     @Test
-    public void testGetUrlName() {
+    void testGetUrlName() {
         String expResult = "";
         String result = sut.getUrlName();
         assertEquals(expResult, result);
     }
 
     @Test
-    public void testListenerOnStartedBuildNumberLessThan2() {
+    void testListenerOnStartedBuildNumberLessThan2() {
         final JobConfigBadgeAction.Listener lsut = createListenerSut();
         lsut.onStarted(mockedBuild, TaskListener.NULL);
     }
 
     @Test
-    public void testListenerOnStartedGreaterThan2ButNoPreviousBuild() {
+    void testListenerOnStartedGreaterThan2ButNoPreviousBuild() {
         final JobConfigBadgeAction.Listener psut = createListenerSut();
         when(mockedProject.getNextBuildNumber()).thenReturn(3);
         when(mockedProject.getLastBuild()).thenReturn(mockedBuild);
@@ -197,7 +201,7 @@ public class JobConfigBadgeActionTest {
     }
 
     @Test
-    public void testListenerOnStarted() {
+    void testListenerOnStarted() {
         final JobConfigBadgeAction.Listener psut = createListenerSut();
         when(mockedProject.getNextBuildNumber()).thenReturn(3);
         when(mockedProject.getLastBuild()).thenReturn(mockedBuild);

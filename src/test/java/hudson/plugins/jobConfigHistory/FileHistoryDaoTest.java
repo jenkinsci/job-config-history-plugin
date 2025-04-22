@@ -34,11 +34,11 @@ import hudson.model.User;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,12 +62,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -76,17 +77,17 @@ import static org.mockito.Mockito.when;
  *
  * @author Mirko Friedenhagen
  */
-public class FileHistoryDaoTest {
+@WithJenkins
+class FileHistoryDaoTest {
 
     private static final String FULL_NAME = "Full Name";
     private static final String USER_ID = "userId";
-    @Rule
-    public final UnpackResourceZip unpackResourceZip = UnpackResourceZip
-            .create();
+
     private final User mockedUser = mock(User.class);
     private final AbstractItem mockedItem = mock(AbstractItem.class);
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
+
+    private JenkinsRule jenkinsRule;
+    private UnpackResourceZip unpackResourceZip;
     private File jenkinsHome;
     private XmlFile test1Config;
     private File historyRoot;
@@ -95,11 +96,11 @@ public class FileHistoryDaoTest {
     private FileHistoryDao sutWithUserAndNoDuplicateHistory;
     private File test1JobDirectory;
 
-    public FileHistoryDaoTest() {
-    }
 
-    @Before
-    public void setFieldsFromUnpackResource() {
+    @BeforeEach
+    void setUp(JenkinsRule rule) throws Exception {
+        jenkinsRule = rule;
+        unpackResourceZip = UnpackResourceZip.create();
         jenkinsHome = unpackResourceZip.getRoot();
         test1Config = new XmlFile(
                 unpackResourceZip.getResource("jobs/Test1/config.xml"));
@@ -114,11 +115,18 @@ public class FileHistoryDaoTest {
                 jenkinsHome, new MimickedUser(mockedUser), 0, false);
     }
 
+    @AfterEach
+    void tearDown() throws Exception {
+        if (unpackResourceZip != null) {
+            unpackResourceZip.cleanUp();
+        }
+    }
+
     /**
      * Test of createNewHistoryEntry method, of class FileHistoryDao.
      */
     @Test
-    public void testCreateNewHistoryEntry() {
+    void testCreateNewHistoryEntry() {
         sutWithoutUserAndDuplicateHistory.createNewHistoryEntry(test1Config,
                 "foo", null, null, null);
         final int newLength = getHistoryLength();
@@ -129,7 +137,7 @@ public class FileHistoryDaoTest {
      * Test of createNewHistoryEntry method, of class FileHistoryDao.
      */
     @Test
-    public void testCreateNewHistoryEntryRTE() {
+    void testCreateNewHistoryEntryRTE() {
         final XmlFile xmlFile = test1Config;
         FileHistoryDao sut = new FileHistoryDao(historyRoot, jenkinsHome, null,
                 0, false) {
@@ -139,24 +147,22 @@ public class FileHistoryDaoTest {
                 throw new RuntimeException("oops");
             }
         };
-        try {
-            sut.createNewHistoryEntry(xmlFile, "foo", null, null, null);
-            fail("Should throw RTE");
-        } catch (RuntimeException e) {
-            final int newLength = getHistoryLength();
-            assertEquals(5, newLength);
-        }
+        assertThrows(RuntimeException.class,
+                () -> sut.createNewHistoryEntry(xmlFile, "foo", null, null, null));
+
+        final int newLength = getHistoryLength();
+        assertEquals(5, newLength);
     }
 
     /**
      * Test of getIdFormatter method, of class FileHistoryDao.
      */
     @Test
-    public void testGetIdFormatter() {
+    void testGetIdFormatter() {
         SimpleDateFormat result = FileHistoryDao.getIdFormatter();
         // setting a default timezone to avoid timezone issues in different environments
         result.setTimeZone(TimeZone.getTimeZone("UTC"));
-        
+
         final String formattedDate = result.format(new Date(0));
         // workaround for timezone issues, as cloudbees is in the far east :-)
         // and returns 1969 :-).
@@ -168,7 +174,7 @@ public class FileHistoryDaoTest {
      * Test of copyConfigFile method, of class FileHistoryDao.
      */
     @Test
-    public void testCopyConfigFile() throws Exception {
+    void testCopyConfigFile() throws Exception {
         File currentConfig = test1Config.getFile();
         File timestampedDir = new File(jenkinsHome, "timestamp");
         timestampedDir.mkdir();
@@ -180,19 +186,20 @@ public class FileHistoryDaoTest {
     /**
      * Test of copyConfigFile method, of class FileHistoryDao.
      */
-    @Test(expected = FileNotFoundException.class)
-    public void testCopyConfigFileIOE() throws Exception {
+    @Test
+    void testCopyConfigFileIOE() {
         File currentConfig = test1Config.getFile();
         File timestampedDir = new File(jenkinsHome, "timestamp");
-        // do *not* create the directory
-        FileHistoryDao.copyConfigFile(currentConfig, timestampedDir);
+        assertThrows(FileNotFoundException.class, () ->
+            // do *not* create the directory
+            FileHistoryDao.copyConfigFile(currentConfig, timestampedDir));
     }
 
     /**
      * Test of createHistoryXmlFile method, of class FileHistoryDao.
      */
     @Test
-    public void testCreateHistoryXmlFile() throws Exception {
+    void testCreateHistoryXmlFile() throws Exception {
         testCreateHistoryXmlFile(sutWithUserAndNoDuplicateHistory, FULL_NAME);
     }
 
@@ -200,7 +207,7 @@ public class FileHistoryDaoTest {
      * Test of createHistoryXmlFile method, of class FileHistoryDao.
      */
     @Test
-    public void testCreateHistoryXmlFileAnonym() throws Exception {
+    void testCreateHistoryXmlFileAnonym() throws Exception {
         testCreateHistoryXmlFile(sutWithoutUserAndDuplicateHistory, "unknown");
     }
 
@@ -224,7 +231,7 @@ public class FileHistoryDaoTest {
      * Test of createNewHistoryDir method, of class FileHistoryDao.
      */
     @Test
-    public void testCreateNewHistoryDir() throws IOException {
+    void testCreateNewHistoryDir() throws IOException {
         final AtomicReference<Calendar> timestampHolder = new AtomicReference<>();
         final File first = FileHistoryDao.createNewHistoryDir(historyRoot,
                 timestampHolder);
@@ -242,7 +249,7 @@ public class FileHistoryDaoTest {
      * Test of getRootDir method, of class FileHistoryDao.
      */
     @Test
-    public void testGetRootDir() throws IOException {
+    void testGetRootDir() throws IOException {
         AtomicReference<Calendar> timestampHolder = new AtomicReference<>();
         File result = sutWithoutUserAndDuplicateHistory.getRootDir(test1Config,
                 timestampHolder);
@@ -256,7 +263,7 @@ public class FileHistoryDaoTest {
      * Test of createNewItem method, of class FileHistoryDao.
      */
     @Test
-    public void testCreateNewItem() throws IOException {
+    void testCreateNewItem() throws IOException {
         final File jobDir = new File(jenkinsHome, "jobs/MyTest");
         jobDir.mkdirs();
         FileUtils.copyFile(test1Config.getFile(), new File(jobDir, "config.xml"));
@@ -274,7 +281,7 @@ public class FileHistoryDaoTest {
      * Test of saveItem method, of class FileHistoryDao.
      */
     @Test
-    public void testSaveItem_AbstractItem() {
+    void testSaveItem_AbstractItem() {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         when(mockedItem.getConfigFile()).thenCallRealMethod();
         sutWithUserAndNoDuplicateHistory.saveItem(mockedItem.getConfigFile());
@@ -285,7 +292,7 @@ public class FileHistoryDaoTest {
      * Test of saveItem method, of class FileHistoryDao.
      */
     @Test
-    public void testSaveItem_XmlFile() {
+    void testSaveItem_XmlFile() {
         sutWithUserAndNoDuplicateHistory.saveItem(test1Config);
         assertEquals(5, getHistoryLength());
     }
@@ -294,7 +301,7 @@ public class FileHistoryDaoTest {
      * Test of saveItem method, of class FileHistoryDao.
      */
     @Test
-    public void testSaveItem_XmlFileDuplicate() {
+    void testSaveItem_XmlFileDuplicate() {
         sutWithoutUserAndDuplicateHistory.saveItem(test1Config);
         assertEquals(6, getHistoryLength());
     }
@@ -307,7 +314,7 @@ public class FileHistoryDaoTest {
      * Test of deleteItem method, of class FileHistoryDao.
      */
     @Test
-    public void testDeleteItem() {
+    void testDeleteItem() {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         when(mockedItem.getConfigFile()).thenCallRealMethod();
         sutWithUserAndNoDuplicateHistory.deleteItem(mockedItem);
@@ -317,7 +324,7 @@ public class FileHistoryDaoTest {
      * Test of renameItem method, of class FileHistoryDao.
      */
     @Test
-    public void testRenameItem() throws IOException {
+    void testRenameItem() throws IOException {
         String newName = "NewName";
         File newJobDir = unpackResourceZip.getResource("jobs/" + newName);
         // Rename of Job is already done in Listener.
@@ -336,7 +343,7 @@ public class FileHistoryDaoTest {
      * Test of getRevisions method, of class FileHistoryDao.
      */
     @Test
-    public void testGetRevisions_XmlFile() {
+    void testGetRevisions_XmlFile() {
         SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory
                 .getRevisions(test1Config);
         testGetRevisions(result);
@@ -357,7 +364,7 @@ public class FileHistoryDaoTest {
      * Test of getRevisions method, of class FileHistoryDao.
      */
     @Test
-    public void testGetRevisionsForItemWithoutHistory() throws IOException {
+    void testGetRevisionsForItemWithoutHistory() throws IOException {
         final String jobWithoutHistory = "NewJobWithoutHistory";
         final File configFile = new File(
                 unpackResourceZip.getResource("jobs/" + jobWithoutHistory),
@@ -371,7 +378,7 @@ public class FileHistoryDaoTest {
      * Test of getOldRevision method, of class FileHistoryDao.
      */
     @Test
-    public void testGetOldRevision_Item() throws IOException {
+    void testGetOldRevision_Item() throws IOException {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         when(mockedItem.getConfigFile()).thenCallRealMethod();
         String identifier = "2012-11-21_11-42-05";
@@ -381,7 +388,7 @@ public class FileHistoryDaoTest {
     }
 
     @Test
-    public void testGetRevisionAmount() throws IOException {
+    void testGetRevisionAmount() throws IOException {
         assertEquals(5, sutWithUserAndNoDuplicateHistory.getRevisionAmount(test1Config));
 
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject();
@@ -389,7 +396,7 @@ public class FileHistoryDaoTest {
     }
 
     @Test
-    public void testGetJobRevisionAmount() throws IOException, InterruptedException {
+    void testGetJobRevisionAmount() throws IOException, InterruptedException {
         assertEquals(6, sutWithUserAndNoDuplicateHistory.getJobRevisionAmount());
 
 
@@ -406,7 +413,7 @@ public class FileHistoryDaoTest {
     }
 
     @Test
-    public void testGetJobRevisionAmount_Single() throws IOException, InterruptedException {
+    void testGetJobRevisionAmount_Single() throws IOException, InterruptedException {
         assertEquals(5, sutWithUserAndNoDuplicateHistory.getJobRevisionAmount(test1JobDirectory.getName()));
 
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject();
@@ -418,12 +425,12 @@ public class FileHistoryDaoTest {
     }
 
     @Test
-    public void testGetSystemConfigsMap() {
+    void testGetSystemConfigsMap() {
         Iterator<String> it =
                 Arrays.asList(new String[]{"config", "jenkins.model.JenkinsLocationConfiguration", "jenkins.telemetry.Correlator"}).iterator();
         getJenkinsRuleSut().getSystemConfigsMap().forEach((k, v) -> {
             assertEquals(it.next(), k);
-            assertTrue(v instanceof LazyHistoryDescr);
+            assertInstanceOf(LazyHistoryDescr.class, v);
         });
         getJenkinsRuleSut().getSystemConfigsMap().forEach((k, v) -> System.out.println(new Pair<>(k, v)));
     }
@@ -432,7 +439,7 @@ public class FileHistoryDaoTest {
      * Test of getOldRevision method, of class FileHistoryDao.
      */
     @Test
-    public void testGetOldRevision_XmlFile() throws IOException {
+    void testGetOldRevision_XmlFile() throws IOException {
         String identifier = "2012-11-21_11-42-05";
         final XmlFile result = sutWithUserAndNoDuplicateHistory
                 .getOldRevision(test1Config, identifier);
@@ -449,7 +456,7 @@ public class FileHistoryDaoTest {
      * Test of getOldRevision method, of class FileHistoryDao.
      */
     @Test
-    public void testHasOldRevision_Item() {
+    void testHasOldRevision_Item() {
         when(mockedItem.getRootDir()).thenReturn(test1JobDirectory);
         when(mockedItem.getConfigFile()).thenCallRealMethod();
         assertTrue(sutWithUserAndNoDuplicateHistory.hasOldRevision(
@@ -462,7 +469,7 @@ public class FileHistoryDaoTest {
      * Test of getOldRevision method, of class FileHistoryDao.
      */
     @Test
-    public void testHasOldRevision_XmlFile() {
+    void testHasOldRevision_XmlFile() {
         assertTrue(sutWithUserAndNoDuplicateHistory.hasOldRevision(test1Config,
                 "2012-11-21_11-42-05"));
         assertFalse(sutWithUserAndNoDuplicateHistory.hasOldRevision(test1Config,
@@ -473,7 +480,7 @@ public class FileHistoryDaoTest {
      * Test of getHistoryDir method, of class FileHistoryDao.
      */
     @Test
-    public void testGetHistoryDir() {
+    void testGetHistoryDir() {
         final File configFile = test1Config.getFile();
         File result = sutWithUserAndNoDuplicateHistory
                 .getHistoryDir(configFile);
@@ -484,7 +491,7 @@ public class FileHistoryDaoTest {
      * Test of getHistoryDir method, of class FileHistoryDao.
      */
     @Test
-    public void testGetHistoryDirWithFolder() throws IOException {
+    void testGetHistoryDirWithFolder() throws IOException {
         String folderName = "FolderName";
         final File destDir = unpackResourceZip.getResource(
                 "config-history/jobs/" + folderName + "/jobs/Test1");
@@ -503,7 +510,7 @@ public class FileHistoryDaoTest {
      * Test of getHistoryDir method, of class FileHistoryDao.
      */
     @Test
-    public void testGetHistoryDirOfSystemXml() {
+    void testGetHistoryDirOfSystemXml() {
         final XmlFile systemXmlFile = new XmlFile(
                 new File(jenkinsHome, "jenkins.xml"));
         final File configFile = systemXmlFile.getFile();
@@ -516,7 +523,7 @@ public class FileHistoryDaoTest {
      * Test of getJobHistoryRootDir method, of class FileHistoryDao.
      */
     @Test
-    public void testGetJobHistoryRootDir() {
+    void testGetJobHistoryRootDir() {
         assertEquals(unpackResourceZip.getResource("config-history/jobs"),
                 sutWithUserAndNoDuplicateHistory.getJobHistoryRootDir());
     }
@@ -525,7 +532,7 @@ public class FileHistoryDaoTest {
      * Test of purgeOldEntries method, of class FileHistoryDao.
      */
     @Test
-    public void testPurgeOldEntriesNoEntriesToDelete() {
+    void testPurgeOldEntriesNoEntriesToDelete() {
         final int maxEntries = 0;
         final int expectedLength = 5;
         testPurgeOldEntries(maxEntries, expectedLength);
@@ -535,7 +542,7 @@ public class FileHistoryDaoTest {
      * Test of purgeOldEntries method, of class FileHistoryDao.
      */
     @Test
-    public void testPurgeOldEntriesOnlyTwoExistingOneBecauseOfCreatedStatus() {
+    void testPurgeOldEntriesOnlyTwoExistingOneBecauseOfCreatedStatus() {
         final int maxEntries = 2;
         final int expectedLength = 2;
         testPurgeOldEntries(maxEntries, expectedLength);
@@ -552,11 +559,11 @@ public class FileHistoryDaoTest {
      * Test of hasDuplicateHistory method, of class FileHistoryDao.
      */
     @Test
-    public void testHasDuplicateHistoryNoDuplicates() throws IOException {
+    void testHasDuplicateHistoryNoDuplicates() throws IOException {
         XmlFile xmlFile = new XmlFile(
                 new File(test1History, "2012-11-21_11-41-14/history.xml"));
         final File configFile = new File(test1JobDirectory, "config.xml");
-        IOUtils.write(xmlFile.asString(), new FileOutputStream(configFile));
+        IOUtils.write(xmlFile.asString(), new FileOutputStream(configFile), StandardCharsets.UTF_8);
         boolean result = sutWithUserAndNoDuplicateHistory
                 .hasDuplicateHistory(new XmlFile(configFile));
         assertFalse(result);
@@ -566,7 +573,7 @@ public class FileHistoryDaoTest {
      * Test of hasDuplicateHistory method, of class FileHistoryDao.
      */
     @Test
-    public void testHasDuplicateHistoryDuplicates() {
+    void testHasDuplicateHistoryDuplicates() {
         final File configFile = new File(test1JobDirectory, "config.xml");
         boolean result = sutWithUserAndNoDuplicateHistory
                 .hasDuplicateHistory(new XmlFile(configFile));
@@ -577,7 +584,7 @@ public class FileHistoryDaoTest {
      * Test of hasDuplicateHistory method, of class FileHistoryDao.
      */
     @Test
-    public void testHasDuplicateHistoryNoHistory() {
+    void testHasDuplicateHistoryNoHistory() {
         final File configFile = new File(jenkinsHome, "jobs/Test2/config.xml");
         boolean result = sutWithUserAndNoDuplicateHistory
                 .hasDuplicateHistory(new XmlFile(configFile));
@@ -588,7 +595,7 @@ public class FileHistoryDaoTest {
      * Test of checkDuplicate method, of class FileHistoryDao.
      */
     @Test
-    public void testCheckDuplicate() {
+    void testCheckDuplicate() {
         XmlFile xmlFile = new XmlFile(
                 new File(test1JobDirectory, "config.xml"));
         boolean result = sutWithoutUserAndDuplicateHistory
@@ -600,7 +607,7 @@ public class FileHistoryDaoTest {
      * Test of checkDuplicate method, of class FileHistoryDao.
      */
     @Test
-    public void testCheckDuplicateSkip() {
+    void testCheckDuplicateSkip() {
         XmlFile xmlFile = new XmlFile(
                 new File(test1JobDirectory, "config.xml"));
         boolean result = sutWithUserAndNoDuplicateHistory
@@ -612,7 +619,7 @@ public class FileHistoryDaoTest {
      * Test of checkDuplicate method, of class FileHistoryDao.
      */
     @Test
-    public void testCheckDuplicateHasDuplicate() {
+    void testCheckDuplicateHasDuplicate() {
         XmlFile xmlFile = new XmlFile(
                 new File(jenkinsHome, "jobs/Test2/config.xml"));
         boolean result = sutWithUserAndNoDuplicateHistory
@@ -624,7 +631,7 @@ public class FileHistoryDaoTest {
      * Test of getSystemConfigs method, of class FileHistoryDao.
      */
     @Test
-    public void testGetSystemConfigs() {
+    void testGetSystemConfigs() {
         final File[] systemConfigs = sutWithoutUserAndDuplicateHistory
                 .getSystemConfigs();
         assertEquals(1, systemConfigs.length);
@@ -635,7 +642,7 @@ public class FileHistoryDaoTest {
      * Test of getSystemConfigs method, of class FileHistoryDao.
      */
     @Test
-    public void testGetSystemConfigsWithoutData() {
+    void testGetSystemConfigsWithoutData() {
         new File(jenkinsHome, "config-history")
                 .renameTo(new File(jenkinsHome, "invalid"));
         final File[] systemConfigs = sutWithoutUserAndDuplicateHistory
@@ -647,7 +654,7 @@ public class FileHistoryDaoTest {
      * Test of getDeletedJobs method, of class FileHistoryDao.
      */
     @Test
-    public void testGetDeletedJobs() {
+    void testGetDeletedJobs() {
         final File[] deletedJobs = sutWithoutUserAndDuplicateHistory
                 .getDeletedJobs("");
         assertEquals(1, deletedJobs.length);
@@ -659,7 +666,7 @@ public class FileHistoryDaoTest {
      * Test of getDeletedJobs method, of class FileHistoryDao.
      */
     @Test
-    public void testGetJobs() {
+    void testGetJobs() {
         final File[] jobs = sutWithoutUserAndDuplicateHistory.getJobs("");
         assertEquals(1, jobs.length);
         final String name = jobs[0].getName();
@@ -670,7 +677,7 @@ public class FileHistoryDaoTest {
      * Test of getJobHistory method, of class FileHistoryDao.
      */
     @Test
-    public void testGetJobHistory() {
+    void testGetJobHistory() {
         final SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory
                 .getJobHistory("Test1");
         assertEquals(5, result.size());
@@ -681,7 +688,7 @@ public class FileHistoryDaoTest {
      * Test of getJobHistory method, of class FileHistoryDao.
      */
     @Test
-    public void testGetJobHistoryNonExistent() {
+    void testGetJobHistoryNonExistent() {
         final SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory
                 .getJobHistory("JobDoesNotExist");
         assertTrue(result.isEmpty());
@@ -691,7 +698,7 @@ public class FileHistoryDaoTest {
      * Test of getSystemHistory method, of class FileHistoryDao.
      */
     @Test
-    public void testGetSystemHistory() {
+    void testGetSystemHistory() {
         final SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory
                 .getSystemHistory("config");
         assertEquals(5, result.size());
@@ -702,7 +709,7 @@ public class FileHistoryDaoTest {
      * Test of getSystemHistory method, of class FileHistoryDao.
      */
     @Test
-    public void testGetSystemHistoryNonExistent() {
+    void testGetSystemHistoryNonExistent() {
         final SortedMap<String, HistoryDescr> result = sutWithUserAndNoDuplicateHistory
                 .getSystemHistory("config-does-not-exist");
         assertTrue(result.isEmpty());
@@ -712,7 +719,7 @@ public class FileHistoryDaoTest {
      * Test of copyHistoryAndDelete method, of class FileHistoryDao.
      */
     @Test
-    public void testMoveHistory() {
+    void testMoveHistory() {
         sutWithUserAndNoDuplicateHistory
                 .copyHistoryAndDelete("Foo_deleted_20130830_223932_071", "Foo");
         assertEquals(3,
@@ -722,24 +729,26 @@ public class FileHistoryDaoTest {
     /**
      * Test of copyHistoryAndDelete method, of class FileHistoryDao.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public void testMoveHistoryIOException() {
-        sutWithUserAndNoDuplicateHistory.copyHistoryAndDelete("Test1", "Test1");
+    @Test
+    void testMoveHistoryIOException() {
+        assertThrows(IllegalArgumentException.class, () ->
+            sutWithUserAndNoDuplicateHistory.copyHistoryAndDelete("Test1", "Test1"));
     }
 
     @Test
-    public void testCreateNewNode() throws Exception {
+    void testCreateNewNode() throws Exception {
         Node agent = jenkinsRule.createOnlineSlave();
         sutWithUserAndNoDuplicateHistory.createNewNode(agent);
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
         File revisions = new File(file, agent.getNodeName());
-        assertEquals("agent should have only one save history.", 1,
-                revisions.list().length);
+        assertEquals(1,
+                revisions.list().length,
+                "agent should have only one save history.");
         File config = new File(revisions.listFiles()[0], "config.xml");
-        assertTrue("File config.xml should be saved.", config.exists());
+        assertTrue(config.exists(), "File config.xml should be saved.");
         File history = new File(revisions.listFiles()[0],
                 JobConfigHistoryConsts.HISTORY_FILE);
-        assertTrue("File history.xml should be saved.", history.exists());
+        assertTrue(history.exists(), "File history.xml should be saved.");
     }
 
     /**
@@ -764,14 +773,14 @@ public class FileHistoryDaoTest {
 
         // Call method an check that all files have been deleted
         func.call();
-        assertFalse("File config.xml should be deleted.", config.exists());
-        assertFalse("File history.xml should be deleted.", history.exists());
-        assertFalse("Previous revision directory should be deleted",
-                revision.exists());
+        assertFalse(config.exists(), "File config.xml should be deleted.");
+        assertFalse(history.exists(), "File history.xml should be deleted.");
+        assertFalse(revision.exists(),
+                "Previous revision directory should be deleted");
     }
 
     @Test
-    public void testDeleteNode() throws Exception {
+    void testDeleteNode() throws Exception {
         Node agent = jenkinsRule.createOnlineSlave();
         printTestData(agent, () -> {
             sutWithUserAndNoDuplicateHistory.deleteNode(agent);
@@ -780,7 +789,7 @@ public class FileHistoryDaoTest {
     }
 
     @Test
-    public void testRenameNode() throws Exception {
+    void testRenameNode() throws Exception {
         Node agent = jenkinsRule.createOnlineSlave();
         printTestData(agent, () -> {
             sutWithUserAndNoDuplicateHistory.renameNode(agent,
@@ -791,7 +800,7 @@ public class FileHistoryDaoTest {
     }
 
     @Test
-    public void testGetRevisions() throws Exception {
+    void testGetRevisions() throws Exception {
         Node agent = jenkinsRule.createOnlineSlave();
         createNodeRevisionManually("2014-01-18_10-12-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-18_10-12-34"), agent);
         createNodeRevisionManually("2014-01-19_10-12-34", getRandomConfigXml(), getHistoryXmlFromTimestamp("2014-01-19_10-12-34"), agent);
@@ -800,14 +809,14 @@ public class FileHistoryDaoTest {
 
         SortedMap<String, HistoryDescr> revisions = sutWithUserAndNoDuplicateHistory
                 .getRevisions(agent);
-        assertNotNull("Revision 2014-01-18_10-12-34 should be returned.",
-                revisions.get("2014-01-18_10-12-34"));
-        assertNotNull("Revision 2014-01-19_10-12-34 should be returned.",
-                revisions.get("2014-01-19_10-12-34"));
-        assertNotNull("Revision 2014-01-20_10-12-34 should be returned.",
-                revisions.get("2014-01-20_10-12-34"));
-        assertNotNull("Revision 2014-01-20_10-21-34 should be returned.",
-                revisions.get("2014-01-20_10-21-34"));
+        assertNotNull(revisions.get("2014-01-18_10-12-34"),
+                "Revision 2014-01-18_10-12-34 should be returned.");
+        assertNotNull(revisions.get("2014-01-19_10-12-34"),
+                "Revision 2014-01-19_10-12-34 should be returned.");
+        assertNotNull(revisions.get("2014-01-20_10-12-34"),
+                "Revision 2014-01-20_10-12-34 should be returned.");
+        assertNotNull(revisions.get("2014-01-20_10-21-34"),
+                "Revision 2014-01-20_10-21-34 should be returned.");
     }
 
     private File createNodeRevisionManually(String timestamp, String configXmlContent, String historyXmlContent, Node agent) throws IOException {
@@ -864,17 +873,18 @@ public class FileHistoryDaoTest {
     }
 
     @Test
-    public void testSaveNode() throws Exception {
+    void testSaveNode() throws Exception {
         Node agent = jenkinsRule.createOnlineSlave();
         File file = sutWithUserAndNoDuplicateHistory.getNodeHistoryRootDir();
         File revisions = new File(file, agent.getNodeName());
         sutWithUserAndNoDuplicateHistory.saveNode(agent);
-        assertEquals("New revision should be saved.", 1,
-                revisions.list().length);
+        assertEquals(1,
+                revisions.list().length,
+                "New revision should be saved.");
     }
 
     @Test
-    public void testGetOldRevision_Node() throws Exception {
+    void testGetOldRevision_Node() throws Exception {
         Slave agent = jenkinsRule.createOnlineSlave();
         agent.setNumExecutors(1);
         File revision1 = createNodeRevision("2014-01-18_10-12-34", agent);
@@ -889,17 +899,17 @@ public class FileHistoryDaoTest {
         XmlFile file3 = sutWithUserAndNoDuplicateHistory
                 .getOldRevision(agent, "2014-01-20_10-12-34");
         assertEquals(
-                "Should return config.xml file of revision 2014-01-18_10-12-34",
                 new File(revision1, "config.xml").getAbsolutePath(),
-                file1.getFile().getAbsolutePath());
+                file1.getFile().getAbsolutePath(),
+                "Should return config.xml file of revision 2014-01-18_10-12-34");
         assertEquals(
-                "Should return config.xml file of revision 2014-01-19_10-12-34",
                 new File(revision2, "config.xml").getAbsolutePath(),
-                file2.getFile().getAbsolutePath());
+                file2.getFile().getAbsolutePath(),
+                "Should return config.xml file of revision 2014-01-19_10-12-34");
         assertEquals(
-                "Should return config.xml file of revision 2014-01-20_10-12-34",
                 new File(revision3, "config.xml").getAbsolutePath(),
-                file3.getFile().getAbsolutePath());
+                file3.getFile().getAbsolutePath(),
+                "Should return config.xml file of revision 2014-01-20_10-12-34");
     }
 
     private FileHistoryDao getJenkinsRuleSut() {

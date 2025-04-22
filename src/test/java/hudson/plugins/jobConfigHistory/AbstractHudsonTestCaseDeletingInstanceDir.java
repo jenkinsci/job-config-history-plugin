@@ -4,7 +4,10 @@
 package hudson.plugins.jobConfigHistory;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 import java.io.File;
 import java.util.logging.Level;
@@ -16,10 +19,13 @@ import java.util.logging.Logger;
  *
  * @author mfriedenhagen
  */
-public abstract class AbstractHudsonTestCaseDeletingInstanceDir extends JenkinsRule {
+@WithJenkins
+abstract class AbstractHudsonTestCaseDeletingInstanceDir {
 
     private static final Logger LOG = Logger.getLogger(
             AbstractHudsonTestCaseDeletingInstanceDir.class.getName());
+
+    protected JenkinsRule rule;
 
     static {
         new File("target/tmp").mkdir();
@@ -30,13 +36,14 @@ public abstract class AbstractHudsonTestCaseDeletingInstanceDir extends JenkinsR
         System.setProperty("hudson.model.Hudson.parallelLoad", "false");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void after() throws Exception {
-        super.after();
-        final File rootDir = jenkins.getRootDir();
+    @BeforeEach
+    void setUp(JenkinsRule rule) throws Exception {
+        this.rule = rule;
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        final File rootDir = rule.jenkins.getRootDir();
         LOG.log(Level.INFO, "Deleting {0} in tearDown", rootDir);
         FileUtils.deleteDirectory(rootDir);
     }

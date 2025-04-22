@@ -4,27 +4,25 @@ import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
+import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import io.jenkins.plugins.casc.model.CNode;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 
 import static io.jenkins.plugins.casc.misc.Util.getUnclassifiedRoot;
 import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
 import static io.jenkins.plugins.casc.misc.Util.toYamlString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ConfigurationAsCodeTest {
-    
-    @Rule
-    public JenkinsConfiguredWithCodeRule r = new JenkinsConfiguredWithCodeRule();
+@WithJenkinsConfiguredWithCode
+class ConfigurationAsCodeTest {
 
     @Issue("JENKINS-55667")
     @Test
     @ConfiguredWithCode("configuration-as-code.yml")
-    public void should_support_configuration_as_code() {
+    void should_support_configuration_as_code(JenkinsConfiguredWithCodeRule r) {
         JobConfigHistory plugin = PluginUtils.getPlugin();
         assertEquals("/var/jenkins_home", plugin.getHistoryRootDir());
         assertEquals("30", plugin.getMaxDaysToKeepEntries());
@@ -42,7 +40,7 @@ public class ConfigurationAsCodeTest {
     @Issue("JENKINS-55667")
     @Test
     @ConfiguredWithCode("configuration-as-code.yml")
-    public void should_support_configuration_export() throws Exception {
+    void should_support_configuration_export(JenkinsConfiguredWithCodeRule r) throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
         CNode jobConfigHistoryAttribute = getUnclassifiedRoot(context).get("jobConfigHistory");
@@ -56,7 +54,7 @@ public class ConfigurationAsCodeTest {
 
     @Issue("JENKINS-55667")
     @Test
-    public void should_support_configuration_export_default() throws Exception {
+    void should_support_configuration_export_default(JenkinsConfiguredWithCodeRule r) throws Exception {
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
         CNode jobConfigHistoryAttribute = getUnclassifiedRoot(context).get("jobConfigHistory");

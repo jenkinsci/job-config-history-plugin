@@ -1,11 +1,12 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.model.Slave;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -13,15 +14,20 @@ import static org.mockito.Mockito.mock;
  *
  * @author Greg Fogelberg
  */
-public class ComputerConfigHistoryActionIT {
-
-    @ClassRule
-    public static JenkinsRule rule = new JenkinsRule();
+@WithJenkins
+class ComputerConfigHistoryActionIT {
 
     private final Slave agentMock = mock(Slave.class);
 
+    private JenkinsRule rule;
+
+    @BeforeEach
+    void setUp(JenkinsRule j) {
+        rule = j;
+    }
+
     @Test
-    public void testGetDisplayName() {
+    void testGetDisplayName() {
         ComputerConfigHistoryAction sut = new ComputerConfigHistoryActionImpl();
         String expResult = "Agent Config History";
         String result = sut.getDisplayName();
