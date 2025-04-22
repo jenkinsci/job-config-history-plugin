@@ -373,7 +373,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     /**
      * Gets whether a change reason comment is mandatory.
      *
-     * @return Whether a comment window should be shown.
+     * @return Whether the change reason comment is mandatory
      */
     public boolean getChangeReasonCommentIsMandatory() {
         return changeReasonCommentIsMandatory;

@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
   <f:section title="${%Job Config History}">
     <f:entry title="${%Use different history directory than default}" field="historyRootDir">
       <f:textbox/>
@@ -37,14 +37,15 @@
       <f:entry title="${%Exclude users}" field="excludedUsers">
         <f:textbox/>
       </f:entry>
-      <f:entry title="${%Show the change message window in jobs' configure pages}"
+      <f:entry title="${%Show the change message dialog in jobs' configure pages}"
                field="showChangeReasonCommentWindow">
         <f:checkbox/>
       </f:entry>
-      <f:entry title="${%Change reason is mandatory}"
+      <f:entry title="${%Change message is mandatory}"
                field="changeReasonCommentIsMandatory">
         <f:checkbox/>
       </f:entry>
+      <st:adjunct includes="hudson.plugins.jobConfigHistory.checkbox-logic"/>
     </f:advanced>
   </f:section>
 </j:jelly>
