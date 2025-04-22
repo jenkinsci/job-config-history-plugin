@@ -2,9 +2,10 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.security.AccessControlled;
 import jenkins.model.Jenkins;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.kohsuke.stapler.StaplerRequest2;
 
 import java.io.File;
@@ -14,10 +15,10 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,16 +27,22 @@ import static org.mockito.Mockito.when;
  *
  * @author Mirko Friedenhagen
  */
-public class JobConfigHistoryBaseActionTest {
+@WithJenkins
+class JobConfigHistoryBaseActionTest {
 
     private final Jenkins jenkinsMock = mock(Jenkins.class);
     private final StaplerRequest2 staplerRequestMock = mock(
             StaplerRequest2.class);
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
+
+    private JenkinsRule jenkinsRule;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkinsRule = rule;
+    }
 
     @Test
-    public void testGetDisplayName() {
+    void testGetDisplayName() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         String expResult = "Job Config History";
         String result = sut.getDisplayName();
@@ -43,7 +50,7 @@ public class JobConfigHistoryBaseActionTest {
     }
 
     @Test
-    public void testGetUrlName() {
+    void testGetUrlName() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         String expResult = "jobConfigHistory";
         String result = sut.getUrlName();
@@ -51,7 +58,7 @@ public class JobConfigHistoryBaseActionTest {
     }
 
     @Test
-    public void testGetOutputTypeXml() {
+    void testGetOutputTypeXml() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         when(staplerRequestMock.getParameter("type")).thenReturn("xml");
         String expResult = "xml";
@@ -60,7 +67,7 @@ public class JobConfigHistoryBaseActionTest {
     }
 
     @Test
-    public void testGetOutputTypeOther() {
+    void testGetOutputTypeOther() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         when(staplerRequestMock.getParameter("type"))
                 .thenReturn("does not matter");
@@ -70,7 +77,7 @@ public class JobConfigHistoryBaseActionTest {
     }
 
     @Test
-    public void testCheckTimestamp() {
+    void testCheckTimestamp() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         assertFalse(sut.checkTimestamp("null"));
         assertFalse(sut.checkTimestamp(null));
@@ -78,7 +85,7 @@ public class JobConfigHistoryBaseActionTest {
     }
 
     @Test
-    public void testGetRequestParameter() {
+    void testGetRequestParameter() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         final String parameterName = "type";
         when(staplerRequestMock.getParameter(parameterName)).thenReturn("xml");
@@ -88,13 +95,13 @@ public class JobConfigHistoryBaseActionTest {
     }
 
     @Test
-    public void testCheckConfigurePermission() {
+    void testCheckConfigurePermission() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         sut.checkConfigurePermission();
     }
 
     @Test
-    public void testHasConfigurePermission() {
+    void testHasConfigurePermission() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         boolean expResult = false;
         boolean result = sut.hasConfigurePermission();
@@ -102,7 +109,7 @@ public class JobConfigHistoryBaseActionTest {
     }
 
     @Test
-    public void testGetAccessControlledObject() {
+    void testGetAccessControlledObject() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         AccessControlled expResult = null;
         AccessControlled result = sut.getAccessControlledObject();
@@ -110,7 +117,7 @@ public class JobConfigHistoryBaseActionTest {
     }
 
     @Test
-    public void testGetDiffLines() throws Exception {
+    void testGetDiffLines() throws Exception {
         final String resourceName = "diff.txt";
         final List<String> lines = TUtils.readResourceLines(resourceName);
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
@@ -119,7 +126,7 @@ public class JobConfigHistoryBaseActionTest {
     }
 
     @Test
-    public void testGetDiffAsString() throws IOException {
+    void testGetDiffAsString() throws IOException {
         String result = testGetDiffAsString("file1.txt", "file2.txt");
         assertThat(result, endsWith("@@ -1,1 +1,1 @@\n-a\n+b\n"));
         assertThat(result, containsString("--- "));
@@ -127,19 +134,19 @@ public class JobConfigHistoryBaseActionTest {
     }
 
     @Test
-    public void testGetDiffAsStringOfEqualFiles() throws IOException {
+    void testGetDiffAsStringOfEqualFiles() throws IOException {
         String result = testGetDiffAsString("file1.txt", "file1.txt");
         assertEquals("\n", result);
     }
 
     @Test
-    public void testGetMaxEntriesPerPage() {
+    void testGetMaxEntriesPerPage() {
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         assertEquals(JobConfigHistoryConsts.DEFAULT_MAX_ENTRIES_PER_PAGE, sut.getMaxEntriesPerPage());
     }
 
     @Test
-    public void testGetRelevantPageNums() {
+    void testGetRelevantPageNums() {
         //assuming JobConfigHistoryConsts.PAGING_EPSILON == 2
         assertArrayEquals(
                 new Integer[]{0, 1, 2, -1, 50},

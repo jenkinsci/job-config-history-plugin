@@ -24,12 +24,12 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -37,22 +37,22 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Mirko Friedenhagen
  */
-public class DeletedFileFilterTest {
+class DeletedFileFilterTest {
 
     @Test
-    public void existingFileShouldNotBeAccepted() {
+    void existingFileShouldNotBeAccepted() {
         File file = new File("123");
         assertFalse(DeletedFileFilter.accepts(file));
     }
 
     @Test
-    public void deletedFileShouldBeAccepted() {
+    void deletedFileShouldBeAccepted() {
         File file = new File("_deleted_");
         assertTrue(DeletedFileFilter.accepts(file));
     }
 
     @Test
-    public void deletedFilenameShouldBeAccepted() {
+    void deletedFilenameShouldBeAccepted() {
         assertTrue(DeletedFileFilter.accepts("_deleted_"));
     }
 
