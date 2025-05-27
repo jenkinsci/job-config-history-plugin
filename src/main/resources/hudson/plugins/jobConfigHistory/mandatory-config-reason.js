@@ -44,7 +44,11 @@ window.jchpLib = window.jchpLib || {
             }).then(
                 (val) => {
                     this.reason.value = val;
-                    button.dispatchEvent(new Event('click'));
+                    if (this.underTest) {
+                        this.dialogShown = false;
+                    } else {
+                        button.dispatchEvent(new Event('click'));
+                    }
                 },
                 () => {
                     this.dialogShown = false;

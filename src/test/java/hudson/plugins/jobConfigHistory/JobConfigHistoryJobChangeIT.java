@@ -149,8 +149,14 @@ public class JobConfigHistoryJobChangeIT {
                 dlg = p.querySelector("dialog.jenkins-dialog");
                 assertNull(dlg, "Dialog after it's ok button was clicked");
             } else {
-                HtmlFormUtil.submit(form);
-                // if we used The "Save" button to trigger the dialog, we
+                if (mandatory) {
+                    // Form submissal would normally be done in our JS code
+                    // using dispatchEvent(new Event('click')), but that
+                    // triggers a JS exception in htmlunit's WebClient.
+                    // Therefore we submit the form here.
+                    HtmlFormUtil.submit(form);
+                }
+                // if we use The "Save" button to trigger the dialog, we
                 // cannot check the state of the dialog after saving, because
                 // submitting the form redirects to a different page.
             }
@@ -326,12 +332,17 @@ public class JobConfigHistoryJobChangeIT {
         assertEquals("Created", cilist.get(1).getOperation(), "operation");
     }
 
-    //@Test
+    @Test
     public void testJobConfigSaveMandatory(JenkinsRule j) throws Exception {
         LOGGER.info("Running " + boldWhite("#testJobConfigSaveMandatory"));
         configurePlugin(j, true, true);
         FreeStyleProject project = j.createFreeStyleProject();
         HtmlPage p = j.createWebClient().goTo(project.getUrl() + "configure");
+
+        // This test needs to activate a flag in our JS object which
+        // prevents a script exception. I blame this on the script
+        // engine in htmlunit's WebClient implementation.
+        p.executeJavaScript("window.jchpLib.underTest = true;");
 
         /*
          * - Check that we have our invisible input element
@@ -364,6 +375,9 @@ public class JobConfigHistoryJobChangeIT {
         assertEquals(project.getDescription(), cilist.get(0).getChangeReasonComment(), "changeReason");
         assertEquals("unknown", cilist.get(0).getUser(), "user");
         assertEquals("unknown", cilist.get(0).getUserID(), "userId");
-        assertEquals("Created", cilist.get(0).getOperation(), "operation");
+        assertEquals("Changed", cilist.get(0).getOperation(), "operation");
+        assertEquals("unknown", cilist.get(1).getUser(), "user");
+        assertEquals("unknown", cilist.get(1).getUserID(), "userId");
+        assertEquals("Created", cilist.get(1).getOperation(), "operation");
     }
 }
