@@ -67,7 +67,7 @@ If you use this plugin together with the [Cluster Statistics Plugin](https://plu
 
 ## Open Issues
 
-* See [open issues](https://issues.jenkins.io/browse/JENKINS-66956?jql=component%20%3D%20jobconfighistory-plugin) on issues.jenkins-ci.org.
+* See [open issues](https://issues.jenkins.io/issues/?jql=resolution%20is%20EMPTY%20and%20component%3D15683) on issues.jenkins-ci.org.
 
 ------------------------------------------------------------------------
 
