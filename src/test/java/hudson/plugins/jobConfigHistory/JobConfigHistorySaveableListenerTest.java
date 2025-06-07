@@ -3,7 +3,7 @@ package hudson.plugins.jobConfigHistory;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.XmlFile;
 import hudson.model.Saveable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
  *
  * @author Mirko Friedenhagen
  */
-public class JobConfigHistorySaveableListenerTest {
+class JobConfigHistorySaveableListenerTest {
 
     private final HistoryDao mockedConfigHistoryListenerHelper = mock(
             HistoryDao.class);
@@ -24,7 +24,7 @@ public class JobConfigHistorySaveableListenerTest {
     private final JobConfigHistory mockedPlugin = mock(JobConfigHistory.class);
 
     @Test
-    public void testOnChangeNotSaveable() {
+    void testOnChangeNotSaveable() {
         when(mockedPlugin.isSaveable(any(Saveable.class), any(XmlFile.class)))
                 .thenReturn(false);
         JobConfigHistorySaveableListener sut = new JobConfigHistorySaveableListenerImpl();
@@ -32,8 +32,9 @@ public class JobConfigHistorySaveableListenerTest {
         verifyNoInteractions(mockedConfigHistoryListenerHelper);
     }
 
+
     @Test
-    public void testOnChangeSaveable() {
+    void testOnChangeSaveable() {
         when(mockedPlugin.isSaveable(null, null))
                 .thenReturn(true);
         JobConfigHistorySaveableListener sut = new JobConfigHistorySaveableListenerImpl();

@@ -24,28 +24,28 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for NonDeletedFileFilter.
  *
  * @author Mirko Friedenhagen
  */
-public class NonDeletedFileFilterTest {
+class NonDeletedFileFilterTest {
 
     @Test
-    public void existingFileShouldBeAccepted() {
+    void existingFileShouldBeAccepted() {
         File file = new File("123");
         assertTrue(NonDeletedFileFilter.accepts(file));
     }
 
     @Test
-    public void deletedShouldNotBeAccepted() {
+    void deletedShouldNotBeAccepted() {
         File file = new File("_deleted_");
         assertFalse(NonDeletedFileFilter.accepts(file));
     }

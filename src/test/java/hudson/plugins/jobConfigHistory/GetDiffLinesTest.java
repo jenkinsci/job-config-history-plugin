@@ -24,23 +24,23 @@
 package hudson.plugins.jobConfigHistory;
 
 import com.github.difflib.patch.DiffException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests for GetDiffLines.
  *
  * @author Mirko Friedenhagen
  */
-public class GetDiffLinesTest {
+class GetDiffLinesTest {
 
     @Test
-    public void getterShouldReturnCorrectly() throws IOException, DiffException {
+    void getterShouldReturnCorrectly() throws IOException, DiffException {
         GetDiffLines sut = createGetDiffLines();
         List<SideBySideView.Line> result = sut.get();
         assertEquals(24, result.size());
@@ -58,7 +58,7 @@ public class GetDiffLinesTest {
         assertEquals("diff_revised", right.getCssClass());
     }
 
-    GetDiffLines createGetDiffLines() throws IOException {
+    private GetDiffLines createGetDiffLines() throws IOException {
         final String resourceName = "diff.txt";
         final List<String> lines = TUtils.readResourceLines(resourceName);
         return new GetDiffLines(lines);

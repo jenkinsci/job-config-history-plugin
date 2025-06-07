@@ -1,14 +1,14 @@
 package hudson.plugins.jobConfigHistory;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.rules.ExternalResource;
-import org.junit.rules.TemporaryFolder;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -18,38 +18,37 @@ import java.util.zip.ZipInputStream;
  *
  * @author Mirko Friedenhagen
  */
-public class UnpackResourceZip extends ExternalResource {
+class UnpackResourceZip {
 
-    private final TemporaryFolder temporaryFolder = new TemporaryFolder(
-            new File("target"));
+    private final File temporaryFolder;
 
     private final URL resourceURL;
 
-    public UnpackResourceZip(URL resourceURL) {
+    private UnpackResourceZip(URL resourceURL) throws Exception {
+        this.temporaryFolder = Files.createTempDirectory(new File("target").toPath(), "junit").toFile();
         this.resourceURL = resourceURL;
+
+        unpackZip();
     }
 
-    public static UnpackResourceZip create() {
+    public static UnpackResourceZip create() throws Exception {
         return new UnpackResourceZip(UnpackResourceZip.class
                 .getResource("JobConfigHistoryPurgerIT.zip"));
     }
 
-    @Override
-    protected void before() throws Throwable {
-        temporaryFolder.create();
-        unpackZip();
-    }
-
-    @Override
-    protected void after() {
-        temporaryFolder.delete();
+    public void cleanUp() throws Exception {
+        try {
+            FileUtils.deleteDirectory(getRoot());
+        } catch (IOException ex) {
+            FileUtils.forceDeleteOnExit(getRoot());
+        }
     }
 
     /**
      * @return the root location of the unpacked resources.
      */
     public File getRoot() {
-        return temporaryFolder.getRoot();
+        return temporaryFolder;
     }
 
     /**
@@ -65,8 +64,7 @@ public class UnpackResourceZip extends ExternalResource {
         try (ZipInputStream in = new ZipInputStream(resourceURL.openStream())) {
             ZipEntry entry = in.getNextEntry();
             while (entry != null) {
-                final File file = new File(temporaryFolder.getRoot(),
-                        entry.getName());
+                final File file = new File(getRoot(), entry.getName());
                 if (!entry.isDirectory()) {
                     createFileResource(file, in);
                 } else {

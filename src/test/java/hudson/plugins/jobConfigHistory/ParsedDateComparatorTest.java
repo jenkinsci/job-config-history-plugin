@@ -1,19 +1,19 @@
 package hudson.plugins.jobConfigHistory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for ParsedDateComparator.
  *
  * @author Mirko Friedenhagen
  */
-public class ParsedDateComparatorTest {
+class ParsedDateComparatorTest {
 
     private static final String DATE = "2012-11-21_11-29-12";
 
@@ -30,7 +30,7 @@ public class ParsedDateComparatorTest {
             null);
 
     @Test
-    public void objectsWithSameValuesShouldBeEqual() {
+    void objectsWithSameValuesShouldBeEqual() {
         assertEquals(0, ParsedDateComparator.DESCENDING.compare(historyDescr,
                 historyDescrClone));
         assertEquals(0, ParsedDateComparator.DESCENDING
@@ -38,7 +38,7 @@ public class ParsedDateComparatorTest {
     }
 
     @Test
-    public void historyDescrShouldBeSortedCorrectly() {
+    void historyDescrShouldBeSortedCorrectly() {
         final List<HistoryDescr> list = Arrays.asList(historyDescr,
                 historyDescrNewer);
         list.sort(ParsedDateComparator.DESCENDING);

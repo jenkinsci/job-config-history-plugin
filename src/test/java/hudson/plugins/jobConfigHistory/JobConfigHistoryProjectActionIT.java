@@ -4,9 +4,16 @@ import org.htmlunit.html.HtmlAnchor;
 import org.htmlunit.html.HtmlForm;
 import org.htmlunit.html.HtmlPage;
 import hudson.model.FreeStyleProject;
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class JobConfigHistoryProjectActionIT
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@WithJenkins
+class JobConfigHistoryProjectActionIT
         extends
         AbstractHudsonTestCaseDeletingInstanceDir {
 
@@ -14,24 +21,25 @@ public class JobConfigHistoryProjectActionIT
     // directories
     // (which are saved with a granularity of one second)
     private static final int SLEEP_TIME = 1100;
-    private WebClient webClient;
+    private JenkinsRule.WebClient webClient;
 
     @Override
-    public void before() throws Throwable {
-        super.before();
-        webClient = createWebClient();
+    void setUp(JenkinsRule rule) throws Exception {
+        super.setUp(rule);
+        webClient = rule.createWebClient();
     }
 
     /**
      * Tests restore link on job config history page.
      */
-    public void testRestore() {
+    @Test
+    void testRestore() {
         final String firstDescription = "first test";
         final String secondDescription = "second test";
         final String projectName = "Test1";
 
-        try {
-            final FreeStyleProject project = createFreeStyleProject(
+        assertDoesNotThrow(() -> {
+            final FreeStyleProject project = rule.createFreeStyleProject(
                     projectName);
             Thread.sleep(SLEEP_TIME);
             project.setDescription(firstDescription);
@@ -39,7 +47,7 @@ public class JobConfigHistoryProjectActionIT
             project.setDescription(secondDescription);
             Thread.sleep(SLEEP_TIME);
 
-            Assert.assertEquals(project.getDescription(), secondDescription);
+            assertEquals(secondDescription, project.getDescription());
 
             final HtmlPage htmlPage = webClient.goTo("job/" + projectName + "/"
                     + JobConfigHistoryConsts.URLNAME);
@@ -48,54 +56,48 @@ public class JobConfigHistoryProjectActionIT
             final HtmlPage reallyRestorePage = restoreLink.click();
             final HtmlForm restoreForm = reallyRestorePage
                     .getFormByName("restore");
-            final HtmlPage jobPage = submit(restoreForm, "Submit");
+            final HtmlPage jobPage = rule.submit(restoreForm, "Submit");
 
-            Assert.assertTrue(
-                    "Verify return to job page and changed description.",
-                    jobPage.asNormalizedText().contains(firstDescription));
-            Assert.assertEquals("Verify changed description.",
-                    project.getDescription(), firstDescription);
+            assertTrue(
+                    jobPage.asNormalizedText().contains(firstDescription),
+                    "Verify return to job page and changed description.");
+            assertEquals(firstDescription, project.getDescription(), "Verify changed description.");
 
-        } catch (Exception ex) {
-            Assert.fail("Unable to complete restore config test: " + ex);
-        }
+        }, "Unable to complete restore config test: ");
     }
 
     /**
      * Tests restore button on "Really restore?" page.
      */
-    public void testRestoreFromDiffFiles() {
+    @Test
+    void testRestoreFromDiffFiles() {
         final String firstDescription = "first test";
         final String secondDescription = "second test";
         final String projectName = "Test1";
-        final FreeStyleProject project;
 
-        try {
-            project = createFreeStyleProject(projectName);
+        assertDoesNotThrow(() -> {
+            final FreeStyleProject project = rule.createFreeStyleProject(projectName);
             Thread.sleep(SLEEP_TIME);
             project.setDescription(firstDescription);
             Thread.sleep(SLEEP_TIME);
             project.setDescription(secondDescription);
             Thread.sleep(SLEEP_TIME);
 
-            Assert.assertEquals(project.getDescription(), secondDescription);
+            assertEquals(secondDescription, project.getDescription());
 
             final HtmlPage htmlPage = webClient.goTo("job/" + projectName + "/"
                     + JobConfigHistoryConsts.URLNAME);
-            final HtmlPage diffPage = submit(
+            final HtmlPage diffPage = rule.submit(
                     htmlPage.getFormByName("diffFiles"), "Submit");
-            final HtmlPage reallyRestorePage = submit(
+            final HtmlPage reallyRestorePage = rule.submit(
                     diffPage.getFormByName("forward"), "Submit");
-            final HtmlPage jobPage = submit(
+            final HtmlPage jobPage = rule.submit(
                     reallyRestorePage.getFormByName("restore"), "Submit");
 
-            Assert.assertTrue(
-                    "Verify return to job page and changed description.",
-                    jobPage.asNormalizedText().contains(firstDescription));
-            Assert.assertEquals("Verify changed description.",
-                    project.getDescription(), firstDescription);
-        } catch (Exception ex) {
-            Assert.fail("Unable to complete restore config test: " + ex);
-        }
+            assertTrue(
+                    jobPage.asNormalizedText().contains(firstDescription),
+                    "Verify return to job page and changed description.");
+            assertEquals(firstDescription, project.getDescription(), "Verify changed description.");
+        }, "Unable to complete restore config test: ");
     }
 }

@@ -2,7 +2,8 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.model.ItemGroup;
 import jenkins.model.Jenkins;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -10,9 +11,9 @@ import java.util.GregorianCalendar;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,14 +23,15 @@ import static org.mockito.Mockito.when;
  *
  * @author Mirko Friedenhagen
  */
-public class ConfigInfoTest {
+class ConfigInfoTest {
 
     private static final String DATE = "2012-11-21_11-29-12";
 
     private final HistoryDescr historyDescr = new HistoryDescr(
             "Firstname Lastname", "userId", "operation", DATE, null, null);
 
-    public ConfigInfoTest() {
+    @BeforeEach
+    void setUp() {
         ItemGroup<?> itemGroupMock = mock(ItemGroup.class);
         when(itemGroupMock.getFullName()).thenReturn("does not matter parent");
         Jenkins jenkinsMock = mock(Jenkins.class);
@@ -40,7 +42,7 @@ public class ConfigInfoTest {
      * Test of create method, of class ConfigInfo.
      */
     @Test
-    public void configInfoShouldBeInitializedCorrectly() {
+    void configInfoShouldBeInitializedCorrectly() {
         ConfigInfo sut = ConfigInfo.create("jobName", true, historyDescr,
                 false);
         assertNotNull(sut);
@@ -48,7 +50,7 @@ public class ConfigInfoTest {
     }
 
     @Test
-    public void toStringShouldContainOperationString() {
+    void toStringShouldContainOperationString() {
         ConfigInfo sut = ConfigInfo.create("jobName", true, historyDescr,
                 false);
         String result = sut.toString();
@@ -56,7 +58,7 @@ public class ConfigInfoTest {
     }
 
     @Test
-    public void dateShouldBeParsedCorrectly() {
+    void dateShouldBeParsedCorrectly() {
         ConfigInfo sut = ConfigInfo.create("jobName", true, historyDescr,
                 false);
         Date expResult = new GregorianCalendar(2012, Calendar.NOVEMBER, 21, 11, 29, 12).getTime();

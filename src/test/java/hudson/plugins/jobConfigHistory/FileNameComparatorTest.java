@@ -24,12 +24,12 @@
 
 package hudson.plugins.jobConfigHistory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  *
@@ -37,12 +37,12 @@ import static org.junit.Assert.assertNotEquals;
  *
  * @author Mirko Friedenhagen
  */
-public class FileNameComparatorTest {
+class FileNameComparatorTest {
 
     private static final int RESULT_SAME_NAME = 0;
 
     @Test
-    public void sameFileNamesShouldBeEqual() {
+    void sameFileNamesShouldBeEqual() {
         File f1 = new File("a");
         File f2 = new File("a");
         int result = FileNameComparator.INSTANCE.compare(f1, f2);
@@ -50,7 +50,7 @@ public class FileNameComparatorTest {
     }
 
     @Test
-    public void differentFileNamesShouldNotBeEqual() {
+    void differentFileNamesShouldNotBeEqual() {
         assertNotEquals(RESULT_SAME_NAME,
                 FileNameComparator.INSTANCE.compare(
                         new File("abc"),
@@ -59,7 +59,7 @@ public class FileNameComparatorTest {
     }
 
     @Test
-    public void sameFileShouldEqualItsOwnname() {
+    void sameFileShouldEqualItsOwnname() {
         File file = new File("test.txt");
         assertEquals(RESULT_SAME_NAME, FileNameComparator.INSTANCE.compare(file, file));
     }

@@ -23,21 +23,16 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import org.htmlunit.html.DomElement;
-import org.htmlunit.html.HtmlButton;
-import org.htmlunit.html.HtmlForm;
-import org.htmlunit.html.HtmlPage;
 import hudson.XmlFile;
-import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.JDK;
-import hudson.model.Project;
 import hudson.security.AccessControlled;
 import jenkins.model.Jenkins;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.StaplerResponse2;
 
@@ -49,12 +44,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -64,14 +59,20 @@ import static org.mockito.Mockito.verify;
  *
  * @author Mirko Friedenhagen
  */
-public class JobConfigHistoryRootActionTest {
+@WithJenkins
+class JobConfigHistoryRootActionTest {
 
     private final StaplerRequest2 mockedStaplerRequest = mock(StaplerRequest2.class);
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
+
+    private JenkinsRule jenkinsRule;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkinsRule = rule;
+    }
 
     @Test
-    public void testGetUrlName() {
+    void testGetUrlName() {
         JobConfigHistoryRootAction sut = createSut();
         String expResult = "/" + JobConfigHistoryConsts.URLNAME;
         String result = sut.getUrlName();
@@ -79,22 +80,23 @@ public class JobConfigHistoryRootActionTest {
     }
 
     @Test
-    public void testGetIconFileNameWithoutPermissions() {
+    void testGetIconFileNameWithoutPermissions() {
         assertNull(createUnauthorizedStaplerMockedSut().getIconFileName());
     }
 
     @Test
-    public void testGetIconFileName() {
+    void testGetIconFileName() {
         assertNotNull(createSut().getIconFileName());
     }
 
     @Test
-    public void testGetIconFileNameWithJobPermission() {
+    void testGetIconFileNameWithJobPermission() {
         assertNotNull(createSut().getIconFileName());
     }
 
-    @Ignore
-    public void testGetSingleConfigs_fromTo() throws Exception {
+    @Disabled
+    @Test
+    void testGetSingleConfigs_fromTo() throws Exception {
         given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME + "/history");
         given(mockedStaplerRequest.getParameter("name")).willReturn("config");
         JobConfigHistoryRootAction sut = createStaplerMockedSut();
@@ -112,7 +114,7 @@ public class JobConfigHistoryRootActionTest {
      * Test of getJobConfigs method, of class JobConfigHistoryRootAction.
      */
     @Test
-    public void testGetJobConfigs() throws Exception {
+    void testGetJobConfigs() throws Exception {
         //no projects
         assertEquals(0, createSut().getJobConfigs("").size());
 
@@ -130,7 +132,7 @@ public class JobConfigHistoryRootActionTest {
      * Test of getFile method, of class JobConfigHistoryRootAction.
      */
     @Test
-    public void testGetFileWithoutPermissions() throws Exception {
+    void testGetFileWithoutPermissions() throws Exception {
         given(mockedStaplerRequest.getParameter("name"))
                 .willReturn("jobs/Test1");
         assertEquals("No permission to view config files",
@@ -145,7 +147,7 @@ public class JobConfigHistoryRootActionTest {
      * Test of getFile method, of class JobConfigHistoryRootAction.
      */
     @Test
-    public void testGetFile() throws Exception {
+    void testGetFile() throws Exception {
         //create a job, then feed the stapler request.
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
         List<String> timestamps = getCreatedTimestamps(freeStyleProject);
@@ -169,7 +171,7 @@ public class JobConfigHistoryRootActionTest {
     }
 
     @Test
-    public void testGetFileDeleted() throws Exception {
+    void testGetFileDeleted() throws Exception {
 
         //initialize deleted project
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
@@ -189,14 +191,14 @@ public class JobConfigHistoryRootActionTest {
     }
 
     @Test
-    public void testCreateLinkToFilesDeleted() throws IOException, InterruptedException {
+    void testCreateLinkToFilesDeleted() throws IOException, InterruptedException {
         //create a project
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
         freeStyleProject.delete();
 
         //get the expected timestamp
         List<File> revisionsFromDeletedProject = Arrays.stream(PluginUtils.getHistoryDao().getDeletedJobs()[0].listFiles())
-                .sorted(Comparator.naturalOrder()).collect(Collectors.toList());
+                .sorted(Comparator.naturalOrder()).toList();
 
         //expected stuff
         final String deletedFolderName = PluginUtils.getHistoryDao().getDeletedJobs()[0].getName();
@@ -215,7 +217,7 @@ public class JobConfigHistoryRootActionTest {
     }
 
     @Test
-    public void testCreateLinkToFiles() {
+    void testCreateLinkToFiles() {
         final ConfigInfo config = mock(ConfigInfo.class);
         given(config.getJob()).willReturn("Test1");
         given(config.getDate()).willReturn("2012-11-21_11-42-05");
@@ -225,7 +227,7 @@ public class JobConfigHistoryRootActionTest {
     }
 
     @Test
-    public void testCreateLinkToFilesSystem() {
+    void testCreateLinkToFilesSystem() {
         final ConfigInfo config = mock(ConfigInfo.class);
         given(config.getJob()).willReturn("config");
         given(config.getDate()).willReturn("2012-11-21_11-42-05");
@@ -235,48 +237,50 @@ public class JobConfigHistoryRootActionTest {
     }
 
     @Test
-    public void testGetAccessControlledObject() {
+    void testGetAccessControlledObject() {
         assertEquals(jenkinsRule.getInstance(), createSut().getAccessControlledObject());
     }
 
     @Test
-    public void testCheckConfigurePermission() {
+    void testCheckConfigurePermission() {
         createSut().checkConfigurePermission();
     }
 
     @Test
-    public void testHasConfigurePermission() {
+    void testHasConfigurePermission() {
         assertTrue(createSut().hasConfigurePermission());
     }
 
     @Test
-    public void testHasJobConfigurePermission() {
+    void testHasJobConfigurePermission() {
         assertTrue(createSut().hasJobConfigurePermission());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testCheckParametersIAE() {
-        createSut().checkParameters("foo", "bar");
+    @Test
+    void testCheckParametersIAE() {
+        assertThrows(IllegalArgumentException.class, () ->
+            createSut().checkParameters("foo", "bar"));
     }
 
     @Test
-    public void testCheckParametersNameIsNull() {
+    void testCheckParametersNameIsNull() {
         assertFalse(createSut().checkParameters(null, "2013-01-18_18-24-33"));
         assertFalse(createSut().checkParameters("null", "2013-01-18_18-24-33"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testCheckParametersNameHasDots() {
-        createSut().checkParameters("../foo", "2013-01-18_18-24-33");
+    @Test
+    void testCheckParametersNameHasDots() {
+        assertThrows(IllegalArgumentException.class, () ->
+            createSut().checkParameters("../foo", "2013-01-18_18-24-33"));
     }
 
     @Test
-    public void testCheckParameters() {
+    void testCheckParameters() {
         assertTrue(createSut().checkParameters("foo", "2013-01-18_18-24-33"));
     }
 
     @Test
-    public void testDoDiffFiles() throws Exception {
+    void testDoDiffFiles() throws Exception {
         final String boundary = "AAAA";
         given(mockedStaplerRequest.getContentType())
                 .willReturn("multipart/form-data; boundary=" + boundary);
@@ -290,7 +294,7 @@ public class JobConfigHistoryRootActionTest {
     }
 
     @Test
-    public void testGetLines() throws Exception {
+    void testGetLines() throws Exception {
 
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
 
@@ -303,7 +307,7 @@ public class JobConfigHistoryRootActionTest {
 
     private void testLines(long expected, FreeStyleProject freeStyleProject, int i, int j, boolean hideVersionDiffs) throws IOException {
         List<String> timestamps = getCreatedTimestamps(freeStyleProject);
-        assertTrue("i or j are too high", timestamps.size() > Math.max(i, j));
+        assertTrue(timestamps.size() > Math.max(i, j), "i or j are too high");
 
         final List<SideBySideView.Line> lines = createSut().getLines(
                 getConfigXml(freeStyleProject, timestamps.get(i)),
@@ -335,13 +339,13 @@ public class JobConfigHistoryRootActionTest {
     }
 
     @Test
-    public void testGetLinesNoPermissions() throws Exception {
+    void testGetLinesNoPermissions() throws Exception {
         given(mockedStaplerRequest.getParameter("name")).willReturn("Test1");
         assertEquals(0, createUnauthorizedStaplerMockedSut().getLines().size());
     }
 
     @Test
-    public void testFindNewName() throws Exception {
+    void testFindNewName() throws Exception {
         FreeStyleProject test1 = jenkinsRule.createFreeStyleProject("Test1");
         assertEquals("Test1_1", createSut().findNewName("Test1"));
 
@@ -353,7 +357,7 @@ public class JobConfigHistoryRootActionTest {
     }
 
     @Test
-    public void testGetOldConfigXml() throws IOException, InterruptedException {
+    void testGetOldConfigXml() throws IOException, InterruptedException {
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
         List<String> timestamps = getCreatedTimestamps(freeStyleProject);
         freeStyleProject.delete();
@@ -375,15 +379,16 @@ public class JobConfigHistoryRootActionTest {
         );
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testGetOldConfigXmlNonExisting() {
+    @Test
+    void testGetOldConfigXmlNonExisting() {
         final String name = "jobs/I_DO_NOT_EXIST";
         final String timestamp = "2012-11-21_11-35-12";
-        createSut().getOldConfigXml(name, timestamp);
+        assertThrows(IllegalArgumentException.class, () ->
+            createSut().getOldConfigXml(name, timestamp));
     }
 
     @Test
-    public void testGetLastAvailableConfigXml() throws IOException {
+    void testGetLastAvailableConfigXml() throws IOException {
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");
         List<String> timestamps = getCreatedTimestamps(freeStyleProject);
         final String timestamp = timestamps.get(0);
@@ -396,13 +401,13 @@ public class JobConfigHistoryRootActionTest {
     }
 
     @Test
-    public void testGetLastAvailableConfigXmlNoConfigs() {
+    void testGetLastAvailableConfigXmlNoConfigs() {
         String name = "jobs/I_DO_NOT_EXIST";
         assertNull(createSut().getLastAvailableConfigXml(name));
     }
 
     @Test
-    public void testDoForwardToRestoreQuestion() throws Exception {
+    void testDoForwardToRestoreQuestion() throws Exception {
         given(mockedStaplerRequest.getParameter("name")).willReturn("foo");
         StaplerResponse2 mockedResponse = mock(StaplerResponse2.class);
         JobConfigHistoryRootAction sut = createStaplerMockedSut();
