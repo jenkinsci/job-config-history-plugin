@@ -1,0 +1,12 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+  <div class="jenkins-hidden" id="restore-config-template" data-title="${%Restore Configuration}" data-ok-text="${%Restore}"
+       data-description="${%Replace the current configuration with the version from }">
+    <f:form method="post" name="restore">
+      <div class="jenkins-!-margin-bottom-3 restore-config-dialog">
+        <l:icon src="symbol-warning-outline plugin-ionicons-api" class="icon-md jenkins-!-error-color"/>
+        <span class="restore-config-form-content"/>
+      </div>
+    </f:form>
+  </div>
+</j:jelly>

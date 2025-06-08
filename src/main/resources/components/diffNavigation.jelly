@@ -1,0 +1,35 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core">
+  <div class="jch-diff-navigation jenkins-!-margin-top-1">
+    <j:if test="${prev1 != timestamp1}">
+      <a href="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${timestamp2}" class="jenkins-button">
+        &lt; ${%Expand Diff}
+      </a>
+    </j:if>
+    <j:if test="${next1 != timestamp1}">
+      <a href="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${timestamp2}" class="jenkins-button">
+        ${%Shrink Diff} &gt;
+      </a>
+    </j:if>
+    <j:if test="${prev1 != prev2}">
+      <a href="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${prev2}" class="jenkins-button">
+        &lt; ${%Prev}
+      </a>
+    </j:if>
+    <j:if test="${next1 != next2}">
+      <a href="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${next2}" class="jenkins-button">
+        ${%Next} &gt;
+      </a>
+    </j:if>
+    <j:if test="${prev2 != timestamp2}">
+      <a href="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${prev2}" class="jenkins-button">
+        &lt; ${%Shrink Diff}
+      </a>
+    </j:if>
+    <j:if test="${next2 != timestamp2}">
+      <a href="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${next2}" class="jenkins-button">
+        ${%Expand Diff} &gt;
+      </a>
+    </j:if>
+  </div>
+</j:jelly>

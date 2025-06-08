@@ -1,0 +1,25 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
+  <j:if test="${!syntaxCheck1.isWellFormatted() || !syntaxCheck2.isWellFormatted()}">
+    <div class="jenkins-alert jenkins-alert-warning">
+      <h3>${%Warning}: ${%Corrupt XML files}</h3>
+      <div style="display: flex;gap: 1rem">
+        <l:icon src="symbol-alert-outline plugin-ionicons-api" class="jenkins-!-error-color icon-xlg"/>
+        <j:set var="revisionStr" value="${%Revision}"/>
+        <div>
+          <j:if test="${!syntaxCheck1.isWellFormatted()}">
+            <div>
+              ${revisionStr + " " + it.getTimestamp(1) + ": " + syntaxCheck1.getMessage()}left
+            </div>
+          </j:if>
+          <j:if test="${!syntaxCheck2.isWellFormatted()}">
+            <div>
+              ${revisionStr + " " + it.getTimestamp(2) + ": " + syntaxCheck2.getMessage()}
+            </div>
+          </j:if>
+        </div>
+        <l:icon src="symbol-alert-outline plugin-ionicons-api" class="jenkins-!-error-color icon-xlg"/>
+      </div>
+    </div>
+  </j:if>
+</j:jelly>

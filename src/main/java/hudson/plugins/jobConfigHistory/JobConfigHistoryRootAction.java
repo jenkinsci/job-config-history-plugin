@@ -731,20 +731,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         return newName;
     }
 
-    /**
-     * Action when 'restore' button in history.jelly is pressed. Gets required
-     * parameter and forwards to restoreQuestion.jelly.
-     *
-     * @param req StaplerRequest2 created by pressing the button
-     * @param rsp Outgoing StaplerResponse2
-     * @throws IOException If redirect goes wrong
-     */
-    public final void doForwardToRestoreQuestion(StaplerRequest2 req,
-                                                 StaplerResponse2 rsp) throws IOException {
-        final String name = req.getParameter("name");
-        rsp.sendRedirect("restoreQuestion?name=" + name);
-    }
-
     @POST
     public final void doDeleteRevision(StaplerRequest2 req, StaplerResponse2 rsp) {
         checkDeleteEntryPermission();

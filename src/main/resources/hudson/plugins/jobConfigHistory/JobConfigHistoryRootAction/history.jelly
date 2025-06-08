@@ -6,6 +6,7 @@
   <l:layout title="${%Job Configuration History}">
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css" />
+    <st:adjunct includes="hudson.plugins.jobConfigHistory.restore-config"/>
 
     <j:set var="useNameInComponentUrl" value="1" />
     <j:set var="name" value="${request2.getParameter('name')}" />
@@ -13,7 +14,6 @@
     <j:set var="offsetIfDeleted" value="${isDeleted ? 1 : 0}" />
     <l:side-panel>
       <l:tasks>
-        <l:task icon="icon-up" href="${rootURL}/" title="${%Back to Dashboard}" />
         <l:task icon="symbol-confighistory plugin-jobConfigHistory" href="${rootURL}/jobConfigHistory" title="${%Back to Overview}" />
         <j:choose>
           <j:when test="${isDeleted}">
@@ -26,6 +26,15 @@
       </l:tasks>
     </l:side-panel>
     <l:main-panel>
+      <div class="jenkins-hidden" id="restore-config-template" data-title="${%Restore Configuration}" data-ok-text="${%Restore}"
+           data-description="${%Replace the current configuration with the version from }">
+        <f:form method="post" name="restore">
+          <div class="jenkins-!-margin-bottom-3 restore-config-dialog">
+            <l:icon src="symbol-warning-outline plugin-ionicons-api" class="icon-md jenkins-!-error-color"/>
+            <span class="restore-config-form-content"/>
+          </div>
+        </f:form>
+      </div>
       <j:choose>
         <j:when test="${isDeleted}">
           <h1>${%Job Deletion History}</h1>
@@ -73,19 +82,19 @@
             <f:form id="rootHistoryDiffForm" method="post" action="diffFiles" enctype="multipart/form-data">
 
               <table id="confighistory" class="jenkins-table sortable">
-                <caption class="caption">
-                  <h2>${name}</h2>
+                <caption class="jch-caption">
+                  ${name}
                 </caption>
                 <thead>
                   <tr>
-                    <th initialSortDir="up" style="text-align:left">${%Date}</th>
-                    <th style="text-align:left"> ${%Operation}</th>
-                    <th style="text-align:left">${%User}</th>
-                    <th style="text-align:left">${%Show File}</th>
-                    <th style="text-align:center">${%File A}</th>
-                    <th style="text-align:center">${%File B}</th>
+                    <th initialSortDir="up">${%Date}</th>
+                    <th> ${%Operation}</th>
+                    <th>${%User}</th>
+                    <th data-sort-disable="true">${%Show File}</th>
+                    <th data-sort-disable="true" style="text-align:center">${%File A}</th>
+                    <th data-sort-disable="true" style="text-align:center">${%File B}</th>
                     <j:if test="${it.hasDeleteEntryPermission()}">
-                      <th style="text-align:center">${%Delete Entry}</th>
+                      <th data-sort-disable="true" style="text-align:center">${%Delete Entry}</th>
                     </j:if>
                   </tr>
                 </thead>
@@ -117,28 +126,28 @@
                       <!-- File A -->
                       <td style="text-align:center">
                         <j:if test="${config.operation != 'Deleted'}">
-                          <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfDeleted) ? true:false}" />
+                          <c:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfDeleted) ? true:false}" />
                         </j:if>
                       </td>
 
                       <!-- File B -->
                       <td style="text-align:center">
                         <j:if test="${config.operation != 'Deleted'}">
-                          <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == (1 + offsetIfDeleted) ? true:false}" />
+                          <c:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == (1 + offsetIfDeleted) ? true:false}" />
                         </j:if>
                       </td>
 
                       <!-- Trash icon -->
-                      <td style="text-align:center">
-                        <j:if test="${it.hasDeleteEntryPermission() and !config.operation.toString().equals(&quot;Deleted&quot;)}">
+                      <j:if test="${it.hasDeleteEntryPermission() and !config.operation.toString().equals(&quot;Deleted&quot;)}">
+                        <td style="text-align:center">
                           <j:set var="message" value="${%Do you really want to delete the history entry} " />
-                          <div id="target-div" jobName="${config.getJob()}">
-                            <button type="button" class="jenkins-button jenkins-button--destructive system-config-history-delete-button" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
+                          <div id="target-div" jobName="${config.getJob()}" class="jenkins-table__cell__button-wrapper">
+                            <button type="button" class="jenkins-button jenkins-!-destructive-color system-config-history-delete-button" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
                               <l:icon src="symbol-trash-outline plugin-ionicons-api" class="icon-md" alt="${%Delete Revision}" />
                             </button>
                           </div>
-                        </j:if>
-                      </td>
+                        </td>
+                      </j:if>
                     </tr>
 
                     <f:invisibleEntry>

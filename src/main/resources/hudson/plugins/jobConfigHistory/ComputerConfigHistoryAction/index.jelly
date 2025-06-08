@@ -1,16 +1,38 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:c="/components">
   <l:layout title="${%Agent Configuration History}">
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
+    <st:adjunct includes="hudson.plugins.jobConfigHistory.restore-config"/>
 
     <st:include it="${it.agent.toComputer()}" page="sidepanel.jelly" />
     <l:main-panel>
-      <h1>${%Agent Configuration History}</h1>
+      <c:restore-config-template/>
+      <l:app-bar title="${%Agent Configuration History}"/>
       <div>
-
+        <j:set var="captionTitle" value="${it.agent.getNodeName()}"/>
         <st:adjunct includes="hudson.plugins.jobConfigHistory.deleteRevisionAndTableEntry" />
         <j:set var="configs" value="${it.getAgentConfigs()}" />
+        <j:set var="defaultEntriesPerPage" value="${it.getMaxEntriesPerPage()}" />
+        <j:set var="pageNum" value="${request2.getParameter('pageNum')}" />
+        <j:set var="entriesPerPage" value="${request2.getParameter('entriesPerPage')}" />
+        <j:set var="totalEntriesNumber" value="${it.getRevisionAmount()}" />
+        <j:if test="${pageNum == null or pageNum.equals(&quot;&quot;)}">
+          <j:set var="pageNum" value="0" />
+        </j:if>
+        <j:if test="${entriesPerPage == null or entriesPerPage.equals(&quot;&quot;)}">
+          <j:set var="entriesPerPage" value="${defaultEntriesPerPage.toString()}" />
+        </j:if>
+        <j:choose>
+          <j:when test="${entriesPerPage.equals(&quot;all&quot;)}">
+            <j:set var="configs" value="${it.getAgentConfigs()}" />
+            <j:set var="maxPageNum" value="${0}" />
+          </j:when>
+          <j:otherwise>
+            <j:set var="configs" value="${it.getAgentConfigs(pageNum*entriesPerPage, pageNum*entriesPerPage+entriesPerPage)}" />
+            <j:set var="maxPageNum" value="${it.getMaxPageNum()}" />
+          </j:otherwise>
+        </j:choose>
         <j:choose>
           <j:when test="${configs.size() == 0}">
             ${%No agent configuration history available}
@@ -19,42 +41,29 @@
             <br/>
             <div>
               <f:form method="post" action="diffFiles" name="diffFiles">
-                <j:if test="${configs.size() > 1}">
-                  <div align="right">
-                    <div align="right">
-                      <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
-                    </div>
-                    <div style="padding:2px"/>
-                  </div>
-                </j:if>
-
-                <table class="jch" style="width:100%">
-                  <thead>
-                    <caption class="caption">
-                      ${it.getAgent().getNodeName()}
+                  <table id="confighistory" class="jenkins-table sortable">
+                    <caption class="jch-caption">
+                      ${captionTitle}
                     </caption>
-                  </thead>
-                </table>
-                <div class="resizeWrapper" style="overflow-y:scroll; height:100%; max-height:59vh;">
-                  <table id="confighistory" class="pane sortable jch">
                     <thead>
                       <tr>
-                        <th initialSortDir="up" align="left">${%Date}</th>
+                        <th initialSortDir="up">${%Date}</th>
                         <th>${%Operation}</th>
                         <th>${%User}</th>
-                        <th>${%Show File}</th>
-                        <th style=" text-align:center">${%Restore old config}</th>
-                        <th style=" text-align:center">${%File A}</th>
-                        <th style=" text-align:center">${%File B}</th>
+                        <th data-sort-disable="true">${%Show File}</th>
+                        <th data-sort-disable="true" style=" text-align:center">${%Restore old config}</th>
+                        <th data-sort-disable="true" style=" text-align:center">${%File A}</th>
+                        <th data-sort-disable="true" style=" text-align:center">${%File B}</th>
                         <j:if test="${it.hasDeleteEntryPermission()}">
-                          <th style="text-align:center">${%Delete Entry}</th>
+                          <th data-sort-disable="true" style="text-align:center">${%Delete Entry}</th>
                         </j:if>
                       </tr>
                     </thead>
+                    <tbody>
                     <j:set var="configNr" value="0"/>
                     <j:forEach var="config" items="${configs}">
                       <j:set var="configNr" value="${configNr + 1}"/>
-                      <tr class="alternate" id="table-row-${configNr}">
+                      <tr id="table-row-${configNr}">
                         <td>${config.date}</td>
                         <td>
                         <j:if test="${(config.currentName!=null) and (! config.currentName.isEmpty())}">
@@ -71,9 +80,9 @@
                         <td>
                           <j:set var="fileMissing" value="${!config.hasConfig()}"/>
                           <j:if test="${!fileMissing}">
-                            <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}"> ${%View as XML} </a>
+                            <a href="configOutput?type=xml&amp;timestamp=${config.getDate()}" class="jenkins-table__link"> ${%View as XML} </a>
                             <st:nbsp />
-                            <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}">
+                            <a href="configOutput?type=raw&amp;timestamp=${config.getDate()}" class="jenkins-table__link jenkins-table__badge">
                               (${%RAW})
                             </a>
                           </j:if>
@@ -81,15 +90,15 @@
                         <td style=" text-align:center">
                           <j:set var="revisionEqualsCurrent" value="${it.revisionEqualsCurrent(config.getDate())}"/>
                           <j:if test="${!revisionEqualsCurrent and !fileMissing}">
-                            <a href="restoreQuestion?timestamp=${config.getDate()}" style="text-decoration: none">
-                              <span class="icon-md">
-                                <l:icon id="restore${configNr}" src="symbol-restore plugin-jobConfigHistory" title="${%Restore}" />
-                              </span>
-                            </a>
-                            <j:if test="${configNr == 1}">
+                            <div class="jenkins-table__cell__button-wrapper">
+                            <button type="button" class="jenkins-button restore-config" data-timestamp="${config.getDate()}">
+                              <l:icon id="restore${configNr}" src="symbol-restore plugin-jobConfigHistory" class="jenkins-!-warning-color" tooltip="${%Restore}" />
+                            </button>
+                            </div>
+                            <j:if test="${configNr == 1 and pageNum == 0}">
                               <!--The current version is not present in history!-->
                               <br/>
-                              <span style="color: rgb(196, 109, 0); font-weight:bold;">
+                              <span style="color: var(--warning-color); font-weight:bold;">
                                 ${%Warning}: ${%This is the latest revision in history, but not the current config. Save config to create a current entry.}
                               </span>
                             </j:if>
@@ -98,22 +107,26 @@
                         <j:if test="${configNr == 2 and fileMissing}">
                           <j:set var="offsetIfFileMissing" value="1"/>
                         </j:if>
-                        <td style="border-left: solid 1px #bbb; text-align:center">
+                        <td style="text-align:center">
                           <j:if test="${!fileMissing}">
-                            <f:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfFileMissing) ? true:false}" />
+                            <div>
+                            <c:radio name="timestamp1" value="${config.getDate()}" checked="${configNr == (2 + offsetIfFileMissing) ? true:false}"/>
+                            </div>
                           </j:if>
                         </td>
-                        <td style="border-left: solid 1px #bbb; text-align:center">
+                        <td style="text-align:center">
                           <j:if test="${!fileMissing}">
-                            <f:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" />
+                            <c:radio name="timestamp2" value="${config.getDate()}" checked="${configNr == 1 ? true:false}" />
                           </j:if>
                         </td>
                         <j:if test="${it.hasDeleteEntryPermission()}">
                           <td style="text-align:center">
+                            <div class="jenkins-table__cell__button-wrapper">
                               <j:set var="message" value="${%Do you really want to delete the history entry} "/>
-                              <button type="button" class="jch delete-button agent-config-history-delete-button" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
-                                <l:icon class="icon-stop icon-sm" alt="${%Delete Revision}"/>
+                              <button type="button" class="jenkins-button jenkins-!-destructive-color agent-config-history-delete-button" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
+                                <l:icon src="symbol-trash-outline plugin-ionicons-api" class="icon-md" alt="${%Delete Revision}" />
                               </button>
+                            </div>
                           </td>
                         </j:if>
                       </tr>
@@ -121,16 +134,15 @@
                         <f:textbox name="name" value="${config.getJob()}" />
                       </f:invisibleEntry>
                     </j:forEach>
+                    </tbody>
                   </table>
-                </div>
-                <j:if test="${configs.size() > 1}">
-                  <div align="right">
-                    <div style="padding:2px"/>
-                    <div align="right">
-                      <input class="jch standard-button" type="submit" value="${%Show Diffs}"/>
-                    </div>
-                  </div>
-                </j:if>
+                <f:bottomButtonBar>
+                  <c:entries-per-page />
+                  <c:pagination />
+                  <j:if test="${configs.size() > 1}">
+                    <button class="jenkins-button">${%Show Diffs}</button>
+                  </j:if>
+                </f:bottomButtonBar>
               </f:form>
             </div>
           </j:otherwise>
