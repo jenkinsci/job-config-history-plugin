@@ -80,6 +80,12 @@ public interface HistoryDao {
     int getRevisionAmount(XmlFile xmlFile);
 
     /**
+     * @param node node
+     * @return the amount of revision entries of a certain config.
+     */
+    int getRevisionAmount(Node node);
+
+    /**
      * Returns one old configuration of item.
      *
      * @param item       project

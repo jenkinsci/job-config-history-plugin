@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:st="jelly:stapler">
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:st="jelly:stapler" xmlns:c="/components">
   <l:layout title="${%Job Configuration History}">
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/diff_highlight.css"/>
@@ -14,40 +14,12 @@
 
     <l:side-panel>
       <l:tasks>
-        <l:task icon="icon-up icon-md" href="${rootURL}/" title="${%Back to Dashboard}" />
         <l:task icon="symbol-confighistory plugin-jobConfigHistory" href="${rootURL}/jobConfigHistory" title="${%Back to Overview}" />
       </l:tasks>
     </l:side-panel>
     <l:main-panel>
       <h1>${%Configuration Difference}</h1>
-      <j:if test="${!syntaxCheck1.isWellFormatted() || !syntaxCheck2.isWellFormatted()}">
-        <div class="jch-warning">
-          <table class="no-borders-warning">
-            <caption style="">${%Warning}: ${%Corrupt XML file(s)}: </caption>
-            <tr>
-              <td>
-                <div style="font-size:30px" class="jch-warning">
-                  &#x2757;
-                </div>
-              </td>
-              <td>
-                <j:set var="revisionStr" value="${%Revision}"/>
-                ${!syntaxCheck1.isWellFormatted() ? revisionStr + " " + it.getTimestamp(1) + ": " + syntaxCheck1.getMessage() : ""}
-                <j:if test="${!syntaxCheck2.isWellFormatted()}">
-                  <j:if test="${!syntaxCheck1.isWellFormatted()}"><br/><br/></j:if>
-                </j:if>
-                ${!syntaxCheck2.isWellFormatted() ? revisionStr + " " + it.getTimestamp(2) + ": " + syntaxCheck2.getMessage() : ""}
-              </td>
-              <td>
-                <div style="font-size:30px;" class="jch-warning">
-                  &#x2757;
-                </div>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <br/>
-      </j:if>
+      <c:diff-warning/>
 
       <div>
       <j:set var="name" value="${request2.getParameter('name')}"/>
@@ -66,11 +38,8 @@
               <j:set var="timestamp1" value="${it.getTimestamp(1)}"/>
               <j:set var="timestamp2" value="${it.getTimestamp(2)}"/>
 
-              <div class="small-button-wrapper">
-                <input id="showHideVersionDiffsJsButton" class="small-button" type="button" data-hide-text="${%Hide Version Changes}"
-                       data-show-text="${%Show Version Changes}" value="${%Hide Version Changes}"/>
-              </div>
-              <div style="padding:2px"/>
+              <button id="showHideVersionDiffsJsButton" class="jenkins-button jenkins-!-margin-bottom-1" type="button" data-hide-text="${%Hide Version Changes}"
+                      data-show-text="${%Show Version Changes}">${%Hide Version Changes}</button>
 
               <j:choose>
                 <j:when test="${it.getLines().size() == 0}">
@@ -79,46 +48,34 @@
                 <j:otherwise>
                   <!-- The following 2 tbodys are switched via a js button-->
                   <!-- First is default and shows version diffs, second doesn't.-->
-                  <table  class="center jch" style="width:100%">
+                  <table  class="jenkins-table">
+                    <caption class="jch-caption">
+                      ${name}
+                    </caption>
                     <thead>
-                      <caption class="caption" style="text-align:center">
-                        ${name}
-                      </caption>
                       <tr>
-                        <th colspan="2" class="subcaption">
+                        <th colspan="2" style="width: 50%;">
 
-                          <div style="float:top">
-                            <table style="border:0px; width:100%">
-                              <tr>
-                                <td class="subcaption" style="padding:0px;  width:60%; background-color:inherit;">
-                                  ${%Older Change}
-                                </td>
-                              </tr>
-                            </table>
+                          <div class="jch-diff">
+                            ${%Older Change}
                           </div>
-                          <div style="float:bottom" class="singleLineView description">
+                          <div>
                             <div>
                               <b>${%Date}:</b>
-                              <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(1)}">
+                              <a class="jenkins-table__link jenkins-!-margin-left-2" href="${rootURL}/${it.getProject().getUrl()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(1)}">
                                 ${it.getTimestamp(1)}
                               </a>
                             </div>
                           </div>
                         </th>
                         <th colspan="2" class="subcaption">
-                          <div style="float:top">
-                            <table style="border:0px; width:100%">
-                              <tr>
-                                <td class="subcaption" style="padding:0px;  width:60%; background-color:inherit;">
-                                  ${%Newer Change}
-                                </td>
-                              </tr>
-                            </table>
+                          <div class="jch-diff">
+                            ${%Newer Change}
                           </div>
-                          <div style="float:bottom" class="singleLineView description">
+                          <div>
                             <div>
                               <b>${%Date}:</b>
-                              <a class="url-button" href="${rootURL}/${it.getProject().getUrl()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(2)}">
+                              <a class="jenkins-table__link jenkins-!-margin-left-2" href="${rootURL}/${it.getProject().getUrl()}/jobConfigHistory/configOutput?type=xml&amp;name=config&amp;timestamp=${it.getTimestamp(2)}">
                                 ${it.getTimestamp(2)}
                               </a>
                             </div>
@@ -127,119 +84,7 @@
                       </tr>
                     </thead>
 
-                    <tbody style="display:''" id="tbody_versionDiffsShown">
-                        <tr>
-                          <td class="diffLineWrapper" colspan="4">
-                            <div class="resizeWrapper" style="overflow-y:scroll;">
-                              <table class="center jch diffLineTable">
-                                <j:choose>
-                                  <j:when test="${it.getLines().size() == 0}">
-                                    <tr>
-                                      <td colspan="4">
-                                        <p>${%No lines changed}</p>
-                                      </td>
-                                    </tr>
-                                  </j:when>
-                                  <j:otherwise>
-                                    <j:forEach items="${it.getLines(false)}" var="line">
-                                      <tr>
-                                        <j:choose>
-                                          <j:when test="${line.skipping}">
-                                            <th class="lineNum">...</th>
-                                            <td class="skipping"/>
-                                            <th class="lineNum">...</th>
-                                            <td class="skipping"/>
-                                          </j:when>
-                                          <j:otherwise>
-                                            <th class="lineNum ${line.left.cssClass}">${line.left.lineNumber}</th>
-                                            <td class="${line.left.cssClass}">
-                                              <div style="margin-left: ${it.getLeadingWhitespace(line.left.text)*0.5}em;">
-                                                <pre>
-                                                  <code>
-                                                    <j:out value="${line.left.text.trim()}"/>
-                                                  </code>
-                                                </pre>
-                                              </div>
-                                            </td>
-                                            <th class="lineNum ${line.right.cssClass}">${line.right.lineNumber}</th>
-                                            <td class="${line.right.cssClass}">
-                                              <!--For correct indentation in case of line-breaks.-->
-                                              <div style="margin-left: ${it.getLeadingWhitespace(line.right.text)*0.5}em;">
-                                                <pre>
-                                                  <code>
-                                                    <j:out value="${line.right.text.trim()}"/>
-                                                  </code>
-                                                </pre>
-                                              </div>
-                                            </td>
-                                          </j:otherwise>
-                                        </j:choose>
-                                      </tr>
-                                    </j:forEach>
-                                  </j:otherwise>
-                                </j:choose>
-                              </table>
-                            </div>
-                          </td>
-                        </tr>
-                    </tbody>
-
-                    <tbody style="width:100%; display:none" id="tbody_versionDiffsHidden">
-                      <tr>
-                        <td class="diffLineWrapper" colspan="4">
-                          <div class="resizeWrapper" style="overflow-y:scroll;">
-                            <table class="center jch diffLineTable">
-                              <j:choose>
-                                <j:when test="${it.getLines().size() == 0}">
-                                  <tr>
-                                    <td colspan="4">
-                                      <p>${%No lines changed}</p>
-                                    </td>
-                                  </tr>
-                                </j:when>
-                                <j:otherwise>
-                                  <j:forEach items="${it.getLines(true)}" var="line">
-                                    <tr>
-                                      <j:choose>
-                                        <j:when test="${line.skipping}">
-                                          <th class="lineNum">...</th>
-                                          <td class="skipping"/>
-                                          <th class="lineNum">...</th>
-                                          <td class="skipping"/>
-                                        </j:when>
-                                        <j:otherwise>
-                                          <th class="lineNum ${line.left.cssClass}">${line.left.lineNumber}</th>
-                                          <td class="${line.left.cssClass}">
-                                            <div style="margin-left: ${it.getLeadingWhitespace(line.left.text)*0.5}em;">
-                                              <pre>
-                                                <code>
-                                                  <j:out value="${line.left.text.trim()}"/>
-                                                </code>
-                                              </pre>
-                                            </div>
-                                          </td>
-                                          <th class="lineNum ${line.right.cssClass}">${line.right.lineNumber}</th>
-                                          <td class="${line.right.cssClass}">
-                                            <!--For correct indentation in case of line-breaks.-->
-                                            <div style="margin-left: ${it.getLeadingWhitespace(line.right.text)*0.5}em;">
-                                              <pre>
-                                                <code>
-                                                  <j:out value="${line.right.text.trim()}"/>
-                                                </code>
-                                              </pre>
-                                            </div>
-                                          </td>
-                                        </j:otherwise>
-                                      </j:choose>
-                                    </tr>
-                                  </j:forEach>
-                                </j:otherwise>
-                              </j:choose>
-                            </table>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
+                    <c:diff-body/>
                   </table>
                 </j:otherwise>
               </j:choose>

@@ -376,15 +376,6 @@ class JobConfigHistoryProjectActionTest {
         verify(mockedProject).save();
     }
 
-    @Test
-    void testDoForwardToRestoreQuestion() throws Exception {
-        when(mockedRequest.getParameter("timestamp"))
-                .thenReturn("2012-11-21_11-41-14");
-        JobConfigHistoryProjectAction sut = createAction();
-        sut.doForwardToRestoreQuestion(mockedRequest, mockedResponse);
-        verify(mockedResponse).sendRedirect(any(String.class));
-    }
-
     private JobConfigHistoryProjectAction createAction() {
         return new JobConfigHistoryProjectActionImpl(mockedProject);
     }

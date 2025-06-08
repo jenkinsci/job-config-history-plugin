@@ -29,33 +29,10 @@
 #####################################################################
 */
 
-td.skipping {
-    background-color:rgb(250, 250, 250);
+.no-lines-changed {
+  padding: .5rem!important;
+  font-weight: 600;
 }
-
-td.diff_original {
-    /*background-color: #FF8C8C;*/
-    background-color: rgb(251, 233, 235);
-}
-
-td.diff_revised {
-    /*background-color: #CCCCFF;*/
-    background-color: rgb(236, 253, 240);
-}
-
-td.singleLineView.skipping {
-    background-color:rgb(250, 250, 250);
-}
-
-
-td.singleLineView.diff_original {
-    background-color: rgb(251, 233, 235);
-}
-
-td.singleLineView.diff_revised {
-    background-color: rgb(236, 253, 240);
-}
-
 
 /*
 #####################################################################
@@ -73,66 +50,29 @@ table.diffLineTable th.lineNum {
 
     white-space: nowrap;
 
-    padding: 0 3px;
-
-    border-bottom: 0;
-    border-radius: 0;
-    border-bottom: 1px solid #e8e8e8;
-    border-color:rgb(232, 232, 232);
-
     font-size:13px;
     font-weight: normal;
     text-align:center;
 
-    color: rgba(0, 0, 0, 0.3);
-    background-color:rgb(250, 250, 250);
+    color: var(--text-color-secondary);
 
     font-family: "Menlo", "DejaVu Sans Mono", "Liberation Mono", "Consolas", "Ubuntu Mono", "Courier New", "andale mono", "lucida console", monospace;
 }
 
-table.diffLineTable th.singleLineView.lineNum {
-    width: 50px;
-    border-bottom:0;
-}
-
-/*lines where something happens*/
-table.diffLineTable th.singleLineView.lineNum.diff_equal {
-
-}
-
 table.diffLineTable th.lineNum.diff_original {
-    background-color: rgb(249, 215, 220);
-    border-color: rgb(250, 197, 205);
-    color:rgb(174, 151, 154);
+    background-color: var(--red);
+    color: var(--white);
 }
 
 table.diffLineTable th.lineNum.diff_revised {
-    background-color: rgb(221, 251, 230);
-    border-color: rgb(189, 240, 203);
-    color:rgb(155, 176, 161);
+    background-color: var(--green);
+    color: var(--white);
 }
 
-/*
-#####################################################################
-###                      line modifiers                           ###
-#####################################################################
-*/
-
-/*- or + for original or revised lines. */
-div.diffLine_Modifier {
-    font-weight: normal;
-    float:left;
-    width:18px;
-    text-align:center;
+table.diffLineTable td {
+  background: var(--background) !important;
 }
 
-div.diffLine_Modifier.plus_style {
-    color: rgba(0, 0, 0, 0.3);
-}
-
-div.diffLine_Modifier.minus_style {
-    color: rgba(0, 0, 0, 0.3);
-}
 
 /*
 #####################################################################
@@ -142,21 +82,12 @@ div.diffLine_Modifier.minus_style {
 */
 /*sort of a "second subcaption"*/
 
-div.singleLineView.description {
-    font-size:13px;
-    padding-top:8px;
-    color:rgba(0,0,0,0.8);
-}
-
 .describedElement:hover {
-    color: rgba(0, 0, 0, 0.4);
+    color: var(--text-color);
 }
 
 .describedElement {
-    background-color: rgba(56,56,56, 0.14);
-    color: rgba(0, 0, 0, 0.7);
-    border-radius:3px;
-    padding:0 2px 0 2px;
+  color: var(--text-color-secondary);
 }
 
 
@@ -188,25 +119,9 @@ table.diffLineTable {
     height:100%;
 }
 
-table.diffLineTable tr {
-    height:20px;
+table.diffLineTable td {
+  padding-left: 0.25rem;
 }
-
-table.diffLineTable th {
-    height:20px;
-}
-
-
-
-table.jch.diffLineTable td {
-    padding:0;
-    height:20px;
-    max-height:40px;
-    border-top: 0;
-    text-align:left;
-    width:100%;
-}
-
 
 /*
 #####################################################################
@@ -214,32 +129,7 @@ table.jch.diffLineTable td {
 #####################################################################
 */
 
-table.center.jch td.diffLineWrapper {
-
-    border: 1px solid rgb(221, 221, 221);
-    border-bottom: 0;
+table.jenkins-table td.diffLineWrapper {
     width:100%;
-    padding:0;
-}
-
-
-/*
-#####################################################################
-###                        other stuff                            ###
-#####################################################################
-*/
-
-/*subcaptions are the single files, here.*/
-table.jch td.subcaption-wrap {
-    /*No space between subcaption wrapper and table content.*/
-    padding:0;
-    border:0;
-}
-
-span.file_added {
-    color: rgba(0,140,0,0.5);
-}
-
-span.file_removed {
-    color: rgba(140,0,0,0.5);
+    padding:0!important;
 }

@@ -506,6 +506,16 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     }
 
     @Override
+    public int getRevisionAmount(Node node) {
+        final File historiesDir = getHistoryDirForNode(node);
+        final File[] historyDirsOfItem = historiesDir.listFiles(HistoryFileFilter.INSTANCE);
+        if (historyDirsOfItem == null) {
+            LOG.log(WARNING, "Error occurred while trying to calculate the current revision amount: {0}.listFiles(..) returned null.", historiesDir);
+        }
+        return historyDirsOfItem != null ? historyDirsOfItem.length : -1;
+    }
+
+    @Override
     public int getSystemRevisionAmount(String sysConfigName) {
         return getSystemHistory(sysConfigName).size();
     }

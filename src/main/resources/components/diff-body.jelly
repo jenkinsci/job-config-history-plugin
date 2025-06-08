@@ -1,0 +1,117 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core">
+  <tbody id="tbody_versionDiffsShown">
+    <tr>
+      <td class="diffLineWrapper" colspan="4">
+        <div class="resizeWrapper">
+          <table class="diffLineTable">
+            <j:choose>
+              <j:when test="${it.getLines(false).size() == 0}">
+                <tr>
+                  <td colspan="4" class="no-lines-changed">
+                    ${%No lines changed}
+                  </td>
+                </tr>
+              </j:when>
+              <j:otherwise>
+                <j:forEach items="${it.getLines(false)}" var="line">
+                  <tr>
+                    <j:choose>
+                      <j:when test="${line.skipping}">
+                        <th class="lineNum">...</th>
+                        <td class="skipping"/>
+                        <th class="lineNum">...</th>
+                        <td class="skipping"/>
+                      </j:when>
+                      <j:otherwise>
+                        <th class="lineNum ${line.left.cssClass}">${line.left.lineNumber}</th>
+                        <td class="${line.left.cssClass}">
+                          <div style="margin-left: ${it.getLeadingWhitespace(line.left.text)*0.5}em;">
+                            <pre>
+                              <code>
+                                <j:out value="${line.left.text.trim()}"/>
+                              </code>
+                            </pre>
+                          </div>
+                        </td>
+                        <th class="lineNum ${line.right.cssClass}">${line.right.lineNumber}</th>
+                        <td class="${line.right.cssClass}">
+                          <!--For correct indentation in case of line-breaks.-->
+                          <div style="margin-left: ${it.getLeadingWhitespace(line.right.text)*0.5}em;">
+                            <pre>
+                              <code>
+                                <j:out value="${line.right.text.trim()}"/>
+                              </code>
+                            </pre>
+                          </div>
+                        </td>
+                      </j:otherwise>
+                    </j:choose>
+                  </tr>
+                </j:forEach>
+              </j:otherwise>
+            </j:choose>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+
+  <tbody style="display:none" id="tbody_versionDiffsHidden">
+    <tr>
+      <td class="diffLineWrapper" colspan="4">
+        <div class="resizeWrapper">
+          <table class="diffLineTable">
+            <j:choose>
+              <j:when test="${it.getLines(true).size() == 0}">
+                <tr>
+                  <td colspan="4" class="no-lines-changed">
+                    ${%No lines changed}
+                  </td>
+                </tr>
+              </j:when>
+              <j:otherwise>
+                <j:forEach items="${it.getLines(true)}" var="line">
+                  <tr>
+                    <j:choose>
+                      <j:when test="${line.skipping}">
+                        <th class="lineNum">...</th>
+                        <td class="skipping"/>
+                        <th class="lineNum">...</th>
+                        <td class="skipping"/>
+                      </j:when>
+                      <j:otherwise>
+                        <th class="lineNum ${line.left.cssClass}">${line.left.lineNumber}</th>
+                        <td class="${line.left.cssClass}">
+                          <div style="margin-left: ${it.getLeadingWhitespace(line.left.text)*0.5}em;">
+                            <pre>
+                              <code>
+                                <j:out value="${line.left.text.trim()}"/>
+                              </code>
+                            </pre>
+                          </div>
+                        </td>
+                        <th class="lineNum ${line.right.cssClass}">${line.right.lineNumber}</th>
+                        <td class="${line.right.cssClass}">
+                          <!--For correct indentation in case of line-breaks.-->
+                          <div style="margin-left: ${it.getLeadingWhitespace(line.right.text)*0.5}em;">
+                            <pre>
+                              <code>
+                                <j:out value="${line.right.text.trim()}"/>
+                              </code>
+                            </pre>
+                          </div>
+                        </td>
+                      </j:otherwise>
+                    </j:choose>
+                  </tr>
+                </j:forEach>
+              </j:otherwise>
+            </j:choose>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+
+</j:jelly>

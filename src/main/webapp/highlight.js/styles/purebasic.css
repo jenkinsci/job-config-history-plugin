@@ -25,7 +25,7 @@ NOTE_2:	Color names provided in comments were derived using "Name that Color" on
 	display: block;
 	overflow-x: auto;
 	padding: 0.5em;
-	background: #FFFFDF; /* Half and Half (approx.) */
+	background: var(--background); /* Half and Half (approx.) */
 /* --- Uncomment to add PureBASIC native IDE styled font!
 	font-family: Consolas;
 */
@@ -39,13 +39,11 @@ NOTE_2:	Color names provided in comments were derived using "Name that Color" on
 .hljs-attr,
 .hljs-params,
 .hljs-subst {
-	color: #000000; /* Black */
-
+	color: var(--text-color); /* Black */
 }
 
 .hljs {
-
-	color: rgb(150,0,0);
+	color: var(--red);
 }
 
 .hljs-comment, /* --- used for PureBASIC Comments --- */
@@ -53,14 +51,14 @@ NOTE_2:	Color names provided in comments were derived using "Name that Color" on
 .hljs-section,
 .hljs-selector-pseudo,
 .hljs-addition {
-	color: #00AAAA; /* Persian Green (approx.) */
+	color: var(--teal); /* Persian Green (approx.) */
 }
 
 .hljs-title, /* --- used for PureBASIC Procedures Names --- */
 .hljs-tag,
 .hljs-variable,
 .hljs-code  {
-	color: #006666; /* Blue Stone (approx.) */
+	color: var(--blue); /* Blue Stone (approx.) */
 }
 
 .hljs-keyword, /* --- used for PureBASIC Keywords --- */
@@ -69,26 +67,26 @@ NOTE_2:	Color names provided in comments were derived using "Name that Color" on
 .hljs-selector-class,
 .hljs-built_in,
 .hljs-builtin-name {
-	color: #006666; /* Blue Stone (approx.) */
+	color:var(--blue); /* Blue Stone (approx.) */
 	font-weight: bold;
 }
 
 .hljs-string, /* --- used for PureBASIC Strings --- */
 .hljs-selector-attr {
-	color: #0080FF; /* Azure Radiance (approx.) */
+	color: var(--cyan); /* Azure Radiance (approx.) */
 }
 
 .hljs-symbol, /* --- used for PureBASIC Constants --- */
 .hljs-link,
 .hljs-deletion,
 .hljs-attribute {
-	color: #924B72; /* Cannon Pink (approx.) */
+	color: var(--purple); /* Cannon Pink (approx.) */
 }
 
 .hljs-meta,
 .hljs-literal,
 .hljs-selector-id {
-	color: #924B72; /* Cannon Pink (approx.) */
+	color: var(--purple); /* Cannon Pink (approx.) */
 	font-weight: bold;
 }
 
