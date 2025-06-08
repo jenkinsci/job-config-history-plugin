@@ -23,9 +23,12 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import static java.util.logging.Level.FINEST;
+
 import hudson.XmlFile;
 import hudson.model.Api;
 import hudson.model.Computer;
+import hudson.model.Item;
 import hudson.model.Node;
 import hudson.model.Slave;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
@@ -137,8 +140,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
 
     @Override
     public int getRevisionAmount() {
-        LOG.log(Level.INFO, "Paging is not implemented for agents yet!");
-        return -1;
+        return getHistoryDao().getRevisionAmount(agent);
     }
 
     @Override
@@ -197,6 +199,65 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
             }
         }
         configs.sort(ParsedDateComparator.DESCENDING);
+        return configs;
+    }
+
+    public boolean hasReadExtensionPermission() {
+        return getAccessControlledObject().hasPermission(Item.EXTENDED_READ);
+    }
+
+    /**
+     * Calculates a list containing the .subList(from, to) of the newest-first list of job config revision entries.
+     * Does not read the history.xmls unless it is inevitable.
+     *
+             * @param from the first revision to display
+     * @param to   the first revision not to display anymore
+     * @return a list equivalent to getJobConfigs().subList(from, to), but more efficiently calculated.
+            */
+    public final List<ConfigInfo> getAgentConfigs(int from, int to) {
+        if (from > to)
+            throw new IllegalArgumentException("start index is greater than end index: (" + from + ", " + to + ")");
+        final int revisionAmount = getRevisionAmount();
+        if (from > revisionAmount) {
+            LOG.log(FINEST, "Unexpected arguments while generating overview page: start index ({0}) is greater than total revision amount ({1})!",
+                    new Object[]{from, revisionAmount});
+            return Collections.emptyList();
+        }
+
+        if (to > revisionAmount) {
+            to = revisionAmount;
+        }
+
+        if (!hasConfigurePermission() && !hasReadExtensionPermission()) {
+            checkConfigurePermission();
+            return Collections.emptyList();
+        }
+        //load historydescrs lazily
+        final SortedMap<String, HistoryDescr> historyDescrSortedMap = getHistoryDao().getRevisions(agent);
+
+        //get them values in DESCENDING order (newest revision first)
+        ArrayList<HistoryDescr> mapValues = new ArrayList<>(historyDescrSortedMap.values());
+        Collections.reverse(mapValues);
+
+        final List<HistoryDescr> cuttedHistoryDescrs = mapValues.subList(from, to);
+        //only after selecting the entries to be displayed, the files are read (if the HistoryDao uses LazyHistoryDescr, of course).
+        return toConfigInfoList(cuttedHistoryDescrs, 0, cuttedHistoryDescrs.size());
+    }
+
+    private List<ConfigInfo> toConfigInfoList(List<HistoryDescr> historyDescrs, int from, int to) {
+        ArrayList<ConfigInfo> configs = new ArrayList<>();
+        for (final HistoryDescr historyDescr : historyDescrs.subList(from, to)) {
+            final String timestamp = historyDescr.getTimestamp();
+            final XmlFile oldRevision = getHistoryDao().getOldRevision(agent,
+                    timestamp);
+            if (oldRevision.getFile() != null) {
+                configs.add(ConfigInfo.create(agent.getNodeName(), true,
+                        historyDescr, true));
+            } else if ("Deleted".equals(historyDescr.getOperation())) {
+                configs.add(ConfigInfo.create(agent.getNodeName(), false,
+                        historyDescr, true));
+            }
+        }
         return configs;
     }
 
@@ -402,19 +463,6 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         else {
             rsp.sendRedirect(Jenkins.get().getRootUrl() + computer.getUrl());
         }
-    }
-
-    /**
-     * Action when 'restore' button in showDiffFiles.jelly is pressed. Gets
-     * required parameter and forwards to restoreQuestion.jelly.
-     *
-     * @param req StaplerRequest2 created by pressing the button
-     * @param rsp Outgoing StaplerResponse2
-     * @throws IOException If XML file can't be read
-     */
-    public final void doForwardToRestoreQuestion(StaplerRequest2 req, StaplerResponse2 rsp) throws IOException {
-        final String timestamp = req.getParameter("timestamp");
-        rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
     }
 
     @POST

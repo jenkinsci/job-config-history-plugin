@@ -4,10 +4,10 @@
   <l:layout title="${%All Configuration History}">
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css" />
+    <st:adjunct includes="hudson.plugins.jobConfigHistory.restore-config"/>
 
     <l:side-panel>
       <l:tasks>
-        <l:task icon="icon-up icon-md" href="${rootURL}/" title="${%Back to Dashboard}" />
         <l:task icon="symbol-filter plugin-jobConfigHistory" href="?filter=system" title="${%Show system configs only}" />
         <l:task icon="symbol-filter plugin-jobConfigHistory" href="?filter=jobs" title="${%Show job configs only}" />
         <l:task icon="symbol-filter plugin-jobConfigHistory" href="?filter=created" title="${%Show created jobs only}" />
@@ -20,6 +20,15 @@
     <j:set var="filter" value="${filter == null ? 'system' : filter}" />
 
     <l:main-panel>
+      <div class="jenkins-hidden" id="restore-config-template" data-title="${%Restore Project}" data-ok-text="${%Restore}"
+           data-description="${%Restore the deleted project} ">
+        <f:form method="post" name="restore">
+          <div class="jenkins-!-margin-bottom-3 restore-config-dialog">
+            <l:icon src="symbol-warning-outline plugin-ionicons-api" class="icon-md jenkins-!-error-color"/>
+            <span class="restore-config-form-content"/>
+          </div>
+        </f:form>
+      </div>
       <j:choose>
         <j:when test="${filter == 'all'}">
           <l:app-bar title="${%All Configuration History}" />
@@ -73,19 +82,19 @@
               <table class="jenkins-table sortable">
                 <thead>
                   <tr>
-                    <th initialSortDir="up" style="text-align:left">${%Date}</th>
-                    <th style="text-align:left">
+                    <th initialSortDir="up">${%Date}</th>
+                    <th>
                       <j:choose>
                         <j:when test="${filter == 'jobs' || filter == 'deleted' || filter == 'created'}">${%Job configuration}</j:when>
                         <j:when test="${filter == 'all'}">${%Job and system configuration}</j:when>
                         <j:otherwise>${%System configuration}</j:otherwise>
                       </j:choose>
                     </th>
-                    <th style="text-align:left">${%Operation}</th>
+                    <th >${%Operation}</th>
                     <j:if test="${it.hasConfigurePermission() || it.hasJobConfigurePermission()}">
-                      <th style="text-align:left">${%User}</th>
+                      <th>${%User}</th>
                     </j:if>
-                    <th style="text-align:left">${%File(RAW)}</th>
+                    <th data-sort-disable="true">${%File(RAW)}</th>
                     <j:if test="${filter == 'deleted'}">
                       <th style="text-align:center">${%Restore project}</th>
                     </j:if>
@@ -95,7 +104,7 @@
                 <j:set var="configNr" value="0" />
                 <j:forEach var="config" items="${configs}">
                   <j:set var="configNr" value="${configNr + 1}" />
-                  <tr class="alternate">
+                  <tr>
                     <td>${config.date}</td>
                     <j:choose>
                       <j:when test="${config.getIsJob()}">
@@ -143,11 +152,11 @@
                             <!--this prevents people from destroying their history by trying to restore deleted folder jobs
                              TODO Fix that. (see code)-->
                             <j:if test="${config.job.replace('/jobs', '/job').equals(config.job)}">
-                              <a href="restoreQuestion?name=${config.getJob()}" style="text-decoration: none">
-                                <span class="icon-md">
-                                  <l:icon id="restore" src="symbol-restore plugin-jobConfigHistory" title="${%Restore}" />
-                                </span>
-                              </a>
+                              <div class="jenkins-table__cell__button-wrapper">
+                                <button type="button" class="jenkins-button restore-config" data-type="name" data-name="${config.getJob()}">
+                                  <l:icon src="symbol-restore plugin-jobConfigHistory" class="jenkins-!-warning-color" tooltip="${%Restore}"/>
+                                </button>
+                              </div>
                             </j:if>
                           </j:if>
                         </j:if>

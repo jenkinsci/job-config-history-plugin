@@ -1,6 +1,0 @@
-table#confighistory {
-    width: 100%;
-}
-table#confighistory tr:nth-child(even) {
-    background-color: #eee;
-}

@@ -406,15 +406,6 @@ class JobConfigHistoryRootActionTest {
         assertNull(createSut().getLastAvailableConfigXml(name));
     }
 
-    @Test
-    void testDoForwardToRestoreQuestion() throws Exception {
-        given(mockedStaplerRequest.getParameter("name")).willReturn("foo");
-        StaplerResponse2 mockedResponse = mock(StaplerResponse2.class);
-        JobConfigHistoryRootAction sut = createStaplerMockedSut();
-        sut.doForwardToRestoreQuestion(mockedStaplerRequest, mockedResponse);
-        verify(mockedResponse).sendRedirect("restoreQuestion?name=foo");
-    }
-
     JobConfigHistoryRootAction createSut() {
         return new JobConfigHistoryRootAction();
     }

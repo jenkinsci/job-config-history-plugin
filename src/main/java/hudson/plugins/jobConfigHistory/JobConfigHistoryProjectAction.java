@@ -480,20 +480,6 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
         rsp.sendRedirect(Jenkins.get().getRootUrl() + project.getUrl());
     }
 
-    /**
-     * Action when 'restore' button in showDiffFiles.jelly is pressed. Gets
-     * required parameter and forwards to restoreQuestion.jelly.
-     *
-     * @param req StaplerRequest2 created by pressing the button
-     * @param rsp Outgoing StaplerResponse2
-     * @throws IOException If XML file can't be read
-     */
-    public final void doForwardToRestoreQuestion(StaplerRequest2 req,
-                                                 StaplerResponse2 rsp) throws IOException {
-        final String timestamp = req.getParameter("timestamp");
-        rsp.sendRedirect("restoreQuestion?timestamp=" + timestamp);
-    }
-
     @POST
     public final void doDeleteRevision(StaplerRequest2 req, StaplerResponse2 rsp) {
         checkDeleteEntryPermission();
