@@ -138,14 +138,16 @@
                       </td>
 
                       <!-- Trash icon -->
-                      <j:if test="${it.hasDeleteEntryPermission() and !config.operation.toString().equals(&quot;Deleted&quot;)}">
+                      <j:if test="${it.hasDeleteEntryPermission()}">
                         <td style="text-align:center">
-                          <j:set var="message" value="${%Do you really want to delete the history entry} " />
-                          <div id="target-div" jobName="${config.getJob()}" class="jenkins-table__cell__button-wrapper">
-                            <button type="button" class="jenkins-button jenkins-!-destructive-color system-config-history-delete-button" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
-                              <l:icon src="symbol-trash-outline plugin-ionicons-api" class="icon-md" alt="${%Delete Revision}" />
-                            </button>
-                          </div>
+                          <j:if test="${!config.operation.toString().equals(&quot;Deleted&quot;)}">
+                            <j:set var="message" value="${%Do you really want to delete the history entry} " />
+                            <div id="target-div" jobName="${config.getJob()}" class="jenkins-table__cell__button-wrapper">
+                              <button type="button" class="jenkins-button jenkins-!-destructive-color system-config-history-delete-button" data-config-nr="${configNr}" data-config-date="${config.date}" data-message-text="${message}" value="X">
+                                <l:icon src="symbol-trash-outline plugin-ionicons-api" class="icon-md" alt="${%Delete Revision}" />
+                              </button>
+                            </div>
+                          </j:if>
                         </td>
                       </j:if>
                     </tr>
