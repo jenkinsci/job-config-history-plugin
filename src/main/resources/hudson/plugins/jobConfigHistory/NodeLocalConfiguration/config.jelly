@@ -8,6 +8,6 @@
         data-dialog-cancel="${%Cancel}"
         data-dialog-optional="(${%optional})"/>
     </f:invisibleEntry>
-    <st:adjunct includes="hudson.plugins.jobConfigHistory.mandatory-config-reason"/>
+    <st:adjunct includes="hudson.plugins.jobConfigHistory.mandatory-config-reason-onlycomputer"/>
   </j:if>
 </j:jelly>
