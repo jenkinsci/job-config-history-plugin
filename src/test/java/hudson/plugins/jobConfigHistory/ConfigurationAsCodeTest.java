@@ -35,6 +35,7 @@ class ConfigurationAsCodeTest {
         assertTrue(plugin.getShowChangeReasonCommentWindow());
         assertTrue(plugin.getSkipDuplicateHistory());
         assertFalse(plugin.getSaveModuleConfiguration());
+        assertFalse(plugin.getChangeReasonCommentIsMandatory());
     }
 
     @Issue("JENKINS-55667")

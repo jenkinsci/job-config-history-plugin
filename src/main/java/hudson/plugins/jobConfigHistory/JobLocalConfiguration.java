@@ -6,20 +6,16 @@ import hudson.Extension;
 import hudson.Util;
 import hudson.XmlFile;
 import hudson.model.AbstractProject;
-import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
-import hudson.util.FormValidation;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest2;
 
 import java.util.logging.Logger;
@@ -80,13 +76,16 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
             throw new FormException("form exception", "localValues.changeReasonComment");
         }
 
-        public FormValidation doCheckChangeReasonComment(@QueryParameter String changeReasonComment, @AncestorInPath Item item) {
-            //TODO maybe use this instead of javascript. (need to figure out how to relocate the message...)
-            return FormValidation.ok();
-        }
-
         public boolean getShowChangeReasonCommentWindow() {
             return PluginUtils.getPlugin().getShowChangeReasonCommentWindow();
+        }
+
+        public boolean getChangeReasonCommentIsMandatory() {
+            return PluginUtils.getPlugin().getChangeReasonCommentIsMandatory();
+        }
+
+        public boolean isDialogEnabled() {
+            return !PluginUtils.isUserExcluded(PluginUtils.getPlugin()) && getShowChangeReasonCommentWindow();
         }
     }
 }
