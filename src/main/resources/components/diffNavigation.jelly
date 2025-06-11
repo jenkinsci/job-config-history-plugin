@@ -1,35 +1,38 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core">
-  <div class="jch-diff-navigation jenkins-!-margin-top-1">
-    <j:if test="${prev1 != timestamp1}">
-      <a href="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${timestamp2}" class="jenkins-button">
-        &lt; ${%Expand Diff}
-      </a>
-    </j:if>
-    <j:if test="${next1 != timestamp1}">
-      <a href="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${timestamp2}" class="jenkins-button">
-        ${%Shrink Diff} &gt;
-      </a>
-    </j:if>
-    <j:if test="${prev1 != prev2}">
-      <a href="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${prev2}" class="jenkins-button">
-        &lt; ${%Prev}
-      </a>
-    </j:if>
-    <j:if test="${next1 != next2}">
-      <a href="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${next2}" class="jenkins-button">
-        ${%Next} &gt;
-      </a>
-    </j:if>
-    <j:if test="${prev2 != timestamp2}">
-      <a href="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${prev2}" class="jenkins-button">
-        &lt; ${%Shrink Diff}
-      </a>
-    </j:if>
-    <j:if test="${next2 != timestamp2}">
-      <a href="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${next2}" class="jenkins-button">
-        ${%Expand Diff} &gt;
-      </a>
-    </j:if>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
+  <j:set var="x1_disabled" value="${prev1 != timestamp1 ? null : 'true'}" />
+  <j:set var="s1_disabled" value="${next1 != timestamp1 ? null : 'true'}" />
+  <j:set var="p_disabled"  value="${prev1 != prev2      ? null : 'true'}" />
+  <j:set var="n_disabled"  value="${next1 != next2      ? null : 'true'}" />
+  <j:set var="s2_disabled" value="${prev2 != timestamp2 ? null : 'true'}" />
+  <j:set var="x2_disabled" value="${next2 != timestamp2 ? null : 'true'}" />
+  <f:bottomButtonBar>
+  <div class="jch-diff-navigation" style="width:100%">
+    <button data-url="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${timestamp2}"
+      class="jenkins-button jch-navbutton" disabled="${x1_disabled}" type="button">
+      &lt; ${%Expand Diff}
+    </button>
+    <button data-url="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${timestamp2}"
+      class="jenkins-button jch-navbutton" disabled="${s1_disabled}" type="button">
+      ${%Shrink Diff} &gt;
+    </button>
+    <button data-url="diffFilesPrevNext?timestamp1=${prev1}&amp;timestamp2=${prev2}"
+      class="jenkins-button jch-navbutton" disabled="${p_disabled}" type="button">
+      &lt; ${%Prev}
+    </button>
+    <button data-url="diffFilesPrevNext?timestamp1=${next1}&amp;timestamp2=${next2}"
+      class="jenkins-button jch-navbutton" disabled="${n_disabled}" type="button">
+      ${%Next} &gt;
+    </button>
+    <button data-url="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${prev2}"
+      class="jenkins-button jch-navbutton" disabled="${s2_disabled}" type="button">
+      &lt; ${%Shrink Diff}
+    </button>
+    <button data-url="diffFilesPrevNext?timestamp1=${timestamp1}&amp;timestamp2=${next2}"
+      class="jenkins-button jch-navbutton" disabled="${x2_disabled}" type="button">
+      ${%Expand Diff} &gt;
+    </button>
+    <st:adjunct includes="components.navbuttons"/>
   </div>
+  </f:bottomButtonBar>
 </j:jelly>
