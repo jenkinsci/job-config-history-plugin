@@ -3,5 +3,5 @@ excludePattern: "queue\\.xml|nodeMonitors\\.xml|UpdateCenter\\.xml|global-build-
   .xml|MilestoneStep\\.xml|cloudbees-disk-usage-simple\\.xml"
 saveModuleConfiguration: false
 showBuildBadges: "always"
-showChangeReasonCommentWindow: true
+showChangeReasonCommentWindow: false
 skipDuplicateHistory: true
