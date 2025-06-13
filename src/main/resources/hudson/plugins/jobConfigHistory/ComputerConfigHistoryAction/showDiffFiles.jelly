@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:c="/components" xmlns:f="/lib/form">
-  <l:layout title="${%Job Configuration History}">
+  <l:layout title="${%Job Configuration History}" type="one-column">
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/diff_highlight.css"/>
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
@@ -10,7 +10,6 @@
     <script src="${rootURL}/plugin/jobConfigHistory/highlight.js/highlight.pack.js"/>
     <st:adjunct includes="hudson.plugins.jobConfigHistory.show-diff-files-behaviour"/>
     <st:adjunct includes="hudson.plugins.jobConfigHistory.restore-config"/>
-    <st:include it="${it.agent.toComputer()}" page="sidepanel.jelly" />
     <j:set var="syntaxCheck1" value="${it.checkXmlSyntax(it.getTimestamp(1))}"/>
     <j:set var="syntaxCheck2" value="${it.checkXmlSyntax(it.getTimestamp(2))}"/>
     <l:main-panel>
