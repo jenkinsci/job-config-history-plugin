@@ -153,6 +153,15 @@ public class JobConfigBadgeAction implements BuildBadgeAction, RunAction2 {
     }
 
     /**
+     * Returns the alt (for screenreader) text.
+     *
+     * @return alt text
+     */
+    public String getAlt() {
+        return "symbol-buildbadge";
+    }
+
+    /**
      * Non-use interface method. {@inheritDoc}
      */
     public String getIconFileName() {

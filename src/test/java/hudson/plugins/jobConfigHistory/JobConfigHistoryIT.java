@@ -1,13 +1,16 @@
 package hudson.plugins.jobConfigHistory;
 
 import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlPage;
 import hudson.XmlFile;
 import hudson.maven.MavenModuleSet;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.security.HudsonPrivateSecurityRealm;
 import jenkins.model.Jenkins;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
@@ -26,13 +29,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
+
+import static  hudson.plugins.jobConfigHistory.TestHelper.triggerValidation;
+import static  hudson.plugins.jobConfigHistory.TestHelper.getFormError;
+
 /**
  * @author jborghi@cisco.com
  */
 @WithJenkins
-class JobConfigHistoryIT
-        extends
-        AbstractHudsonTestCaseDeletingInstanceDir {
+class JobConfigHistoryIT {
 
     // we need to sleep between saves so we don't overwrite the history
     // directories
@@ -48,31 +58,30 @@ class JobConfigHistoryIT
         }
     };
     private JenkinsRule.WebClient webClient;
+    private JenkinsRule rule;
 
-    @Override
+    @BeforeEach
     void setUp(JenkinsRule rule) throws Exception {
-        super.setUp(rule);
+        this.rule = rule;
         rule.jenkins.setSecurityRealm(
                 new HudsonPrivateSecurityRealm(true, false, null));
         webClient = rule.createWebClient();
     }
 
     @Test
-    void testJobConfigHistoryPreConfigured() {
+    void testJobConfigHistoryPreConfigured() throws Exception {
         final JobConfigHistory jch = PluginUtils.getPlugin();
-        assertDoesNotThrow(() -> {
             final HtmlForm form = webClient.goTo("configure")
                     .getFormByName("config");
-            form.getInputByName("maxHistoryEntries").setValue("10");
-            form.getInputByName("saveModuleConfiguration").setChecked(false);
-            form.getInputByName("skipDuplicateHistory").setChecked(false);
-            form.getInputByName("excludePattern")
+            form.getInputByName("_.maxHistoryEntries").setValue("10");
+            form.getInputByName("_.saveModuleConfiguration").setChecked(false);
+            form.getInputByName("_.skipDuplicateHistory").setChecked(false);
+            form.getInputByName("_.excludePattern")
                     .setValue(JobConfigHistoryConsts.DEFAULT_EXCLUDE);
-            form.getInputByName("historyRootDir")
+            form.getInputByName("_.historyRootDir")
                     .setValue("jobConfigHistory");
             form.getInputByValue("never").setChecked(true);
             rule.submit(form);
-        }, "unable to configure Jenkins instance ");
         assertEquals("10",
                 jch.getMaxHistoryEntries(),
                 "Verify history entries to keep setting.");
@@ -118,8 +127,8 @@ class JobConfigHistoryIT
                 "Verify Maven module configuration default setting.");
         assertTrue(jch.getSkipDuplicateHistory(),
                 "Verify skip duplicate history default setting.");
-        assertNull(jch.getExcludePattern(),
-                "Verify unconfigured exclude pattern.");
+        assertThat("Verify unconfigured exclude pattern.",
+                jch.getExcludePattern(), equalTo(JobConfigHistoryConsts.DEFAULT_EXCLUDE));
         assertEquals("always",
                 jch.getShowBuildBadges(),
                 "Verify build badges setting.");
@@ -201,7 +210,7 @@ class JobConfigHistoryIT
 
         // reconfigure to allow saving duplicate history
         form = webClient.goTo("configure").getFormByName("config");
-        form.getInputByName("skipDuplicateHistory").setChecked(false);
+        form.getInputByName("_.skipDuplicateHistory").setChecked(false);
         rule.submit(form);
 
         // perform additional save and verify more than one history entries
@@ -217,81 +226,75 @@ class JobConfigHistoryIT
     }
 
     @Test
-    void testFormValidation() {
+    void testFormValidation() throws Exception {
         final JobConfigHistory jch = PluginUtils.getPlugin();
-        assertDoesNotThrow(() -> {
-            final HtmlForm form = webClient.goTo("configure")
-                    .getFormByName("config");
-            assertFalse(
-                    form.getTextContent()
-                            .contains("Enter a valid positive integer"),
-                    "Check no error message present for history entry.");
-            form.getInputByName("maxHistoryEntries").setValue("-2");
-            assertTrue(form.getTextContent()
-                            .contains("Enter a valid positive integer"),
-                    "Check error message on invalid history entry.");
-            assertFalse(
-                    form.getTextContent().contains("Invalid regexp"),
-                    "Check no error message present for regexp excludePattern.");
-            form.getInputByName("excludePattern").setValue("**");
-            assertTrue(
-                    form.getTextContent().contains("Invalid regexp"),
-                    "Check error message on invalid regexp excludePattern.");
-            rule.submit(form);
-            assertEquals("**",
-                    jch.getExcludePattern(),
-                    "Verify invalid regexp string is saved.");
-            assertNull(jch.getExcludeRegexpPattern(),
-                    "Verify invalid regexp has not been loaded.");
+        final HtmlPage p = webClient.goTo("configure");
+        final HtmlForm form = p.getFormByName("config");
+        assertThat(getFormError(p), equalTo(""));
 
-        }, "Unable to complete form validation: ");
+        form.getInputByName("_.maxHistoryEntries").setValue("-2");
+        triggerValidation(form.getInputByName("_.maxHistoryEntries"));
+        assertThat(getFormError(p), containsString("Enter a valid positive integer"));
+        form.getInputByName("_.maxHistoryEntries").setValue("2");
+        triggerValidation(form.getInputByName("_.maxHistoryEntries"));
+        assertThat(getFormError(p), equalTo(""));
+
+        form.getInputByName("_.excludePattern").setValue("**");
+        triggerValidation(form.getInputByName("_.excludePattern"));
+        assertThat("Error message on invalid regexp excludePattern",
+                getFormError(p), equalTo("Enter a valid regular expression"));
+        rule.submit(form);
+        assertEquals("**",
+                jch.getExcludePattern(),
+                "Verify invalid regexp string is saved.");
+        assertNull(jch.getExcludeRegexpPattern(),
+                "Verify invalid regexp has not been loaded.");
+
     }
 
     @Test
-    void testMaxHistoryEntries() {
-        assertDoesNotThrow(() -> {
-            final HtmlForm form = webClient.goTo("configure")
-                    .getFormByName("config");
-            form.getInputByName("maxHistoryEntries").setValue("5");
-            form.getInputByName("skipDuplicateHistory").setChecked(false);
-            rule.submit(form);
+    void testMaxHistoryEntries() throws Exception {
+        final HtmlForm form = webClient.goTo("configure")
+            .getFormByName("config");
+        form.getInputByName("_.maxHistoryEntries").setValue("5");
+        form.getInputByName("_.skipDuplicateHistory").setChecked(false);
+        rule.submit(form);
 
-            final FreeStyleProject project = rule.createFreeStyleProject(
-                    "testproject");
-            final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(
-                    project);
+        final FreeStyleProject project = rule.createFreeStyleProject(
+                "testproject");
+        final JobConfigHistoryProjectAction projectAction = new JobConfigHistoryProjectAction(
+                project);
 
-            assertFalse(projectAction.getJobConfigs().isEmpty(), "Verify at least 1 history entry created.");
-            for (int i = 0; i < 3; i++) {
-                Thread.sleep(SLEEP_TIME);
-                project.save();
-            }
-            assertTrue(projectAction.getJobConfigs().size() >= 4,
-                    "Verify at least 4 history entries.");
+        assertFalse(projectAction.getJobConfigs().isEmpty(), "Verify at least 1 history entry created.");
+        for (int i = 0; i < 3; i++) {
+            Thread.sleep(SLEEP_TIME);
+            project.save();
+        }
+        assertTrue(projectAction.getJobConfigs().size() >= 4,
+                "Verify at least 4 history entries.");
 
-            for (int i = 0; i < 3; i++) {
-                Thread.sleep(SLEEP_TIME);
-                project.save();
-            }
-            assertEquals(
-                    5 + 1, projectAction.getJobConfigs().size(), "Verify no more than 5 history entries created + 1 'Created' entry that won't be deleted.");
-        }, "Unable to complete max history entries test: ");
+        for (int i = 0; i < 3; i++) {
+            Thread.sleep(SLEEP_TIME);
+            project.save();
+        }
+        assertEquals(
+                5 + 1, projectAction.getJobConfigs().size(), "Verify no more than 5 history entries created + 1 'Created' entry that won't be deleted.");
     }
 
     @Test
-    void testAbsPathHistoryRootDir() throws Exception {
+    void testAbsPathHistoryRootDir(@TempDir File tmp) throws Exception {
         final JobConfigHistory jch = PluginUtils.getPlugin();
         // create a unique name, then delete the empty file - will be recreated
         // later
         final File root = File
-                .createTempFile("jobConfigHistory.test_abs_path", null)
+                .createTempFile("jobConfigHistory.test_abs_path", null, tmp)
                 .getCanonicalFile();
         final String absolutePath = root.getPath();
         root.delete();
 
         final HtmlForm form = webClient.goTo("configure")
                 .getFormByName("config");
-        form.getInputByName("historyRootDir").setValue(absolutePath);
+        form.getInputByName("_.historyRootDir").setValue(absolutePath);
         rule.submit(form);
         assertEquals(new File(root, JobConfigHistoryConsts.DEFAULT_HISTORY_DIR),
                 jch.getConfiguredHistoryRootDir(),
@@ -299,6 +302,7 @@ class JobConfigHistoryIT
 
         // save something
         rule.createFreeStyleProject();
+        Thread.sleep(SLEEP_TIME);
         assertTrue(root.exists(), "Verify history root exists.");
 
         // cleanup - Jenkins doesn't know about these files we created
@@ -413,7 +417,7 @@ class JobConfigHistoryIT
 
             final HtmlForm form = webClient.goTo("configure")
                     .getFormByName("config");
-            form.getInputByName("historyRootDir").setValue("newDir");
+            form.getInputByName("_.historyRootDir").setValue("newDir");
             rule.submit(form);
 
             assertEquals(0,
@@ -452,9 +456,8 @@ class JobConfigHistoryIT
 
         // check empty value
         jch.setMaxHistoryEntries("");
-        assertEquals("",
-                jch.getMaxHistoryEntries(),
-                "Verify maxHistoryEntries empty");
+        assertThat("Verify maxHistoryEntries empty",
+                jch.getMaxHistoryEntries(), nullValue());
     }
 
     @Test
@@ -481,9 +484,8 @@ class JobConfigHistoryIT
 
         // check empty value
         jch.setMaxDaysToKeepEntries("");
-        assertEquals("",
-                jch.getMaxDaysToKeepEntries(),
-                "Verify maxDaysToKeepEntries empty");
+        assertThat("Verify maxDaysToKeepEntries empty",
+                jch.getMaxDaysToKeepEntries(), nullValue());
     }
 
     private File getHistoryDir(XmlFile xmlFile) {
@@ -492,4 +494,5 @@ class JobConfigHistoryIT
         return ((FileHistoryDao) PluginUtils.getHistoryDao(jch))
                 .getHistoryDir(configFile);
     }
+
 }

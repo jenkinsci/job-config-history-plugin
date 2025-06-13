@@ -1,6 +1,7 @@
 package hudson.plugins.jobConfigHistory;
 
 import hudson.XmlFile;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
@@ -17,16 +18,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WithJenkins
-class JobConfigHistoryPurgerIT
-        extends
-        AbstractHudsonTestCaseDeletingInstanceDir {
+class JobConfigHistoryPurgerIT {
     private static final int SLEEP_TIME = 1100;
     private JobConfigHistory jch;
     private JobConfigHistoryPurger purger;
+    private JenkinsRule rule;
 
-    @Override
+    @BeforeEach
     void setUp(JenkinsRule rule) throws Exception {
-        super.setUp(rule);
+        this.rule = rule;
         jch = PluginUtils.getPlugin();
         purger = new JobConfigHistoryPurger();
     }

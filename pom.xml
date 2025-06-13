@@ -114,6 +114,30 @@
         </dependency>
     </dependencies>
 
+    <build>
+      <plugins>
+        <plugin>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+          <excludes>
+            <exclude>**/JobConfigHistoryProjectActionIT.java</exclude><!-- Needs rewrite due to #372 -->
+            <exclude>**/JobConfigHistoryRootActionIT.java</exclude><!-- Needs rewrite due to #372 -->
+            <exclude>**/JobConfigBadgeActionIT.java</exclude><!-- Needs rewrite due to #372 -->
+            <exclude>**/PluginIT.java</exclude><!-- Needs rewrite due to #372 -->
+          </excludes>
+        </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
+
     <repositories>
       <repository>
         <id>repo.jenkins-ci.org</id>

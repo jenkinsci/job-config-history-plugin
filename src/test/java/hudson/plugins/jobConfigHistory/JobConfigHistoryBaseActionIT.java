@@ -15,6 +15,8 @@ import hudson.security.Permission;
 import hudson.tasks.LogRotator;
 import jenkins.model.Jenkins;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -37,9 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author mfriedenhagen
  */
 @WithJenkins
-class JobConfigHistoryBaseActionIT
-        extends
-        AbstractHudsonTestCaseDeletingInstanceDir {
+class JobConfigHistoryBaseActionIT {
 
     // we need to sleep between saves so we don't overwrite the history
     // directories
@@ -47,20 +47,20 @@ class JobConfigHistoryBaseActionIT
     private static final int SLEEP_TIME = 1100;
     private final File file1 = new File("old/config.xml");
     private final File file2 = new File("new/config.xml");
+    private JenkinsRule rule;
     private JenkinsRule.WebClient webClient;
     private String oldLineSeparator;
 
-    @Override
+    @BeforeEach
     void setUp(JenkinsRule rule) throws Exception {
-        super.setUp(rule);
+        this.rule = rule;
         webClient = rule.createWebClient();
         oldLineSeparator = System.lineSeparator();
         System.setProperty("line.separator", "\n");
     }
 
-    @Override
+    @AfterEach
     void tearDown() throws Exception {
-        super.tearDown();
         System.setProperty("line.separator", oldLineSeparator);
     }
 
@@ -186,22 +186,22 @@ class JobConfigHistoryBaseActionIT
     void testSecuredAccessToJobConfigHistoryPage()
             throws IOException, SAXException {
         // without security the jobConfigHistory-badge should show.
-        final HtmlPage withoutSecurity = webClient.goTo("/");
+        final HtmlPage withoutSecurity = webClient.goTo("");
         assertThat(withoutSecurity.asXml(), Matchers
-                .containsString(JobConfigHistoryConsts.ICONFILENAME));
-        withoutSecurity.getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME);
+                .containsString("/jenkins/jobConfigHistory"));
+        withoutSecurity.getAnchorByHref("/jenkins/" + JobConfigHistoryConsts.URLNAME);
         // with security enabled the jobConfigHistory-badge should not show
         // anymore.
         rule.jenkins.setSecurityRealm(
                 new HudsonPrivateSecurityRealm(false, false, null));
         rule.jenkins.setAuthorizationStrategy(new LegacyAuthorizationStrategy());
-        final HtmlPage withSecurityEnabled = webClient.goTo("/");
+        final HtmlPage withSecurityEnabled = webClient.goTo("");
         assertThat(withSecurityEnabled.asXml(), not(Matchers
-                .containsString(JobConfigHistoryConsts.ICONFILENAME)));
+                .containsString("/jenkins/jobConfigHistory")));
 
         assertThrows(ElementNotFoundException.class,
                 () -> withSecurityEnabled
-                    .getAnchorByHref("/" + JobConfigHistoryConsts.URLNAME));
+                    .getAnchorByHref("/jenkins/" + JobConfigHistoryConsts.URLNAME));
     }
 
     @Issue("JENKINS-17124")

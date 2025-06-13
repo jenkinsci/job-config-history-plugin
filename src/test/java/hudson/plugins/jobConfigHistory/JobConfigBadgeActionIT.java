@@ -6,6 +6,7 @@ import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import jenkins.model.Jenkins;
 import org.acegisecurity.context.SecurityContextHolder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
@@ -13,20 +14,23 @@ import org.jvnet.hudson.test.recipes.LocalData;
 import org.jvnet.hudson.test.recipes.PresetData;
 import org.jvnet.hudson.test.recipes.PresetData.DataSet;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WithJenkins
-class JobConfigBadgeActionIT
-        extends
-        AbstractHudsonTestCaseDeletingInstanceDir {
+class JobConfigBadgeActionIT {
 
     private static final int SLEEP_TIME = 1100;
     private JenkinsRule.WebClient webClient;
+    private JenkinsRule rule;
 
-    @Override
+    @BeforeEach
     void setUp(JenkinsRule rule) throws Exception {
-        super.setUp(rule);
+        this.rule = rule;
         webClient = rule.createWebClient();
     }
 
@@ -38,21 +42,18 @@ class JobConfigBadgeActionIT
 
         rule.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
         HtmlPage htmlPage = webClient.goTo("job/" + jobName);
-        assertFalse(htmlPage.asXml().contains("symbol-buildbadge"),
-                "Page should not contain build badge");
+        assertThat(htmlPage.asXml(), not(containsString("symbol-buildbadge")));
 
         rule.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
         htmlPage = (HtmlPage) htmlPage.refresh();
-        assertFalse(htmlPage.asXml().contains("symbol-buildbadge"),
-                "Page should still not contain build badge");
+        assertThat(htmlPage.asXml(), not(containsString("symbol-buildbadge")));
 
         project.setDescription(description);
         Thread.sleep(SLEEP_TIME);
         rule.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
         htmlPage = (HtmlPage) htmlPage.refresh();
-        assertTrue(htmlPage.asXml().contains("symbol-buildbadge"),
-                "Page should contain build badge");
+        assertThat(htmlPage.asXml(), containsString("symbol-buildbadge"));
     }
 
     @Test
@@ -69,8 +70,7 @@ class JobConfigBadgeActionIT
         project.scheduleBuild2(0).get();
 
         final HtmlPage htmlPage = webClient.goTo("job/" + newName);
-        assertTrue(htmlPage.asXml().contains("symbol-buildbadge"),
-                "Page should contain build badge");
+        assertThat(htmlPage.asXml(), containsString("symbol-buildbadge"));
 
         final HtmlAnchor showDiffLink = (HtmlAnchor) htmlPage
                 .getElementById("showDiff");
