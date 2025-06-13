@@ -123,7 +123,7 @@ public class JobConfigHistory extends GlobalConfiguration {
     /**
      * Whether a change reason comment window should be shown on a jobs' configure page.
      */
-    private boolean showChangeReasonCommentWindow = true;
+    private boolean showChangeReasonCommentWindow = false;
     /**
      * Whether the change reason comment is mandatory (must not be empty).
      */
