@@ -75,6 +75,9 @@
                         <j:if test="${(config.currentName==null) || (config.currentName.isEmpty())}">
                           ${config.operation}
                         </j:if>
+                        <j:if test="${config.changeReasonComment != null and !config.changeReasonComment.equals(&quot;&quot;)}">
+                          <l:icon src="symbol-information-circle-outline plugin-ionicons-api" class="icon-md" title="${%Change Message}: &quot;${config.changeReasonComment}&quot;" tooltip="${%Change Message}: &quot;${config.changeReasonComment}&quot;" />
+                        </j:if>
                         </td>
                         <td><a href="${rootURL}/user/${config.userID}">${config.userID}</a></td>
                         <td>
