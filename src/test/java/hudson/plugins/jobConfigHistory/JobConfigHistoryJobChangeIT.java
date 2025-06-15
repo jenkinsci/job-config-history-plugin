@@ -282,8 +282,8 @@ public class JobConfigHistoryJobChangeIT {
         assertEquals("unknown", cilist.get(0).getUser(), "user");
         assertEquals("unknown", cilist.get(0).getUserID(), "userId");
         assertEquals("Changed", cilist.get(0).getOperation(), "operation");
-        assertEquals("unknown", cilist.get(1).getUser(), "user");
-        assertEquals("unknown", cilist.get(1).getUserID(), "userId");
+        assertEquals("SYSTEM", cilist.get(1).getUser(), "user");
+        assertEquals("SYSTEM", cilist.get(1).getUserID(), "userId");
         assertEquals("Created", cilist.get(1).getOperation(), "operation");
     }
 
@@ -327,8 +327,8 @@ public class JobConfigHistoryJobChangeIT {
         assertEquals("unknown", cilist.get(0).getUser(), "user");
         assertEquals("unknown", cilist.get(0).getUserID(), "userId");
         assertEquals("Changed", cilist.get(0).getOperation(), "operation");
-        assertEquals("unknown", cilist.get(1).getUser(), "user");
-        assertEquals("unknown", cilist.get(1).getUserID(), "userId");
+        assertEquals("SYSTEM", cilist.get(1).getUser(), "user");
+        assertEquals("SYSTEM", cilist.get(1).getUserID(), "userId");
         assertEquals("Created", cilist.get(1).getOperation(), "operation");
     }
 
@@ -376,8 +376,8 @@ public class JobConfigHistoryJobChangeIT {
         assertEquals("unknown", cilist.get(0).getUser(), "user");
         assertEquals("unknown", cilist.get(0).getUserID(), "userId");
         assertEquals("Changed", cilist.get(0).getOperation(), "operation");
-        assertEquals("unknown", cilist.get(1).getUser(), "user");
-        assertEquals("unknown", cilist.get(1).getUserID(), "userId");
+        assertEquals("SYSTEM", cilist.get(1).getUser(), "user");
+        assertEquals("SYSTEM", cilist.get(1).getUserID(), "userId");
         assertEquals("Created", cilist.get(1).getOperation(), "operation");
     }
 }
