@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:st="jelly:stapler" xmlns:c="/components">
-  <l:layout title="${%Job Configuration History}">
+  <l:layout title="${%Job Configuration History}" type="one-column">
 
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/diff_highlight.css"/>
     <link rel="stylesheet" type="text/css" href="${rootURL}/plugin/jobConfigHistory/css/style.css"/>
@@ -12,11 +12,6 @@
     <j:set var="syntaxCheck1" value="${it.checkXmlSyntax(request2.getParameter('name'), it.getTimestamp(1))}"/>
     <j:set var="syntaxCheck2" value="${it.checkXmlSyntax(request2.getParameter('name'), it.getTimestamp(2))}"/>
 
-    <l:side-panel>
-      <l:tasks>
-        <l:task icon="symbol-confighistory plugin-jobConfigHistory" href="${rootURL}/jobConfigHistory" title="${%Back to Overview}" />
-      </l:tasks>
-    </l:side-panel>
     <l:main-panel>
       <h1>${%Configuration Difference}</h1>
       <c:diff-warning/>
