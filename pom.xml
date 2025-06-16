@@ -119,13 +119,16 @@
         <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
-          <excludes>
-            <exclude>**/JobConfigHistoryProjectActionIT.java</exclude><!-- Needs rewrite due to #372 -->
-            <exclude>**/JobConfigHistoryRootActionIT.java</exclude><!-- Needs rewrite due to #372 -->
-            <exclude>**/JobConfigBadgeActionIT.java</exclude><!-- Needs rewrite due to #372 -->
-            <exclude>**/PluginIT.java</exclude><!-- Needs rewrite due to #372 -->
-          </excludes>
-        </configuration>
+            <excludes>
+              <exclude>**/JobConfigHistoryProjectActionIT.java</exclude><!-- Needs rewrite due to #372 -->
+              <exclude>**/JobConfigHistoryRootActionIT.java</exclude><!-- Needs rewrite due to #372 -->
+              <exclude>**/JobConfigBadgeActionIT.java</exclude><!-- Needs rewrite due to #372 -->
+              <exclude>**/PluginIT.java</exclude><!-- Needs rewrite due to #372 -->
+            </excludes>
+            <forkCount>1C</forkCount>
+            <reuseForks>true</reuseForks>
+            <parallel>methods</parallel>
+          </configuration>
           <executions>
             <execution>
               <goals>
