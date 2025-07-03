@@ -37,7 +37,7 @@
       <f:entry title="${%Exclude users}" field="excludedUsers">
         <f:textbox/>
       </f:entry>
-      <f:entry title="${%Show the change message dialog in jobs' configure pages}"
+      <f:entry title="${%Show change message dialog in config pages for jobs and agents}"
                field="showChangeReasonCommentWindow">
         <f:checkbox/>
       </f:entry>
