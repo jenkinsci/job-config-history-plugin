@@ -4,6 +4,8 @@ import hudson.model.User;
 import hudson.security.ACL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
@@ -11,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @WithJenkins
+@Execution(ExecutionMode.SAME_THREAD)
 class MimickedUserTest {
 
     private final MimickedUser sutNameId = createSut("SYSTEM", "SYSTEM");

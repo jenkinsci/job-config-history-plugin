@@ -11,6 +11,8 @@ import jenkins.model.Jenkins;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
@@ -31,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -42,6 +43,7 @@ import static  hudson.plugins.jobConfigHistory.TestHelper.getFormError;
  * @author jborghi@cisco.com
  */
 @WithJenkins
+@Execution(ExecutionMode.SAME_THREAD)
 class JobConfigHistoryIT {
 
     // we need to sleep between saves so we don't overwrite the history

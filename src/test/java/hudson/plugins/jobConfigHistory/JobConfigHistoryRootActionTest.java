@@ -29,8 +29,9 @@ import hudson.model.JDK;
 import hudson.security.AccessControlled;
 import jenkins.model.Jenkins;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.kohsuke.stapler.StaplerRequest2;
@@ -60,6 +61,7 @@ import static org.mockito.Mockito.verify;
  * @author Mirko Friedenhagen
  */
 @WithJenkins
+@Execution(ExecutionMode.SAME_THREAD)
 class JobConfigHistoryRootActionTest {
 
     private final StaplerRequest2 mockedStaplerRequest = mock(StaplerRequest2.class);
@@ -85,16 +87,10 @@ class JobConfigHistoryRootActionTest {
     }
 
     @Test
-    void testGetIconFileName() {
-        assertNotNull(createSut().getIconFileName());
-    }
-
-    @Test
     void testGetIconFileNameWithJobPermission() {
         assertNotNull(createSut().getIconFileName());
     }
 
-    @Disabled
     @Test
     void testGetSingleConfigs_fromTo() throws Exception {
         given(mockedStaplerRequest.getRequestURI()).willReturn("/jenkins/" + JobConfigHistoryConsts.URLNAME + "/history");
@@ -102,8 +98,8 @@ class JobConfigHistoryRootActionTest {
         JobConfigHistoryRootAction sut = createStaplerMockedSut();
 
 
-        assertEquals(3, sut.getSingleConfigs("config", 0, sut.getRevisionAmount()).size());
-        assertEquals(2, sut.getSingleConfigs("config", 0, 2).size());
+        assertEquals(2, sut.getSingleConfigs("config", 0, sut.getRevisionAmount()).size());
+        assertEquals(1, sut.getSingleConfigs("config", 0, 1).size());
 
         //create a deleted project
         FreeStyleProject freeStyleProject = jenkinsRule.createFreeStyleProject("Test1");

@@ -7,6 +7,8 @@ import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
 import io.jenkins.plugins.casc.misc.junit.jupiter.WithJenkinsConfiguredWithCode;
 import io.jenkins.plugins.casc.model.CNode;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.jvnet.hudson.test.Issue;
 
 import static io.jenkins.plugins.casc.misc.Util.getUnclassifiedRoot;
@@ -17,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WithJenkinsConfiguredWithCode
+@Execution(ExecutionMode.SAME_THREAD)
 class ConfigurationAsCodeTest {
 
     @Issue("JENKINS-55667")

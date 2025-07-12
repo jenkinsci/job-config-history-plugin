@@ -18,6 +18,8 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
@@ -39,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author mfriedenhagen
  */
 @WithJenkins
+@Execution(ExecutionMode.SAME_THREAD)
 class JobConfigHistoryBaseActionIT {
 
     // we need to sleep between saves so we don't overwrite the history
