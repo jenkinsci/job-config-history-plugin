@@ -5,6 +5,8 @@ import org.htmlunit.html.HtmlInput;
 import hudson.model.Slave;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
@@ -21,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author lucinka
  */
 @WithJenkins
+@Execution(ExecutionMode.SAME_THREAD)
 class ComputerHistoryListenerIT {
 
     private JenkinsRule rule;

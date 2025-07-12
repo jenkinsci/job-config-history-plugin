@@ -37,6 +37,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
@@ -78,6 +80,7 @@ import static org.mockito.Mockito.when;
  * @author Mirko Friedenhagen
  */
 @WithJenkins
+@Execution(ExecutionMode.SAME_THREAD)
 class FileHistoryDaoTest {
 
     private static final String FULL_NAME = "Full Name";
