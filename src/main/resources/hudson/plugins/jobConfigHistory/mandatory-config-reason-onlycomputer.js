@@ -87,7 +87,7 @@ Behaviour.specify('INPUT.change-reason-comment', 'ConfigHistoryInit', -999, func
 
 const re = /^\/computer\/[^\/]+\/configure$/;
 // Only install our hooks if we are on a computer config page
-if (re.test(window.location.pathname)) {
+if (re.test(window.location.pathname.replace(new RegExp("^" + document.head.dataset.rooturl), ''))) {
     Behaviour.specify('FORM', 'ConfigHistoryForm', -999, function (e) {
         e.addEventListener('formdata', jchpLib.handleFormData.bind(jchpLib));
     });
