@@ -25,6 +25,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.Functions;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
@@ -33,7 +34,6 @@ import hudson.model.Node;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.SystemUtils;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -386,11 +386,11 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         if (historyRootDir != null) {
             final String jobsStr;
             final File newHistoryDir = getHistoryDir(item);
-            if (SystemUtils.IS_OS_UNIX) {
-                jobsStr = "/jobs/";
-            } else {
+            if (Functions.isWindows()) {
                 //windows
                 jobsStr = "\\jobs\\";
+            } else {
+                jobsStr = "/jobs/";
             }
             final File oldHistoryDir = new File(newHistoryDir.getAbsolutePath()
                     .replaceFirst(

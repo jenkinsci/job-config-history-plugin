@@ -34,7 +34,6 @@ import hudson.model.Action;
 import hudson.plugins.jobConfigHistory.SideBySideView.Line;
 import hudson.security.AccessControlled;
 import hudson.util.MultipartFormDataParser;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.StaplerResponse2;
@@ -375,15 +374,15 @@ public abstract class JobConfigHistoryBaseAction implements Action {
             patch.getDeltas().removeAll(deltasToBeRemovedAfterTheMainLoop);
         }
 
-        return StringUtils.join(
+        return String.join(
+                "\n",
                 UnifiedDiffUtils.generateUnifiedDiff(
                         file1.getPath(),
                         file2.getPath(),
                         Arrays.asList(file1Lines),
                         patch,
                         3
-                ),
-                "\n"
+                )
         ) + "\n";
     }
 
