@@ -30,7 +30,6 @@ import com.github.difflib.patch.DiffException;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.text.DiffRow;
 import com.github.difflib.text.DiffRowGenerator;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 
@@ -172,37 +171,39 @@ public class GetDiffLines {
             final SideBySideView.Line line = new SideBySideView.Line();
             final SideBySideView.Line.Item left = line.getLeft();
             final SideBySideView.Line.Item right = line.getRight();
+            String oldLine = row.getOldLine();
+            String newLine = row.getNewLine();
             if (tag == DiffRow.Tag.INSERT) {
                 left.setCssClass("diff_original");
                 right.setLineNumber(rightPos);
-                right.setText(row.getNewLine());
+                right.setText(newLine);
                 right.setCssClass("diff_revised");
                 rightPos++;
             } else if (tag == DiffRow.Tag.CHANGE) {
-                if (StringUtils.isNotEmpty(row.getOldLine())) {
+                if (oldLine != null && !oldLine.isEmpty()) {
                     left.setLineNumber(leftPos);
-                    left.setText(row.getOldLine());
+                    left.setText(oldLine);
                     leftPos++;
                 }
                 left.setCssClass("diff_original");
-                if (StringUtils.isNotEmpty(row.getNewLine())) {
+                if (newLine != null && !newLine.isEmpty()) {
                     right.setLineNumber(rightPos);
-                    right.setText(row.getNewLine());
+                    right.setText(newLine);
                     rightPos++;
                 }
                 right.setCssClass("diff_revised");
             } else if (tag == DiffRow.Tag.DELETE) {
                 left.setLineNumber(leftPos);
-                left.setText(row.getOldLine());
+                left.setText(oldLine);
                 left.setCssClass("diff_original");
                 leftPos++;
                 right.setCssClass("diff_revised");
             } else if (tag == DiffRow.Tag.EQUAL) {
                 left.setLineNumber(leftPos);
-                left.setText(row.getOldLine());
+                left.setText(oldLine);
                 leftPos++;
                 right.setLineNumber(rightPos);
-                right.setText(row.getNewLine());
+                right.setText(newLine);
                 rightPos++;
             } else {
                 throw new IllegalStateException("Unknown tag pattern: " + tag);

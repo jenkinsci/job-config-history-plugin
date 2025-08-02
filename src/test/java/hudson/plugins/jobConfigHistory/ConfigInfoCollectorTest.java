@@ -25,7 +25,6 @@
 package hudson.plugins.jobConfigHistory;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -134,7 +133,7 @@ class ConfigInfoCollectorTest {
         result.sort(ParsedDateComparator.DESCENDING);
         assertEquals(noOfHistoryItems,
                 result.size(),
-                StringUtils.join(result, "\n"));
+                String.join("\n", result.stream().map(ConfigInfo::toString).toList()));
     }
 
     private ConfigInfoCollector createSut(final String type) {

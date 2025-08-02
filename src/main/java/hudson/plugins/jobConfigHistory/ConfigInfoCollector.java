@@ -23,12 +23,11 @@
  */
 package hudson.plugins.jobConfigHistory;
 
-import org.apache.commons.lang.ArrayUtils;
+import java.util.stream.Stream;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -134,15 +133,16 @@ final class ConfigInfoCollector {
      */
     public List<ConfigInfo> collect(final String folderName)
             throws IOException {
-        final File[] itemDirs;
+        final List<File> itemDirs = new ArrayList<>();
         if ("deleted".equals(type)) {
-            itemDirs = overViewhistoryDao.getDeletedJobs(folderName);
+            itemDirs.addAll(List.of(overViewhistoryDao.getDeletedJobs(folderName)));
         } else {
-            itemDirs = (File[]) ArrayUtils.addAll(
-                    overViewhistoryDao.getDeletedJobs(folderName),
-                    overViewhistoryDao.getJobs(folderName));
+            itemDirs.addAll(Stream.concat(
+                    Stream.of(overViewhistoryDao.getDeletedJobs(folderName)),
+                    Stream.of(overViewhistoryDao.getJobs(folderName))
+            ).toList());
         }
-        Arrays.sort(itemDirs, FileNameComparator.INSTANCE);
+        itemDirs.sort(FileNameComparator.INSTANCE);
         for (final File itemDir : itemDirs) {
             getConfigsForType(itemDir, folderName);
         }
@@ -150,15 +150,16 @@ final class ConfigInfoCollector {
     }
 
     public List<ConfigInfo> collect() throws IOException {
-        final File[] itemDirs;
+        final List<File> itemDirs = new ArrayList<>();
         if ("deleted".equals(type)) {
-            itemDirs = overViewhistoryDao.getDeletedJobs();
+            itemDirs.addAll(List.of(overViewhistoryDao.getDeletedJobs()));
         } else {
-            itemDirs = (File[]) ArrayUtils.addAll(
-                    overViewhistoryDao.getDeletedJobs(),
-                    overViewhistoryDao.getJobs());
+            itemDirs.addAll(Stream.concat(
+                    Stream.of(overViewhistoryDao.getDeletedJobs()),
+                    Stream.of(overViewhistoryDao.getJobs())
+            ).toList());
         }
-        Arrays.sort(itemDirs, FileNameComparator.INSTANCE);
+        itemDirs.sort(FileNameComparator.INSTANCE);
 
         for (final File itemDir : itemDirs) {
             String folderName = getFolderName(itemDir);
@@ -175,7 +176,7 @@ final class ConfigInfoCollector {
             while (nextAncestor.isDirectory() && !nextAncestor.toString().equals(jobConfigHistoryJobDirection.toString())) {
 
                 folderName.insert(0, nextAncestor.getName()
-                        + ((folderName.length() == 0) ? "" : "/"));
+                        + ((folderName.isEmpty()) ? "" : "/"));
 
                 nextAncestor = nextAncestor.getParentFile();
             }
