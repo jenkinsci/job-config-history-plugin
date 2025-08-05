@@ -25,7 +25,6 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
 import hudson.model.PeriodicWork;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.text.ParseException;
@@ -111,7 +110,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     protected void doRun() {
         final String maxAgeString = plugin.getMaxDaysToKeepEntries();
         int maxAge;
-        if (StringUtils.isNotEmpty(maxAgeString)) {
+        if (maxAgeString != null && !maxAgeString.isEmpty()) {
             try {
                 maxAge = Integer.parseInt(maxAgeString);
                 if (maxAge > 0) {
