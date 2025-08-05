@@ -8,7 +8,10 @@ import org.htmlunit.html.HtmlPage;
 import hudson.model.FreeStyleProject;
 import hudson.security.HudsonPrivateSecurityRealm;
 import hudson.security.LegacyAuthorizationStrategy;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.jvnet.hudson.test.recipes.LocalData;
@@ -26,19 +29,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WithJenkins
-class JobConfigHistoryRootActionIT
-        extends
-        AbstractHudsonTestCaseDeletingInstanceDir {
+@Execution(ExecutionMode.SAME_THREAD)
+class JobConfigHistoryRootActionIT {
 
     // we need to sleep between saves so we don't overwrite the history
     // directories
     // (which are saved with a granularity of one second)
     private static final int SLEEP_TIME = 1100;
     private JenkinsRule.WebClient webClient;
+    private JenkinsRule rule;
 
-    @Override
+    @BeforeEach
     void setUp(JenkinsRule rule) throws Exception {
-        super.setUp(rule);
+        this.rule = rule;
         webClient = rule.createWebClient();
         Logger.getLogger("org.htmlunit").setLevel(Level.OFF);
         Logger.getLogger("").setLevel(Level.WARNING);

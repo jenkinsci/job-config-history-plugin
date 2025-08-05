@@ -25,6 +25,7 @@ package hudson.plugins.jobConfigHistory;
 
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.Functions;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
@@ -33,7 +34,6 @@ import hudson.model.Node;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.SystemUtils;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -386,11 +386,11 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         if (historyRootDir != null) {
             final String jobsStr;
             final File newHistoryDir = getHistoryDir(item);
-            if (SystemUtils.IS_OS_UNIX) {
-                jobsStr = "/jobs/";
-            } else {
+            if (Functions.isWindows()) {
                 //windows
                 jobsStr = "\\jobs\\";
+            } else {
+                jobsStr = "/jobs/";
             }
             final File oldHistoryDir = new File(newHistoryDir.getAbsolutePath()
                     .replaceFirst(
@@ -1046,7 +1046,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     public void createNewNode(final Node node) {
         final String content = Jenkins.XSTREAM2.toXML(node);
         createNewHistoryEntryAndSaveConfig(node, content,
-                Messages.ConfigHistoryListenerHelper_CREATED(), null, null);
+                Messages.ConfigHistoryListenerHelper_CREATED(), null, null, Optional.empty());
     }
 
     /**
@@ -1057,10 +1057,12 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @param operation operation.
      */
     private void createNewHistoryEntryAndSaveConfig(final Node node,
-                                                    final String content, final String operation, final String newName,
-                                                    final String oldName) {
+                                                    final String content,
+                                                    final String operation, final String newName,
+                                                    final String oldName,
+                                                    final Optional<String> changeReasonCommentOptional) {
         final File timestampedDir = createNewHistoryEntry(node, operation,
-                newName, oldName, null);
+                newName, oldName, changeReasonCommentOptional.orElse(null));
         final File nodeConfigHistoryFile = new File(timestampedDir,
                 "config.xml");
         try (PrintStream stream = new PrintStream(nodeConfigHistoryFile, StandardCharsets.UTF_8)) {
@@ -1128,7 +1130,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
         final String content = Jenkins.XSTREAM2.toXML(node);
         createNewHistoryEntryAndSaveConfig(node, content,
                 Messages.ConfigHistoryListenerHelper_RENAMED(), newName,
-                oldName);
+                oldName, Optional.empty());
     }
 
     @Override
@@ -1284,9 +1286,10 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
     @Override
     public void saveNode(final Node node) {
         final String content = Jenkins.XSTREAM2.toXML(node);
+        Optional<String> changeReasonCommentOptional = NodeLocalConfiguration.lastChangeReasonComment(node);
         if (checkDuplicate(node)) {
             createNewHistoryEntryAndSaveConfig(node, content,
-                    Messages.ConfigHistoryListenerHelper_CHANGED(), null, null);
+                    Messages.ConfigHistoryListenerHelper_CHANGED(), null, null, changeReasonCommentOptional);
         }
     }
 

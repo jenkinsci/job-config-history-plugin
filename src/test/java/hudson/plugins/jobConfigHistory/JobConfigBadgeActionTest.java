@@ -35,6 +35,8 @@ import hudson.security.ACL;
 import jenkins.model.Jenkins;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
@@ -57,6 +59,7 @@ import static org.mockito.Mockito.when;
  * @author Mirko Friedenhagen
  */
 @WithJenkins
+@Execution(ExecutionMode.SAME_THREAD)
 class JobConfigBadgeActionTest {
 
     private final Build mockedBuild = mock(Build.class);

@@ -61,6 +61,9 @@
                           <b>${%User}:</b>
                           <a class="jenkins-table__link jenkins-!-margin-left-2" href="${rootURL}/user/${it.getUserID(1)}">${it.getUser(1)}</a>
                         </div>
+                        <j:if test="${it.hasChangeReasonComment(1)}">
+                          <div><b>${%Change Reason}:</b> <span class="describedElement jenkins-!-margin-left-2">${it.getChangeReasonComment(1)}</span> </div>
+                        </j:if>
                       </div>
                     </th>
 
@@ -83,6 +86,9 @@
                             <b>${%User}:</b>
                             <a class="jenkins-table__link jenkins-!-margin-left-2" href="${rootURL}/user/${it.getUserID(2)}">${it.getUser(2)}</a>
                         </div>
+                        <j:if test="${it.hasChangeReasonComment(2)}">
+                          <div><b>${%Change Reason}:</b> <span class="describedElement jenkins-!-margin-left-2">${it.getChangeReasonComment(2)}</span> </div>
+                        </j:if>
                       </div>
                     </th>
                   </tr>

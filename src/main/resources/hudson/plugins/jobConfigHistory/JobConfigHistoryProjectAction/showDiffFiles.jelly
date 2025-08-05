@@ -68,7 +68,7 @@
                         </j:if>
 
                         <j:if test="${it.hasChangeReasonComment(1)}">
-                          <div><b>${%Change Reason}:</b><span class="describedElement">${it.getChangeReasonComment(1)}</span> </div>
+                          <div><b>${%Change Reason}:</b> <span class="describedElement jenkins-!-margin-left-2">${it.getChangeReasonComment(1)}</span> </div>
                         </j:if>
                       </div>
                     </th>
@@ -98,7 +98,7 @@
 
                         </div>
                         <j:if test="${it.hasChangeReasonComment(2)}">
-                          <div><b>${%Change Reason}:</b><span class="describedElement">${it.getChangeReasonComment(2)}</span> </div>
+                          <div><b>${%Change Reason}:</b> <span class="describedElement jenkins-!-margin-left-2">${it.getChangeReasonComment(2)}</span> </div>
                         </j:if>
                       </div>
                     </th>

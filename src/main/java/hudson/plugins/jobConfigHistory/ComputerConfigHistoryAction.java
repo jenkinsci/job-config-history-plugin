@@ -333,6 +333,17 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
         return getHistoryDao().getRevisions(this.agent).get(getTimestamp(timestamp)).getUserID();
     }
 
+    public final String getChangeReasonComment(int timestamp) {
+        checkConfigurePermission();
+        return getHistoryDao().getRevisions(this.agent).get(getTimestamp(timestamp)).getChangeReasonComment();
+    }
+
+    public final boolean hasChangeReasonComment(int timestamp) {
+        checkConfigurePermission();
+        final String comment = getHistoryDao().getRevisions(this.agent).get(getTimestamp(timestamp)).getChangeReasonComment();
+        return comment != null && !comment.isEmpty();
+    }
+
     /**
      * Used in the Difference jelly only. Returns the operation made on one of
      * the two Files A and B. timestampNumber decides which file exactly.

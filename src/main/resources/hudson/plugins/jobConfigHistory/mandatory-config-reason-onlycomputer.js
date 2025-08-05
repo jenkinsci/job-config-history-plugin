@@ -85,10 +85,14 @@ Behaviour.specify('INPUT.change-reason-comment', 'ConfigHistoryInit', -999, func
     jchpLib.init.bind(jchpLib)(e);
 });
 
-Behaviour.specify('FORM', 'ConfigHistoryForm', -999, function (e) {
-    e.addEventListener('formdata', jchpLib.handleFormData.bind(jchpLib));
-});
+const re = /^\/computer\/[^\/]+\/configure$/;
+// Only install our hooks if we are on a computer config page
+if (re.test(window.location.pathname.replace(new RegExp("^" + document.head.dataset.rooturl), ''))) {
+    Behaviour.specify('FORM', 'ConfigHistoryForm', -999, function (e) {
+        e.addEventListener('formdata', jchpLib.handleFormData.bind(jchpLib));
+    });
 
-Behaviour.specify('div.bottom-sticker-inner > button.jenkins-button', 'ConfigHistory', -999, function (e) {
-    e.addEventListener('click', jchpLib.handleClick.bind(jchpLib));
-});
+    Behaviour.specify('div.bottom-sticker-inner > button.jenkins-button', 'ConfigHistory', -999, function (e) {
+        e.addEventListener('click', jchpLib.handleClick.bind(jchpLib));
+    });
+}
