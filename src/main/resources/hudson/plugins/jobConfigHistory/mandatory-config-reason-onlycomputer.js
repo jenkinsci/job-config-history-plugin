@@ -6,9 +6,11 @@ window.jchpLib = window.jchpLib || {
     'mandatory': false,
     'dlgMsg': 'defaultDialogMessage',
     'dlgCancel': 'defaultCancel',
+    'disabled': false,
 
     'init': function(e) {
-        this.reason = e;
+        this.reason = e.querySelector("INPUT.change-reason-comment");
+        this.disabled = e.dataset.enabled == 'false';
         this.mandatory = e.dataset.mandatory == 'true';
         this.dlgMsg = e.dataset.dialogMessage;
         if (!this.mandatory) {
@@ -17,18 +19,17 @@ window.jchpLib = window.jchpLib || {
         this.dlgCancel = e.dataset.dialogCancel;
         // Hide corresponding parent optional container in node config and check the
         // corresponding checkbox in order to get the change message actually submitted.
-        var p = e.parentElement;
-        while (null != p) {
-            if (p.classList.contains('optionalBlock-container') && p.tagName == 'DIV') {
-                p.style.display = 'none';
-                var cb = p.querySelector('INPUT.optional-block-control');
-                if (null != cb) {
-                    cb.checked = true;
-                    cb.dispatchEvent(new Event('click'));
-                }
-                break;
+        var p = e.closest('DIV.optionalBlock-container');
+        if (p != null) {
+            p.style.display = 'none';
+            var cb = p.querySelector('INPUT.optional-block-control');
+            if (null != cb) {
+              if (e.dataset.enabled == 'true') {
+                cb.checked = true;
+              } else {
+                cb.checked = false;
+              }
             }
-            p = p.parentElement;
         }
     },
 
@@ -42,6 +43,9 @@ window.jchpLib = window.jchpLib || {
     },
 
     'handleClick': function(e) {
+        if (this.disabled) {
+          return;
+        }
         var button = e.target;
         var isSubmit = button.classList.contains('jenkins-submit-button');
         if (this.reasonNeedsReset) {
@@ -81,7 +85,7 @@ window.jchpLib = window.jchpLib || {
     }
 };
 
-Behaviour.specify('INPUT.change-reason-comment', 'ConfigHistoryInit', -999, function (e) {
+Behaviour.specify('DIV.change-reason-container', 'ConfigHistoryInit', -999, function (e) {
     jchpLib.init.bind(jchpLib)(e);
 });
 

@@ -1,13 +1,16 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
-  <j:if test="${descriptor.isDialogEnabled()}">
-    <f:invisibleEntry>
-      <f:textbox field="changeReasonComment" clazz="change-reason-comment ignore-dirty"
-        data-mandatory="${descriptor.getChangeReasonCommentIsMandatory()}"
-        data-dialog-message="${%Please provide a change message}"
-        data-dialog-cancel="${%Cancel}"
-        data-dialog-optional="(${%optional})"/>
-    </f:invisibleEntry>
+  <div class="change-reason-container"
+       data-mandatory="${descriptor.getChangeReasonCommentIsMandatory()}"
+       data-dialog-message="${%Please provide a change message}"
+       data-dialog-cancel="${%Cancel}"
+       data-dialog-optional="(${%optional})"
+       data-enabled="${descriptor.isDialogEnabled()}">
+    <j:if test="${descriptor.isDialogEnabled()}">
+      <f:invisibleEntry>
+        <f:textbox field="changeReasonComment" clazz="change-reason-comment ignore-dirty"/>
+      </f:invisibleEntry>
+    </j:if>
     <st:adjunct includes="hudson.plugins.jobConfigHistory.mandatory-config-reason-onlycomputer"/>
-  </j:if>
+  </div>
 </j:jelly>

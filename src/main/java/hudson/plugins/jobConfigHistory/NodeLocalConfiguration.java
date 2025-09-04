@@ -75,7 +75,7 @@ public class NodeLocalConfiguration extends NodeProperty<Node> {
             if (isApplicable(n)) {
                 lastChangeReasonCommentByNode.put(n, Util.fixEmptyAndTrim(nlc.changeReasonComment));
             }
-            return null;
+            return nlc;
         }
 
         @Override
