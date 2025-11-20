@@ -134,6 +134,7 @@ public class JobConfigHistoryPurger extends PeriodicWork {
     void purgeHistoryByAge() {
         purgeSystemOrJobHistory(overviewHistoryDao.getSystemConfigs());
         purgeSystemOrJobHistory(overviewHistoryDao.getJobs(""));
+        purgeSystemOrJobHistory(overviewHistoryDao.getDeletedJobs(""));
     }
 
     /**

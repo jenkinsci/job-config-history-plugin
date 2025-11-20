@@ -6,7 +6,9 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -122,6 +124,34 @@ class JobConfigHistoryPurgerTest {
         File[] itemDirs = {newFolder};
         sut.purgeSystemOrJobHistory(itemDirs);
         assertTrue(newFolder.exists());
+    }
+
+
+    @Test
+    void testPurgeHistoryByAgeIncludesDeletedJobs() {
+        File[] systemDirs = { new File("sys") };
+        File[] jobDirs = { new File("job") };
+        File[] deletedJobDirs = { new File("job_deleted_20200101_000000_000") };
+
+        when(mockedOverviewDao.getSystemConfigs()).thenReturn(systemDirs);
+        when(mockedOverviewDao.getJobs("")).thenReturn(jobDirs);
+        when(mockedOverviewDao.getDeletedJobs("")).thenReturn(deletedJobDirs);
+
+        List<File[]> purged = new ArrayList<>();
+
+        JobConfigHistoryPurger sut = new JobConfigHistoryPurger(mockedPlugin, mockedDao, mockedOverviewDao) {
+            @Override
+            void purgeSystemOrJobHistory(File[] itemDirs) {
+                purged.add(itemDirs);
+            }
+        };
+
+        sut.purgeHistoryByAge();
+
+        assertEquals(3, purged.size());
+        assertTrue(purged.contains(systemDirs));
+        assertTrue(purged.contains(jobDirs));
+        assertTrue(purged.contains(deletedJobDirs));
     }
 
     @Test
