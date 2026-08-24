@@ -235,11 +235,6 @@ class JobConfigHistoryBaseActionTest {
         }
 
         @Override
-        public boolean hasAdminPermission() {
-            return false;
-        }
-
-        @Override
         public boolean hasDeleteEntryPermission() {
             return getAccessControlledObject().hasPermission(JobConfigHistory.DELETEENTRY_PERMISSION);
         }

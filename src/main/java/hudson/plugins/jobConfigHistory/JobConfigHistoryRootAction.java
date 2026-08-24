@@ -492,11 +492,6 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
     }
 
     @Override
-    public boolean hasAdminPermission() {
-        return getAccessControlledObject().hasPermission(Jenkins.ADMINISTER);
-    }
-
-    @Override
     public boolean hasDeleteEntryPermission() {
         return getAccessControlledObject().hasPermission(JobConfigHistory.DELETEENTRY_PERMISSION);
     }
