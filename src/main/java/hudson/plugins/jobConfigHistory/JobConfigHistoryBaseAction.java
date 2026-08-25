@@ -152,8 +152,6 @@ public abstract class JobConfigHistoryBaseAction implements Action {
      */
     protected abstract void checkConfigurePermission();
 
-    public abstract boolean hasAdminPermission();
-
     public abstract boolean hasDeleteEntryPermission();
 
     protected abstract void checkDeleteEntryPermission();
