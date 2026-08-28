@@ -23,6 +23,7 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.XmlFile;
 import hudson.maven.MavenModule;
 import hudson.model.AbstractItem;
@@ -243,11 +244,17 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
      * {@inheritDoc} Returns the project.
      */
     @Override
+    @SuppressFBWarnings(
+            value = "IAOM_DO_NOT_INCREASE_METHOD_ACCESSIBILITY",
+            justification = "Preserve the established public API while implementing a protected base hook.")
     public AccessControlled getAccessControlledObject() {
         return project;
     }
 
     @Override
+    @SuppressFBWarnings(
+            value = "IAOM_DO_NOT_INCREASE_METHOD_ACCESSIBILITY",
+            justification = "Preserve the established public API while implementing a protected base hook.")
     public void checkConfigurePermission() {
         getAccessControlledObject().checkPermission(Item.CONFIGURE);
     }
@@ -263,6 +270,9 @@ public class JobConfigHistoryProjectAction extends JobConfigHistoryBaseAction {
     }
 
     @Override
+    @SuppressFBWarnings(
+            value = "IAOM_DO_NOT_INCREASE_METHOD_ACCESSIBILITY",
+            justification = "This method is public for use by Jelly views.")
     public boolean hasConfigurePermission() {
         return getAccessControlledObject().hasPermission(Item.CONFIGURE);
     }
