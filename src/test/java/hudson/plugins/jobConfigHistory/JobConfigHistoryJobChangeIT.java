@@ -186,7 +186,7 @@ public class JobConfigHistoryJobChangeIT {
         assertNotNull(input, "input element");
         assertFalse(input.isDisplayed(), "input is visible");
         assertTrue(input.hasAttributes(), "input has attributes");
-        String expectedMandatoryAttribute = mandatory ? "true" : "false";
+        String expectedMandatoryAttribute = Boolean.toString(mandatory);
         assertEquals(expectedMandatoryAttribute, input.getAttribute("data-mandatory"));
         assertNotEquals("", input.getAttribute("data-dialog-message"));
         assertNotEquals("", input.getAttribute("data-dialog-cancel"));
