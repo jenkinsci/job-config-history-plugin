@@ -5,7 +5,6 @@ import org.htmlunit.html.HtmlPage;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import jenkins.model.Jenkins;
-import org.acegisecurity.context.SecurityContextHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -15,6 +14,7 @@ import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.jvnet.hudson.test.recipes.LocalData;
 import org.jvnet.hudson.test.recipes.PresetData;
 import org.jvnet.hudson.test.recipes.PresetData.DataSet;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -159,7 +159,7 @@ class JobConfigBadgeActionIT {
         rule.assertBuildStatus(Result.SUCCESS, project.scheduleBuild2(0).get());
 
         rule.jenkins.setSecurityRealm(rule.createDummySecurityRealm());
-        SecurityContextHolder.getContext().setAuthentication(Jenkins.ANONYMOUS);
+        SecurityContextHolder.getContext().setAuthentication(Jenkins.ANONYMOUS2);
         shouldPageContainBadge("anonymous");
     }
 

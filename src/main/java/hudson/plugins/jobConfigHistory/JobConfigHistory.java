@@ -129,7 +129,6 @@ public class JobConfigHistory extends GlobalConfiguration {
      */
     private boolean changeReasonCommentIsMandatory = false;
 
-    @DataBoundConstructor
     @Restricted(NoExternalUse.class)
     @SuppressFBWarnings(value = "MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR", justification = "The Descriptor#load documentation states that \"The constructor of the derived class must call this method\".")
     public JobConfigHistory() {

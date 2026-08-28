@@ -143,8 +143,8 @@ public class JobConfigHistoryJobChangeIT {
             ok.fireEvent("click");
             WebClientUtil.waitForJSExec(p.getWebClient());
             if (buttonLabel.equals("Apply")) {
-                dlg = p.querySelector("dialog.jenkins-dialog");
-                assertNull(dlg, "Dialog after it's ok button was clicked");
+                dlg = waitForDialogClose(p);
+                assertNull(dlg, "Dialog after it's ok button was clicked: " + (dlg == null ? "null" : dlg.getTextContent()));
             } else {
                 if (mandatory) {
                     // Form submissal would normally be done in our JS code
@@ -160,10 +160,50 @@ public class JobConfigHistoryJobChangeIT {
         } else {
             DomElement cancel = dlg.querySelector("button.jenkins-button[data-id='cancel']");
             assertNotNull(cancel, "Dialog's cancel button");
-            cancel.fireEvent("click");
-            dlg = p.querySelector("dialog.jenkins-dialog");
-            assertNull(dlg, "Dialog after it was cancelled");
+            cancel.click();
+            // cancel.fireEvent("click");
+            WebClientUtil.waitForJSExec(p.getWebClient());
+            dlg = waitForDialogClose(p);
+            System.out.println("Dialog after cancel: " + (dlg == null ? "null" : dlg.getTextContent()));
+            assertNull(dlg, "Dialog after it was cancelled:" + (dlg == null ? "null" : dlg.getTextContent()));
         }
+    }
+
+    /**
+     * Waits for our dialog to be removed from the DOM.
+     *
+     * The Jenkins core dialog implementation only removes the dialog node
+     * from the DOM once a CSS "animationend" event fires on it (it sets a
+     * "closing" attribute and waits for that event before calling
+     * dialog.remove()). HtmlUnit does not run real CSS animations, so that
+     * event is never dispatched natively. We first give the dialog a brief
+     * chance to close on its own (in case a future HtmlUnit version does
+     * support this), and otherwise dispatch a synthetic "animationend"
+     * event ourselves, so that the real application code performs the
+     * actual removal instead of us just deleting the node.
+     *
+     * @param p The page containing the dialog.
+     * @return The dialog element, or null if it was removed.
+     *
+     * @throws InterruptedException if interrupted while waiting.
+     */
+    private DomElement waitForDialogClose(HtmlPage p) throws InterruptedException {
+        DomElement dlg = p.querySelector("dialog.jenkins-dialog");
+        long start = System.currentTimeMillis();
+        long timeout = 1000; // ms
+        while (dlg != null && (System.currentTimeMillis() - start) < timeout) {
+            Thread.sleep(50);
+            WebClientUtil.waitForJSExec(p.getWebClient());
+            dlg = p.querySelector("dialog.jenkins-dialog");
+        }
+        if (dlg != null) {
+            p.executeJavaScript(
+                    "var d=document.querySelector('dialog.jenkins-dialog');"
+                    + "if(d){d.dispatchEvent(new Event('animationend'));}");
+            WebClientUtil.waitForJSExec(p.getWebClient());
+            dlg = p.querySelector("dialog.jenkins-dialog");
+        }
+        return dlg;
     }
 
     /**
@@ -186,7 +226,7 @@ public class JobConfigHistoryJobChangeIT {
         assertNotNull(input, "input element");
         assertFalse(input.isDisplayed(), "input is visible");
         assertTrue(input.hasAttributes(), "input has attributes");
-        String expectedMandatoryAttribute = mandatory ? "true" : "false";
+        String expectedMandatoryAttribute = Boolean.toString(mandatory);
         assertEquals(expectedMandatoryAttribute, input.getAttribute("data-mandatory"));
         assertNotEquals("", input.getAttribute("data-dialog-message"));
         assertNotEquals("", input.getAttribute("data-dialog-cancel"));

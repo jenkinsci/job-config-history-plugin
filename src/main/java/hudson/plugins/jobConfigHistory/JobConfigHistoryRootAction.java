@@ -744,7 +744,7 @@ public class JobConfigHistoryRootAction extends JobConfigHistoryBaseAction
         final String timestamp = req.getParameter("timestamp");
         final String name = req.getParameter("name");
         final File[] candidatesArray = (name.contains(DeletedFileFilter.DELETED_MARKER)) ? getOverviewHistoryDao().getDeletedJobs() : getOverviewHistoryDao().getSystemConfigs();
-        final List<File> candidates = Arrays.stream(candidatesArray).filter(file -> file.getName().equals(name)).collect(Collectors.toList());
+        final List<File> candidates = Arrays.stream(candidatesArray).filter(file -> file.getName().equals(name)).toList();
 
         if (candidates.size() == 1) {
             getHistoryDao().deleteRevision(candidates.get(0), timestamp);

@@ -1002,11 +1002,7 @@ public class FileHistoryDao extends JobConfigHistoryStrategy
      * @return an empty array when array is null.
      */
     private File[] returnEmptyFileArrayForNull(final File[] array) {
-        if (array != null) {
-            return array;
-        } else {
-            return new File[0];
-        }
+        return Objects.requireNonNullElseGet(array, () -> new File[0]);
     }
 
     @Override

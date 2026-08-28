@@ -159,22 +159,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
      */
     @Deprecated
     public final List<ConfigInfo> getSlaveConfigs() {
-        if (!hasConfigurePermission()) {
-            return Collections.emptyList();
-        }
-        final ArrayList<ConfigInfo> configs = new ArrayList<>();
-        final ArrayList<HistoryDescr> values = new ArrayList<>(getHistoryDao().getRevisions(agent).values());
-        for (final HistoryDescr historyDescr : values) {
-            final String timestamp = historyDescr.getTimestamp();
-            final XmlFile oldRevision = getHistoryDao().getOldRevision(agent, timestamp);
-            if (oldRevision.getFile() != null) {
-                configs.add(ConfigInfo.create(agent.getNodeName(), true, historyDescr, true));
-            } else if ("Deleted".equals(historyDescr.getOperation())) {
-                configs.add(ConfigInfo.create(agent.getNodeName(), false, historyDescr, true));
-            }
-        }
-        configs.sort(ParsedDateComparator.DESCENDING);
-        return configs;
+        return getAgentConfigs();
     }
 
     /**
@@ -274,7 +259,7 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     @Deprecated
     @Exported(name = "jobConfigHistory", visibility = 1)
     public final List<ConfigInfo> getSlaveConfigsREST() throws IOException {
-        return getSlaveConfigs();
+        return getAgentConfigs();
     }
 
     /**
