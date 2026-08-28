@@ -25,6 +25,7 @@ package hudson.plugins.jobConfigHistory;
 
 import static java.util.logging.Level.FINEST;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.XmlFile;
 import hudson.model.Api;
 import hudson.model.Computer;
@@ -134,6 +135,9 @@ public class ComputerConfigHistoryAction extends JobConfigHistoryBaseAction {
     }
 
     @Override
+    @SuppressFBWarnings(
+            value = "IAOM_DO_NOT_INCREASE_METHOD_ACCESSIBILITY",
+            justification = "This method is public for use by Jelly views.")
     public boolean hasConfigurePermission() {
         return getAccessControlledObject().hasPermission(Computer.CONFIGURE);
     }
