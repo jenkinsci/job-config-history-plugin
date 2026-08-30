@@ -43,14 +43,16 @@ class GetDiffLinesTest {
     void getterShouldReturnCorrectly() throws IOException, DiffException {
         GetDiffLines sut = createGetDiffLines();
         List<SideBySideView.Line> result = sut.get();
-        assertEquals(24, result.size());
+        assertEquals(26, result.size());
         SideBySideView.Line firstLine = result.get(0);
+        assertEquals("30", firstLine.getLeft().getLineNumber());
+        assertEquals("30", firstLine.getRight().getLineNumber());
         assertEquals("import bmsi.util.Diff;", firstLine.getLeft().getText());
         assertEquals("import bmsi.util.Diff;", firstLine.getRight().getText());
         SideBySideView.Line fourthLine = result.get(3);
         final SideBySideView.Line.Item left = fourthLine.getLeft();
         final SideBySideView.Line.Item right = fourthLine.getRight();
-        assertEquals("3", right.getLineNumber());
+        assertEquals("33", right.getLineNumber());
         assertNull(left.getText());
         assertEquals("import org.kohsuke.stapler.StaplerRequest2;",
                 right.getText());
