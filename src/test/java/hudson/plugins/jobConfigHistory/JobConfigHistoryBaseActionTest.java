@@ -131,7 +131,7 @@ class JobConfigHistoryBaseActionTest {
         final List<String> lines = TUtils.readResourceLines(resourceName);
         JobConfigHistoryBaseAction sut = new JobConfigHistoryBaseActionImpl();
         List<SideBySideView.Line> result = sut.getDiffLines(lines);
-        assertEquals(24, result.size());
+        assertEquals(26, result.size());
     }
 
     @Test
