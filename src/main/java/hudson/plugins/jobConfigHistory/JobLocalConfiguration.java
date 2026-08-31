@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest2;
 
 import java.util.logging.Logger;
@@ -27,8 +28,18 @@ public class JobLocalConfiguration extends JobProperty<Job<?, ?>> {
 
     private static final Map<File, String> lastChangeReasonCommentByXmlFile = Collections.synchronizedMap(new HashMap<>());
 
+    static final String CHANGE_REASON_HEADER = "X-Job-Config-History-Change-Reason";
+
     static Optional<String> lastChangeReasonComment(XmlFile file) {
-        return Optional.ofNullable(lastChangeReasonCommentByXmlFile.remove(file.getFile()));
+        String fromMap = lastChangeReasonCommentByXmlFile.remove(file.getFile());
+        if (fromMap != null) {
+            return Optional.of(fromMap);
+        }
+        StaplerRequest2 request = Stapler.getCurrentRequest2();
+        if (request != null) {
+            return Optional.ofNullable(Util.fixEmptyAndTrim(request.getHeader(CHANGE_REASON_HEADER)));
+        }
+        return Optional.empty();
     }
 
     private final String changeReasonComment;

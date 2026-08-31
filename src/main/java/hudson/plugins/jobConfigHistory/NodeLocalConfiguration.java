@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest2;
 
 import java.util.logging.Logger;
@@ -28,7 +29,15 @@ public class NodeLocalConfiguration extends NodeProperty<Node> {
     private static final Map<Node, String> lastChangeReasonCommentByNode = Collections.synchronizedMap(new HashMap<>());
 
     static Optional<String> lastChangeReasonComment(Node node) {
-        return Optional.ofNullable(lastChangeReasonCommentByNode.remove(node));
+        String fromMap = lastChangeReasonCommentByNode.remove(node);
+        if (fromMap != null) {
+            return Optional.of(fromMap);
+        }
+        StaplerRequest2 request = Stapler.getCurrentRequest2();
+        if (request != null) {
+            return Optional.ofNullable(Util.fixEmptyAndTrim(request.getHeader(JobLocalConfiguration.CHANGE_REASON_HEADER)));
+        }
+        return Optional.empty();
     }
 
     private final String changeReasonComment;

@@ -3,8 +3,10 @@
  */
 package hudson.plugins.jobConfigHistory;
 
+import org.htmlunit.HttpMethod;
 import org.htmlunit.WebAssert;
 import org.htmlunit.WebClientUtil;
+import org.htmlunit.WebRequest;
 import org.htmlunit.html.DomNode;
 import org.htmlunit.html.DomElement;
 import org.htmlunit.html.HtmlButton;
@@ -29,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import hudson.model.FreeStyleProject;
 import jenkins.model.Jenkins;
 
+import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -416,5 +419,29 @@ public class JobConfigHistoryJobChangeIT {
         assertEquals("SYSTEM", cilist.get(1).getUser(), "user");
         assertEquals("SYSTEM", cilist.get(1).getUserID(), "userId");
         assertEquals("Created", cilist.get(1).getOperation(), "operation");
+    }
+
+    @Test
+    public void testRestApiChangeReasonHeader(JenkinsRule j) throws Exception {
+        LOGGER.info("Running " + boldWhite("#testRestApiChangeReasonHeader"));
+        j.jenkins.setCrumbIssuer(null);
+        FreeStyleProject project = j.createFreeStyleProject();
+        // Modify the config so the duplicate-check passes and a history entry is created.
+        String configXml = project.getConfigFile().asString()
+                .replace("<description/>", "<description>changed via REST</description>");
+
+        URL url = new java.net.URL(j.getURL() + project.getUrl() + "config.xml");
+        WebRequest request = new WebRequest(url, HttpMethod.POST);
+        request.setAdditionalHeader("Content-Type", "application/xml");
+        request.setAdditionalHeader(JobLocalConfiguration.CHANGE_REASON_HEADER, "automated by script");
+        request.setRequestBody(configXml);
+
+        j.createWebClient().getPage(request);
+
+        JobConfigHistoryProjectAction ha = new JobConfigHistoryProjectAction(project);
+        List<ConfigInfo> cilist = ha.getJobConfigs();
+        assertEquals(1, getCreatedIndex(cilist), "Index of 'Created' entry in history list");
+        assertEquals("automated by script", cilist.get(0).getChangeReasonComment(), "changeReason");
+        assertEquals("Changed", cilist.get(0).getOperation(), "operation");
     }
 }
