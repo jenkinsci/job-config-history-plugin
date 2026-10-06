@@ -57,8 +57,12 @@ public final class JobConfigHistoryConsts {
     public static final String HISTORY_FILE = "history.xml";
     /**
      * Default regexp pattern of configuration files not to save.
+     * <dl>
+     *     <dt>com.cloudbees.jenkins.support.filter.ContentMappings.xml</dt>
+     *     <dd><code>support-core</code> generated anonymization mappings. Frequent changes. Little value to the user in keeping the history.</dd>
+     * </dl>
      */
-    public static final String DEFAULT_EXCLUDE = "queue\\.xml|nodeMonitors\\.xml|UpdateCenter\\.xml|global-build-stats|LockableResourcesManager\\.xml|MilestoneStep\\.xml|cloudbees-disk-usage-simple\\.xml";
+    public static final String DEFAULT_EXCLUDE = "queue\\.xml|nodeMonitors\\.xml|UpdateCenter\\.xml|global-build-stats|LockableResourcesManager\\.xml|MilestoneStep\\.xml|cloudbees-disk-usage-simple\\.xml|com\\.cloudbees\\.jenkins\\.support\\.filter\\.ContentMappings\\.xml";
     /**
      * Format for timestamped dirs.
      */
